@@ -1,0 +1,191 @@
+{
+  "overall_metrics": {
+    "total_samples": 323,
+    "valid_predictions": 256,
+    "accuracy": 0.62109375
+  },
+  "predicate_statistics": {
+    "overlaps": {
+      "frequency": 9,
+      "total_samples": 31,
+      "accuracy": 0.2903225806451613,
+      "entropy": 1.8971590210156397
+    },
+    "disjoint": {
+      "frequency": 41,
+      "total_samples": 59,
+      "accuracy": 0.6949152542372882,
+      "entropy": 1.3451281342033379
+    },
+    "crosses": {
+      "frequency": 2,
+      "total_samples": 11,
+      "accuracy": 0.18181818181818182,
+      "entropy": 2.0403733936884962
+    },
+    "within": {
+      "frequency": 63,
+      "total_samples": 67,
+      "accuracy": 0.9402985074626866,
+      "entropy": 0.4158110534354629
+    },
+    "contains": {
+      "frequency": 13,
+      "total_samples": 14,
+      "accuracy": 0.9285714285714286,
+      "entropy": 0.37123232664087563
+    },
+    "touches": {
+      "frequency": 31,
+      "total_samples": 74,
+      "accuracy": 0.4189189189189189,
+      "entropy": 2.1040382957577553
+    }
+  },
+  "conversion_pair_analysis": [
+    {
+      "expected_relation": "contains",
+      "total_samples": 14,
+      "correct_predictions": 13,
+      "accuracy": 0.9285714285714286,
+      "entropy": 0.37123232664087563,
+      "predicted_distribution": {
+        "contains": 13,
+        "touches": 1
+      }
+    },
+    {
+      "expected_relation": "within",
+      "total_samples": 67,
+      "correct_predictions": 63,
+      "accuracy": 0.9402985074626866,
+      "entropy": 0.4158110534354629,
+      "predicted_distribution": {
+        "within": 63,
+        "overlaps": 2,
+        "contains": 1,
+        "touches": 1
+      }
+    },
+    {
+      "expected_relation": "touches",
+      "total_samples": 74,
+      "correct_predictions": 31,
+      "accuracy": 0.4189189189189189,
+      "entropy": 2.1040382957577553,
+      "predicted_distribution": {
+        "touches": 31,
+        "disjoint": 15,
+        "contains": 11,
+        "within": 11,
+        "overlaps": 6
+      }
+    },
+    {
+      "expected_relation": "disjoint",
+      "total_samples": 59,
+      "correct_predictions": 41,
+      "accuracy": 0.6949152542372882,
+      "entropy": 1.3451281342033379,
+      "predicted_distribution": {
+        "disjoint": 41,
+        "contains": 11,
+        "within": 4,
+        "touches": 2,
+        "overlaps": 1
+      }
+    },
+    {
+      "expected_relation": "overlaps",
+      "total_samples": 31,
+      "correct_predictions": 9,
+      "accuracy": 0.2903225806451613,
+      "entropy": 1.8971590210156397,
+      "predicted_distribution": {
+        "within": 12,
+        "overlaps": 9,
+        "contains": 5,
+        "touches": 5
+      }
+    },
+    {
+      "expected_relation": "crosses",
+      "total_samples": 11,
+      "correct_predictions": 2,
+      "accuracy": 0.18181818181818182,
+      "entropy": 2.0403733936884962,
+      "predicted_distribution": {
+        "touches": 5,
+        "crosses": 2,
+        "disjoint": 2,
+        "within": 1,
+        "contains": 1
+      }
+    }
+  ],
+  "geometry_type_analysis": [
+    {
+      "geometry_pair": "MultiPolygon -> MultiPolygon",
+      "total_samples": 15,
+      "correct_predictions": 11,
+      "accuracy": 0.7333333333333333,
+      "entropy": 1.7055872616982601
+    },
+    {
+      "geometry_pair": "Polygon -> Polygon",
+      "total_samples": 128,
+      "correct_predictions": 73,
+      "accuracy": 0.5703125,
+      "entropy": 2.0638888620716744
+    },
+    {
+      "geometry_pair": "Polygon -> MultiPolygon",
+      "total_samples": 50,
+      "correct_predictions": 33,
+      "accuracy": 0.66,
+      "entropy": 1.9158320452319426
+    },
+    {
+      "geometry_pair": "MultiPolygon -> Polygon",
+      "total_samples": 51,
+      "correct_predictions": 39,
+      "accuracy": 0.7647058823529411,
+      "entropy": 2.022204882853244
+    },
+    {
+      "geometry_pair": "MultiPolygon -> Point",
+      "total_samples": 1,
+      "correct_predictions": 1,
+      "accuracy": 1.0,
+      "entropy": -0.0
+    },
+    {
+      "geometry_pair": "LineString -> MultiPolygon",
+      "total_samples": 2,
+      "correct_predictions": 1,
+      "accuracy": 0.5,
+      "entropy": 1.0
+    },
+    {
+      "geometry_pair": "linestring -> polygon",
+      "total_samples": 1,
+      "correct_predictions": 0,
+      "accuracy": 0.0,
+      "entropy": -0.0
+    },
+    {
+      "geometry_pair": "Polygon -> LineString",
+      "total_samples": 6,
+      "correct_predictions": 1,
+      "accuracy": 0.16666666666666666,
+      "entropy": 1.7924812503605778
+    },
+    {
+      "geometry_pair": "MultiPolygon -> LineString",
+      "total_samples": 2,
+      "correct_predictions": 0,
+      "accuracy": 0.0,
+      "entropy": -0.0
+    }
+  ]
+}
