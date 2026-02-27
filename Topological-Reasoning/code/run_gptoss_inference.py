@@ -1,15 +1,15 @@
-"""Run generation using the finetuned GPT-OSS adapter.
+"""Run generation using the finetuned GPT-OSS adapter (local inference).
 
 Usage example:
-  python run_gptoss_inference.py \
-    --base-model unsloth/gpt-oss-20b-bnb-4bit \
-    --adapter-dir ../Topological_Reasoning_GPTOSS_Standard/final_adapter \
-    --data ../dataset/triplet_update_v3_70.csv \
-    --output ../outputs/gptoss_preds.jsonl
+    python run_gptoss_inference.py \
+        --base-model unsloth/gpt-oss-20b-bnb-4bit \
+        --adapter-dir ../Topological_Reasoning_GPTOSS_Standard/final_adapter \
+        --data ../dataset/triplet_update_v3_70.csv \
+        --output ../outputs/gptoss_preds.jsonl
 
-The script loads the base model, applies the PEFT adapter, and generates answers
-for the dataset in batches. It includes guards for missing packages and prints
-helpful error messages when compatibility issues arise.
+This script loads the base model (unsloth/gpt-oss-20b-bnb-4bit) and applies the final adapter for local inference.
+No Ollama server is used; all inference is performed locally using Hugging Face Transformers and PEFT.
+It generates answers for the dataset in batches, includes guards for missing packages, and prints helpful error messages when compatibility issues arise.
 """
 
 import os
@@ -21,6 +21,11 @@ import torch
 from tqdm.auto import tqdm
 import shutil
 import re
+
+# Optionally set Hugging Face token for private model access
+HF_TOKEN = os.getenv("HF_TOKEN")
+if HF_TOKEN:
+    os.environ["HF_TOKEN"] = HF_TOKEN
 
 # Optional imports with friendly errors
 peft_err = None
