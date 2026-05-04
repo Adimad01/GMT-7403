@@ -1,0 +1,436 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        
+            <script>function neighbourhoodHighlight(params) {
+  // console.log("in nieghbourhoodhighlight");
+  allNodes = nodes.get({ returnType: "Object" });
+  // originalNodes = JSON.parse(JSON.stringify(allNodes));
+  // if something is selected:
+  if (params.nodes.length > 0) {
+    highlightActive = true;
+    var i, j;
+    var selectedNode = params.nodes[0];
+    var degrees = 2;
+
+    // mark all nodes as hard to read.
+    for (let nodeId in allNodes) {
+      // nodeColors[nodeId] = allNodes[nodeId].color;
+      allNodes[nodeId].color = "rgba(200,200,200,0.5)";
+      if (allNodes[nodeId].hiddenLabel === undefined) {
+        allNodes[nodeId].hiddenLabel = allNodes[nodeId].label;
+        allNodes[nodeId].label = undefined;
+      }
+    }
+    var connectedNodes = network.getConnectedNodes(selectedNode);
+    var allConnectedNodes = [];
+
+    // get the second degree nodes
+    for (i = 1; i < degrees; i++) {
+      for (j = 0; j < connectedNodes.length; j++) {
+        allConnectedNodes = allConnectedNodes.concat(
+          network.getConnectedNodes(connectedNodes[j])
+        );
+      }
+    }
+
+    // all second degree nodes get a different color and their label back
+    for (i = 0; i < allConnectedNodes.length; i++) {
+      // allNodes[allConnectedNodes[i]].color = "pink";
+      allNodes[allConnectedNodes[i]].color = "rgba(150,150,150,0.75)";
+      if (allNodes[allConnectedNodes[i]].hiddenLabel !== undefined) {
+        allNodes[allConnectedNodes[i]].label =
+          allNodes[allConnectedNodes[i]].hiddenLabel;
+        allNodes[allConnectedNodes[i]].hiddenLabel = undefined;
+      }
+    }
+
+    // all first degree nodes get their own color and their label back
+    for (i = 0; i < connectedNodes.length; i++) {
+      // allNodes[connectedNodes[i]].color = undefined;
+      allNodes[connectedNodes[i]].color = nodeColors[connectedNodes[i]];
+      if (allNodes[connectedNodes[i]].hiddenLabel !== undefined) {
+        allNodes[connectedNodes[i]].label =
+          allNodes[connectedNodes[i]].hiddenLabel;
+        allNodes[connectedNodes[i]].hiddenLabel = undefined;
+      }
+    }
+
+    // the main node gets its own color and its label back.
+    // allNodes[selectedNode].color = undefined;
+    allNodes[selectedNode].color = nodeColors[selectedNode];
+    if (allNodes[selectedNode].hiddenLabel !== undefined) {
+      allNodes[selectedNode].label = allNodes[selectedNode].hiddenLabel;
+      allNodes[selectedNode].hiddenLabel = undefined;
+    }
+  } else if (highlightActive === true) {
+    // console.log("highlightActive was true");
+    // reset all nodes
+    for (let nodeId in allNodes) {
+      // allNodes[nodeId].color = "purple";
+      allNodes[nodeId].color = nodeColors[nodeId];
+      // delete allNodes[nodeId].color;
+      if (allNodes[nodeId].hiddenLabel !== undefined) {
+        allNodes[nodeId].label = allNodes[nodeId].hiddenLabel;
+        allNodes[nodeId].hiddenLabel = undefined;
+      }
+    }
+    highlightActive = false;
+  }
+
+  // transform the object into an array
+  var updateArray = [];
+  if (params.nodes.length > 0) {
+    for (let nodeId in allNodes) {
+      if (allNodes.hasOwnProperty(nodeId)) {
+        // console.log(allNodes[nodeId]);
+        updateArray.push(allNodes[nodeId]);
+      }
+    }
+    nodes.update(updateArray);
+  } else {
+    // console.log("Nothing was selected");
+    for (let nodeId in allNodes) {
+      if (allNodes.hasOwnProperty(nodeId)) {
+        // console.log(allNodes[nodeId]);
+        // allNodes[nodeId].color = {};
+        updateArray.push(allNodes[nodeId]);
+      }
+    }
+    nodes.update(updateArray);
+  }
+}
+
+function filterHighlight(params) {
+  allNodes = nodes.get({ returnType: "Object" });
+  // if something is selected:
+  if (params.nodes.length > 0) {
+    filterActive = true;
+    let selectedNodes = params.nodes;
+
+    // hiding all nodes and saving the label
+    for (let nodeId in allNodes) {
+      allNodes[nodeId].hidden = true;
+      if (allNodes[nodeId].savedLabel === undefined) {
+        allNodes[nodeId].savedLabel = allNodes[nodeId].label;
+        allNodes[nodeId].label = undefined;
+      }
+    }
+
+    for (let i=0; i < selectedNodes.length; i++) {
+      allNodes[selectedNodes[i]].hidden = false;
+      if (allNodes[selectedNodes[i]].savedLabel !== undefined) {
+        allNodes[selectedNodes[i]].label = allNodes[selectedNodes[i]].savedLabel;
+        allNodes[selectedNodes[i]].savedLabel = undefined;
+      }
+    }
+
+  } else if (filterActive === true) {
+    // reset all nodes
+    for (let nodeId in allNodes) {
+      allNodes[nodeId].hidden = false;
+      if (allNodes[nodeId].savedLabel !== undefined) {
+        allNodes[nodeId].label = allNodes[nodeId].savedLabel;
+        allNodes[nodeId].savedLabel = undefined;
+      }
+    }
+    filterActive = false;
+  }
+
+  // transform the object into an array
+  var updateArray = [];
+  if (params.nodes.length > 0) {
+    for (let nodeId in allNodes) {
+      if (allNodes.hasOwnProperty(nodeId)) {
+        updateArray.push(allNodes[nodeId]);
+      }
+    }
+    nodes.update(updateArray);
+  } else {
+    for (let nodeId in allNodes) {
+      if (allNodes.hasOwnProperty(nodeId)) {
+        updateArray.push(allNodes[nodeId]);
+      }
+    }
+    nodes.update(updateArray);
+  }
+}
+
+function selectNode(nodes) {
+  network.selectNodes(nodes);
+  neighbourhoodHighlight({ nodes: nodes });
+  return nodes;
+}
+
+function selectNodes(nodes) {
+  network.selectNodes(nodes);
+  filterHighlight({nodes: nodes});
+  return nodes;
+}
+
+function highlightFilter(filter) {
+  let selectedNodes = []
+  let selectedProp = filter['property']
+  if (filter['item'] === 'node') {
+    let allNodes = nodes.get({ returnType: "Object" });
+    for (let nodeId in allNodes) {
+      if (allNodes[nodeId][selectedProp] && filter['value'].includes((allNodes[nodeId][selectedProp]).toString())) {
+        selectedNodes.push(nodeId)
+      }
+    }
+  }
+  else if (filter['item'] === 'edge'){
+    let allEdges = edges.get({returnType: 'object'});
+    // check if the selected property exists for selected edge and select the nodes connected to the edge
+    for (let edge in allEdges) {
+      if (allEdges[edge][selectedProp] && filter['value'].includes((allEdges[edge][selectedProp]).toString())) {
+        selectedNodes.push(allEdges[edge]['from'])
+        selectedNodes.push(allEdges[edge]['to'])
+      }
+    }
+  }
+  selectNodes(selectedNodes)
+}</script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js" integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+            
+            
+            
+            
+            
+
+        
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+          crossorigin="anonymous"
+        />
+        <script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+          crossorigin="anonymous"
+        ></script>
+
+
+        <center>
+          <h1></h1>
+        </center>
+        <style type="text/css">
+
+             #mynetwork {
+                 width: 100%;
+                 height: 100vh;
+                 background-color: #fcfcfc;
+                 border: 1px solid lightgray;
+                 position: relative;
+                 float: left;
+             }
+
+             
+
+             
+             #config {
+                 float: left;
+                 width: 400px;
+                 height: 600px;
+             }
+             
+
+             
+        </style>
+    </head>
+
+
+    <body>
+        <div class="card" style="width: 100%">
+            
+            
+            <div id="mynetwork" class="card-body"></div>
+        </div>
+
+        
+        
+            <div id="config"></div>
+        
+
+        <script type="text/javascript">
+
+              // initialize global variables.
+              var edges;
+              var nodes;
+              var allNodes;
+              var allEdges;
+              var nodeColors;
+              var originalNodes;
+              var network;
+              var container;
+              var options, data;
+              var filter = {
+                  item : '',
+                  property : '',
+                  value : []
+              };
+
+              
+
+              
+
+              // This method is responsible for drawing the graph, returns the drawn network
+              function drawGraph() {
+                  var container = document.getElementById('mynetwork');
+
+                  
+
+                  // parsing and collecting nodes and edges from the python
+                  nodes = new vis.DataSet([{"font": {"color": "#333333"}, "full_name": "Austin, Texas", "group": "Texas", "id": "Austin, Texas", "label": "Austin", "lat": 30.264979, "lon": -97.746598, "mentions": 748654, "shape": "dot", "size": 10, "state": "Texas", "title": "\u003cb\u003eAustin, Texas\u003c/b\u003e\u003cbr\u003eState: Texas"}, {"font": {"color": "#333333"}, "full_name": "Atlanta, Georgia", "group": "Georgia", "id": "Atlanta, Georgia", "label": "Atlanta", "lat": 33.748547, "lon": -84.391502, "mentions": 737411, "shape": "dot", "size": 10, "state": "Georgia", "title": "\u003cb\u003eAtlanta, Georgia\u003c/b\u003e\u003cbr\u003eState: Georgia"}, {"font": {"color": "#333333"}, "full_name": "Boston, Massachusetts", "group": "Massachusetts", "id": "Boston, Massachusetts", "label": "Boston", "lat": 42.3589942, "lon": -71.0586293, "mentions": 1350933, "shape": "dot", "size": 10, "state": "Massachusetts", "title": "\u003cb\u003eBoston, Massachusetts\u003c/b\u003e\u003cbr\u003eState: Massachusetts"}, {"font": {"color": "#333333"}, "full_name": "Chicago, Illinois", "group": "Illinois", "id": "Chicago, Illinois", "label": "Chicago", "lat": 41.883229, "lon": -87.632398, "mentions": 1906731, "shape": "dot", "size": 10, "state": "Illinois", "title": "\u003cb\u003eChicago, Illinois\u003c/b\u003e\u003cbr\u003eState: Illinois"}, {"font": {"color": "#333333"}, "full_name": "Houston, Texas", "group": "Texas", "id": "Houston, Texas", "label": "Houston", "lat": 29.7608026, "lon": -95.3695062, "mentions": 878284, "shape": "dot", "size": 10, "state": "Texas", "title": "\u003cb\u003eHouston, Texas\u003c/b\u003e\u003cbr\u003eState: Texas"}, {"font": {"color": "#333333"}, "full_name": "Las Vegas, Nevada", "group": "Nevada", "id": "Las Vegas, Nevada", "label": "Las Vegas", "lat": 36.1690921, "lon": -115.1405767, "mentions": 821761, "shape": "dot", "size": 10, "state": "Nevada", "title": "\u003cb\u003eLas Vegas, Nevada\u003c/b\u003e\u003cbr\u003eState: Nevada"}, {"font": {"color": "#333333"}, "full_name": "Los Angeles, California", "group": "California", "id": "Los Angeles, California", "label": "Los Angeles", "lat": 34.052238, "lon": -118.243344, "mentions": 1934058, "shape": "dot", "size": 10, "state": "California", "title": "\u003cb\u003eLos Angeles, California\u003c/b\u003e\u003cbr\u003eState: California"}, {"font": {"color": "#333333"}, "full_name": "Miami, Florida", "group": "Florida", "id": "Miami, Florida", "label": "Miami", "lat": 25.775084, "lon": -80.194702, "mentions": 903966, "shape": "dot", "size": 10, "state": "Florida", "title": "\u003cb\u003eMiami, Florida\u003c/b\u003e\u003cbr\u003eState: Florida"}, {"font": {"color": "#333333"}, "full_name": "San Diego, California", "group": "California", "id": "San Diego, California", "label": "San Diego", "lat": 32.71576, "lon": -117.1638173, "mentions": 872060, "shape": "dot", "size": 10, "state": "California", "title": "\u003cb\u003eSan Diego, California\u003c/b\u003e\u003cbr\u003eState: California"}, {"font": {"color": "#333333"}, "full_name": "San Francisco, California", "group": "California", "id": "San Francisco, California", "label": "San Francisco", "lat": 37.7800771, "lon": -122.4201615, "mentions": 1451713, "shape": "dot", "size": 10, "state": "California", "title": "\u003cb\u003eSan Francisco, California\u003c/b\u003e\u003cbr\u003eState: California"}, {"font": {"color": "#333333"}, "full_name": "Seattle, Washington State", "group": "Washington State", "id": "Seattle, Washington State", "label": "Seattle", "lat": 47.60621, "lon": -122.33207, "mentions": 895543, "shape": "dot", "size": 10, "state": "Washington State", "title": "\u003cb\u003eSeattle, Washington State\u003c/b\u003e\u003cbr\u003eState: Washington State"}, {"font": {"color": "#333333"}, "full_name": "New York, New York", "group": "New York", "id": "New York, New York", "label": "New York", "lat": 40.7130466, "lon": -74.0072301, "mentions": 1565556, "shape": "dot", "size": 10, "state": "New York", "title": "\u003cb\u003eNew York, New York\u003c/b\u003e\u003cbr\u003eState: New York"}]);
+                  edges = new vis.DataSet([{"and_count": 0, "close_count": 0, "co_occ": 2633, "distance": 1318.4239733294, "far_count": 0, "from": "Austin, Texas", "near_count": 0, "title": "Distance: 1318.4 km", "to": "Atlanta, Georgia", "width": 1}, {"and_count": 2, "close_count": 0, "co_occ": 3615, "distance": 2729.4028346261, "far_count": 1, "from": "Austin, Texas", "near_count": 0, "title": "Distance: 2729.4 km", "to": "Boston, Massachusetts", "width": 1}, {"and_count": 2, "close_count": 0, "co_occ": 6218, "distance": 1571.8534776138, "far_count": 0, "from": "Austin, Texas", "near_count": 0, "title": "Distance: 1571.9 km", "to": "Chicago, Illinois", "width": 1}, {"and_count": 15, "close_count": 26, "co_occ": 13238, "distance": 236.2734891726, "far_count": 0, "from": "Austin, Texas", "near_count": 32, "title": "Distance: 236.3 km", "to": "Houston, Texas", "width": 1}, {"and_count": 8, "close_count": 0, "co_occ": 1399, "distance": 1745.5859719481, "far_count": 1, "from": "Austin, Texas", "near_count": 0, "title": "Distance: 1745.6 km", "to": "Las Vegas, Nevada", "width": 1}, {"and_count": 0, "close_count": 0, "co_occ": 5982, "distance": 1975.1935714057, "far_count": 0, "from": "Austin, Texas", "near_count": 0, "title": "Distance: 1975.2 km", "to": "Los Angeles, California", "width": 1}, {"and_count": 4, "close_count": 0, "co_occ": 1607, "distance": 1794.0186090265, "far_count": 0, "from": "Austin, Texas", "near_count": 0, "title": "Distance: 1794.0 km", "to": "Miami, Florida", "width": 1}, {"and_count": 9, "close_count": 0, "co_occ": 2168, "distance": 1862.4356603736, "far_count": 0, "from": "Austin, Texas", "near_count": 0, "title": "Distance: 1862.4 km", "to": "San Diego, California", "width": 1}, {"and_count": 0, "close_count": 0, "co_occ": 5632, "distance": 2417.6490016485, "far_count": 0, "from": "Austin, Texas", "near_count": 0, "title": "Distance: 2417.6 km", "to": "San Francisco, California", "width": 1}, {"and_count": 1, "close_count": 0, "co_occ": 3874, "distance": 2849.4469817041, "far_count": 0, "from": "Austin, Texas", "near_count": 0, "title": "Distance: 2849.4 km", "to": "Seattle, Washington State", "width": 1}, {"and_count": 9, "close_count": 0, "co_occ": 3142, "distance": 2434.6761339543, "far_count": 0, "from": "Austin, Texas", "near_count": 0, "title": "Distance: 2434.7 km", "to": "New York, New York", "width": 1}, {"and_count": 22, "close_count": 0, "co_occ": 7644, "distance": 1507.3051510871, "far_count": 3, "from": "Boston, Massachusetts", "near_count": 0, "title": "Distance: 1507.3 km", "to": "Atlanta, Georgia", "width": 1}, {"and_count": 17, "close_count": 0, "co_occ": 24953, "distance": 1371.2555911163, "far_count": 2, "from": "Boston, Massachusetts", "near_count": 1, "title": "Distance: 1371.3 km", "to": "Chicago, Illinois", "width": 1}, {"and_count": 9, "close_count": 0, "co_occ": 5352, "distance": 2583.0548168234, "far_count": 2, "from": "Boston, Massachusetts", "near_count": 0, "title": "Distance: 2583.1 km", "to": "Houston, Texas", "width": 1}, {"and_count": 5, "close_count": 0, "co_occ": 2946, "distance": 3821.6018660171, "far_count": 1, "from": "Boston, Massachusetts", "near_count": 0, "title": "Distance: 3821.6 km", "to": "Las Vegas, Nevada", "width": 1}, {"and_count": 14, "close_count": 0, "co_occ": 19922, "distance": 4178.7003544393, "far_count": 1, "from": "Boston, Massachusetts", "near_count": 1, "title": "Distance: 4178.7 km", "to": "Los Angeles, California", "width": 1}, {"and_count": 7, "close_count": 1, "co_occ": 8418, "distance": 2020.6057254204, "far_count": 3, "from": "Boston, Massachusetts", "near_count": 0, "title": "Distance: 2020.6 km", "to": "Miami, Florida", "width": 1}, {"and_count": 9, "close_count": 0, "co_occ": 4477, "distance": 4158.9242205506, "far_count": 0, "from": "Boston, Massachusetts", "near_count": 0, "title": "Distance: 4158.9 km", "to": "San Diego, California", "width": 1}, {"and_count": 26, "close_count": 0, "co_occ": 18926, "distance": 4344.2620865437, "far_count": 1, "from": "Boston, Massachusetts", "near_count": 0, "title": "Distance: 4344.3 km", "to": "San Francisco, California", "width": 1}, {"and_count": 10, "close_count": 0, "co_occ": 9180, "distance": 4010.9751797523, "far_count": 3, "from": "Boston, Massachusetts", "near_count": 0, "title": "Distance: 4011.0 km", "to": "Seattle, Washington State", "width": 1}, {"and_count": 41, "close_count": 20, "co_occ": 16898, "distance": 306.2225528468, "far_count": 1, "from": "Boston, Massachusetts", "near_count": 8, "title": "Distance: 306.2 km", "to": "New York, New York", "width": 1}, {"and_count": 0, "close_count": 0, "co_occ": 11574, "distance": 3117.0610962071, "far_count": 0, "from": "Los Angeles, California", "near_count": 0, "title": "Distance: 3117.1 km", "to": "Atlanta, Georgia", "width": 1}, {"and_count": 0, "close_count": 0, "co_occ": 42029, "distance": 2807.4453593102, "far_count": 0, "from": "Los Angeles, California", "near_count": 0, "title": "Distance: 2807.4 km", "to": "Chicago, Illinois", "width": 1}, {"and_count": 8, "close_count": 0, "co_occ": 12922, "distance": 2210.8019717975, "far_count": 0, "from": "Los Angeles, California", "near_count": 0, "title": "Distance: 2210.8 km", "to": "Houston, Texas", "width": 1}, {"and_count": 0, "close_count": 0, "co_occ": 16053, "distance": 368.2784594394, "far_count": 0, "from": "Los Angeles, California", "near_count": 0, "title": "Distance: 368.3 km", "to": "Las Vegas, Nevada", "width": 1}, {"and_count": 0, "close_count": 0, "co_occ": 16434, "distance": 3764.2515533618, "far_count": 0, "from": "Los Angeles, California", "near_count": 0, "title": "Distance: 3764.3 km", "to": "Miami, Florida", "width": 1}, {"and_count": 0, "close_count": 0, "co_occ": 28510, "distance": 179.028883964, "far_count": 0, "from": "Los Angeles, California", "near_count": 0, "title": "Distance: 179.0 km", "to": "San Diego, California", "width": 1}, {"and_count": 0, "close_count": 0, "co_occ": 55062, "distance": 559.044673257, "far_count": 0, "from": "Los Angeles, California", "near_count": 0, "title": "Distance: 559.0 km", "to": "San Francisco, California", "width": 1}, {"and_count": 0, "close_count": 0, "co_occ": 15271, "distance": 1543.5984277596, "far_count": 0, "from": "Los Angeles, California", "near_count": 0, "title": "Distance: 1543.6 km", "to": "Seattle, Washington State", "width": 1}, {"and_count": 0, "close_count": 0, "co_occ": 27109, "distance": 3944.4110951634, "far_count": 0, "from": "Los Angeles, California", "near_count": 0, "title": "Distance: 3944.4 km", "to": "New York, New York", "width": 1}, {"and_count": 21, "close_count": 2, "co_occ": 6886, "distance": 972.346843627, "far_count": 1, "from": "Miami, Florida", "near_count": 0, "title": "Distance: 972.3 km", "to": "Atlanta, Georgia", "width": 1}, {"and_count": 22, "close_count": 0, "co_occ": 13277, "distance": 1910.1472821428, "far_count": 2, "from": "Miami, Florida", "near_count": 0, "title": "Distance: 1910.1 km", "to": "Chicago, Illinois", "width": 1}, {"and_count": 14, "close_count": 2, "co_occ": 5365, "distance": 1557.8105644901, "far_count": 0, "from": "Miami, Florida", "near_count": 0, "title": "Distance: 1557.8 km", "to": "Houston, Texas", "width": 1}, {"and_count": 0, "close_count": 0, "co_occ": 4991, "distance": 3509.273695591, "far_count": 0, "from": "Miami, Florida", "near_count": 0, "title": "Distance: 3509.3 km", "to": "Las Vegas, Nevada", "width": 1}, {"and_count": 15, "close_count": 0, "co_occ": 3330, "distance": 3656.0963100579, "far_count": 2, "from": "Miami, Florida", "near_count": 0, "title": "Distance: 3656.1 km", "to": "San Diego, California", "width": 1}, {"and_count": 6, "close_count": 0, "co_occ": 7989, "distance": 4175.3964102058, "far_count": 0, "from": "Miami, Florida", "near_count": 0, "title": "Distance: 4175.4 km", "to": "San Francisco, California", "width": 1}, {"and_count": 5, "close_count": 0, "co_occ": 4062, "distance": 4399.3629948381, "far_count": 0, "from": "Miami, Florida", "near_count": 0, "title": "Distance: 4399.4 km", "to": "Seattle, Washington State", "width": 1}, {"and_count": 20, "close_count": 0, "co_occ": 7223, "distance": 1753.2284965034, "far_count": 1, "from": "Miami, Florida", "near_count": 0, "title": "Distance: 1753.2 km", "to": "New York, New York", "width": 1}, {"and_count": 16, "close_count": 0, "co_occ": 13929, "distance": 943.7317437706, "far_count": 0, "from": "Atlanta, Georgia", "near_count": 0, "title": "Distance: 943.7 km", "to": "Chicago, Illinois", "width": 1}, {"and_count": 10, "close_count": 0, "co_occ": 6595, "distance": 1129.0251546052, "far_count": 0, "from": "Atlanta, Georgia", "near_count": 0, "title": "Distance: 1129.0 km", "to": "Houston, Texas", "width": 1}, {"and_count": 21, "close_count": 0, "co_occ": 2834, "distance": 2809.4670705449, "far_count": 0, "from": "Atlanta, Georgia", "near_count": 0, "title": "Distance: 2809.5 km", "to": "Las Vegas, Nevada", "width": 1}, {"and_count": 13, "close_count": 0, "co_occ": 2708, "distance": 3044.3110707822, "far_count": 1, "from": "Atlanta, Georgia", "near_count": 0, "title": "Distance: 3044.3 km", "to": "San Diego, California", "width": 1}, {"and_count": 30, "close_count": 0, "co_occ": 6746, "distance": 3444.4227952368, "far_count": 0, "from": "Atlanta, Georgia", "near_count": 0, "title": "Distance: 3444.4 km", "to": "San Francisco, California", "width": 1}, {"and_count": 7, "close_count": 0, "co_occ": 4904, "distance": 3511.9621508931, "far_count": 0, "from": "Atlanta, Georgia", "near_count": 0, "title": "Distance: 3512.0 km", "to": "Seattle, Washington State", "width": 1}, {"and_count": 15, "close_count": 1, "co_occ": 5146, "distance": 1201.1077133274, "far_count": 1, "from": "Atlanta, Georgia", "near_count": 0, "title": "Distance: 1201.1 km", "to": "New York, New York", "width": 1}, {"and_count": 0, "close_count": 0, "co_occ": 27259, "distance": 2990.5638639532, "far_count": 0, "from": "San Francisco, California", "near_count": 0, "title": "Distance: 2990.6 km", "to": "Chicago, Illinois", "width": 1}, {"and_count": 6, "close_count": 0, "co_occ": 5951, "distance": 2647.7743925948, "far_count": 0, "from": "San Francisco, California", "near_count": 0, "title": "Distance: 2647.8 km", "to": "Houston, Texas", "width": 1}, {"and_count": 0, "close_count": 0, "co_occ": 8199, "distance": 672.0776250983, "far_count": 0, "from": "San Francisco, California", "near_count": 0, "title": "Distance: 672.1 km", "to": "Las Vegas, Nevada", "width": 1}, {"and_count": 0, "close_count": 0, "co_occ": 14112, "distance": 737.1279530209, "far_count": 0, "from": "San Francisco, California", "near_count": 0, "title": "Distance: 737.1 km", "to": "San Diego, California", "width": 1}, {"and_count": 0, "close_count": 0, "co_occ": 21125, "distance": 1092.1501996518, "far_count": 0, "from": "San Francisco, California", "near_count": 0, "title": "Distance: 1092.2 km", "to": "Seattle, Washington State", "width": 1}, {"and_count": 0, "close_count": 0, "co_occ": 18868, "distance": 4139.1153950759, "far_count": 0, "from": "San Francisco, California", "near_count": 0, "title": "Distance: 4139.1 km", "to": "New York, New York", "width": 1}, {"and_count": 8, "close_count": 0, "co_occ": 10131, "distance": 1509.8657513628, "far_count": 4, "from": "Houston, Texas", "near_count": 1, "title": "Distance: 1509.9 km", "to": "Chicago, Illinois", "width": 1}, {"and_count": 14, "close_count": 0, "co_occ": 2094, "distance": 1976.0291433447, "far_count": 0, "from": "Houston, Texas", "near_count": 0, "title": "Distance: 1976.0 km", "to": "Las Vegas, Nevada", "width": 1}, {"and_count": 15, "close_count": 1, "co_occ": 2827, "distance": 2098.7058142036, "far_count": 1, "from": "Houston, Texas", "near_count": 0, "title": "Distance: 2098.7 km", "to": "San Diego, California", "width": 1}, {"and_count": 12, "close_count": 0, "co_occ": 4124, "distance": 3042.7688176211, "far_count": 3, "from": "Houston, Texas", "near_count": 0, "title": "Distance: 3042.8 km", "to": "Seattle, Washington State", "width": 1}, {"and_count": 8, "close_count": 0, "co_occ": 4302, "distance": 2282.9166169579, "far_count": 1, "from": "Houston, Texas", "near_count": 0, "title": "Distance: 2282.9 km", "to": "New York, New York", "width": 1}, {"and_count": 19, "close_count": 0, "co_occ": 6819, "distance": 2450.9790865527, "far_count": 1, "from": "Las Vegas, Nevada", "near_count": 0, "title": "Distance: 2451.0 km", "to": "Chicago, Illinois", "width": 1}, {"and_count": 0, "close_count": 0, "co_occ": 5102, "distance": 426.5510250911, "far_count": 0, "from": "Las Vegas, Nevada", "near_count": 0, "title": "Distance: 426.6 km", "to": "San Diego, California", "width": 1}, {"and_count": 0, "close_count": 0, "co_occ": 3326, "distance": 1401.5673017397, "far_count": 0, "from": "Las Vegas, Nevada", "near_count": 0, "title": "Distance: 1401.6 km", "to": "Seattle, Washington State", "width": 1}, {"and_count": 0, "close_count": 0, "co_occ": 5143, "distance": 3592.8027602032, "far_count": 0, "from": "Las Vegas, Nevada", "near_count": 0, "title": "Distance: 3592.8 km", "to": "New York, New York", "width": 1}, {"and_count": 0, "close_count": 0, "co_occ": 6226, "distance": 2789.6517790615, "far_count": 0, "from": "Chicago, Illinois", "near_count": 0, "title": "Distance: 2789.7 km", "to": "San Diego, California", "width": 1}, {"and_count": 21, "close_count": 0, "co_occ": 12442, "distance": 2795.9187613316, "far_count": 2, "from": "Chicago, Illinois", "near_count": 2, "title": "Distance: 2795.9 km", "to": "Seattle, Washington State", "width": 1}, {"and_count": 85, "close_count": 3, "co_occ": 19517, "distance": 1148.7429032931, "far_count": 9, "from": "Chicago, Illinois", "near_count": 2, "title": "Distance: 1148.7 km", "to": "New York, New York", "width": 1}, {"and_count": 0, "close_count": 0, "co_occ": 6297, "distance": 1710.0030670349, "far_count": 0, "from": "Seattle, Washington State", "near_count": 0, "title": "Distance: 1710.0 km", "to": "San Diego, California", "width": 1}, {"and_count": 9, "close_count": 0, "co_occ": 5805, "distance": 3875.5363793146, "far_count": 0, "from": "Seattle, Washington State", "near_count": 0, "title": "Distance: 3875.5 km", "to": "New York, New York", "width": 1}, {"and_count": 0, "close_count": 0, "co_occ": 2938, "distance": 3915.6456686099, "far_count": 0, "from": "New York, New York", "near_count": 0, "title": "Distance: 3915.6 km", "to": "San Diego, California", "width": 1}]);
+
+                  nodeColors = {};
+                  allNodes = nodes.get({ returnType: "Object" });
+                  for (nodeId in allNodes) {
+                    nodeColors[nodeId] = allNodes[nodeId].color;
+                  }
+                  allEdges = edges.get({ returnType: "Object" });
+                  // adding nodes and edges to the graph
+                  data = {nodes: nodes, edges: edges};
+
+                  var options = {
+    "configure": {
+        "enabled": true,
+        "filter": [
+            "physics"
+        ]
+    },
+    "edges": {
+        "color": {
+            "inherit": true
+        },
+        "smooth": {
+            "enabled": true,
+            "type": "dynamic"
+        }
+    },
+    "interaction": {
+        "dragNodes": true,
+        "hideEdgesOnDrag": false,
+        "hideNodesOnDrag": false
+    },
+    "physics": {
+        "enabled": true,
+        "stabilization": {
+            "enabled": true,
+            "fit": true,
+            "iterations": 1000,
+            "onlyDynamicEdges": false,
+            "updateInterval": 50
+        }
+    }
+};
+
+                  
+
+
+                  
+                  // if this network requires displaying the configure window,
+                  // put it in its div
+                  options.configure["container"] = document.getElementById("config");
+                  
+
+                  network = new vis.Network(container, data, options);
+
+                  
+
+                  
+
+                  
+
+
+                  
+
+                  return network;
+
+              }
+              drawGraph();
+        </script>
+    
+    <div id="custom-sidebar" style="position: absolute; top: 0; right: 0; width: 350px; height: 100vh; background: #ffffff; border-left: 2px solid #e0e0e0; padding: 25px; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; z-index: 9999; box-shadow: -4px 0 15px rgba(0,0,0,0.05); overflow-y: auto;">
+        <h2 style="margin-top: 0; padding-bottom: 15px; border-bottom: 2px solid #333; color: #222;">Information Panel</h2>
+        <div id="info-content" style="font-size: 15px; line-height: 1.6; color: #444;">
+            <p style="color: #888; font-style: italic; margin-top: 20px;">👈 Click on any node or edge in the graph to see its detailed geospatial data here.</p>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                if (typeof network !== 'undefined') {
+                    
+                    // Shrink the main network canvas so it doesn't hide behind the sidebar
+                    var container = document.getElementById('mynetwork');
+                    if(container) {
+                        container.style.width = 'calc(100% - 350px)';
+                    }
+                    
+                    // Listen for clicks on the network
+                    network.on("click", function (params) {
+                        var content = document.getElementById("info-content");
+                        
+                        // 1. If a Node is clicked
+                        if (params.nodes.length > 0) {
+                            var nodeId = params.nodes[0];
+                            var nodeData = nodes.get(nodeId); 
+                            
+                            if (nodeData) {
+                                var html = "<h3 style='color: #0056b3; margin-bottom: 10px;'>" + nodeData.full_name + "</h3>";
+                                html += "<b>State:</b> " + nodeData.state + "<br>";
+                                html += "<b>Corpus Mentions:</b> " + nodeData.mentions.toLocaleString() + "<br>";
+                                html += "<b>Latitude:</b> " + nodeData.lat + "°<br>";
+                                html += "<b>Longitude:</b> " + nodeData.lon + "°<br>";
+                                
+                                // Generate a quick Google Maps link
+                                var mapsLink = "https://www.google.com/maps/search/?api=1&query=" + nodeData.lat + "," + nodeData.lon;
+                                html += "<br><a href='" + mapsLink + "' target='_blank' style='display: inline-block; margin-top: 10px; padding: 8px 15px; background: #28a745; color: white; text-decoration: none; border-radius: 4px; font-weight: bold;'>📍 View on Map</a>";
+                                
+                                content.innerHTML = html;
+                            }
+                        } 
+                        // 2. If an Edge is clicked (and no node is clicked)
+                        else if (params.edges.length > 0) {
+                            var edgeId = params.edges[0];
+                            var edgeData = edges.get(edgeId);
+                            
+                            if (edgeData) {
+                                var html = "<h3 style='color: #d35400; margin-bottom: 10px;'>Distance & Signals</h3>";
+                                html += "<b>Direct Distance:</b> " + edgeData.distance.toFixed(2) + " km<br><br>";
+                                
+                                // ADDED NEW CORPUS SIGNALS SECTION HERE 👇
+                                html += "<h4 style='color: #444; margin-bottom: 5px; margin-top: 5px; border-bottom: 1px solid #eee; padding-bottom: 3px;'>Corpus Co-occurrences</h4>";
+                                html += "<b>Total Mentions:</b> " + edgeData.co_occ + "<br>";
+                                html += "<b>'Near' Context:</b> " + (edgeData.near_count || 0) + "<br>";
+                                html += "<b>'Close' Context:</b> " + (edgeData.close_count || 0) + "<br>";
+                                html += "<b>'Far' Context:</b> " + (edgeData.far_count || 0) + "<br>";
+                                html += "<b>'And' Context:</b> " + (edgeData.and_count || 0) + "<br>";
+                                
+                                content.innerHTML = html;
+                            }
+                        } 
+                        // 3. If empty space is clicked
+                        else {
+                            content.innerHTML = "<p style='color: #888; font-style: italic; margin-top: 20px;'>👈 Click on any node or edge in the graph to see its detailed geospatial data here.</p>";
+                        }
+                    });
+                }
+            }, 800); // Wait 800ms to ensure the network has finished loading
+        });
+    </script>
+    </body>
+    
+</html>

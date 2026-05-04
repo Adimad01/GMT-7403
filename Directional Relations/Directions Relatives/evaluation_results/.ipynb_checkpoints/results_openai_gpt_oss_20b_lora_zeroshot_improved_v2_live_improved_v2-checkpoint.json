@@ -1,0 +1,89 @@
+{
+  "metadata": {
+    "model": "openai/gpt-oss-20b",
+    "is_lora": true,
+    "mode": "zeroshot_improved_v2",
+    "few_shot_k": 0,
+    "last_updated": "2026-03-31T23:44:22.753161"
+  },
+  "progress": {
+    "processed": 9,
+    "total": 270,
+    "correct_so_far": 6,
+    "running_accuracy": 66.6667
+  },
+  "results": [
+    {
+      "index": 0,
+      "correct": false,
+      "model_answer": "<|channel|>analysis<|message|>We need to compute final position. Start at electric guitar. Then sequence of moves: 1 step counter-clockwise, 10 steps clockwise, 8 steps clockwise, 3 steps counter-clockwise, 6 steps counter-clockwise, 5 steps clockwise, 9 steps clockwise, 1 step counter-clockwise.",
+      "model_raw": "<|channel|>analysis<|message|>We need to compute final position. Start at electric guitar. Then sequence of moves: 1 step counter-clockwise, 10 steps clockwise, 8 steps clockwise, 3 steps counter-clockwise, 6 steps counter-clockwise, 5 steps clockwise, 9 steps clockwise, 1 step counter-clockwise.\n\nWe have 12 dots. Let's list positions indices: Let's assign numbers 0 to 11 clockwise starting from English Springer Spaniel at 0. Then clockwise order: 0 English Springer Spaniel, 1 rock crab, 2 nematode, 3 ring-tailed lemur,",
+      "expected_answer": "Basenji",
+      "error": null
+    },
+    {
+      "index": 1,
+      "correct": false,
+      "model_answer": "<|channel|>analysis<|message|>We need to compute final position. Start at toilet seat. Then sequence: 10 steps counter-clockwise, 4 clockwise, 7 counter-clockwise, 5 clockwise, 3 clockwise, 5 counter-clockwise. Let's map positions indices. Let's assign numbers clockwise from toilet seat as 0. Then clockwise steps increase index mod12. Counter-clockwise decreases index mod12.",
+      "model_raw": "<|channel|>analysis<|message|>We need to compute final position. Start at toilet seat. Then sequence: 10 steps counter-clockwise, 4 clockwise, 7 counter-clockwise, 5 clockwise, 3 clockwise, 5 counter-clockwise. Let's map positions indices. Let's assign numbers clockwise from toilet seat as 0. Then clockwise steps increase index mod12. Counter-clockwise decreases index mod12.\n\nPositions list clockwise: 0 toilet seat,1 speaker,2 crash helmet,3 alp,4 eastern hog-nosed snake,5 soda bottle,6 Polaroid camera,7 mitten,8 mosquito net,9 American bullfrog",
+      "expected_answer": "eastern hog-nosed snake",
+      "error": null
+    },
+    {
+      "index": 2,
+      "correct": true,
+      "model_answer": "<|channel|>analysis<|message|>We need to compute final position. Start at CD player. Steps: 9 clockwise. 12 dots total. 9 mod12 =9. So position after 9: let's list indices: 0 CD,1 window shade,2 trifle,3 Redbone Coonhound,4 radio telescope,5 broom,6 green mamba,7 bald eagle,8 Gordon Setter,9 impala,10 bell-cot,11 ear. So 9 steps lands at impala.",
+      "model_raw": "<|channel|>analysis<|message|>We need to compute final position. Start at CD player. Steps: 9 clockwise. 12 dots total. 9 mod12 =9. So position after 9: let's list indices: 0 CD,1 window shade,2 trifle,3 Redbone Coonhound,4 radio telescope,5 broom,6 green mamba,7 bald eagle,8 Gordon Setter,9 impala,10 bell-cot,11 ear. So 9 steps lands at impala.\n\nThen 2 clockwise: from impala -> bell-cot (10), ear (11). So now at ear.\n\nThen",
+      "expected_answer": "radio telescope",
+      "error": null
+    },
+    {
+      "index": 3,
+      "correct": true,
+      "model_answer": "<|channel|>analysis<|message|>We have 12 dots. Starting at tram. Steps clockwise 4: tram->loggerhead sea turtle (1), milk can (2), marmot (3), vacuum cleaner (4). So after 4 clockwise we are at vacuum cleaner. Then 8 steps counter-clockwise. Counter-clockwise means opposite direction. From vacuum cleaner, counter-clockwise 1: English foxhound, 2: Giant Schnauzer, 3: coucal, 4: pier, 5: ear, 6: slide rule, 7: tram, 8: loggerhead sea turtle. So after",
+      "model_raw": "<|channel|>analysis<|message|>We have 12 dots. Starting at tram. Steps clockwise 4: tram->loggerhead sea turtle (1), milk can (2), marmot (3), vacuum cleaner (4). So after 4 clockwise we are at vacuum cleaner. Then 8 steps counter-clockwise. Counter-clockwise means opposite direction. From vacuum cleaner, counter-clockwise 1: English foxhound, 2: Giant Schnauzer, 3: coucal, 4: pier, 5: ear, 6: slide rule, 7: tram, 8: loggerhead sea turtle. So after ",
+      "expected_answer": "vacuum cleaner",
+      "error": null
+    },
+    {
+      "index": 4,
+      "correct": true,
+      "model_answer": "<|channel|>analysis<|message|>We need to parse. We have circular path of 12 dots: order clockwise: toy terrier (0), whistle (1), shoji (2), koala (3), hay (4), kingsnake (5), toy store (6), mask (7), obelisk (8), Saluki (9), Toy Poodle (10), damselfly (11). Then back to toy terrier.",
+      "model_raw": "<|channel|>analysis<|message|>We need to parse. We have circular path of 12 dots: order clockwise: toy terrier (0), whistle (1), shoji (2), koala (3), hay (4), kingsnake (5), toy store (6), mask (7), obelisk (8), Saluki (9), Toy Poodle (10), damselfly (11). Then back to toy terrier.\n\nStart at koala (3). Move 3 steps counter-clockwise: counter-clockwise means opposite of clockwise, so decreasing index: 3->2 (shoji), 2->1 (",
+      "expected_answer": "toy terrier",
+      "error": null
+    },
+    {
+      "index": 5,
+      "correct": true,
+      "model_answer": "tick",
+      "model_raw": "<|channel|>analysis<|message|>We have 12 dots. Starting from fig, move 1 step clockwise: that is tick. Then 12 steps clockwise: 12 steps brings back to same position as after 1 step? Actually 12 steps from tick returns to tick. So final object tick.<|end|><|start|>assistant<|channel|>final<|message|>tick<|return|>",
+      "expected_answer": "tick",
+      "error": null
+    },
+    {
+      "index": 6,
+      "correct": true,
+      "model_answer": "typewriter keyboard",
+      "model_raw": "<|channel|>analysis<|message|>We have 12 dots. Starting at typewriter keyboard, moving 12 steps clockwise returns to typewriter keyboard. So answer typewriter keyboard.<|end|><|start|>assistant<|channel|>final<|message|>typewriter keyboard<|return|>",
+      "expected_answer": "typewriter keyboard",
+      "error": null
+    },
+    {
+      "index": 7,
+      "correct": true,
+      "model_answer": "violin",
+      "model_raw": "<|channel|>analysis<|message|>We have 12 dots. Starting at violin. Counter-clockwise direction: list counter-clockwise? The list given is clockwise order. So counter-clockwise would be reverse: violin, then feather boa, sleeping bag, indri, southern black widow, perfume, Lhasa Apso, dining table, beer bottle, altar, dragonfly, violin. 12 steps counter-clockwise from violin returns to violin. So answer violin.<|end|><|start|>assistant<|channel|>final<|message|>violin<|return|>",
+      "expected_answer": "violin",
+      "error": null
+    },
+    {
+      "index": 8,
+      "correct": false,
+      "model_answer": "<|channel|>analysis<|message|>We need to compute final position. Start at Border Terrier. Then sequence: +3 clockwise, -4 counter-clockwise, +5 clockwise, -6 counter-clockwise, -5 counter-clockwise, -2 counter-clockwise. Let's convert all to net steps clockwise? Counter-clockwise steps subtract. So net = +3 -4 +5 -6 -5 -2 = (3+5) - (4+6+5+2) =8 -17 = -9 clockwise meaning 9 steps counter-clockwise. On 12-dot circle, -9 mod12 = 3 clockwise? Because -",
+      "model_raw": "<|channel|>analysis<|message|>We need to compute final position. Start at Border Terrier. Then sequence: +3 clockwise, -4 counter-clockwise, +5 clockwise, -6 counter-clockwise, -5 counter-clockwise, -2 counter-clockwise. Let's convert all to net steps clockwise? Counter-clockwise steps subtract. So net = +3 -4 +5 -6 -5 -2 = (3+5) - (4+6+5+2) =8 -17 = -9 clockwise meaning 9 steps counter-clockwise. On 12-dot circle, -9 mod12 = 3 clockwise? Because -",
+      "expected_answer": "digital clock",
+      "error": null
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+══════════════════════════════════════════════════════════════════════════════
+  Cardinal Direction Classification — Fine-tuned GPT-OSS
+  Task    : Classify the direction of a spatial relationship
+  Classes : north, north-east, east, south-east, south, south-west, west, north-west
+  Each question answered 3× at temperatures: 0.25, 0.5, 1.0
+══════════════════════════════════════════════════════════════════════════════
+
+──────────────────────────────────────────────────────────────────────────────
+  Config        T=0.25    T=0.50    T=1.00   Majority   Stability
+  ────────────────────────────────────────────────────────────
+  0-shot        88.33%    92.14%    92.86%     95.00%      79.52%
+  3-shot        94.52%    96.19%    93.33%     98.33%      85.95% ◀
+  ────────────────────────────────────────────────────────────
+  Best config: 3-shot  (Majority-vote accuracy = 413/420 = 98.33%)
+
+──────────────────────────────────────────────────────────────────────────────
+  Per-Direction Accuracy — Best Config (3-shot, T=0.25)
+  Direction       Support   Correct    Accuracy
+  ──────────────────────────────────────────────
+  north                53        52     98.11%
+  north-east           52        47     90.38%
+  east                 53        52     98.11%
+  south-east           53        48     90.57%
+  south                52        47     90.38%
+  south-west           52        48     92.31%
+  west                 53        53    100.00%
+  north-west           52        50     96.15%
+  OVERALL             420       397     94.52%
+
+──────────────────────────────────────────────────────────────────────────────
+  Confusion Matrix — Best Config (3-shot, all temperatures)
+  Rows = Ground Truth  |  Columns = Predicted
+
+  Actual \ Pred      N    NE     E    SE     S    SW     W    NW   INV
+  ────────────────────────────────────────────────────────────────────
+  north            155     0     1     0     0     0     2     1     0
+  north-east         3   137     0    12     0     2     0     2     0
+  east               2     2   152     1     2     0     0     0     0
+  south-east         0     5     0   148     1     3     0     2     0
+  south              0     0     6     0   145     1     4     0     0
+  south-west         1     0     0     2     0   149     0     4     0
+  west               0     0     1     0     0     0   158     0     0
+  north-west         0     1     0     1     1     4     0   149     0
+
+──────────────────────────────────────────────────────────────────────────────
+  Invalid Predictions & Temperature Stability
+  ──────────────────────────────────────────────────
+  0-shot      invalid=1  stable=334/420 (79.5%)
+  3-shot      invalid=0  stable=361/420 (86.0%)
+
+══════════════════════════════════════════════════════════════════════════════

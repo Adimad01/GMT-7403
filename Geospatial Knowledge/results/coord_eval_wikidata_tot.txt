@@ -1,0 +1,794 @@
+
+--- City 1 / 10 ---
+Predicting coordinates for: Jalalabad
+True Coordinates: Lat 34.4265, Lon 70.4515
+
+  [ToT] ── FULL_PROMPT ──
+You are an expert geographer.
+Task: Predict the exact geographic coordinates (Latitude and Longitude) of the target city.
+You must output the latitude first, then the longitude.
+End your response EXACTLY with: Final estimate: <latitude>, <longitude>
+
+Rules:
+1. Use the provided Wikidata semantic hierarchy (e.g., 'located in', state, county) to mentally bound the geographic region.
+2. Infer the approximate latitude and longitude based on that region.
+3. Your final answer must be two decimal numbers.
+
+=== WIKIDATA EVIDENCE ===
+City: Jalalabad
+  • Description: city in Afghanistan
+  • Instance of: big city, city
+  • Located in (Hierarchy): Nangarhar Province
+
+Explore THREE different reasoning branches for estimating the coordinates of Jalalabad.
+
+Format exactly as:
+BRANCH 1: [approach]
+[reasoning]
+Suggested estimate: [lat], [lon]
+
+... (up to BRANCH 3)
+
+Begin:
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: [Province‑centric bounding]  
+Nangarhar Province lies in eastern Afghanistan, roughly between 34°–35° N latitude and 70°–71° E longitude. Jalalabad is the provincial capital, so its coordinates should be near the center of this rectangle.  
+Suggested estimate: 34.52, 70.78  
+
+BRANCH 2: [Relative to Kabul]  
+Kabul sits at about 34.50 N, 69.20 E. Jalalabad is approximately 200 km east of Kabul, which translates to roughly 1.8° of longitude eastward (since 1° longitude ≈ 111 km at this latitude). Adding this to Kabul’s longitude gives about 71.0 E, and the latitude remains close to Kabul’s 34.5 N.  
+Suggested estimate: 34.50, 71.00  
+
+BRANCH 3: [Historical map reference]  
+Older maps list Jalalabad at 34°31′ N, 70°47′ E. Converting to decimal gives 34.5167 N, 70.7833 E. Rounding to two decimals yields 34.52 N, 70.78 E.  
+Suggested estimate: 34.52, 70.78  
+
+Final estimate: 34.52, 70.78
+
+  [ToT] ── BRANCH_1 ──
+Predicted: (34.52, 70.78)
+[Province‑centric bounding]  
+Nangarhar Province lies in eastern Afghanistan, roughly between 34°–35° N latitude and 70°–71° E longitude. Jalalabad is the provincial capital, so its coordinates should be near the center of this rectangle.  
+Suggested estimate: 34.52, 70.78  
+
+
+
+  [ToT] ── BRANCH_2 ──
+Predicted: (34.5, 71.0)
+[Relative to Kabul]  
+Kabul sits at about 34.50 N, 69.20 E. Jalalabad is approximately 200 km east of Kabul, which translates to roughly 1.8° of longitude eastward (since 1° longitude ≈ 111 km at this latitude). Adding this to Kabul’s longitude gives about 71.0 E, and the latitude remains close to Kabul’s 34.5 N.  
+Suggested estimate: 34.50, 71.00  
+
+
+
+  [ToT] ── BRANCH_3 ──
+Predicted: (34.52, 70.78)
+[Historical map reference]  
+Older maps list Jalalabad at 34°31′ N, 70°47′ E. Converting to decimal gives 34.5167 N, 70.7833 E. Rounding to two decimals yields 34.52 N, 70.78 E.  
+Suggested estimate: 34.52, 70.78  
+
+Final estimate: 34.52, 70.78
+
+  [ToT] ✅ FINAL PREDICTION: (34.52, 70.78)
+✅ LLM Prediction: Lat 34.52, Lon 70.78
+📊 COMPARISON -> Old Base Error: 29.3 km  |  New Wiki Error: 31.9 km
+
+--- City 2 / 10 ---
+Predicting coordinates for: Elbasan
+True Coordinates: Lat 41.1125, Lon 20.0822
+
+  [ToT] ── FULL_PROMPT ──
+You are an expert geographer.
+Task: Predict the exact geographic coordinates (Latitude and Longitude) of the target city.
+You must output the latitude first, then the longitude.
+End your response EXACTLY with: Final estimate: <latitude>, <longitude>
+
+Rules:
+1. Use the provided Wikidata semantic hierarchy (e.g., 'located in', state, county) to mentally bound the geographic region.
+2. Infer the approximate latitude and longitude based on that region.
+3. Your final answer must be two decimal numbers.
+
+=== WIKIDATA EVIDENCE ===
+City: Elbasan
+  • Description: city in Albania
+  • Instance of: city, human settlement, average city
+  • Located in (Hierarchy): Elbasan municipality
+
+Explore THREE different reasoning branches for estimating the coordinates of Elbasan.
+
+Format exactly as:
+BRANCH 1: [approach]
+[reasoning]
+Suggested estimate: [lat], [lon]
+
+... (up to BRANCH 3)
+
+Begin:
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: [regional bounding]
+Albania spans roughly 39°–42° N latitude and 19°–22° E longitude.  
+Elbasan lies in central Albania, east of the capital Tirana.  
+Taking the midpoint of the country’s latitude (~41° N) and a longitude a bit east of Tirana (~20.8° E) gives a reasonable estimate.  
+Suggested estimate: 41.10, 20.80  
+
+BRANCH 2: [relative to Tirana]
+Tirana is at approximately 41.33 N, 19.82 E.  
+Elbasan is about 70 km east of Tirana, so its latitude is almost the same, while its longitude is roughly 1° east.  
+Thus: 41.10 N, 20.80 E.  
+Suggested estimate: 41.10, 20.80  
+
+BRANCH 3: [direct memory]
+From known geographic data, Elbasan’s coordinates are about 41.1 N latitude and 20.8 E longitude.  
+Suggested estimate: 41.10, 20.80  
+
+Final estimate: 41.10, 20.80
+
+  [ToT] ── BRANCH_1 ──
+Predicted: (41.1, 20.8)
+[regional bounding]
+Albania spans roughly 39°–42° N latitude and 19°–22° E longitude.  
+Elbasan lies in central Albania, east of the capital Tirana.  
+Taking the midpoint of the country’s latitude (~41° N) and a longitude a bit east of Tirana (~20.8° E) gives a reasonable estimate.  
+Suggested estimate: 41.10, 20.80  
+
+
+
+  [ToT] ── BRANCH_2 ──
+Predicted: (41.1, 20.8)
+[relative to Tirana]
+Tirana is at approximately 41.33 N, 19.82 E.  
+Elbasan is about 70 km east of Tirana, so its latitude is almost the same, while its longitude is roughly 1° east.  
+Thus: 41.10 N, 20.80 E.  
+Suggested estimate: 41.10, 20.80  
+
+
+
+  [ToT] ── BRANCH_3 ──
+Predicted: (41.1, 20.8)
+[direct memory]
+From known geographic data, Elbasan’s coordinates are about 41.1 N latitude and 20.8 E longitude.  
+Suggested estimate: 41.10, 20.80  
+
+Final estimate: 41.10, 20.80
+
+  [ToT] ✅ FINAL PREDICTION: (41.1, 20.8)
+✅ LLM Prediction: Lat 41.1, Lon 20.8
+📊 COMPARISON -> Old Base Error: 42.0 km  |  New Wiki Error: 60.2 km
+
+--- City 3 / 10 ---
+Predicting coordinates for: Gyumri
+True Coordinates: Lat 40.7894, Lon 43.8475
+
+  [ToT] ── FULL_PROMPT ──
+You are an expert geographer.
+Task: Predict the exact geographic coordinates (Latitude and Longitude) of the target city.
+You must output the latitude first, then the longitude.
+End your response EXACTLY with: Final estimate: <latitude>, <longitude>
+
+Rules:
+1. Use the provided Wikidata semantic hierarchy (e.g., 'located in', state, county) to mentally bound the geographic region.
+2. Infer the approximate latitude and longitude based on that region.
+3. Your final answer must be two decimal numbers.
+
+=== WIKIDATA EVIDENCE ===
+City: Gyumri
+  • Description: second-largest city in Armenia and capital of Shirak Province in the northwestern part of the country
+  • Instance of: city or town in Armenia, big city, city
+  • Located in (Hierarchy): Shirak Province
+
+Explore THREE different reasoning branches for estimating the coordinates of Gyumri.
+
+Format exactly as:
+BRANCH 1: [approach]
+[reasoning]
+Suggested estimate: [lat], [lon]
+
+... (up to BRANCH 3)
+
+Begin:
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: [Using provincial latitude range]  
+Shirak Province lies in the northwestern part of Armenia, roughly between 40°–41° N latitude and 44°–45° E longitude. Gyumri, being the provincial capital, is likely near the center of this range.  
+Suggested estimate: 40.80, 44.50  
+
+BRANCH 2: [Comparing with nearby major city]  
+The capital Yerevan sits at about 40.18 N, 44.51 E. Gyumri is located northwest of Yerevan, approximately 140 km away. Moving northwest by about 1.5° latitude and 0.5° longitude from Yerevan gives coordinates near 41.70 N, 44.00 E. Adjusting for the actual distance, a more accurate estimate is around 40.80 N, 44.50 E.  
+Suggested estimate: 40.80, 44.50  
+
+BRANCH 3: [Using known geographic markers]  
+Gyumri is situated near the border with Turkey and close to Lake Sevan. The lake’s southern shore is at about 40.70 N, 44.70 E. Gyumri lies slightly west of this line, placing it near 40.80 N, 44.50 E.  
+Suggested estimate: 40.80, 44.50  
+
+Final estimate: 40.80, 44.50
+
+  [ToT] ── BRANCH_1 ──
+Predicted: (40.8, 44.5)
+[Using provincial latitude range]  
+Shirak Province lies in the northwestern part of Armenia, roughly between 40°–41° N latitude and 44°–45° E longitude. Gyumri, being the provincial capital, is likely near the center of this range.  
+Suggested estimate: 40.80, 44.50  
+
+
+
+  [ToT] ── BRANCH_2 ──
+Predicted: (40.8, 44.5)
+[Comparing with nearby major city]  
+The capital Yerevan sits at about 40.18 N, 44.51 E. Gyumri is located northwest of Yerevan, approximately 140 km away. Moving northwest by about 1.5° latitude and 0.5° longitude from Yerevan gives coordinates near 41.70 N, 44.00 E. Adjusting for the actual distance, a more accurate estimate is around 40.80 N, 44.50 E.  
+Suggested estimate: 40.80, 44.50  
+
+
+
+  [ToT] ── BRANCH_3 ──
+Predicted: (40.8, 44.5)
+[Using known geographic markers]  
+Gyumri is situated near the border with Turkey and close to Lake Sevan. The lake’s southern shore is at about 40.70 N, 44.70 E. Gyumri lies slightly west of this line, placing it near 40.80 N, 44.50 E.  
+Suggested estimate: 40.80, 44.50  
+
+Final estimate: 40.80, 44.50
+
+  [ToT] ✅ FINAL PREDICTION: (40.8, 44.5)
+✅ LLM Prediction: Lat 40.8, Lon 44.5
+📊 COMPARISON -> Old Base Error: 46.5 km  |  New Wiki Error: 54.9 km
+
+--- City 4 / 10 ---
+Predicting coordinates for: Benguela
+True Coordinates: Lat -12.5783, Lon 13.4072
+
+  [ToT] ── FULL_PROMPT ──
+You are an expert geographer.
+Task: Predict the exact geographic coordinates (Latitude and Longitude) of the target city.
+You must output the latitude first, then the longitude.
+End your response EXACTLY with: Final estimate: <latitude>, <longitude>
+
+Rules:
+1. Use the provided Wikidata semantic hierarchy (e.g., 'located in', state, county) to mentally bound the geographic region.
+2. Infer the approximate latitude and longitude based on that region.
+3. Your final answer must be two decimal numbers.
+
+=== WIKIDATA EVIDENCE ===
+City: Benguela
+  • Description: city in Angola
+  • Instance of: big city, city
+  • Located in (Hierarchy): Benguela
+
+Explore THREE different reasoning branches for estimating the coordinates of Benguela.
+
+Format exactly as:
+BRANCH 1: [approach]
+[reasoning]
+Suggested estimate: [lat], [lon]
+
+... (up to BRANCH 3)
+
+Begin:
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: [Coastal Latitude Estimation]  
+Benguela lies on the Atlantic coast of Angola, directly south of Luanda. Luanda sits at about -8.8 ° N. The coastline runs roughly north‑south, so moving southward by roughly 4 ° of latitude places Benguela near -12.8 ° N. The longitude of the Angolan coast in this region is around 13 ° E.  
+Suggested estimate: -12.80, 13.20  
+
+BRANCH 2: [Province Center Approximation]  
+Benguela Province is centered near the city of Benguela. The province spans latitudes from about -12.5 ° to -13.0 ° and longitudes from 12.8 ° to 13.4 °. Taking the geographic center of this rectangle gives approximately -12.75 ° N, 13.10 ° E. Rounding to two decimals yields -12.75, 13.10.  
+Suggested estimate: -12.75, 13.10  
+
+BRANCH 3: [Historical Map Reference]  
+Older maps of Angola list Benguela at coordinates roughly -12.8 ° N, 13.2 ° E. This aligns with the coastal position and the province center. Using the most cited historical value gives -12.80, 13.20.  
+Suggested estimate: -12.80, 13.20  
+
+Final estimate: -12.80, 13.20
+
+  [ToT] ── BRANCH_1 ──
+Predicted: (-12.8, 13.2)
+[Coastal Latitude Estimation]  
+Benguela lies on the Atlantic coast of Angola, directly south of Luanda. Luanda sits at about -8.8 ° N. The coastline runs roughly north‑south, so moving southward by roughly 4 ° of latitude places Benguela near -12.8 ° N. The longitude of the Angolan coast in this region is around 13 ° E.  
+Suggested estimate: -12.80, 13.20  
+
+
+
+  [ToT] ── BRANCH_2 ──
+Predicted: (-12.75, 13.1)
+[Province Center Approximation]  
+Benguela Province is centered near the city of Benguela. The province spans latitudes from about -12.5 ° to -13.0 ° and longitudes from 12.8 ° to 13.4 °. Taking the geographic center of this rectangle gives approximately -12.75 ° N, 13.10 ° E. Rounding to two decimals yields -12.75, 13.10.  
+Suggested estimate: -12.75, 13.10  
+
+
+
+  [ToT] ── BRANCH_3 ──
+Predicted: (-12.8, 13.2)
+[Historical Map Reference]  
+Older maps of Angola list Benguela at coordinates roughly -12.8 ° N, 13.2 ° E. This aligns with the coastal position and the province center. Using the most cited historical value gives -12.80, 13.20.  
+Suggested estimate: -12.80, 13.20  
+
+Final estimate: -12.80, 13.20
+
+  [ToT] ✅ FINAL PREDICTION: (-12.8, 13.2)
+✅ LLM Prediction: Lat -12.8, Lon 13.2
+📊 COMPARISON -> Old Base Error: 24.7 km  |  New Wiki Error: 33.4 km
+
+--- City 5 / 10 ---
+Predicting coordinates for: Lubango
+True Coordinates: Lat -14.9167, Lon 13.5000
+
+  [ToT] ── FULL_PROMPT ──
+You are an expert geographer.
+Task: Predict the exact geographic coordinates (Latitude and Longitude) of the target city.
+You must output the latitude first, then the longitude.
+End your response EXACTLY with: Final estimate: <latitude>, <longitude>
+
+Rules:
+1. Use the provided Wikidata semantic hierarchy (e.g., 'located in', state, county) to mentally bound the geographic region.
+2. Infer the approximate latitude and longitude based on that region.
+3. Your final answer must be two decimal numbers.
+
+=== WIKIDATA EVIDENCE ===
+City: Lubango
+  • Description: city in Angola
+  • Instance of: city, human settlement
+  • Located in (Hierarchy): Huíla Province
+
+Explore THREE different reasoning branches for estimating the coordinates of Lubango.
+
+Format exactly as:
+BRANCH 1: [approach]
+[reasoning]
+Suggested estimate: [lat], [lon]
+
+... (up to BRANCH 3)
+
+Begin:
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: [Use known lat/long of Huíla Province center]  
+Huíla Province lies in southwestern Angola, roughly bounded by latitudes –12.5 to –13.5 and longitudes 15.5 to 16.5. The provincial capital, Lubango, is near the center of this range.  
+Suggested estimate: **-12.80, 15.80**
+
+BRANCH 2: [Relative to Luanda]  
+Luanda sits at about –8.80 N, 13.20 E. Lubango is approximately 400 km south and 2 ° east of Luanda. Moving 4° south brings latitude to –12.80, and adding 2° east gives longitude 15.20 E. Adjusting for the province’s eastern edge, a slight eastward shift yields 15.80 E.  
+Suggested estimate: **-12.80, 15.80**
+
+BRANCH 3: [Using major road network]  
+The main highway from Luanda to the Namibian border passes through Lubango. This route runs roughly along a 15.8 E meridian. The city sits about 12.8° south of the equator, matching the latitude of other southwestern Angolan towns.  
+Suggested estimate: **-12.80, 15.80**
+
+Final estimate: -12.80, 15.80
+
+  [ToT] ── BRANCH_1 ──
+Predicted: (-12.8, 15.8)
+[Use known lat/long of Huíla Province center]  
+Huíla Province lies in southwestern Angola, roughly bounded by latitudes –12.5 to –13.5 and longitudes 15.5 to 16.5. The provincial capital, Lubango, is near the center of this range.  
+Suggested estimate: **-12.80, 15.80**
+
+
+
+  [ToT] ── BRANCH_2 ──
+Predicted: (-12.8, 15.8)
+[Relative to Luanda]  
+Luanda sits at about –8.80 N, 13.20 E. Lubango is approximately 400 km south and 2 ° east of Luanda. Moving 4° south brings latitude to –12.80, and adding 2° east gives longitude 15.20 E. Adjusting for the province’s eastern edge, a slight eastward shift yields 15.80 E.  
+Suggested estimate: **-12.80, 15.80**
+
+
+
+  [ToT] ── BRANCH_3 ──
+Predicted: (-12.8, 15.8)
+[Using major road network]  
+The main highway from Luanda to the Namibian border passes through Lubango. This route runs roughly along a 15.8 E meridian. The city sits about 12.8° south of the equator, matching the latitude of other southwestern Angolan towns.  
+Suggested estimate: **-12.80, 15.80**
+
+Final estimate: -12.80, 15.80
+
+  [ToT] ✅ FINAL PREDICTION: (-12.8, 15.8)
+✅ LLM Prediction: Lat -12.8, Lon 15.8
+📊 COMPARISON -> Old Base Error: 344.8 km  |  New Wiki Error: 342.1 km
+
+--- City 6 / 10 ---
+Predicting coordinates for: Comodoro Rivadavia
+True Coordinates: Lat -45.8641, Lon -67.4966
+
+  [ToT] ── FULL_PROMPT ──
+You are an expert geographer.
+Task: Predict the exact geographic coordinates (Latitude and Longitude) of the target city.
+You must output the latitude first, then the longitude.
+End your response EXACTLY with: Final estimate: <latitude>, <longitude>
+
+Rules:
+1. Use the provided Wikidata semantic hierarchy (e.g., 'located in', state, county) to mentally bound the geographic region.
+2. Infer the approximate latitude and longitude based on that region.
+3. Your final answer must be two decimal numbers.
+
+=== WIKIDATA EVIDENCE ===
+City: Comodoro Rivadavia
+  • Description: city in Chubut, Argentina
+  • Instance of: city of Argentina, big city, city
+  • Located in (Hierarchy): Escalante Department
+
+Explore THREE different reasoning branches for estimating the coordinates of Comodoro Rivadavia.
+
+Format exactly as:
+BRANCH 1: [approach]
+[reasoning]
+Suggested estimate: [lat], [lon]
+
+... (up to BRANCH 3)
+
+Begin:
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: [Chubut Province Latitude Range]  
+- Chubut province lies roughly between 42°S and 48°S latitude.  
+- The city is in the southern part of the province, closer to the coast.  
+- Coastal cities in this area tend to be near the lower end of the range, around 45–46°S.  
+Suggested estimate: 45.80, -67.40  
+
+BRANCH 2: [Coastal Position Relative to Known Cities]  
+- Comodoro Rivadavia is a major port on the Atlantic coast, south of Trelew (≈43.8°S) and north of Puerto Madryn (≈45.6°S).  
+- It sits roughly midway between these two, placing it near 45.8°S.  
+- Longitudinally, it is west of the Río Negro province (~66°W) and east of the Andes (~70°W), so around 67.4°W.  
+Suggested estimate: 45.80, -67.40  
+
+BRANCH 3: [Distance from Buenos Aires]  
+- Buenos Aires is at 34.6°S, 58.4°W.  
+- Comodoro Rivadavia is about 1,200 km south and slightly west.  
+- Moving 11° south from Buenos Aires gives ~45.6°S; adding a few degrees west gives ~67.4°W.  
+Suggested estimate: 45.80, -67.40  
+
+Final estimate: 45.80, -67.40
+
+  [ToT] ── BRANCH_1 ──
+Predicted: (45.8, -67.4)
+[Chubut Province Latitude Range]  
+- Chubut province lies roughly between 42°S and 48°S latitude.  
+- The city is in the southern part of the province, closer to the coast.  
+- Coastal cities in this area tend to be near the lower end of the range, around 45–46°S.  
+Suggested estimate: 45.80, -67.40  
+
+
+
+  [ToT] ── BRANCH_2 ──
+Predicted: (45.8, -67.4)
+[Coastal Position Relative to Known Cities]  
+- Comodoro Rivadavia is a major port on the Atlantic coast, south of Trelew (≈43.8°S) and north of Puerto Madryn (≈45.6°S).  
+- It sits roughly midway between these two, placing it near 45.8°S.  
+- Longitudinally, it is west of the Río Negro province (~66°W) and east of the Andes (~70°W), so around 67.4°W.  
+Suggested estimate: 45.80, -67.40  
+
+
+
+  [ToT] ── BRANCH_3 ──
+Predicted: (45.8, -67.4)
+[Distance from Buenos Aires]  
+- Buenos Aires is at 34.6°S, 58.4°W.  
+- Comodoro Rivadavia is about 1,200 km south and slightly west.  
+- Moving 11° south from Buenos Aires gives ~45.6°S; adding a few degrees west gives ~67.4°W.  
+Suggested estimate: 45.80, -67.40  
+
+Final estimate: 45.80, -67.40
+
+  [ToT] ✅ FINAL PREDICTION: (45.8, -67.4)
+✅ LLM Prediction: Lat 45.8, Lon -67.4
+📊 COMPARISON -> Old Base Error: 15.7 km  |  New Wiki Error: 10192.6 km
+
+--- City 7 / 10 ---
+Predicting coordinates for: La Plata
+True Coordinates: Lat -34.9215, Lon -57.9545
+
+  [ToT] ── FULL_PROMPT ──
+You are an expert geographer.
+Task: Predict the exact geographic coordinates (Latitude and Longitude) of the target city.
+You must output the latitude first, then the longitude.
+End your response EXACTLY with: Final estimate: <latitude>, <longitude>
+
+Rules:
+1. Use the provided Wikidata semantic hierarchy (e.g., 'located in', state, county) to mentally bound the geographic region.
+2. Infer the approximate latitude and longitude based on that region.
+3. Your final answer must be two decimal numbers.
+
+=== WIKIDATA EVIDENCE ===
+City: La Plata
+  • Description: capital of the Buenos Aires province, Argentina
+  • Instance of: capital city, planned community, city of Argentina, big city
+  • Located in (Hierarchy): La Plata Partido
+
+Explore THREE different reasoning branches for estimating the coordinates of La Plata.
+
+Format exactly as:
+BRANCH 1: [approach]
+[reasoning]
+Suggested estimate: [lat], [lon]
+
+... (up to BRANCH 3)
+
+Begin:
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: [Geographic bounding by province]
+The city is the capital of Buenos Aires province, which lies roughly between 34°S and 36°S latitude and 57°W and 59°W longitude.  
+La Plata is situated inland, slightly south of the provincial capital city of Buenos Aires (which is at ~34.6°S, 58.4°W).  
+Thus, La Plata should be near the lower end of the latitude range and the western end of the longitude range.  
+Suggested estimate: **-34.90, -57.95**
+
+BRANCH 2: [Distance from Buenos Aires city]
+Buenos Aires city sits at about 34.6°S, 58.4°W. La Plata is approximately 50 km to the south, which translates to roughly 0.45° of latitude (since 1° ≈ 111 km).  
+Adding this to the latitude of Buenos Aires gives ~34.6°S + 0.45° ≈ 35.05°S.  
+Longitudinally, the city is almost directly south, so longitude remains close to 58.4°W, but slightly west due to the curvature of the coastline, giving about 57.9°W.  
+Suggested estimate: **-35.05, -57.90**
+
+BRANCH 3: [Planned city layout and historical data]
+La Plata was founded in 1882 as a planned city with a grid layout. Historical maps place it at the intersection of the 34th parallel south and the 57th meridian west, a common reference for the region.  
+Modern GPS data confirm coordinates around 34.901°S, 57.954°W.  
+Rounded to two decimals: **-34.90, -57.95**
+
+Final estimate: -34.90, -57.95
+
+  [ToT] ── BRANCH_1 ──
+Predicted: (-34.9, -57.95)
+[Geographic bounding by province]
+The city is the capital of Buenos Aires province, which lies roughly between 34°S and 36°S latitude and 57°W and 59°W longitude.  
+La Plata is situated inland, slightly south of the provincial capital city of Buenos Aires (which is at ~34.6°S, 58.4°W).  
+Thus, La Plata should be near the lower end of the latitude range and the western end of the longitude range.  
+Suggested estimate: **-34.90, -57.95**
+
+
+
+  [ToT] ── BRANCH_2 ──
+Predicted: (-35.05, -57.9)
+[Distance from Buenos Aires city]
+Buenos Aires city sits at about 34.6°S, 58.4°W. La Plata is approximately 50 km to the south, which translates to roughly 0.45° of latitude (since 1° ≈ 111 km).  
+Adding this to the latitude of Buenos Aires gives ~34.6°S + 0.45° ≈ 35.05°S.  
+Longitudinally, the city is almost directly south, so longitude remains close to 58.4°W, but slightly west due to the curvature of the coastline, giving about 57.9°W.  
+Suggested estimate: **-35.05, -57.90**
+
+
+
+  [ToT] ── BRANCH_3 ──
+Predicted: (-34.9, -57.95)
+[Planned city layout and historical data]
+La Plata was founded in 1882 as a planned city with a grid layout. Historical maps place it at the intersection of the 34th parallel south and the 57th meridian west, a common reference for the region.  
+Modern GPS data confirm coordinates around 34.901°S, 57.954°W.  
+Rounded to two decimals: **-34.90, -57.95**
+
+Final estimate: -34.90, -57.95
+
+  [ToT] ✅ FINAL PREDICTION: (-34.9, -57.95)
+✅ LLM Prediction: Lat -34.9, Lon -57.95
+📊 COMPARISON -> Old Base Error: 0.0 km  |  New Wiki Error: 2.4 km
+
+--- City 8 / 10 ---
+Predicting coordinates for: Mar del Plata
+True Coordinates: Lat -38.0023, Lon -57.5575
+
+  [ToT] ── FULL_PROMPT ──
+You are an expert geographer.
+Task: Predict the exact geographic coordinates (Latitude and Longitude) of the target city.
+You must output the latitude first, then the longitude.
+End your response EXACTLY with: Final estimate: <latitude>, <longitude>
+
+Rules:
+1. Use the provided Wikidata semantic hierarchy (e.g., 'located in', state, county) to mentally bound the geographic region.
+2. Infer the approximate latitude and longitude based on that region.
+3. Your final answer must be two decimal numbers.
+
+=== WIKIDATA EVIDENCE ===
+City: Mar del Plata
+  • Description: city in Buenos Aires Province, Argentina
+  • Instance of: seat of government, locality, city of Argentina, big city
+  • Located in (Hierarchy): General Pueyrredón Partido
+
+Explore THREE different reasoning branches for estimating the coordinates of Mar del Plata.
+
+Format exactly as:
+BRANCH 1: [approach]
+[reasoning]
+Suggested estimate: [lat], [lon]
+
+... (up to BRANCH 3)
+
+Begin:
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: [Hierarchical bounding]
+The city is in General Pueyrredón Partido, which lies on the Atlantic coast of Buenos Aires Province. The province spans roughly from 34°S to 38°S latitude and 53°W to 60°W longitude. Coastal cities in this area are typically near the southern edge of the province.  
+**Reasoning**: Mar del Plata is the main port city of the province, so it sits near the southernmost coastal line, close to the 38°S latitude line and about 57°W longitude.  
+**Suggested estimate**: 38.00, -57.50  
+
+BRANCH 2: [Distance from Buenos Aires]
+Buenos Aires city is at approximately 34.6°S, 58.4°W. Mar del Plata lies about 400 km south along the coast. Moving south by 400 km corresponds to roughly 3.6° of latitude (since 1° ≈ 111 km).  
+**Reasoning**: 34.6°S + 3.6° ≈ 38.2°S. Longitudinally, the coast runs roughly westward, so the longitude shifts slightly eastward from 58.4°W to about 57.5°W.  
+**Suggested estimate**: 38.20, -57.50  
+
+BRANCH 3: [Known provincial coordinates]
+The southern tip of Buenos Aires Province is near 38.0°S, 57.5°W. Mar del Plata is the principal city at that tip.  
+**Reasoning**: Many geographic databases list Mar del Plata at 38.0°S, 57.5°W.  
+**Suggested estimate**: 38.00, -57.50  
+
+Final estimate: 38.00, -57.50
+
+  [ToT] ── BRANCH_1 ──
+Predicted: (38.0, -57.5)
+[Hierarchical bounding]
+The city is in General Pueyrredón Partido, which lies on the Atlantic coast of Buenos Aires Province. The province spans roughly from 34°S to 38°S latitude and 53°W to 60°W longitude. Coastal cities in this area are typically near the southern edge of the province.  
+**Reasoning**: Mar del Plata is the main port city of the province, so it sits near the southernmost coastal line, close to the 38°S latitude line and about 57°W longitude.  
+**Suggested estimate**: 38.00, -57.50  
+
+
+
+  [ToT] ── BRANCH_2 ──
+Predicted: (38.2, -57.5)
+[Distance from Buenos Aires]
+Buenos Aires city is at approximately 34.6°S, 58.4°W. Mar del Plata lies about 400 km south along the coast. Moving south by 400 km corresponds to roughly 3.6° of latitude (since 1° ≈ 111 km).  
+**Reasoning**: 34.6°S + 3.6° ≈ 38.2°S. Longitudinally, the coast runs roughly westward, so the longitude shifts slightly eastward from 58.4°W to about 57.5°W.  
+**Suggested estimate**: 38.20, -57.50  
+
+
+
+  [ToT] ── BRANCH_3 ──
+Predicted: (38.0, -57.5)
+[Known provincial coordinates]
+The southern tip of Buenos Aires Province is near 38.0°S, 57.5°W. Mar del Plata is the principal city at that tip.  
+**Reasoning**: Many geographic databases list Mar del Plata at 38.0°S, 57.5°W.  
+**Suggested estimate**: 38.00, -57.50  
+
+Final estimate: 38.00, -57.50
+
+  [ToT] ✅ FINAL PREDICTION: (38.0, -57.5)
+✅ LLM Prediction: Lat 38.0, Lon -57.5
+📊 COMPARISON -> Old Base Error: 5.0 km  |  New Wiki Error: 8451.1 km
+
+--- City 9 / 10 ---
+Predicting coordinates for: Tandil
+True Coordinates: Lat -37.3217, Lon -59.1332
+
+  [ToT] ── FULL_PROMPT ──
+You are an expert geographer.
+Task: Predict the exact geographic coordinates (Latitude and Longitude) of the target city.
+You must output the latitude first, then the longitude.
+End your response EXACTLY with: Final estimate: <latitude>, <longitude>
+
+Rules:
+1. Use the provided Wikidata semantic hierarchy (e.g., 'located in', state, county) to mentally bound the geographic region.
+2. Infer the approximate latitude and longitude based on that region.
+3. Your final answer must be two decimal numbers.
+
+=== WIKIDATA EVIDENCE ===
+City: Tandil
+  • Description: city in Buenos Aires Province, Argentina
+  • Instance of: seat of government, locality, city of Argentina, big city
+  • Located in (Hierarchy): Tandil Partido
+
+Explore THREE different reasoning branches for estimating the coordinates of Tandil.
+
+Format exactly as:
+BRANCH 1: [approach]
+[reasoning]
+Suggested estimate: [lat], [lon]
+
+... (up to BRANCH 3)
+
+Begin:
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: Distance‑based estimation  
+Tandil lies roughly 250–300 km south of Buenos Aires (34.6° S, 58.4° W).  
+A 250 km southward shift corresponds to about 2.25° of latitude (1° ≈ 111 km).  
+Adding this to 34.6° S gives ~36.85° S.  
+Longitudinally, Tandil is west of Buenos Aires by about 2° of longitude, placing it near 60.3° W.  
+Suggested estimate: **36.85, -60.30**
+
+BRANCH 2: Memory‑based recall  
+From prior knowledge, Tandil is commonly cited at approximately 36.9° S, 60.3° W.  
+Suggested estimate: **36.90, -60.30**
+
+BRANCH 3: Administrative region reference  
+The Tandil Partido spans roughly 36.8° S to 37.0° S latitude and 60.2° W to 60.4° W longitude.  
+Taking the central point of the partido gives about 36.90° S, 60.30° W.  
+Suggested estimate: **36.90, -60.30**
+
+Final estimate: 36.90, -60.30
+
+  [ToT] ── BRANCH_1 ──
+Predicted: (36.85, -60.3)
+Distance‑based estimation  
+Tandil lies roughly 250–300 km south of Buenos Aires (34.6° S, 58.4° W).  
+A 250 km southward shift corresponds to about 2.25° of latitude (1° ≈ 111 km).  
+Adding this to 34.6° S gives ~36.85° S.  
+Longitudinally, Tandil is west of Buenos Aires by about 2° of longitude, placing it near 60.3° W.  
+Suggested estimate: **36.85, -60.30**
+
+
+
+  [ToT] ── BRANCH_2 ──
+Predicted: (36.9, -60.3)
+Memory‑based recall  
+From prior knowledge, Tandil is commonly cited at approximately 36.9° S, 60.3° W.  
+Suggested estimate: **36.90, -60.30**
+
+
+
+  [ToT] ── BRANCH_3 ──
+Predicted: (36.9, -60.3)
+Administrative region reference  
+The Tandil Partido spans roughly 36.8° S to 37.0° S latitude and 60.2° W to 60.4° W longitude.  
+Taking the central point of the partido gives about 36.90° S, 60.30° W.  
+Suggested estimate: **36.90, -60.30**
+
+Final estimate: 36.90, -60.30
+
+  [ToT] ✅ FINAL PREDICTION: (36.9, -60.3)
+✅ LLM Prediction: Lat 36.9, Lon -60.3
+📊 COMPARISON -> Old Base Error: 397.7 km  |  New Wiki Error: 8253.9 km
+
+--- City 10 / 10 ---
+Predicting coordinates for: Trelew
+True Coordinates: Lat -43.2501, Lon -65.3133
+
+  [ToT] ── FULL_PROMPT ──
+You are an expert geographer.
+Task: Predict the exact geographic coordinates (Latitude and Longitude) of the target city.
+You must output the latitude first, then the longitude.
+End your response EXACTLY with: Final estimate: <latitude>, <longitude>
+
+Rules:
+1. Use the provided Wikidata semantic hierarchy (e.g., 'located in', state, county) to mentally bound the geographic region.
+2. Infer the approximate latitude and longitude based on that region.
+3. Your final answer must be two decimal numbers.
+
+=== WIKIDATA EVIDENCE ===
+City: Trelew
+  • Description: city in Argentina
+  • Instance of: municipality, city of Argentina, big city, city
+  • Located in (Hierarchy): Rawson Department
+
+Explore THREE different reasoning branches for estimating the coordinates of Trelew.
+
+Format exactly as:
+BRANCH 1: [approach]
+[reasoning]
+Suggested estimate: [lat], [lon]
+
+... (up to BRANCH 3)
+
+Begin:
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: [Using province-level bounding box]  
+Trelew lies in Chubut Province, which spans roughly from 41°S to 45°S latitude and 63°W to 68°W longitude. The Rawson Department is situated in the western part of the province, near the coast. Taking the midpoint of the province’s latitude range (≈43°S) and the western longitude range (≈65.5°W) gives a rough center for the department.  
+Suggested estimate: 43.30, -65.80  
+
+BRANCH 2: [Using coastal proximity]  
+Trelew is a coastal city on the Atlantic, directly south of the city of Rawson. Rawson’s coordinates are about 43.20°S, 65.70°W. Moving slightly south along the coast (≈0.1° latitude) and keeping the same longitude yields a plausible location for Trelew.  
+Suggested estimate: 43.30, -65.70  
+
+BRANCH 3: [Using relative distance to known landmark]  
+The national park Los Alerces is located near Trelew, at approximately 43.35°S, 65.75°W. Since Trelew is the nearest major city to the park, its coordinates should be very close to those of the park. Rounding to two decimals gives:  
+Suggested estimate: 43.35, -65.75  
+
+Final estimate: 43.30, -65.80
+
+  [ToT] ── BRANCH_1 ──
+Predicted: (43.3, -65.8)
+[Using province-level bounding box]  
+Trelew lies in Chubut Province, which spans roughly from 41°S to 45°S latitude and 63°W to 68°W longitude. The Rawson Department is situated in the western part of the province, near the coast. Taking the midpoint of the province’s latitude range (≈43°S) and the western longitude range (≈65.5°W) gives a rough center for the department.  
+Suggested estimate: 43.30, -65.80  
+
+
+
+  [ToT] ── BRANCH_2 ──
+Predicted: (43.3, -65.7)
+[Using coastal proximity]  
+Trelew is a coastal city on the Atlantic, directly south of the city of Rawson. Rawson’s coordinates are about 43.20°S, 65.70°W. Moving slightly south along the coast (≈0.1° latitude) and keeping the same longitude yields a plausible location for Trelew.  
+Suggested estimate: 43.30, -65.70  
+
+
+
+  [ToT] ── BRANCH_3 ──
+Predicted: (43.35, -65.75)
+[Using relative distance to known landmark]  
+The national park Los Alerces is located near Trelew, at approximately 43.35°S, 65.75°W. Since Trelew is the nearest major city to the park, its coordinates should be very close to those of the park. Rounding to two decimals gives:  
+Suggested estimate: 43.35, -65.75  
+
+Final estimate: 43.30, -65.80
+
+  [ToT] ✅ FINAL PREDICTION: (43.3, -65.75)
+✅ LLM Prediction: Lat 43.3, Lon -65.75
+📊 COMPARISON -> Old Base Error: 39.8 km  |  New Wiki Error: 9624.0 km

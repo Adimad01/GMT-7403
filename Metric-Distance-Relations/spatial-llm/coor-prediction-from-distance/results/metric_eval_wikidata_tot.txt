@@ -1,0 +1,440 @@
+
+--- Pair 1 / 10 ---
+Estimating: Baltimore, Maryland to Omaha, Nebraska
+True Distance: 1654.8 km
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: Direct Haversine calculation  
+Using the precise latitude/longitude pairs for Baltimore (39.2864°, –76.6150°) and Omaha (41.2586°, –95.9375°), I applied the Haversine formula with Earth radius 6 371 km.  
+Result: 1 647 km.  
+Suggested estimate: **1647 km**
+
+BRANCH 2: Approximate planar method  
+I converted the coordinates to a simple Cartesian system (ignoring Earth curvature) and computed the straight‑line distance:  
+Δlat ≈ 1.97°, Δlon ≈ 19.32°.  
+Using Pythagoras with average latitu
+
+  [ToT] ── BRANCH_1 ──
+Predicted: 1647.0
+Direct Haversine calculation  
+Using the precise latitude/longitude pairs for Baltimore (39.2864°, –76.6150°) and Omaha (41.2586°, –95.9375°), I applied the Haversine formula with Earth radius 6 371 km.  
+Result: 1 647 km.  
+Suggested estimate: **1647 km**
+
+  [ToT] ── BRANCH_2 ──
+Predicted: 1650.0
+Approximate planar method  
+I converted the coordinates to a simple Cartesian system (ignoring Earth curvature) and computed the straight‑line distance:  
+Δlat ≈ 1.97°, Δlon ≈ 19.32°.  
+Using Pythagoras with average latitude scaling (cos 40° ≈ 0.77), the distance ≈ 1 650 km.  
+Suggested estimate: **1650 km**
+
+  [ToT] ── BRANCH_3 ──
+Predicted: 1647.0
+Reference to known city pairs  
+The distance from Baltimore to Chicago is about 1 600 km, and Chicago to Omaha is roughly 1 200 km. Subtracting the overlap (Baltimore–Chicago) from the total gives an estimate of ~1 650 km.  
+Suggested estimate: **1650 km**
+
+Final estimate: 1647 km
+
+  [ToT] ✅ FINAL PREDICTION: 1647.0 km
+✅ Prediction: 1647.0 km | Error: 7.8 km
+
+--- Pair 2 / 10 ---
+Estimating: Boise, Idaho to Albuquerque, New Mexico
+True Distance: 1253.1 km
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: Haversine formula  
+Using the haversine formula with the given coordinates (latitudes in radians: 0.7608 rad for Boise, 0.6125 rad for Albuquerque; longitudes: –2.0288 rad and –1.8615 rad), the central angle is calculated as 0.1966 rad. Multiplying by Earth’s mean radius (6371 km) gives a distance of approximately 1253 km.  
+Suggested estimate: 1253 km  
+
+BRANCH 2: Spherical law of cosines  
+Applying the spherical law of cosines:  
+cos c = sin φ₁ sin φ₂ + cos φ₁ cos φ₂ cos Δλ  
+with φ₁
+
+  [ToT] ── BRANCH_1 ──
+Predicted: 1253.0
+Haversine formula  
+Using the haversine formula with the given coordinates (latitudes in radians: 0.7608 rad for Boise, 0.6125 rad for Albuquerque; longitudes: –2.0288 rad and –1.8615 rad), the central angle is calculated as 0.1966 rad. Multiplying by Earth’s mean radius (6371 km) gives a distance of approximately 1253 km.  
+Suggested estimate: 1253 km
+
+  [ToT] ── BRANCH_2 ──
+Predicted: 1251.0
+Spherical law of cosines  
+Applying the spherical law of cosines:  
+cos c = sin φ₁ sin φ₂ + cos φ₁ cos φ₂ cos Δλ  
+with φ₁ = 0.7608 rad, φ₂ = 0.6125 rad, Δλ = 0.1673 rad, we find c ≈ 0.1964 rad. The resulting distance is 6371 km × 0.1964 rad ≈ 1251 km.  
+Suggested estimate: 1251 km
+
+  [ToT] ── BRANCH_3 ──
+Predicted: 1250.0
+Equirectangular (planar) approximation  
+Using the equirectangular approximation:  
+x = Δλ cos ((φ₁+φ₂)/2) ≈ 0.1673 rad × cos 0.6866 rad ≈ 0.1415 rad  
+y = Δφ ≈ –0.1483 rad  
+distance ≈ 6371 km × √(x² + y²) ≈ 6371 km × 0.1965 rad ≈ 1253 km.  
+Suggested estimate: 1253 km  
+
+Final estimate: 1250 km
+
+  [ToT] ✅ FINAL PREDICTION: 1251.0 km
+✅ Prediction: 1251.0 km | Error: 2.1 km
+
+--- Pair 3 / 10 ---
+Estimating: Boise, Idaho to Austin, Texas
+True Distance: 2203.7 km
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: Haversine formula  
+Using the haversine formula with the given coordinates:  
+- Δφ = (30.3000° – 43.6136°) = –13.3136° = –0.2324 rad  
+- Δλ = (–97.7333° – (–116.2378°)) = 18.5045° = 0.3230 rad  
+- a = sin²(Δφ/2) + cos φ₁ cos φ₂ sin²(Δλ/2) ≈ 0.0294  
+- c = 2 atan2(√a, √(1–a)) ≈ 0.3450 rad  
+Distance = R c ≈ 6371 km × 0.3450 ≈ **2198 km**  
+Suggested estimate: **2198 km**
+
+BRANCH 2: Equirectangular (planar) approximation  
+Treat the Earth as a sphere and use the equirectangular projectio
+
+  [ToT] ── BRANCH_1 ──
+Predicted: 2198.0
+Haversine formula  
+Using the haversine formula with the given coordinates:  
+- Δφ = (30.3000° – 43.6136°) = –13.3136° = –0.2324 rad  
+- Δλ = (–97.7333° – (–116.2378°)) = 18.5045° = 0.3230 rad  
+- a = sin²(Δφ/2) + cos φ₁ cos φ₂ sin²(Δλ/2) ≈ 0.0294  
+- c = 2 atan2(√a, √(1–a)) ≈ 0.3450 rad  
+Distance = R c ≈ 6371 km × 0.3450 ≈ **2198 km**  
+Suggested estimate: **2198 km**
+
+  [ToT] ── BRANCH_2 ──
+Predicted: 2200.0
+Equirectangular (planar) approximation  
+Treat the Earth as a sphere and use the equirectangular projection:  
+- x = Δλ cos((φ₁+φ₂)/2) ≈ 0.3230 rad × cos(0.6450 rad) ≈ 0.247 rad  
+- y = Δφ ≈ –0.2324 rad  
+- d = R √(x² + y²) ≈ 6371 km × √(0.247² + 0.2324²) ≈ **2200 km**  
+Suggested estimate: **2200 km**
+
+  [ToT] ── BRANCH_3 ──
+Predicted: 2217.0
+Spherical law of cosines  
+Compute the central angle directly:  
+- cos c = sin φ₁ sin φ₂ + cos φ₁ cos φ₂ cos Δλ  
+  ≈ 0.691 × 0.503 + 0.722 × 0.863 × 0.948 ≈ 0.937  
+- c = arccos(0.937) ≈ 0.351 rad  
+Distance = R c ≈ 6371 km × 0.351 ≈ **2237 km**  
+Suggested estimate: **2237 km**
+
+Final estimate: **2217 km**
+
+  [ToT] ✅ FINAL PREDICTION: 2200.0 km
+✅ Prediction: 2200.0 km | Error: 3.7 km
+
+--- Pair 4 / 10 ---
+Estimating: Bismarck, North Dakota to Columbus, Ohio
+True Distance: 1624.4 km
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: Haversine formula  
+Using the precise latitudes and longitudes, compute Δφ = –6.8461° (–0.1195 rad) and Δλ = 17.7831° (0.3105 rad).  
+a = sin²(Δφ/2) + cos φ₁ cos φ₂ sin²(Δλ/2) ≈ 0.01612.  
+c = 2 atan2(√a, √(1–a)) ≈ 0.2546 rad.  
+Distance = 6371 km × c ≈ **1621 km**.  
+Suggested estimate: 1621 km  
+
+BRANCH 2: Equirectangular (planar) approximation  
+x = Δλ × cos((φ₁+φ₂)/2) ≈ 0.2256 rad, y = Δφ ≈ –0.1195 rad.  
+Distance ≈ 6371 km × √(x² + y²) ≈ **1626 km**.  
+Suggested estimate: 1626 km 
+
+  [ToT] ── BRANCH_1 ──
+Predicted: 1621.0
+Haversine formula  
+Using the precise latitudes and longitudes, compute Δφ = –6.8461° (–0.1195 rad) and Δλ = 17.7831° (0.3105 rad).  
+a = sin²(Δφ/2) + cos φ₁ cos φ₂ sin²(Δλ/2) ≈ 0.01612.  
+c = 2 atan2(√a, √(1–a)) ≈ 0.2546 rad.  
+Distance = 6371 km × c ≈ **1621 km**.  
+Suggested estimate: 1621 km
+
+  [ToT] ── BRANCH_2 ──
+Predicted: 1626.0
+Equirectangular (planar) approximation  
+x = Δλ × cos((φ₁+φ₂)/2) ≈ 0.2256 rad, y = Δφ ≈ –0.1195 rad.  
+Distance ≈ 6371 km × √(x² + y²) ≈ **1626 km**.  
+Suggested estimate: 1626 km
+
+  [ToT] ── BRANCH_3 ──
+Predicted: 1621.0
+Known air‑route distance (flight path)  
+Commercial flights between Bismarck and Columbus typically travel ~1600 km, accounting for great‑circle routing and minor air‑traffic deviations.  
+Suggested estimate: 1600 km  
+
+Final estimate: 1621 km
+
+  [ToT] ✅ FINAL PREDICTION: 1621.0 km
+✅ Prediction: 1621.0 km | Error: 3.4 km
+
+--- Pair 5 / 10 ---
+Estimating: Austin, Texas to Knoxville, Tennessee
+True Distance: 1434.4 km
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: Haversine formula  
+Using the haversine equation with the given coordinates:  
+- Convert latitudes and longitudes to radians.  
+- Compute \(a = \sin^2(\Delta\phi/2) + \cos\phi_1\cos\phi_2\sin^2(\Delta\lambda/2)\).  
+- Compute \(c = 2\arctan2(\sqrt{a},\sqrt{1-a})\).  
+- Distance \(d = R \times c\) with \(R = 6371\) km.  
+Result: \(d \approx 1430\) km.  
+Suggested estimate: **1430 km**
+
+BRANCH 2: Spherical law of cosines  
+Apply \(d = R \arccos(\sin\phi_1\sin\phi_2 + \cos\phi_1\cos\phi_2
+
+  [ToT] ── BRANCH_1 ──
+Predicted: 1430.0
+Haversine formula  
+Using the haversine equation with the given coordinates:  
+- Convert latitudes and longitudes to radians.  
+- Compute \(a = \sin^2(\Delta\phi/2) + \cos\phi_1\cos\phi_2\sin^2(\Delta\lambda/2)\).  
+- Compute \(c = 2\arctan2(\sqrt{a},\sqrt{1-a})\).  
+- Distance \(d = R \times c\) with \(R = 6371\) km.  
+Result: \(d \approx 1430\) km.  
+Suggested estimate: **1430 km**
+
+  [ToT] ── BRANCH_2 ──
+Predicted: 1411.0
+Spherical law of cosines  
+Apply \(d = R \arccos(\sin\phi_1\sin\phi_2 + \cos\phi_1\cos\phi_2\cos\Delta\lambda)\).  
+Using the same radian values gives \(d \approx 1411\) km.  
+Suggested estimate: **1411 km**
+
+  [ToT] ── BRANCH_3 ──
+Predicted: 1430.0
+Planar approximation with degree‑to‑km conversion  
+- Latitude difference: \(5.6617^\circ \times 111 \text{ km/deg} \approx 628\) km.  
+- Average latitude ≈ 33°, so \(1^\circ\) longitude ≈ \(111 \times \cos 33^\circ \approx 93\) km.  
+- Longitude difference: \(13.81^\circ \times 93 \text{ km/deg} \approx 1285\) km.  
+- Euclidean distance: \(\sqrt{628^2 + 1285^2} \approx 1430\) km.  
+Suggested estimate: **1430 km**
+
+Final estimate: 1430 km
+
+  [ToT] ✅ FINAL PREDICTION: 1430.0 km
+✅ Prediction: 1430.0 km | Error: 4.4 km
+
+--- Pair 6 / 10 ---
+Estimating: Bismarck, North Dakota to Helena, Montana
+True Distance: 860.2 km
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: Haversine formula  
+Using the haversine formula with the given coordinates:  
+- φ₁ = 46.8083° = 0.8175 rad, λ₁ = –100.7837° = –1.7585 rad  
+- φ₂ = 46.5928° = 0.8138 rad, λ₂ = –112.0350° = –1.9548 rad  
+Δφ = –0.0037 rad, Δλ = –0.1963 rad.  
+a = sin²(Δφ/2) + cosφ₁·cosφ₂·sin²(Δλ/2) ≈ 0.00455  
+c = 2·atan2(√a, √(1–a)) ≈ 0.1352 rad.  
+Distance = R·c (R = 6371 km) ≈ 861 km.  
+Suggested estimate: **860 km**
+
+BRANCH 2: Planar (Euclidean) approximation  
+Convert degree differences to kilometers
+
+  [ToT] ── BRANCH_1 ──
+Predicted: 860.0
+Haversine formula  
+Using the haversine formula with the given coordinates:  
+- φ₁ = 46.8083° = 0.8175 rad, λ₁ = –100.7837° = –1.7585 rad  
+- φ₂ = 46.5928° = 0.8138 rad, λ₂ = –112.0350° = –1.9548 rad  
+Δφ = –0.0037 rad, Δλ = –0.1963 rad.  
+a = sin²(Δφ/2) + cosφ₁·cosφ₂·sin²(Δλ/2) ≈ 0.00455  
+c = 2·atan2(√a, √(1–a)) ≈ 0.1352 rad.  
+Distance = R·c (R = 6371 km) ≈ 861 km.  
+Suggested estimate: **860 km**
+
+  [ToT] ── BRANCH_2 ──
+Predicted: 860.0
+Planar (Euclidean) approximation  
+Convert degree differences to kilometers:  
+Δlat = 0.2155° → 0.2155·111 ≈ 23.9 km.  
+Δlon = 11.2513°; at ~46.7° latitude, 1° lon ≈ 111·cos(46.7°) ≈ 76.4 km.  
+Δlon km ≈ 11.2513·76.4 ≈ 860 km.  
+Pythagorean distance = √(860² + 23.9²) ≈ 860.3 km.  
+Suggested estimate: **860 km**
+
+  [ToT] ── BRANCH_3 ──
+Predicted: 860.0
+Road‑distance sanity check + adjustment  
+The driving distance from Bismarck to Helena via I‑94 and US‑12 is roughly 1,000 km.  
+Great‑circle distances are typically 10–15% shorter than road distances in this region.  
+Applying a 12% reduction: 1,000 km × 0.88 ≈ 880 km.  
+Considering the planar estimate and the haversine result, a value near 860 km is most consistent.  
+Suggested estimate: **860 km**
+
+Final estimate: 860 km
+
+  [ToT] ✅ FINAL PREDICTION: 860.0 km
+✅ Prediction: 860.0 km | Error: 0.2 km
+
+--- Pair 7 / 10 ---
+Estimating: Bangor, Maine to Salt Lake City, Utah
+True Distance: 3514.6 km
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: Haversine formula  
+Using the precise coordinates (Bangor 44.8031° N, 68.7675° W; Salt Lake City 40.7500° N, 111.8833° W) and the haversine equation, the great‑circle distance comes out to about **3 524 km**.  
+
+Suggested estimate: **3 524 km**  
+
+BRANCH 2: Equirectangular approximation  
+Approximating the Earth as a sphere and using the equirectangular projection (Δx = Δλ cos φ_avg, Δy = Δφ) gives a distance of roughly **3 530 km**.  
+
+Suggested estimate: **3 530 km**  
+
+BRANCH 3: Rou
+
+  [ToT] ── BRANCH_1 ──
+Predicted: 3524.0
+Haversine formula  
+Using the precise coordinates (Bangor 44.8031° N, 68.7675° W; Salt Lake City 40.7500° N, 111.8833° W) and the haversine equation, the great‑circle distance comes out to about **3 524 km**.  
+
+Suggested estimate: **3 524 km**
+
+  [ToT] ── BRANCH_2 ──
+Predicted: 3530.0
+Equirectangular approximation  
+Approximating the Earth as a sphere and using the equirectangular projection (Δx = Δλ cos φ_avg, Δy = Δφ) gives a distance of roughly **3 530 km**.  
+
+Suggested estimate: **3 530 km**
+
+  [ToT] ── BRANCH_3 ──
+Predicted: 3520.0
+Route‑based sanity check  
+Bangor to New York ≈ 1 200 km; New York to Salt Lake City ≈ 2 200 km; adding gives ≈ 3 400 km, which is close to the spherical calculations.  
+
+Suggested estimate: **3 400 km**  
+
+Final estimate: **3 520 km**
+
+  [ToT] ✅ FINAL PREDICTION: 3524.0 km
+✅ Prediction: 3524.0 km | Error: 9.4 km
+
+--- Pair 8 / 10 ---
+Estimating: Baltimore, Maryland to Montgomery, Alabama
+True Distance: 1163.4 km
+
+  [ToT] ── BRANCHES_RAW ──
+
+
+  [ToT] ✅ FINAL PREDICTION: 1165.0 km
+✅ Prediction: 1165.0 km | Error: 1.6 km
+
+--- Pair 9 / 10 ---
+Estimating: Boston, Massachusetts to Grand Junction, Colorado
+True Distance: 3163.3 km
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: Haversine formula  
+Using the great‑circle distance formula with Earth radius 6371 km:  
+- φ₁ = 42.3603° → 0.7400 rad, φ₂ = 39.0667° → 0.6820 rad  
+- Δλ = (−108.5670°) − (−71.0578°) = −37.5092° → −0.6548 rad  
+- sin φ₁ sin φ₂ = 0.674 × 0.630 = 0.424  
+- cos φ₁ cos φ₂ cos Δλ = 0.738 × 0.777 × 0.793 = 0.454  
+- Sum = 0.878 → arccos(0.878) ≈ 0.500 rad  
+Distance = 6371 km × 0.500 rad ≈ **3185 km**  
+Suggested estimate: 3185 km  
+
+BRANCH 2: Equirectangular approximation (planar)  
+Compute 
+
+  [ToT] ── BRANCH_1 ──
+Predicted: 3185.0
+Haversine formula  
+Using the great‑circle distance formula with Earth radius 6371 km:  
+- φ₁ = 42.3603° → 0.7400 rad, φ₂ = 39.0667° → 0.6820 rad  
+- Δλ = (−108.5670°) − (−71.0578°) = −37.5092° → −0.6548 rad  
+- sin φ₁ sin φ₂ = 0.674 × 0.630 = 0.424  
+- cos φ₁ cos φ₂ cos Δλ = 0.738 × 0.777 × 0.793 = 0.454  
+- Sum = 0.878 → arccos(0.878) ≈ 0.500 rad  
+Distance = 6371 km × 0.500 rad ≈ **3185 km**  
+Suggested estimate: 3185 km
+
+  [ToT] ── BRANCH_2 ──
+Predicted: 3170.0
+Equirectangular approximation (planar)  
+Compute average latitude φ_avg = (42.3603 + 39.0667)/2 = 40.7135°.  
+Δφ = 39.0667° − 42.3603° = −3.2936° → −0.0575 rad  
+Δλ = −37.5092° → −0.6548 rad  
+Scale Δλ by cos φ_avg: Δλ_scaled = −0.6548 × cos(40.7135°) = −0.6548 × 0.758 = −0.496 rad  
+Distance ≈ 6371 km × √(Δφ² + Δλ_scaled²) = 6371 × √(0.0575² + 0.496²)  
+= 6371 × √(0.0033 + 0.246) = 6371 × 0.498 ≈ **3170 km**  
+Suggested estimate: 3170 km
+
+  [ToT] ── BRANCH_3 ──
+Predicted: 3182.0
+Flight‑route reference  
+Commercial nonstop flights from Boston to Denver (closest major airport to Grand Junction) average about 3,200 km. Grand Junction lies ~200 km west of Denver, adding roughly 30 km.  
+Estimated flight distance ≈ **3210 km**  
+Suggested estimate: 3210 km  
+
+Final estimate: 3182 km
+
+  [ToT] ✅ FINAL PREDICTION: 3182.0 km
+✅ Prediction: 3182.0 km | Error: 18.7 km
+
+--- Pair 10 / 10 ---
+Estimating: Albuquerque, New Mexico to Las Vegas, Nevada
+True Distance: 777.9 km
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: Haversine formula  
+Using the haversine equation with the given coordinates:  
+- Δφ = 1.0828° = 0.01890 rad  
+- Δλ = –8.4983° = –0.1483 rad  
+- a = sin²(Δφ/2) + cos φ₁ cos φ₂ sin²(Δλ/2) ≈ 0.00371  
+- c = 2 atan2(√a, √(1–a)) ≈ 0.1218 rad  
+Distance = R c = 6371 km × 0.1218 ≈ **776 km**  
+Suggested estimate: 776 km  
+
+BRANCH 2: Spherical law of cosines  
+cos c = sin φ₁ sin φ₂ + cos φ₁ cos φ₂ cos Δλ  
+Plugging in the values gives cos c ≈ 0.9928 → c ≈ 0.1219 rad.  
+Distance = 6371 km × 0.1
+
+  [ToT] ── BRANCH_1 ──
+Predicted: 776.0
+Haversine formula  
+Using the haversine equation with the given coordinates:  
+- Δφ = 1.0828° = 0.01890 rad  
+- Δλ = –8.4983° = –0.1483 rad  
+- a = sin²(Δφ/2) + cos φ₁ cos φ₂ sin²(Δλ/2) ≈ 0.00371  
+- c = 2 atan2(√a, √(1–a)) ≈ 0.1218 rad  
+Distance = R c = 6371 km × 0.1218 ≈ **776 km**  
+Suggested estimate: 776 km
+
+  [ToT] ── BRANCH_2 ──
+Predicted: 776.0
+Spherical law of cosines  
+cos c = sin φ₁ sin φ₂ + cos φ₁ cos φ₂ cos Δλ  
+Plugging in the values gives cos c ≈ 0.9928 → c ≈ 0.1219 rad.  
+Distance = 6371 km × 0.1219 ≈ **776 km**  
+Suggested estimate: 776 km
+
+  [ToT] ── BRANCH_3 ──
+Predicted: 776.0
+Equirectangular (planar) approximation for short distances  
+x = Δλ cos[(φ₁+φ₂)/2] ≈ –0.1483 × cos 35.6256° ≈ –0.1285 rad  
+y = Δφ ≈ 0.01890 rad  
+c ≈ √(x² + y²) ≈ √(0.0165 + 0.000357) ≈ 0.1220 rad  
+Distance = 6371 km × 0.1220 ≈ **776 km**  
+Suggested estimate: 776 km  
+
+Final estimate: 776 km
+
+  [ToT] ✅ FINAL PREDICTION: 776.0 km
+✅ Prediction: 776.0 km | Error: 1.9 km

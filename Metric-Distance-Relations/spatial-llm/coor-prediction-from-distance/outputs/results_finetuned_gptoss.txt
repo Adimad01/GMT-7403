@@ -1,0 +1,46 @@
+════════════════════════════════════════════════════════════════════════════════
+  Distance Prediction Results — Fine-tuned GPT-OSS
+  Task   : Estimate geographic distance (km) between city pairs
+  Method : Predictions re-extracted from model output text
+════════════════════════════════════════════════════════════════════════════════
+
+  Prompt Types:
+    P1 — City names only          — answer-only format
+    P2 — City names + coordinates — answer-only format
+    P3 — City names only          — reasoning format
+    P4 — City names + coordinates — reasoning format
+
+────────────────────────────────────────────────────────────────────────────────
+  Config               N  Valid     MAE km    RMSE km    MAPE %       R²   Median km
+  ────────────────────────────────────────────────────────────────────────
+  P1 zero-shot       100   100 ( 100%)      100.8      122.7        8.3%   0.9848        79.4
+  P1 3-shot          100   100 ( 100%)      351.2      672.5       26.9%   0.5428       197.1
+  P2 zero-shot       100   100 ( 100%)       37.5       53.4        2.7%   0.9971        24.3
+  P2 3-shot          100   100 ( 100%)      157.2      655.3        9.7%   0.5658        47.5
+  P3 zero-shot       100   100 ( 100%)      585.9     1432.2       39.6%  -1.0738       144.4
+  P3 3-shot          100   100 ( 100%)      195.8      238.3       17.3%   0.9426       171.1
+  P4 zero-shot       100   100 ( 100%)       41.7       62.7        2.8%   0.9960        28.2
+  P4 3-shot          100   100 ( 100%)       83.4      196.7        6.0%   0.9609        52.7
+  ────────────────────────────────────────────────────────────────────────
+  ◀ Best config by MAE : P2 zero-shot  (MAE=37.5 km  |  RMSE=53.4 km  |  R²=0.9971)
+
+────────────────────────────────────────────────────────────────────────────────
+  Error Distribution — Best Config (P2 zero-shot)
+  ────────────────────────────────────────────────────────────────────────
+  <  100 km           92 ( 92.0%)  ████████████████████████████████████
+  100–500 km           8 (  8.0%)  ███
+  500–1000 km          0 (  0.0%)  
+  1000–2000 km         0 (  0.0%)  
+  > 2000 km            0 (  0.0%)  
+
+  Min error : 0.5 km
+  Max error : 190.0 km
+  Std dev   : 38.0 km
+
+────────────────────────────────────────────────────────────────────────────────
+  Extraction Strategies — Best Config (P2 zero-shot)
+  ──────────────────────────────────────────────────
+  Number followed by 'km/kilometers'       :   93
+  First plausible numeric token (≥50 km)   :    7
+
+════════════════════════════════════════════════════════════════════════════════
