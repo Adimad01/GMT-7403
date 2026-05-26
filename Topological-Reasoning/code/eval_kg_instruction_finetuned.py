@@ -329,7 +329,7 @@ def main():
     if args.adapter_path:
         adapter_abs = os.path.abspath(args.adapter_path)
         print(f"[MODEL] Applying LoRA adapter from: {adapter_abs}")
-        model = PeftModel.from_pretrained(model, adapter_abs)
+        model = PeftModel.from_pretrained(model, adapter_abs, local_files_only=True)
 
     model.eval()
     print(f"[MODEL] Ready. KG source: {args.kg_source}")

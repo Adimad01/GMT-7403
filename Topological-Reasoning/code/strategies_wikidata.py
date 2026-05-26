@@ -15,8 +15,12 @@ from typing import Dict, Any, Optional, List, Tuple
 from dataclasses import dataclass, field
 from math import radians, sin, cos, sqrt, atan2
 
-from langchain_ollama import ChatOllama
-from langchain_core.messages import HumanMessage
+try:
+    from langchain_ollama import ChatOllama
+    from langchain_core.messages import HumanMessage
+except ImportError:
+    ChatOllama = None  # only needed for prompting strategies, not KG evidence gathering
+    HumanMessage = None
 
 # =====================================================================
 # OLLAMA CONFIG
