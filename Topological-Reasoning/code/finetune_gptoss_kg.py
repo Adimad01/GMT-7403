@@ -202,7 +202,7 @@ def main():
         learning_rate=args.lr,
         bf16=_BF16,
         fp16=_FP16,
-        no_cuda=not _CUDA_OK,
+        use_cpu=not _CUDA_OK,
         optim="paged_adamw_8bit" if _CUDA_OK else "adamw_torch",
         dataset_text_field="text",
         report_to="none",
