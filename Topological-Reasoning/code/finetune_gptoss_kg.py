@@ -71,10 +71,11 @@ from transformers import AutoTokenizer, AutoModelForCausalLM, Mxfp4Config
 import trl
 from trl import SFTTrainer, SFTConfig
 
+MAX_SEQ_LENGTH = 768   # KG prompts are longer than the data-only baseline
+
 # Detect where max_seq_length lives in this TRL version (moves between releases)
 _SFTCONFIG_PARAMS  = set(inspect.signature(SFTConfig.__init__).parameters)
 _SFTTRAINER_PARAMS = set(inspect.signature(SFTTrainer.__init__).parameters)
-MAX_SEQ_LENGTH = 768   # Longer than the data-only baseline: KG prompts are richer
 
 print(f"[INFO] TRL version: {trl.__version__}")
 if "max_seq_length" in _SFTCONFIG_PARAMS:
@@ -85,7 +86,13 @@ elif "max_seq_length" in _SFTTRAINER_PARAMS:
     print("[INFO] max_seq_length -> SFTTrainer")
 else:
     _SEQ_LEN_IN = "neither"
-    print("[WARN] max_seq_length not found in SFTConfig or SFTTrainer — omitting.")
+    print("[INFO] TRL 1.x detected — max_seq_length set via tokenizer.model_max_length")
+
+# Determine bf16/fp16 based on actual GPU availability
+_CUDA_OK = torch.cuda.is_available()
+_BF16    = _CUDA_OK and torch.cuda.is_bf16_supported()
+_FP16    = _CUDA_OK and not _BF16
+print(f"[INFO] CUDA: {_CUDA_OK}  |  bf16: {_BF16}  |  fp16: {_FP16}")
 
 
 def load_jsonl(path: str) -> list[dict]:
@@ -132,6 +139,8 @@ def main():
     tokenizer = AutoTokenizer.from_pretrained(args.model_id, trust_remote_code=True)
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
+    # TRL 1.x uses tokenizer.model_max_length for truncation instead of max_seq_length
+    tokenizer.model_max_length = MAX_SEQ_LENGTH
 
     # Append the EOS token to each training example (the JSONL text does not
     # include it so the fine-tuning objective is clear across all tokenizer variants)
@@ -191,8 +200,10 @@ def main():
         per_device_train_batch_size=args.batch_size,
         gradient_accumulation_steps=args.grad_accum,
         learning_rate=args.lr,
-        bf16=True,
-        optim="paged_adamw_8bit",
+        bf16=_BF16,
+        fp16=_FP16,
+        no_cuda=not _CUDA_OK,
+        optim="paged_adamw_8bit" if _CUDA_OK else "adamw_torch",
         dataset_text_field="text",
         report_to="none",
         run_name=args.run_name,
