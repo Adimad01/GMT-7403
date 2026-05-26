@@ -329,7 +329,19 @@ def main():
     if args.adapter_path:
         adapter_abs = os.path.abspath(args.adapter_path)
         print(f"[MODEL] Applying LoRA adapter from: {adapter_abs}")
-        model = PeftModel.from_pretrained(model, adapter_abs, local_files_only=True)
+        # Older PEFT + newer huggingface_hub rejects absolute paths as invalid repo IDs.
+        # Patch validate_repo_id to pass through absolute local paths without validation.
+        try:
+            import huggingface_hub.utils._validators as _hfv
+            _orig_validate = _hfv.validate_repo_id
+            def _allow_local_abs(repo_id, *a, **kw):
+                if os.path.isabs(repo_id):
+                    return
+                return _orig_validate(repo_id, *a, **kw)
+            _hfv.validate_repo_id = _allow_local_abs
+            model = PeftModel.from_pretrained(model, adapter_abs, local_files_only=True)
+        finally:
+            _hfv.validate_repo_id = _orig_validate
 
     model.eval()
     print(f"[MODEL] Ready. KG source: {args.kg_source}")
