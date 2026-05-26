@@ -11,7 +11,6 @@ import os
 from abc import ABC, abstractmethod
 from typing import Dict, Any, Optional, List, Tuple
 from dataclasses import dataclass, field
-from collections import Counter
 
 from langchain_ollama import ChatOllama
 from langchain_core.messages import HumanMessage
@@ -29,31 +28,105 @@ MODEL_NAME = "gpt-oss"
 # =====================================================================
 VALID_PREDICATES = {
     "disjoint", "touches", "crosses", "within",
-    "contains", "overlaps", "equals",
+    "contains", "overlaps",
 }
 
-VALID_LIST = "contains, within, touches, crosses, disjoint, overlaps, equals"
+VALID_LIST = "contains, within, touches, crosses, disjoint, overlaps"
 
-VERNACULAR_LEXICON = """Vernacular-to-Topology Reference (one example each):
-  WITHIN    — e.g. "is in"         (A is inside B)
-  CONTAINS  — e.g. "is home to"    (A encloses B)
-  TOUCHES   — e.g. "borders"       (A and B share a boundary, no overlap)
-  CROSSES   — e.g. "passes through"(A traverses B)
-  OVERLAPS  — e.g. "overlaps with" (A and B partially share area)
-  DISJOINT  — e.g. "is far from"   (A and B are completely separate)
-  EQUALS    — e.g. "is the same as"(A and B occupy the same space)
+VERNACULAR_LEXICON = """Vernacular-to-Topology Reference:
+  WITHIN    — "is in", "located in", "part of"              (A is fully inside B)
+  CONTAINS  — "is home to", "includes", "hosts"             (A fully encloses B)
+  TOUCHES   — "borders", "adjacent to", "enclave of",
+              "surrounded by" (partial), "across from" (water boundary)
+  CROSSES   — "passes through", "along", "traverses",
+              "at the mouth of" / "upstream from" (full LineString)
+  OVERLAPS  — "partly in", "extends into", "straddles",
+              "part of population in", "county seat of" (may extend into adjacent counties)
+  DISJOINT  — "far from", "miles away", "separate from" (confirmed large distance)
 
-Note: geometry types constrain possible relations.
+WARNING — ambiguous vernacular (read carefully):
+  "county seat of" → does NOT imply within — the city may extend into adjacent counties → overlaps
+  "suburb of"      → does NOT imply touches — suburb may be separated from the main city → disjoint
+  "surrounded by"  → may be touches (partial encirclement), not within (full containment)
+  "enclave of"     → touches (shares boundary), NOT within (not inside interior)
+  "along" + river/road → likely crosses (full LineString traversal), not just touches
 """
 
 RULES_BLOCK = """Rules:
-1. The relation is DIRECTED: A [predicate] B.
-2. Consider geometry types (Point, LineString, Polygon, MultiPolygon).
-3. Pick EXACTLY ONE predicate from: contains, within, touches, crosses, disjoint, overlaps, equals.
-4. Carefully interpret the vernacular expression.
-5. Consider what makes sense given the place types and geometry types involved.
-6. Use the knowledge graph evidence to support your reasoning.
-7. End with: Answer: [predicate]
+1. DIRECTION CHECK (mandatory before answering):
+   — "contains" means A encloses B; "within" means A is inside B.
+   — Explicitly ask: does this predicate apply A→B or B→A?
+   — If the data shows B encloses A, the answer is "within", NOT "contains".
+
+2. TEXTUAL QUALIFIER PRIORITY (override graph evidence when contradictory):
+   — "most sides", "surrounded by" with incomplete encirclement → touches.
+   — "partly in", "extends into", "part of population in" → overlaps.
+   — "enclave of" → touches (shared boundary, not interior containment).
+   — "across from" over water → touches (water boundary is shared in GIS).
+   — "county seat of" alone does NOT imply within.
+
+3. GEOMETRY TYPE CONSTRAINTS:
+   — LineString (river, road) traversing a Polygon interior → crosses.
+   — LineString touching only Polygon boundary → touches.
+   — "At the mouth of" / "upstream from": verify if the full LineString crosses the polygon.
+   — Two Polygons partially sharing area → overlaps.
+
+4. FULL LINESTRING REASONING:
+   — For rivers and roads, reason on the entire geometry, not just the centroid.
+   — A river centroid may fall outside a city even if the river traverses it.
+
+5. PARTIAL COUNT ≠ CONTAINMENT:
+   — "X inhabitants in county Y" means part of the city is in county Y → overlaps, not within.
+
+6. Pick EXACTLY ONE predicate from: contains, within, touches, crosses, disjoint, overlaps.
+7. Use the knowledge graph evidence to support your reasoning.
+8. End with: Answer: [predicate]
+"""
+
+DISAMBIGUATION_TABLE = """
+CRITICAL DISTINCTIONS (most confused predicates):
+
+touches vs overlaps:
+  touches  -> A and B share ONLY their boundary. Interiors do NOT intersect.
+             Example: two adjacent counties sharing a border line.
+  overlaps -> A and B share SOME interior area. Part of A is inside B, part is outside.
+             Example: a city that partially crosses a county boundary.
+
+touches vs crosses:
+  touches  -> boundary contact only, no traversal through interior.
+  crosses  -> A passes THROUGH B, entering AND exiting its interior.
+             Requires different geometry dimensions (LineString through Polygon).
+             Example: a highway that enters and exits a city polygon.
+
+contains vs within (DIRECTION IS CRITICAL):
+  contains -> A is the CONTAINER. B is fully INSIDE A. Ask: "does A surround B?"
+  within   -> A is INSIDE B. Ask: "is A surrounded by B?"
+  KEY RULE: Identify which entity is the enclosing one.
+     If A is smaller than B -> "within".  If A is larger and encloses B -> "contains".
+     Signals for contains: "home to", "location of", "hosts", "includes".
+     Signals for within: "located in", "in", "part of", "county seat of".
+
+disjoint vs touches:
+  disjoint -> A and B share NO point at all.
+  touches  -> A and B share EXACTLY their boundary edge, nothing more.
+  "suburb of" alone does NOT imply touches — suburb may be disjoint from the main city.
+"""
+
+DIRECTIONAL_RULE = """
+ANTI-BIAS RULE for contains/within:
+Before answering, explicitly check: "Is A the LARGER entity that SURROUNDS B?"
+  - YES -> contains
+  - NO, B surrounds A -> within
+Do NOT default to "within" just because A is a sub-entity type or mentioned first.
+"""
+
+OVERLAPS_DETECTION = """
+3-STEP CHECK to detect OVERLAPS (do this before concluding within or touches):
+  Step 1: Is A completely inside B? -> within (not overlaps)
+  Step 2: Is B completely inside A? -> contains (not overlaps)
+  Step 3: Do A and B share SOME area but NEITHER fully contains the other? -> overlaps
+  Strong overlaps signals: "extends into", "partly in", "straddles",
+                           "part of population in", "county seat of" (city crosses county line).
 """
 
 # =====================================================================
@@ -175,6 +248,19 @@ def _build_context_block(entity: Dict[str, Any]) -> str:
 def _gather_kg_evidence(kg: GeographicKnowledgeGraph, place_a: str, place_b: str, sentence: str = "", entity: dict = None, log_fn=None) -> str:
     return kg.gather_evidence(place_a, place_b, sentence, entity, log_fn)
 
+def _geometric_weight(text: str) -> float:
+    """Score a branch/thought by presence of geometric evidence. Higher = more reliable."""
+    geo_keywords = [
+        'bbox', 'bounding box', 'coordinates', 'lat', 'lon', 'polygon',
+        'linestring', 'geometry', 'degrees', 'km', 'kilometer',
+        'south', 'north', 'west', 'east', 'extends into',
+        'boundary', 'border', 'intersect', 'interior', 'traverse',
+    ]
+    text_lower = text.lower()
+    hits = sum(1 for kw in geo_keywords if kw in text_lower)
+    return 1.0 + 0.3 * min(hits, 5)
+
+
 def extract_predicate(text: str) -> Optional[str]:
     """Robust extraction of topological predicates using Regex."""
     if not text:
@@ -182,12 +268,15 @@ def extract_predicate(text: str) -> Optional[str]:
     text_clean = re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL)
     text_clean = re.sub(r"[*_`]", "", text_clean)
     text_lower = text_clean.lower()
-    
+
     patterns = [
         r"answer\s*[:=]\s*\[?(\w+)\]?",
         r"predicate\s*[:=]\s*\[?(\w+)\]?",
-        r"conclusion\s*[:=]\s*(\w+)",
-        r"suggested\s+predicate\s*[:=]\s*(\w+)"
+        r"conclusion\s*[:=]\s*\[?(\w+)\]?",
+        r"suggested\s+predicate\s*[:=]\s*\[?(\w+)\]?",
+        r"the\s+(?:relation|predicate|answer)\s+is\s+[:\[]?(\w+)",
+        r"therefore[,\s]+(?:the\s+)?(?:answer|predicate|relation)\s+is\s+[:\[]?(\w+)",
+        r"final\s+(?:answer|predicate)\s*[:=]\s*\[?(\w+)\]?",
     ]
     for pat in patterns:
         matches = list(re.finditer(pat, text_lower))
@@ -286,12 +375,22 @@ class ChainOfThought(ReasoningStrategy):
 
 {RULES_BLOCK}
 
+{DISAMBIGUATION_TABLE}
+
+{DIRECTIONAL_RULE}
+
+{OVERLAPS_DETECTION}
+
 {context}
 
 --- KNOWLEDGE GRAPH EVIDENCE ---
 {kg_evidence}
 
-Think step-by-step and determine the best topological predicate.
+Think step-by-step:
+1. Read the vernacular carefully for qualifiers: "partly", "extends into", "enclave", "surrounded by".
+2. Use neighborhood links as context, but do not let graph hierarchy alone override textual signals.
+3. For LineString entities (rivers, roads), reason on the full geometry, not just the centroid.
+4. Verify the A→B direction before concluding.
 
 Reasoning:"""
 
@@ -341,12 +440,23 @@ class TreeOfThought(ReasoningStrategy):
 
 {RULES_BLOCK}
 
+{DISAMBIGUATION_TABLE}
+
+{DIRECTIONAL_RULE}
+
+{OVERLAPS_DETECTION}
+
 {context}
 
 --- KNOWLEDGE GRAPH EVIDENCE ---
 {kg_evidence}
 
 Explore THREE different reasoning branches for "{place_a} {rel_pred} {place_b}".
+Each branch must:
+  - Prioritize textual qualifiers ("partly", "extends into", "enclave", etc.) over graph hierarchy.
+  - For LineString entities, reason on the full geometry, not the centroid.
+  - Explicitly verify the A→B direction of the predicate.
+  - Note whether reasoning is based on explicit geometry (reliable) or administrative hierarchy only (use with caution).
 
 Format exactly as:
 BRANCH 1: [approach]
@@ -370,17 +480,23 @@ Begin:"""
         branches = re.findall(branch_pattern, branch_response, re.DOTALL | re.IGNORECASE)
 
         votes = []
+        branch_texts = []
         for i, b_text in enumerate(branches):
             pred = extract_predicate(b_text)
             votes.append(pred)
+            branch_texts.append(b_text)
             trace["branches"].append({"index": i+1, "predicate": pred, "content": b_text.strip()[:400]})
             _log(f"BRANCH_{i+1}", f"Predicted: {pred}\n{b_text.strip()}")
 
         if not votes or all(v is None for v in votes):
             final_pred = extract_predicate(self._generate(f"{context}\nAnswer: ["))
         else:
-            counter = Counter([v for v in votes if v])
-            final_pred = counter.most_common(1)[0][0] if counter else None
+            weighted_scores: Dict[str, float] = {}
+            for pred, b_text in zip(votes, branch_texts):
+                if pred is None:
+                    continue
+                weighted_scores[pred] = weighted_scores.get(pred, 0.0) + _geometric_weight(b_text)
+            final_pred = max(weighted_scores, key=weighted_scores.get) if weighted_scores else None
 
         trace["prediction"] = final_pred
         if log_fn: log_fn(f"\n  [ToT] ✅ FINAL PREDICTION: {final_pred}")
@@ -437,10 +553,22 @@ class GraphOfThought(ReasoningStrategy):
 
 {RULES_BLOCK}
 
+{DISAMBIGUATION_TABLE}
+
+{DIRECTIONAL_RULE}
+
+{OVERLAPS_DETECTION}
+
 {context}
 
 --- KNOWLEDGE GRAPH EVIDENCE ---
 {kg_evidence}
+
+Each thought must:
+  - Prioritize textual qualifiers ("partly", "extends into", "enclave", etc.) over graph hierarchy.
+  - For LineString entities, reason on the full geometry, not the centroid.
+  - Explicitly verify the A→B direction before concluding.
+  - Note whether reasoning is based on explicit geometry (reliable) or administrative hierarchy only (use with caution).
 
 Format:
 THOUGHT 1: [angle]
@@ -459,10 +587,14 @@ Begin:"""
 
         for t_text in thoughts:
             pred = extract_predicate(t_text)
-            _add_node(content=t_text.strip()[:500], predicate=pred, confidence=1.0 if pred else 0.0)
+            weight = _geometric_weight(t_text)
+            _add_node(content=t_text.strip()[:500], predicate=pred, confidence=weight)
 
-        all_preds = [n.predicate for n in thought_graph if n.predicate]
-        final_pred = Counter(all_preds).most_common(1)[0][0] if all_preds else None
+        weighted_scores: Dict[str, float] = {}
+        for node in thought_graph:
+            if node.predicate:
+                weighted_scores[node.predicate] = weighted_scores.get(node.predicate, 0.0) + node.confidence
+        final_pred = max(weighted_scores, key=weighted_scores.get) if weighted_scores else None
 
         trace["prediction"] = final_pred
         if log_fn: log_fn(f"\n  [GoT] ✅ FINAL PREDICTION: {final_pred}")

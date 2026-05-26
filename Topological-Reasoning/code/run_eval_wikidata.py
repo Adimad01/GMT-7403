@@ -25,6 +25,10 @@ from strategies_wikidata import (
     GeographicKnowledgeGraph
 )
 
+# Analysis shows: CoT performs best on OSM (numerical geometry data)
+# GoT performs best on Wikidata (semantic hierarchy data)
+# See recommendation R14 in the analysis report.
+
 # =========================================================
 # EXPERIMENT CONFIG
 # =========================================================
@@ -134,14 +138,17 @@ def evaluate_strategy(strategy, df: pd.DataFrame, output_dir: str,
             row_logger(f"Expected: {expected}")
             row_logger(f"{'=' * 90}")
 
-            try:
-                predicted, trace = strategy.reason(entity, log_fn=row_logger)
-            except Exception as e:
-                predicted = "invalid"
-                row_logger(f"ERROR: {str(e)}")
-
-            if predicted not in VALID_PREDICATES:
-                predicted = "invalid"
+            predicted = "invalid"
+            for attempt in range(3):
+                try:
+                    predicted, trace = strategy.reason(entity, log_fn=row_logger)
+                except Exception as e:
+                    row_logger(f"ERROR attempt {attempt+1}: {str(e)}")
+                    predicted = "invalid"
+                if predicted in VALID_PREDICATES:
+                    break
+                if attempt < 2:
+                    row_logger(f"  ↻ invalid prediction, retrying (attempt {attempt+2}/3)...")
 
             is_match = (expected == predicted)
 

@@ -13,7 +13,7 @@ import requests
 from abc import ABC, abstractmethod
 from typing import Dict, Any, Optional, List, Tuple
 from dataclasses import dataclass, field
-from collections import Counter
+from math import radians, sin, cos, sqrt, atan2
 
 from langchain_ollama import ChatOllama
 from langchain_core.messages import HumanMessage
@@ -31,31 +31,202 @@ MODEL_NAME = "gpt-oss"
 # =====================================================================
 VALID_PREDICATES = {
     "disjoint", "touches", "crosses", "within",
-    "contains", "overlaps", "equals",
+    "contains", "overlaps",
 }
 
-VALID_LIST = "contains, within, touches, crosses, disjoint, overlaps, equals"
+VALID_LIST = "contains, within, touches, crosses, disjoint, overlaps"
 
-VERNACULAR_LEXICON = """Vernacular-to-Topology Reference (one example each):
-  WITHIN    — e.g. "is in"         (A is inside B)
-  CONTAINS  — e.g. "is home to"    (A encloses B)
-  TOUCHES   — e.g. "borders"       (A and B share a boundary, no overlap)
-  CROSSES   — e.g. "passes through"(A traverses B)
-  OVERLAPS  — e.g. "overlaps with" (A and B partially share area)
-  DISJOINT  — e.g. "is far from"   (A and B are completely separate)
-  EQUALS    — e.g. "is the same as"(A and B occupy the same space)
+VERNACULAR_LEXICON = """Vernacular-to-Topology Reference:
+  WITHIN    — "is in", "located in", "part of"              (A is fully inside B)
+  CONTAINS  — "is home to", "includes", "hosts"             (A fully encloses B)
+  TOUCHES   — "borders", "adjacent to", "enclave of",
+              "surrounded by" (partial), "across from" (water boundary)
+  CROSSES   — "passes through", "along", "traverses",
+              "at the mouth of" / "upstream from" (full LineString)
+  OVERLAPS  — "partly in", "extends into", "straddles",
+              "part of population in", "county seat of" (may extend into adjacent counties)
+  DISJOINT  — "far from", "miles away", "separate from" (confirmed large distance)
 
-Note: geometry types constrain possible relations.
+WARNING — ambiguous vernacular (read carefully):
+  "county seat of" → does NOT imply within — the city may extend into adjacent counties → overlaps
+  "suburb of"      → does NOT imply touches — suburb may be separated from the main city → disjoint
+  "surrounded by"  → may be touches (partial encirclement), not within (full containment)
+  "enclave of"     → touches (shares boundary), NOT within (not inside interior)
+  "along" + river/road → likely crosses (full LineString traversal), not just touches
 """
 
 RULES_BLOCK = """Rules:
-1. The relation is DIRECTED: A [predicate] B.
-2. Consider geometry types (Point, LineString, Polygon, MultiPolygon).
-3. Pick EXACTLY ONE predicate from: contains, within, touches, crosses, disjoint, overlaps, equals.
-4. Carefully interpret the vernacular expression.
-5. Use the provided OpenStreetMap coordinates, bounding boxes, and administrative hierarchy to deduce the spatial relationship. 
-6. End with: Answer: [predicate]
+1. DIRECTION CHECK (mandatory before answering):
+   — "contains" means A encloses B; "within" means A is inside B.
+   — Explicitly ask: does this predicate apply A→B or B→A?
+   — If the data shows B encloses A, the answer is "within", NOT "contains".
+
+2. TEXTUAL QUALIFIER PRIORITY (override geometric signals when contradictory):
+   — "most sides", "surrounded by" with incomplete encirclement → touches.
+   — "partly in", "extends into", "part of population in" → overlaps.
+   — "enclave of" → touches (shared boundary, not interior containment).
+   — "across from" over water → touches (water boundary is shared in GIS).
+   — "county seat of" alone does NOT imply within.
+
+3. GEOMETRY TYPE CONSTRAINTS:
+   — LineString (river, road) traversing a Polygon interior → crosses.
+   — LineString touching only Polygon boundary → touches.
+   — "At the mouth of" / "upstream from": verify if the full LineString crosses the polygon.
+   — Two Polygons partially sharing area → overlaps.
+
+4. BOUNDING BOX CAUTION (never conclude directly from bbox):
+   — bbox overlap ≠ polygon overlap. Polygons inside overlapping bboxes may still be disjoint.
+   — bbox containment ≠ within/contains. A country bbox contains almost all nearby entities.
+   — Treat bbox as a clue, never as proof.
+
+5. BBOX GAP TOLERANCE:
+   — A gap of < 0.01 degrees (~1 km) between bboxes is NOT proof of disjoint.
+   — Administrative boundaries often share exact edges with 0-meter gap.
+
+6. ENTITY VALIDATION:
+   — Verify the retrieved OSM entity matches the expected state/region.
+   — If the entity location does not match the context, treat its geometry as unreliable.
+
+7. FULL LINESTRING REASONING:
+   — For rivers and roads, reason on the entire geometry, not just the centroid/representative point.
+   — A river centroid may fall outside a city even if the river traverses it.
+
+8. Pick EXACTLY ONE predicate from: contains, within, touches, crosses, disjoint, overlaps.
+9. End with: Answer: [predicate]
 """
+
+DISAMBIGUATION_TABLE = """
+CRITICAL DISTINCTIONS (most confused predicates):
+
+touches vs overlaps:
+  touches  → A and B share ONLY their boundary. Interiors do NOT intersect.
+             Example: two adjacent counties sharing a border line.
+  overlaps → A and B share SOME interior area. Part of A is inside B, part is outside.
+             Example: a city that partially crosses a county boundary.
+
+touches vs crosses:
+  touches  → boundary contact only, no traversal through interior.
+  crosses  → A passes THROUGH B, entering AND exiting its interior.
+             Requires different geometry dimensions (LineString through Polygon).
+             Example: a highway that enters and exits a city polygon.
+
+contains vs within (DIRECTION IS CRITICAL):
+  contains → A is the CONTAINER. B is fully INSIDE A. Ask: "does A surround B?"
+  within   → A is INSIDE B. Ask: "is A surrounded by B?"
+  KEY RULE: Identify which entity is the enclosing one.
+     If A is smaller than B -> "within".  If A is larger and encloses B -> "contains".
+     Signals for contains: "home to", "location of", "hosts", "includes".
+     Signals for within: "located in", "in", "part of", "county seat of".
+
+disjoint vs touches:
+  disjoint -> A and B share NO point at all.
+  touches  -> A and B share EXACTLY their boundary edge, nothing more.
+  "suburb of" alone does NOT imply touches — suburb may be disjoint from the main city.
+"""
+
+DIRECTIONAL_RULE = """
+ANTI-BIAS RULE for contains/within:
+Before answering, explicitly check: "Is A the LARGER entity that SURROUNDS B?"
+  - YES -> contains
+  - NO, B surrounds A -> within
+Do NOT default to "within" just because A is a sub-entity type or mentioned first.
+"""
+
+OVERLAPS_DETECTION = """
+3-STEP CHECK to detect OVERLAPS (do this before concluding within or touches):
+  Step 1: Is A completely inside B? -> within (not overlaps)
+  Step 2: Is B completely inside A? -> contains (not overlaps)
+  Step 3: Do A and B share SOME area but NEITHER fully contains the other? -> overlaps
+  Strong overlaps signals: "extends into", "partly in", "straddles",
+                           "part of population in", "county seat of" (city crosses county line).
+"""
+
+# =====================================================================
+# ENTITY VALIDATION HELPERS (Recommendation 1 & 2 & 3)
+# =====================================================================
+US_STATE_NAMES = {
+    'AL': 'Alabama', 'AK': 'Alaska', 'AZ': 'Arizona', 'AR': 'Arkansas',
+    'CA': 'California', 'CO': 'Colorado', 'CT': 'Connecticut', 'DE': 'Delaware',
+    'FL': 'Florida', 'GA': 'Georgia', 'HI': 'Hawaii', 'ID': 'Idaho',
+    'IL': 'Illinois', 'IN': 'Indiana', 'IA': 'Iowa', 'KS': 'Kansas',
+    'KY': 'Kentucky', 'LA': 'Louisiana', 'ME': 'Maine', 'MD': 'Maryland',
+    'MA': 'Massachusetts', 'MI': 'Michigan', 'MN': 'Minnesota', 'MS': 'Mississippi',
+    'MO': 'Missouri', 'MT': 'Montana', 'NE': 'Nebraska', 'NV': 'Nevada',
+    'NH': 'New Hampshire', 'NJ': 'New Jersey', 'NM': 'New Mexico', 'NY': 'New York',
+    'NC': 'North Carolina', 'ND': 'North Dakota', 'OH': 'Ohio', 'OK': 'Oklahoma',
+    'OR': 'Oregon', 'PA': 'Pennsylvania', 'RI': 'Rhode Island', 'SC': 'South Carolina',
+    'SD': 'South Dakota', 'TN': 'Tennessee', 'TX': 'Texas', 'UT': 'Utah',
+    'VT': 'Vermont', 'VA': 'Virginia', 'WA': 'Washington', 'WV': 'West Virginia',
+    'WI': 'Wisconsin', 'WY': 'Wyoming', 'DC': 'District of Columbia',
+    'MX': 'Mexico',
+}
+
+def _extract_state_hint(place_name: str) -> Optional[str]:
+    """Extract US state abbreviation from a place name like 'San Jose CA'."""
+    parts = place_name.strip().split()
+    if parts and parts[-1].upper() in US_STATE_NAMES:
+        return parts[-1].upper()
+    return None
+
+def _validate_entity_context(place_name: str, osm_data: dict) -> str:
+    """Verify the OSM result matches the expected state/region from the place name."""
+    if not osm_data:
+        return ""
+    state_hint = _extract_state_hint(place_name)
+    if not state_hint:
+        return ""
+    state_name = US_STATE_NAMES[state_hint]
+    hierarchy = osm_data.get('hierarchy', {})
+    hier_str = " ".join(str(v) for v in hierarchy.values()).lower()
+    if state_name.lower() in hier_str or state_hint.lower() in hier_str:
+        return f"  ✓ Entity confirmed in expected state ({state_name})"
+    return (
+        f"  ⚠️ ENTITY MISMATCH: Expected state {state_name} ({state_hint}) not found in OSM "
+        f"hierarchy — this entity may be from a different region. Treat its geometry as UNRELIABLE."
+    )
+
+def _compute_bbox_relationship(bbox_a: list, bbox_b: list) -> str:
+    """Analyze the spatial relationship between two OSM bounding boxes."""
+    try:
+        s_a, n_a, w_a, e_a = float(bbox_a[0]), float(bbox_a[1]), float(bbox_a[2]), float(bbox_a[3])
+        s_b, n_b, w_b, e_b = float(bbox_b[0]), float(bbox_b[1]), float(bbox_b[2]), float(bbox_b[3])
+
+        lat_overlap = s_a <= n_b and n_a >= s_b
+        lon_overlap = w_a <= e_b and e_a >= w_b
+        overlapping = lat_overlap and lon_overlap
+
+        if overlapping:
+            a_in_b = s_a >= s_b and n_a <= n_b and w_a >= w_b and e_a <= e_b
+            b_in_a = s_b >= s_a and n_b <= n_a and w_b >= w_a and e_b <= e_a
+            if a_in_b:
+                return ("A's bbox is fully inside B's bbox — "
+                        "WARNING: bbox containment ≠ polygon within. Verify with polygon geometry.")
+            elif b_in_a:
+                return ("B's bbox is fully inside A's bbox — "
+                        "WARNING: bbox containment ≠ polygon contains. Verify with polygon geometry.")
+            else:
+                return ("Bboxes partially overlap — "
+                        "WARNING: bbox overlap ≠ polygon overlap. The actual polygons may still be disjoint or only touching.")
+        else:
+            lat_gap = max(0.0, max(s_a, s_b) - min(n_a, n_b))
+            lon_gap = max(0.0, max(w_a, w_b) - min(e_a, e_b))
+            gap_deg = max(lat_gap, lon_gap)
+            gap_km = gap_deg * 111.0
+            if gap_km < 1.0:
+                return (f"Bboxes nearly adjacent (gap ≈ {gap_km:.3f} km) — "
+                        f"this small gap does NOT confirm disjoint. Administrative boundaries may share exact edges.")
+            else:
+                return f"Bboxes separated by ≈ {gap_km:.1f} km — entities are likely spatially separate."
+    except (ValueError, TypeError, IndexError):
+        return "Bbox relationship could not be computed."
+
+def _haversine_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    R = 6371.0
+    dlat = radians(lat2 - lat1)
+    dlon = radians(lon2 - lon1)
+    a = sin(dlat/2)**2 + cos(radians(lat1)) * cos(radians(lat2)) * sin(dlon/2)**2
+    return 2 * R * atan2(sqrt(a), sqrt(1 - a))
+
 
 # =====================================================================
 # DYNAMIC OSM KNOWLEDGE GRAPH
@@ -86,27 +257,31 @@ class GeographicKnowledgeGraph:
     def _fetch_osm_data(self, place_name: str) -> Optional[dict]:
         if not place_name or place_name.lower() == "nan":
             return None
-            
         if place_name in self.cache:
             return self.cache[place_name]
 
+        state_hint = _extract_state_hint(place_name)
+        query = f"{place_name}, {US_STATE_NAMES[state_hint]}" if state_hint else place_name
+
         url = "https://nominatim.openstreetmap.org/search"
         params = {
-            "q": place_name,
+            "q": query,
             "format": "json",
             "addressdetails": 1,
-            "limit": 1
+            "limit": 5,
+            "countrycodes": "us,mx",
         }
         headers = {"User-Agent": "LavalUniversity-GeomaticsPhDEval/1.0"}
 
         try:
-            time.sleep(1.1) 
+            time.sleep(1.1)
             response = requests.get(url, params=params, headers=headers)
             response.raise_for_status()
             data = response.json()
-            
+
             if data:
-                result = data[0]
+                preferred_classes = ['boundary', 'place', 'highway', 'waterway', 'natural']
+                result = next((r for r in data if r.get('class') in preferred_classes), data[0])
                 extracted = {
                     "lat": result.get("lat"),
                     "lon": result.get("lon"),
@@ -123,7 +298,6 @@ class GeographicKnowledgeGraph:
                 self.cache[place_name] = None
                 self._save_cache()
                 return None
-                
         except Exception as e:
             print(f"⚠️ OSM API Error for '{place_name}': {e}")
             return None
@@ -139,26 +313,52 @@ class GeographicKnowledgeGraph:
         def format_entity_evidence(name, data, entity_label):
             if not data:
                 return f"{entity_label} ({name}): No OSM data available."
-            
+
             lines = [f"{entity_label}: {name}"]
             lines.append(f"  • Coordinates: Lat {data.get('lat')}, Lon {data.get('lon')}")
-            
+
             bbox = data.get('boundingbox')
             if bbox and len(bbox) == 4:
                 lines.append(f"  • Bounding Box: [South: {bbox[0]}, North: {bbox[1]}, West: {bbox[2]}, East: {bbox[3]}]")
-                
+
             lines.append(f"  • Feature Category: {data.get('class')} / {data.get('type')}")
-            
+
             hierarchy = data.get('hierarchy')
             if hierarchy:
                 hier_str = " > ".join([f"{k}: {v}" for k, v in hierarchy.items()])
                 lines.append(f"  • Administrative Hierarchy: {hier_str}")
-                
+
+            validation_msg = _validate_entity_context(name, data)
+            if validation_msg:
+                lines.append(validation_msg)
+
             return "\n".join(lines)
 
         evidence_lines.append(format_entity_evidence(place_a, data_a, "Entity A"))
         evidence_lines.append("")
         evidence_lines.append(format_entity_evidence(place_b, data_b, "Entity B"))
+
+        bbox_a = data_a.get('boundingbox') if data_a else None
+        bbox_b = data_b.get('boundingbox') if data_b else None
+        if bbox_a and bbox_b and len(bbox_a) == 4 and len(bbox_b) == 4:
+            bbox_rel = _compute_bbox_relationship(bbox_a, bbox_b)
+            evidence_lines.append("\n--- Bounding Box Analysis ---")
+            evidence_lines.append(f"  {bbox_rel}")
+
+        # Distance between centroids
+        if data_a and data_b:
+            try:
+                dist = _haversine_km(float(data_a['lat']), float(data_a['lon']),
+                                     float(data_b['lat']), float(data_b['lon']))
+                if dist < 1.0:
+                    dist_hint = f"Distance between centroids: {dist:.3f} km — very close, likely touching or overlapping"
+                elif dist < 50.0:
+                    dist_hint = f"Distance between centroids: {dist:.1f} km — moderate distance"
+                else:
+                    dist_hint = f"Distance between centroids: {dist:.1f} km — large distance, likely disjoint"
+                evidence_lines.append(f"  {dist_hint}")
+            except (TypeError, ValueError):
+                pass
 
         evidence_text = "\n".join(evidence_lines)
 
@@ -191,6 +391,19 @@ def _build_context_block(entity: Dict[str, Any]) -> str:
 def _gather_kg_evidence(kg: GeographicKnowledgeGraph, place_a: str, place_b: str, sentence: str = "", entity: dict = None, log_fn=None) -> str:
     return kg.gather_evidence(place_a, place_b, sentence, entity, log_fn)
 
+def _geometric_weight(text: str) -> float:
+    """Score a branch/thought by presence of geometric evidence. Higher = more reliable."""
+    geo_keywords = [
+        'bbox', 'bounding box', 'coordinates', 'lat', 'lon', 'polygon',
+        'linestring', 'geometry', 'degrees', 'km', 'kilometer',
+        'south', 'north', 'west', 'east', 'extends into',
+        'boundary', 'border', 'intersect', 'interior', 'traverse',
+    ]
+    text_lower = text.lower()
+    hits = sum(1 for kw in geo_keywords if kw in text_lower)
+    return 1.0 + 0.3 * min(hits, 5)
+
+
 def extract_predicate(text: str) -> Optional[str]:
     """Robust extraction of topological predicates using Regex."""
     if not text:
@@ -198,12 +411,15 @@ def extract_predicate(text: str) -> Optional[str]:
     text_clean = re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL)
     text_clean = re.sub(r"[*_`]", "", text_clean)
     text_lower = text_clean.lower()
-    
+
     patterns = [
         r"answer\s*[:=]\s*\[?(\w+)\]?",
         r"predicate\s*[:=]\s*\[?(\w+)\]?",
-        r"conclusion\s*[:=]\s*(\w+)",
-        r"suggested\s+predicate\s*[:=]\s*(\w+)"
+        r"conclusion\s*[:=]\s*\[?(\w+)\]?",
+        r"suggested\s+predicate\s*[:=]\s*\[?(\w+)\]?",
+        r"the\s+(?:relation|predicate|answer)\s+is\s+[:\[]?(\w+)",
+        r"therefore[,\s]+(?:the\s+)?(?:answer|predicate|relation)\s+is\s+[:\[]?(\w+)",
+        r"final\s+(?:answer|predicate)\s*[:=]\s*\[?(\w+)\]?",
     ]
     for pat in patterns:
         matches = list(re.finditer(pat, text_lower))
@@ -302,11 +518,22 @@ class ChainOfThought(ReasoningStrategy):
 
 {RULES_BLOCK}
 
+{DISAMBIGUATION_TABLE}
+
+{DIRECTIONAL_RULE}
+
+{OVERLAPS_DETECTION}
+
 {context}
 
 {kg_evidence}
 
-Think step-by-step. Analyze the coordinates, bounding boxes, and hierarchical relationship to determine the best topological predicate.
+Think step-by-step:
+1. Check entity validation warnings — if a mismatch is flagged, treat that geometry as unreliable.
+2. Read the vernacular carefully for qualifiers like "partly", "extends into", "surrounded by", "enclave".
+3. Analyze the Bounding Box Analysis section — note any warnings about bbox vs. polygon.
+4. Verify the direction: does your predicate apply A→B or B→A?
+5. State your final predicate.
 
 Reasoning:"""
 
@@ -356,11 +583,22 @@ class TreeOfThought(ReasoningStrategy):
 
 {RULES_BLOCK}
 
+{DISAMBIGUATION_TABLE}
+
+{DIRECTIONAL_RULE}
+
+{OVERLAPS_DETECTION}
+
 {context}
 
 {kg_evidence}
 
-Explore THREE different reasoning branches for "{place_a} {rel_phrase} {place_b}" using the OSM coordinates and hierarchy.
+Explore THREE different reasoning branches for "{place_a} {rel_phrase} {place_b}" using the OSM evidence.
+Each branch must:
+  - Check entity validation warnings before using geometry.
+  - Prioritize textual qualifiers ("partly", "extends into", "enclave", etc.) over bbox signals.
+  - Explicitly verify the A→B direction of the predicate.
+  - Note whether reasoning is based on polygon geometry (reliable) or bbox only (use with caution).
 
 Format exactly as:
 BRANCH 1: [approach]
@@ -384,17 +622,23 @@ Begin:"""
         branches = re.findall(branch_pattern, branch_response, re.DOTALL | re.IGNORECASE)
 
         votes = []
+        branch_texts = []
         for i, b_text in enumerate(branches):
             pred = extract_predicate(b_text)
             votes.append(pred)
+            branch_texts.append(b_text)
             trace["branches"].append({"index": i+1, "predicate": pred, "content": b_text.strip()[:400]})
             _log(f"BRANCH_{i+1}", f"Predicted: {pred}\n{b_text.strip()}")
 
         if not votes or all(v is None for v in votes):
             final_pred = extract_predicate(self._generate(f"{context}\nAnswer: ["))
         else:
-            counter = Counter([v for v in votes if v])
-            final_pred = counter.most_common(1)[0][0] if counter else None
+            weighted_scores: Dict[str, float] = {}
+            for pred, b_text in zip(votes, branch_texts):
+                if pred is None:
+                    continue
+                weighted_scores[pred] = weighted_scores.get(pred, 0.0) + _geometric_weight(b_text)
+            final_pred = max(weighted_scores, key=weighted_scores.get) if weighted_scores else None
 
         trace["prediction"] = final_pred
         if log_fn: log_fn(f"\n  [ToT] ✅ FINAL PREDICTION: {final_pred}")
@@ -452,9 +696,21 @@ Analyze the provided OSM coordinates, bounding boxes, and administrative hierarc
 
 {RULES_BLOCK}
 
+{DISAMBIGUATION_TABLE}
+
+{DIRECTIONAL_RULE}
+
+{OVERLAPS_DETECTION}
+
 {context}
 
 {kg_evidence}
+
+Each thought must:
+  - Check entity validation warnings before using any geometry.
+  - Explicitly note if reasoning is based on polygon geometry (reliable) or bbox only (caution).
+  - Prioritize textual qualifiers over geometric signals when they conflict.
+  - Verify the A→B direction before concluding.
 
 Format:
 THOUGHT 1: [angle]
@@ -473,10 +729,14 @@ Begin:"""
 
         for t_text in thoughts:
             pred = extract_predicate(t_text)
-            _add_node(content=t_text.strip()[:500], predicate=pred, confidence=1.0 if pred else 0.0)
+            weight = _geometric_weight(t_text)
+            _add_node(content=t_text.strip()[:500], predicate=pred, confidence=weight)
 
-        all_preds = [n.predicate for n in thought_graph if n.predicate]
-        final_pred = Counter(all_preds).most_common(1)[0][0] if all_preds else None
+        weighted_scores: Dict[str, float] = {}
+        for node in thought_graph:
+            if node.predicate:
+                weighted_scores[node.predicate] = weighted_scores.get(node.predicate, 0.0) + node.confidence
+        final_pred = max(weighted_scores, key=weighted_scores.get) if weighted_scores else None
 
         trace["prediction"] = final_pred
         if log_fn: log_fn(f"\n  [GoT] ✅ FINAL PREDICTION: {final_pred}")
