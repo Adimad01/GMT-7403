@@ -329,19 +329,22 @@ def main():
     if args.adapter_path:
         adapter_abs = os.path.abspath(args.adapter_path)
         print(f"[MODEL] Applying LoRA adapter from: {adapter_abs}")
-        # Older PEFT + newer huggingface_hub rejects absolute paths as invalid repo IDs.
-        # Patch validate_repo_id to pass through absolute local paths without validation.
+        # Older PEFT (conda) + newer huggingface_hub: load_peft_weights() calls
+        # file_exists() to check for a remote safetensors file. For absolute local
+        # paths this constructs a bogus HF URL and raises a 404. Fix: patch
+        # file_exists inside the peft.utils.save_and_load module to short-circuit
+        # for absolute paths and return False (no remote file) immediately.
+        import peft.utils.save_and_load as _peft_sl
+        _orig_fe = _peft_sl.file_exists
+        def _local_file_exists(repo_id, *a, **kw):
+            if os.path.isabs(str(repo_id)):
+                return False
+            return _orig_fe(repo_id, *a, **kw)
+        _peft_sl.file_exists = _local_file_exists
         try:
-            import huggingface_hub.utils._validators as _hfv
-            _orig_validate = _hfv.validate_repo_id
-            def _allow_local_abs(repo_id, *a, **kw):
-                if os.path.isabs(repo_id):
-                    return
-                return _orig_validate(repo_id, *a, **kw)
-            _hfv.validate_repo_id = _allow_local_abs
             model = PeftModel.from_pretrained(model, adapter_abs, local_files_only=True)
         finally:
-            _hfv.validate_repo_id = _orig_validate
+            _peft_sl.file_exists = _orig_fe
 
     model.eval()
     print(f"[MODEL] Ready. KG source: {args.kg_source}")
