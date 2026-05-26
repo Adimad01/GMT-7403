@@ -268,8 +268,12 @@ def main():
     parser.add_argument("--output-dir",     default="results")
     parser.add_argument("--temperature",    type=float, default=0.1)
     parser.add_argument("--max-new-tokens", type=int,   default=150)
-    parser.add_argument("--max-rows",       type=int,   default=None,
+    parser.add_argument("--max-rows",        type=int,   default=None,
                         help="Limit rows (for quick smoke-testing)")
+    parser.add_argument("--filter-indices",  default=None,
+                        help="Path to a JSON file containing a list of row indices to evaluate "
+                             "(e.g. the 96 balanced indices used in the prompting experiments). "
+                             "Rows NOT in the list are skipped.")
     args = parser.parse_args()
 
     # ------------------------------------------------------------------
@@ -288,10 +292,16 @@ def main():
     # ------------------------------------------------------------------
     # 2. Load test dataset
     # ------------------------------------------------------------------
+    import json as _json
     df = pd.read_csv(args.dataset)
     if args.max_rows:
         df = df.head(args.max_rows)
         print(f"[DATA] Truncated to {args.max_rows} rows for testing.")
+    if args.filter_indices:
+        with open(args.filter_indices, "r") as _f:
+            _keep = set(_json.load(_f))
+        df = df.loc[df.index.isin(_keep)]
+        print(f"[DATA] Filtered to {len(df)} rows using index list from {args.filter_indices}")
     print(f"[DATA] {len(df)} test rows loaded from {args.dataset}")
 
     # ------------------------------------------------------------------
