@@ -336,15 +336,28 @@ def main():
         # for absolute paths and return False (no remote file) immediately.
         import peft.utils.save_and_load as _peft_sl
         _orig_fe = _peft_sl.file_exists
+        _orig_dl = _peft_sl.hf_hub_download
+
         def _local_file_exists(repo_id, *a, **kw):
             if os.path.isabs(str(repo_id)):
                 return False
             return _orig_fe(repo_id, *a, **kw)
+
+        def _local_hf_hub_download(repo_id, filename, **kw):
+            if os.path.isabs(str(repo_id)):
+                path = os.path.join(repo_id, filename)
+                if os.path.isfile(path):
+                    return path
+                raise FileNotFoundError(f"Adapter weight not found locally: {path}")
+            return _orig_dl(repo_id, filename, **kw)
+
         _peft_sl.file_exists = _local_file_exists
+        _peft_sl.hf_hub_download = _local_hf_hub_download
         try:
             model = PeftModel.from_pretrained(model, adapter_abs, local_files_only=True)
         finally:
             _peft_sl.file_exists = _orig_fe
+            _peft_sl.hf_hub_download = _orig_dl
 
     model.eval()
     print(f"[MODEL] Ready. KG source: {args.kg_source}")
