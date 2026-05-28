@@ -28,10 +28,37 @@ import os
 import sys
 import json
 import argparse
+import types
 import pandas as pd
 import torch
 from tqdm import tqdm
 from datetime import datetime
+
+# ===========================================================================
+# TORCHVISION STUB
+# Pre-populate sys.modules with a harmless stub BEFORE importing peft or
+# transformers.  On some servers torch and torchvision versions mismatch,
+# causing torchvision to raise ImportError(_cast_Long) when transformers
+# tries to import it.  We don't use torchvision at all in this script.
+# ===========================================================================
+if "torchvision" not in sys.modules:
+    _tv     = types.ModuleType("torchvision")
+    _tv_io  = types.ModuleType("torchvision.io")
+
+    class _ImageReadMode:
+        RGB = 0; GRAY = 1; RGB_ALPHA = 2; GRAY_ALPHA = 3; UNCHANGED = 4
+
+    _tv_io.ImageReadMode = _ImageReadMode
+    _tv_io.decode_image  = None
+
+    sys.modules["torchvision"]                       = _tv
+    sys.modules["torchvision.io"]                    = _tv_io
+    for _sub in [
+        "models", "transforms", "ops", "datasets", "utils",
+        "models.convnext", "ops.misc", "ops._register_onnx_ops",
+    ]:
+        sys.modules[f"torchvision.{_sub}"] = types.ModuleType(f"torchvision.{_sub}")
+# ===========================================================================
 
 # ===========================================================================
 # DEPENDENCY MONKEY PATCHES (same as eval_kg_instruction_finetuned.py)
