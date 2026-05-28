@@ -49,8 +49,6 @@ import importlib.abc
 class _TorchvisionStubFinder(importlib.abc.MetaPathFinder, importlib.abc.Loader):
     def find_spec(self, fullname, path, target=None):
         if fullname == "torchvision" or fullname.startswith("torchvision."):
-            # is_package=True sets submodule_search_locations=[] and __path__=[]
-            # so Python treats this as a package (allows torchvision.io etc.)
             return importlib.machinery.ModuleSpec(fullname, self, is_package=True)
         return None
 
@@ -58,12 +56,33 @@ class _TorchvisionStubFinder(importlib.abc.MetaPathFinder, importlib.abc.Loader)
         return None  # default module creation — __spec__ set by import machinery
 
     def exec_module(self, module):
-        module.__path__ = []   # confirm package status
+        module.__path__ = []
+
+        # Self-referencing catch-all so any attribute access on any sub-module
+        # returns something harmless (prevents future AttributeError surprises).
+        class _Stub:
+            def __init__(self, n=""):  self._n = n
+            def __getattr__(self, n):  return _Stub(n)
+            def __call__(self, *a, **k): return _Stub()
+            def __iter__(self):        return iter([])
+        module.__getattr__ = lambda name: _Stub(name)
+
         if module.__name__ == "torchvision.io":
             class _ImageReadMode:
                 RGB = 0; GRAY = 1; RGB_ALPHA = 2; GRAY_ALPHA = 3; UNCHANGED = 4
             module.ImageReadMode = _ImageReadMode
             module.decode_image  = None
+
+        elif module.__name__ == "torchvision.transforms":
+            class _InterpolationMode:
+                NEAREST       = "nearest"
+                NEAREST_EXACT = "nearest-exact"
+                BILINEAR      = "bilinear"
+                BICUBIC       = "bicubic"
+                BOX           = "box"
+                HAMMING       = "hamming"
+                LANCZOS       = "lanczos"
+            module.InterpolationMode = _InterpolationMode
 
 # Remove any partial / broken cached state, then install our finder first
 for _k in [k for k in list(sys.modules) if k == "torchvision" or k.startswith("torchvision.")]:
