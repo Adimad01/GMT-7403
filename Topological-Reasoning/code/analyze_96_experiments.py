@@ -7,13 +7,13 @@ Unified comparison of all 6 experiments × 3 strategies (CoT, ToT, GoT) on the
 Each experiment uses a different model/adapter configuration; all 6 are evaluated
 with CoT, ToT, and GoT — producing 18 result sets total.
 
-Experiment configurations:
-  Exp 1 — GPTOSS Base           tag: exp1_base_gpu
-  Exp 2 — GPTOSS Fine-tuné      tag: exp2_finetuned_topo_gpu
-  Exp 3 — Fine-tuné + KG entrée tag: exp3_finetuned_kg_in_gpu
-  Exp 4 — Fine-tuné + KG ft     tag: exp4_finetuned_osm_kg_gpu
-  Exp 5 — Fine-tuné + Enriched  tag: exp5_finetuned_enriched_gpu
-  Exp 6 — Base + Enriched Ollama tag: dynamic_osm_improved_version  ✅ done
+Experiment configurations (all use CoT/ToT/GoT + OSM KG at inference):
+  Exp 1 — Base (no adapter)                          tag: exp1_base_gpu              512 tok
+  Exp 2 — FT topo (raw data, no KG in training)      tag: exp2_finetuned_topo_gpu    512 tok
+  Exp 3 — FT OSM-KG (KG in training AND inference)   tag: exp3_finetuned_kg_in_gpu   1024 tok
+  Exp 4 — FT Wikidata-KG (Wikidata in training)      tag: exp4_finetuned_osm_kg_gpu  1024 tok
+  Exp 5 — FT topo, extended reasoning budget         tag: exp5_finetuned_enriched_gpu 1024 tok
+  Exp 6 — Base + Ollama inference                    tag: dynamic_osm_improved_version  ✅ done
 
 Usage:
     cd /path/to/Topological-Reasoning/code
@@ -38,12 +38,12 @@ SUFFIX           = "neighborhood_details_spatial_relation_16_sample"
 # Experiment registry — (label, model_tag, adapter_note)
 # ---------------------------------------------------------------------------
 EXPERIMENTS = [
-    ("Exp1 — Base",                 "exp1_base_gpu",              "no adapter"),
-    ("Exp2 — Fine-tuné",            "exp2_finetuned_topo_gpu",    "topo adapter"),
-    ("Exp3 — FT + KG entrée",       "exp3_finetuned_kg_in_gpu",   "topo adapter + KG at inf."),
-    ("Exp4 — FT + KG ft",           "exp4_finetuned_osm_kg_gpu",  "osm-kg adapter"),
-    ("Exp5 — FT + Enriched GPU",    "exp5_finetuned_enriched_gpu","topo adapter"),
-    ("Exp6 — Base + Ollama",        "dynamic_osm_improved_version","no adapter (Ollama)"),
+    ("Exp1 — Base",                  "exp1_base_gpu",               "no adapter"),
+    ("Exp2 — FT topo",               "exp2_finetuned_topo_gpu",     "topo adapter, 512 tok"),
+    ("Exp3 — FT OSM-KG",             "exp3_finetuned_kg_in_gpu",    "osm-kg adapter, 1024 tok"),
+    ("Exp4 — FT Wikidata-KG",        "exp4_finetuned_osm_kg_gpu",   "wikidata-kg adapter, 1024 tok"),
+    ("Exp5 — FT topo étendu",        "exp5_finetuned_enriched_gpu", "topo adapter, 1024 tok"),
+    ("Exp6 — Base + Ollama",         "dynamic_osm_improved_version","no adapter (Ollama)"),
 ]
 
 
@@ -199,7 +199,7 @@ def plot_grouped_bar(results_matrix: dict, save_path: str):
     ax.set_xticklabels(exp_labels, rotation=20, ha="right", fontsize=8)
     ax.set_ylabel("Accuracy (%)")
     ax.set_ylim(0, 115)
-    ax.set_title("Accuracy per Experiment × Strategy  (96 balanced examples, OSM KG)")
+    ax.set_title("Accuracy per Experiment × Strategy  (96 balanced examples, OSM KG at inference)")
     ax.legend(title="Strategy", loc="upper left")
     ax.yaxis.set_major_formatter(mtick.PercentFormatter())
     plt.tight_layout()

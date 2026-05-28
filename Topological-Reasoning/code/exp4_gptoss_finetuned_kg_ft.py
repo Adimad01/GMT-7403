@@ -1,15 +1,17 @@
 """
-Experiment 4 — GPTOSS Fine-tuné + KG comme entrée de fine-tuning
+Experiment 4 — GPTOSS Fine-tuné Wikidata-KG + Inférence enrichie OSM
 ================================================================================
-GPT-OSS-20B fine-tuned on OSM-KG instruction data (osm_kg_train.jsonl), evaluated
-with CoT, ToT, and GoT reasoning strategies grounded on OSM KG.
+GPT-OSS-20B fine-tuned on Wikidata-KG instruction data (wikidata_kg_train.jsonl),
+evaluated with CoT, ToT, and GoT reasoning strategies grounded on OSM KG.
 
-Every training example already contained OSM evidence in the prompt, so the model
-has learned to interpret and reason from coordinate/bbox/hierarchy data.  At
-evaluation the same OSM evidence is injected via CoT/ToT/GoT strategies.
+Key distinction from Experiment 3: the adapter was trained on Wikidata-based
+evidence (semantic, entity-level) rather than OSM geometric evidence.  At
+inference, OSM KG evidence (coordinates, bounding boxes, hierarchy) is provided
+via CoT/ToT/GoT — testing whether Wikidata-KG fine-tuning transfers to OSM-
+grounded inference.
 
-Model     : openai/gpt-oss-20b + finetuned_gptoss_osm_kg/final_adapter
-KG        : OSM — seen DURING fine-tuning AND at inference via strategies
+Model     : openai/gpt-oss-20b + finetuned_gptoss_wikidata_kg/final_adapter
+KG        : Wikidata in training / OSM (Nominatim) at inference via CoT/ToT/GoT
 Strategies: CoT, ToT, GoT
 Eval set  : 96 balanced examples — 16 per predicate
 Outputs   :
@@ -31,12 +33,12 @@ import argparse
 DATASET        = "../dataset/triplet_update_v3_30.csv"
 INDICES_FILE   = "../dataset/eval_96_balanced_indices.json"
 MODEL_ID       = "openai/gpt-oss-20b"
-ADAPTER_PATH   = "finetuned_gptoss_osm_kg/final_adapter"
+ADAPTER_PATH   = "finetuned_gptoss_wikidata_kg/final_adapter"
 OSM_CACHE      = "results/osm_cache.json"
 MODEL_TAG      = "exp4_finetuned_osm_kg_gpu"
 OUTPUT_DIR     = "results"
 TEMPERATURE    = 0.1
-MAX_NEW_TOKENS = 512
+MAX_NEW_TOKENS = 1024
 
 SUFFIX     = "neighborhood_details_spatial_relation_16_sample"
 STRATEGIES = ["cot", "tot", "got"]
@@ -90,12 +92,12 @@ def run():
     preflight()
 
     print("\n" + "=" * 70)
-    print("  EXPERIMENT 4 — GPTOSS Fine-tuné KG ft + CoT/ToT/GoT")
-    print("  (OSM-KG instruction adapter, KG in training AND inference)")
+    print("  EXPERIMENT 4 — GPTOSS FT Wikidata-KG + Inférence OSM CoT/ToT/GoT")
+    print("  (Wikidata-KG adapter, OSM evidence at inference only)")
     print("=" * 70)
     print(f"  Model      : {MODEL_ID}")
-    print(f"  Adapter    : {ADAPTER_PATH}  [trained WITH OSM KG evidence]")
-    print(f"  KG         : OSM — in training prompts AND CoT/ToT/GoT at inference")
+    print(f"  Adapter    : {ADAPTER_PATH}  [trained WITH Wikidata KG evidence]")
+    print(f"  KG         : Wikidata in training / OSM via CoT/ToT/GoT at inference")
     print(f"  Strategies : {', '.join(s.upper() for s in target)}")
     print(f"  Output tag : {MODEL_TAG}")
     print("=" * 70)

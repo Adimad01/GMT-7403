@@ -1,16 +1,17 @@
 """
-Experiment 3 — GPTOSS Fine-tuné + KG en entrée
+Experiment 3 — GPTOSS Fine-tuné KG-OSM + Inférence enrichie OSM
 ================================================================================
-GPT-OSS-20B fine-tuned on raw topological data, evaluated with CoT/ToT/GoT
-where OSM KG evidence is explicitly embedded in the instruction prompt.
+GPT-OSS-20B fine-tuned on OSM-KG instruction data (osm_kg_train.jsonl), then
+evaluated with CoT/ToT/GoT reasoning strategies grounded on OSM KG.
 
-The key distinction from Experiment 2: the adapter here was trained on raw data
-(no KG), yet the CoT/ToT/GoT reasoning steps are provided with full OSM evidence
-(coordinates, bounding boxes, administrative hierarchy).  This isolates the
-effect of KG evidence at inference time on a non-KG-trained model.
+Key distinction from Experiment 2: the adapter was trained on instruction
+examples that ALREADY contained OSM KG evidence (coordinates, bounding boxes,
+administrative hierarchy).  At inference, the same OSM evidence is provided
+via CoT/ToT/GoT — so the model has seen this kind of evidence both during
+fine-tuning AND at evaluation.
 
-Model     : openai/gpt-oss-20b + finetuned_gptoss_topological/final_adapter
-KG        : OSM (Nominatim) — injected into CoT/ToT/GoT prompts at inference
+Model     : openai/gpt-oss-20b + finetuned_gptoss_osm_kg/final_adapter
+KG        : OSM (Nominatim) — in training AND at inference via CoT/ToT/GoT
 Strategies: CoT, ToT, GoT
 Eval set  : 96 balanced examples — 16 per predicate
 Outputs   :
@@ -32,12 +33,12 @@ import argparse
 DATASET        = "../dataset/triplet_update_v3_30.csv"
 INDICES_FILE   = "../dataset/eval_96_balanced_indices.json"
 MODEL_ID       = "openai/gpt-oss-20b"
-ADAPTER_PATH   = "finetuned_gptoss_topological/final_adapter"
+ADAPTER_PATH   = "finetuned_gptoss_osm_kg/final_adapter"
 OSM_CACHE      = "results/osm_cache.json"
 MODEL_TAG      = "exp3_finetuned_kg_in_gpu"
 OUTPUT_DIR     = "results"
 TEMPERATURE    = 0.1
-MAX_NEW_TOKENS = 512
+MAX_NEW_TOKENS = 1024
 
 SUFFIX     = "neighborhood_details_spatial_relation_16_sample"
 STRATEGIES = ["cot", "tot", "got"]
@@ -91,12 +92,12 @@ def run():
     preflight()
 
     print("\n" + "=" * 70)
-    print("  EXPERIMENT 3 — GPTOSS Fine-tuné + KG en entrée + CoT/ToT/GoT")
-    print("  (raw-data adapter, OSM KG injected at inference via strategies)")
+    print("  EXPERIMENT 3 — GPTOSS FT OSM-KG + Inférence enrichie OSM")
+    print("  (OSM-KG adapter, OSM KG in training AND at inference)")
     print("=" * 70)
     print(f"  Model      : {MODEL_ID}")
-    print(f"  Adapter    : {ADAPTER_PATH}  [trained WITHOUT KG]")
-    print(f"  KG         : OSM evidence injected by CoT/ToT/GoT")
+    print(f"  Adapter    : {ADAPTER_PATH}  [trained WITH OSM KG evidence]")
+    print(f"  KG         : OSM evidence in training + CoT/ToT/GoT at inference")
     print(f"  Strategies : {', '.join(s.upper() for s in target)}")
     print(f"  Output tag : {MODEL_TAG}")
     print("=" * 70)
