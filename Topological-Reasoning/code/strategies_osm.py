@@ -463,13 +463,17 @@ def llm_generate(prompt: str, llm: ChatOllama, timeout_seconds: int = 90):
 # BASE CLASS
 # =====================================================================
 class ReasoningStrategy(ABC):
-    def __init__(self, kg: GeographicKnowledgeGraph, temperature: float = 0.2, max_new_tokens: int = 1024, base_url: str = BASE_URL, model_name: str = MODEL_NAME):
+    def __init__(self, kg: GeographicKnowledgeGraph, temperature: float = 0.2, max_new_tokens: int = 1024,
+                 base_url: str = BASE_URL, model_name: str = MODEL_NAME, model_fn=None):
         self.kg = kg
         self.temperature = temperature
         self.max_new_tokens = max_new_tokens
         self.base_url = base_url
         self.model_name = model_name
-        self.llm = ChatOllama(model=model_name, temperature=temperature, base_url=base_url)
+        self.model_fn = model_fn  # optional GPU callable: (prompt: str) -> str
+        self.llm = None if model_fn is not None else ChatOllama(
+            model=model_name, temperature=temperature, base_url=base_url
+        )
 
     @property
     @abstractmethod
@@ -479,13 +483,13 @@ class ReasoningStrategy(ABC):
     def reason(self, entity: Dict[str, Any], log_fn=None) -> Tuple[Optional[str], Dict]: ...
 
     def _generate(self, prompt: str, **kwargs) -> str:
+        if self.model_fn is not None:
+            return self.model_fn(prompt)
         max_tokens = kwargs.get("max_new_tokens", self.max_new_tokens)
         temp = kwargs.get("temperature", self.temperature)
-        
         if max_tokens != self.max_new_tokens or temp != self.temperature:
             llm = ChatOllama(model=self.model_name, temperature=temp, base_url=self.base_url)
             return llm_generate(prompt, llm=llm, timeout_seconds=90)
-            
         return llm_generate(prompt, llm=self.llm, timeout_seconds=90)
 
 
@@ -757,8 +761,8 @@ STRATEGY_MAP = {
     "got": GraphOfThought,
 }
 
-def get_strategy(name: str, kg: GeographicKnowledgeGraph, **kwargs) -> ReasoningStrategy:
+def get_strategy(name: str, kg: GeographicKnowledgeGraph, model_fn=None, **kwargs) -> ReasoningStrategy:
     name_lower = name.lower()
     if name_lower not in STRATEGY_MAP:
         raise ValueError(f"Unknown strategy: {name}. Available: {list(STRATEGY_MAP.keys())}")
-    return STRATEGY_MAP[name_lower](kg, **kwargs)
+    return STRATEGY_MAP[name_lower](kg, model_fn=model_fn, **kwargs)
