@@ -35,29 +35,37 @@ from tqdm import tqdm
 from datetime import datetime
 
 # ===========================================================================
-# TORCHVISION STUB
-# Pre-populate sys.modules with a harmless stub BEFORE importing peft or
-# transformers.  On some servers torch and torchvision versions mismatch,
-# causing torchvision to raise ImportError(_cast_Long) when transformers
-# tries to import it.  We don't use torchvision at all in this script.
+# TORCHVISION STUB — custom MetaPathFinder
+# On this server torch and torchvision versions mismatch: importing torchvision
+# triggers ImportError(_cast_Long) deep inside its ops module.
+# transformers.__init__ calls importlib.util.find_spec("torchvision") which
+# raises ValueError if __spec__ is None (plain ModuleType stubs won't work).
+# Solution: register a MetaPathFinder at priority 0 that intercepts ALL
+# torchvision imports and returns minimal empty stubs with proper __spec__.
 # ===========================================================================
-if "torchvision" not in sys.modules:
-    _tv     = types.ModuleType("torchvision")
-    _tv_io  = types.ModuleType("torchvision.io")
+import importlib.machinery
+import importlib.abc
 
-    class _ImageReadMode:
-        RGB = 0; GRAY = 1; RGB_ALPHA = 2; GRAY_ALPHA = 3; UNCHANGED = 4
+class _TorchvisionStubFinder(importlib.abc.MetaPathFinder, importlib.abc.Loader):
+    def find_spec(self, fullname, path, target=None):
+        if fullname == "torchvision" or fullname.startswith("torchvision."):
+            return importlib.machinery.ModuleSpec(fullname, self)
+        return None
 
-    _tv_io.ImageReadMode = _ImageReadMode
-    _tv_io.decode_image  = None
+    def create_module(self, spec):
+        return None  # default: new module object with __spec__ set by machinery
 
-    sys.modules["torchvision"]                       = _tv
-    sys.modules["torchvision.io"]                    = _tv_io
-    for _sub in [
-        "models", "transforms", "ops", "datasets", "utils",
-        "models.convnext", "ops.misc", "ops._register_onnx_ops",
-    ]:
-        sys.modules[f"torchvision.{_sub}"] = types.ModuleType(f"torchvision.{_sub}")
+    def exec_module(self, module):
+        if module.__name__ == "torchvision.io":
+            class _ImageReadMode:
+                RGB = 0; GRAY = 1; RGB_ALPHA = 2; GRAY_ALPHA = 3; UNCHANGED = 4
+            module.ImageReadMode = _ImageReadMode
+            module.decode_image  = None
+
+# Remove any partial / broken cached state, then install our finder first
+for _k in [k for k in list(sys.modules) if k == "torchvision" or k.startswith("torchvision.")]:
+    del sys.modules[_k]
+sys.meta_path.insert(0, _TorchvisionStubFinder())
 # ===========================================================================
 
 # ===========================================================================
