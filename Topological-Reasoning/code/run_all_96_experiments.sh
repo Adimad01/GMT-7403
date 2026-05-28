@@ -1,112 +1,65 @@
 #!/usr/bin/env bash
 # =============================================================================
 # run_all_96_experiments.sh
-# Master runner — 6 experiments on the 96 balanced test examples (OSM KG)
+# Master runner — 6 experiments × 3 strategies (CoT/ToT/GoT) on 96 examples
 #
-# Experiments:
-#   1. GPTOSS Base
-#   2. GPTOSS Fine-tuné
-#   3. GPTOSS Fine-tuné + KG en entrée
-#   4. GPTOSS Fine-tuné + KG comme entrée de fine-tuning
-#   5. GPTOSS Fine-tuné + Inférence LLM enrichie par KG  (CoT/ToT/GoT, GPU)
-#   6. GPTOSS + Inférence LLM enrichie par KG            (CoT/ToT/GoT, Ollama) ← ALREADY DONE
+# All experiments use OSM KG evidence + CoT, ToT, GoT reasoning strategies.
+# The only difference between experiments is the model / adapter configuration.
+#
+#  Exp 1 — Base (no adapter)                   → exp1_base_gpu
+#  Exp 2 — Fine-tuné (raw data adapter)        → exp2_finetuned_topo_gpu
+#  Exp 3 — Fine-tuné + KG en entrée            → exp3_finetuned_kg_in_gpu
+#  Exp 4 — Fine-tuné + KG comme ft             → exp4_finetuned_osm_kg_gpu
+#  Exp 5 — Fine-tuné + Enriched GPU            → exp5_finetuned_enriched_gpu
+#  Exp 6 — Base + Enriched Ollama (DONE ✅)    → dynamic_osm_improved_version
 #
 # Usage:
 #   cd /path/to/Topological-Reasoning/code
 #   bash run_all_96_experiments.sh
+#   PYTHON=/path/to/python bash run_all_96_experiments.sh   # custom interpreter
 # =============================================================================
 
 set -euo pipefail
 
-# Python interpreter with all dependencies (torch, transformers, peft, pandas)
-# Adjust to match your GPU environment (conda activate, virtualenv, etc.)
 PYTHON="${PYTHON:-python}"
 
-DATASET="../dataset/triplet_update_v3_30.csv"
-INDICES="../dataset/eval_96_balanced_indices.json"
-OUTPUT_DIR="results"
-MODEL_ID="openai/gpt-oss-20b"
-OSM_CACHE="results/osm_cache.json"
-
-ADAPTER_TOPO="finetuned_gptoss_topological/final_adapter"
-ADAPTER_OSM_KG="finetuned_gptoss_osm_kg/final_adapter"
+echo ""
+echo "============================================================"
+echo "  Experiment 1 — GPTOSS Base + CoT/ToT/GoT (GPU)"
+echo "============================================================"
+$PYTHON exp1_gptoss_base.py
 
 echo ""
 echo "============================================================"
-echo "  Experiment 1 — GPTOSS Base (no adapter, no KG)"
+echo "  Experiment 2 — GPTOSS Fine-tuné + CoT/ToT/GoT (GPU)"
 echo "============================================================"
-$PYTHON eval_kg_instruction_finetuned.py \
-    --dataset        "$DATASET" \
-    --model-id       "$MODEL_ID" \
-    --kg-source      none \
-    --model-tag      gptoss_base_96 \
-    --filter-indices "$INDICES" \
-    --output-dir     "$OUTPUT_DIR"
+$PYTHON exp2_gptoss_finetuned.py
 
 echo ""
 echo "============================================================"
-echo "  Experiment 2 — GPTOSS Fine-tuné (adapter, no KG)"
+echo "  Experiment 3 — Fine-tuné + KG en entrée + CoT/ToT/GoT (GPU)"
 echo "============================================================"
-$PYTHON eval_kg_instruction_finetuned.py \
-    --dataset        "$DATASET" \
-    --model-id       "$MODEL_ID" \
-    --adapter-path   "$ADAPTER_TOPO" \
-    --kg-source      none \
-    --model-tag      gptoss_finetuned_96 \
-    --filter-indices "$INDICES" \
-    --output-dir     "$OUTPUT_DIR"
+$PYTHON exp3_gptoss_finetuned_kg_input.py
 
 echo ""
 echo "============================================================"
-echo "  Experiment 3 — GPTOSS Fine-tuné + KG en entrée"
-echo "  (topological adapter + OSM KG evidence at inference)"
+echo "  Experiment 4 — Fine-tuné KG ft + CoT/ToT/GoT (GPU)"
 echo "============================================================"
-$PYTHON eval_kg_instruction_finetuned.py \
-    --dataset        "$DATASET" \
-    --model-id       "$MODEL_ID" \
-    --adapter-path   "$ADAPTER_TOPO" \
-    --kg-source      osm \
-    --osm-cache      "$OSM_CACHE" \
-    --model-tag      gptoss_finetuned_kg_input_96 \
-    --filter-indices "$INDICES" \
-    --output-dir     "$OUTPUT_DIR"
+$PYTHON exp4_gptoss_finetuned_kg_ft.py
 
 echo ""
 echo "============================================================"
-echo "  Experiment 4 — GPTOSS Fine-tuné + KG comme entrée de fine-tuning"
-echo "  (OSM-KG instruction-tuned adapter + OSM KG evidence)"
+echo "  Experiment 5 — Fine-tuné + Enriched inference (GPU)"
 echo "============================================================"
-$PYTHON eval_kg_instruction_finetuned.py \
-    --dataset        "$DATASET" \
-    --model-id       "$MODEL_ID" \
-    --adapter-path   "$ADAPTER_OSM_KG" \
-    --kg-source      osm \
-    --osm-cache      "$OSM_CACHE" \
-    --model-tag      gptoss_osm_kg_ft_96 \
-    --filter-indices "$INDICES" \
-    --output-dir     "$OUTPUT_DIR"
+$PYTHON exp5_gptoss_finetuned_enriched_gpu.py
 
 echo ""
 echo "============================================================"
-echo "  Experiment 5 — GPTOSS Fine-tuné + Inférence LLM enrichie par KG"
-echo "  (topological adapter + CoT/ToT/GoT via GPU)"
+echo "  Experiment 6 — Base + Enriched inference (Ollama)"
+echo "  [ALREADY COMPLETE — will print results and exit]"
 echo "============================================================"
-$PYTHON run_eval_osm_gpu.py \
-    --dataset        "$DATASET" \
-    --model-id       "$MODEL_ID" \
-    --adapter-path   "$ADAPTER_TOPO" \
-    --filter-indices "$INDICES" \
-    --strategy       all \
-    --output-dir     "$OUTPUT_DIR" \
-    --model-tag      dynamic_osm_finetuned_gpu
+$PYTHON exp6_gptoss_enriched_ollama.py
 
 echo ""
-echo "============================================================"
-echo "  Experiment 6 — GPTOSS + Inférence LLM enrichie par KG"
-echo "  (base model via Ollama, CoT/ToT/GoT) — ALREADY DONE"
-echo "  Results: results/voletc_dynamic_osm_improved_version_*_ckpt.json"
-echo "============================================================"
-echo "  Skipping — checkpoint files already contain all 96 results."
-
-echo ""
-echo "All experiments complete. Run analyze_96_experiments.py for the comparison table."
+echo "All experiments complete."
+echo "Run: $PYTHON analyze_96_experiments.py"

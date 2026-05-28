@@ -1,26 +1,30 @@
 """
 Experiment 3 — GPTOSS Fine-tuné + KG en entrée
 ================================================================================
-The model is fine-tuned on raw topological data (no KG) but at inference time
-OSM KG evidence (coordinates, bounding boxes, administrative hierarchy) is
-injected into the prompt.
+GPT-OSS-20B fine-tuned on raw topological data, evaluated with CoT/ToT/GoT
+where OSM KG evidence is explicitly embedded in the instruction prompt.
 
-This tests whether a model trained without KG can benefit from KG evidence at
-inference — i.e., whether it can generalise to KG-augmented prompts it never
-saw during training.
+The key distinction from Experiment 2: the adapter here was trained on raw data
+(no KG), yet the CoT/ToT/GoT reasoning steps are provided with full OSM evidence
+(coordinates, bounding boxes, administrative hierarchy).  This isolates the
+effect of KG evidence at inference time on a non-KG-trained model.
 
 Model     : openai/gpt-oss-20b + finetuned_gptoss_topological/final_adapter
-KG        : OSM (Nominatim) — injected into the inference prompt only
-Eval set  : 96 balanced examples from triplet_update_v3_30.csv
-Output    : results/kg_eval_gptoss_finetuned_kg_input_96_osm.csv
+KG        : OSM (Nominatim) — injected into CoT/ToT/GoT prompts at inference
+Strategies: CoT, ToT, GoT
+Eval set  : 96 balanced examples — 16 per predicate
+Outputs   :
+  results/voletc_exp3_finetuned_kg_in_gpu_{cot|tot|got}_*_ckpt.json
 
 Run:
     python exp3_gptoss_finetuned_kg_input.py
+    python exp3_gptoss_finetuned_kg_input.py --strategy cot
 """
 
 import os
 import sys
-import pandas as pd
+import json
+import argparse
 
 # ---------------------------------------------------------------------------
 # CONFIGURATION
@@ -29,14 +33,14 @@ DATASET        = "../dataset/triplet_update_v3_30.csv"
 INDICES_FILE   = "../dataset/eval_96_balanced_indices.json"
 MODEL_ID       = "openai/gpt-oss-20b"
 ADAPTER_PATH   = "finetuned_gptoss_topological/final_adapter"
-KG_SOURCE      = "osm"
 OSM_CACHE      = "results/osm_cache.json"
-MODEL_TAG      = "gptoss_finetuned_kg_input_96"
+MODEL_TAG      = "exp3_finetuned_kg_in_gpu"
 OUTPUT_DIR     = "results"
 TEMPERATURE    = 0.1
-MAX_NEW_TOKENS = 200   # slightly larger to accommodate KG evidence in reasoning
+MAX_NEW_TOKENS = 512
 
-OUTPUT_CSV = os.path.join(OUTPUT_DIR, f"kg_eval_{MODEL_TAG}_{KG_SOURCE}.csv")
+SUFFIX     = "neighborhood_details_spatial_relation_16_sample"
+STRATEGIES = ["cot", "tot", "got"]
 # ---------------------------------------------------------------------------
 
 
@@ -52,56 +56,70 @@ def preflight():
     print(f"[OK] Indices : {INDICES_FILE}")
     print(f"[OK] Adapter : {ADAPTER_PATH}")
     if os.path.exists(OSM_CACHE):
-        import json
-        cache = json.load(open(OSM_CACHE))
-        print(f"[OK] OSM cache: {len(cache)} entries pre-loaded ({OSM_CACHE})")
+        print(f"[OK] OSM cache: {len(json.load(open(OSM_CACHE)))} entries")
     else:
-        print(f"[WARN] OSM cache not found at {OSM_CACHE} — will query Nominatim live (slower)")
+        print(f"[WARN] OSM cache not found — will query Nominatim live")
 
 
-def check_existing_results():
-    if os.path.exists(OUTPUT_CSV):
-        df = pd.read_csv(OUTPUT_CSV)
-        done = len(df)
-        print(f"[RESUME] Found {done} rows already evaluated in {OUTPUT_CSV}")
-        if done >= 96:
-            acc = df["match"].astype(str).str.lower().eq("true").mean()
-            print(f"[DONE]   All 96 rows complete. Accuracy = {acc:.2%}")
-            print("         Delete the CSV to force a re-run.")
-            sys.exit(0)
-    else:
-        print(f"[NEW]  Starting fresh — output will be saved to {OUTPUT_CSV}")
+def check_strategy_status(strategies: list) -> bool:
+    print("\n[STATUS] Checkpoint summary:")
+    all_done = True
+    for strat in strategies:
+        ckpt = os.path.join(OUTPUT_DIR, f"voletc_{MODEL_TAG}_{strat}_{SUFFIX}_ckpt.json")
+        if os.path.exists(ckpt):
+            data   = json.load(open(ckpt))
+            done    = len(data.get("processed_indices", []))
+            results = data.get("results", [])
+            if done >= 96 and results:
+                acc = sum(1 for r in results if r.get("match")) / len(results) * 100
+                print(f"  {strat.upper():3s} : COMPLETE  ({done}/96, acc={acc:.1f}%)  ✅")
+            else:
+                print(f"  {strat.upper():3s} : PARTIAL   ({done}/96) — will resume")
+                all_done = False
+        else:
+            print(f"  {strat.upper():3s} : NOT STARTED")
+            all_done = False
+    return all_done
 
 
 def run():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--strategy", choices=STRATEGIES + ["all"], default="all")
+    args = parser.parse_args()
+    target = STRATEGIES if args.strategy == "all" else [args.strategy]
+
     preflight()
-    check_existing_results()
 
     print("\n" + "=" * 70)
-    print("  EXPERIMENT 3 — GPTOSS Fine-tuné + KG en entrée")
-    print("  (topological adapter + OSM KG evidence at inference)")
+    print("  EXPERIMENT 3 — GPTOSS Fine-tuné + KG en entrée + CoT/ToT/GoT")
+    print("  (raw-data adapter, OSM KG injected at inference via strategies)")
     print("=" * 70)
-    print(f"  Model  : {MODEL_ID}")
-    print(f"  Adapter: {ADAPTER_PATH}")
-    print(f"  KG     : OSM (injected at inference, not seen during training)")
-    print(f"  Output : {OUTPUT_CSV}")
-    print("=" * 70 + "\n")
+    print(f"  Model      : {MODEL_ID}")
+    print(f"  Adapter    : {ADAPTER_PATH}  [trained WITHOUT KG]")
+    print(f"  KG         : OSM evidence injected by CoT/ToT/GoT")
+    print(f"  Strategies : {', '.join(s.upper() for s in target)}")
+    print(f"  Output tag : {MODEL_TAG}")
+    print("=" * 70)
 
+    if check_strategy_status(target):
+        print("\n[DONE] All strategies complete. Delete checkpoints to re-run.")
+        sys.exit(0)
+
+    print()
     sys.argv = [
-        "eval_kg_instruction_finetuned.py",
+        "run_eval_osm_gpu.py",
         "--dataset",        DATASET,
         "--model-id",       MODEL_ID,
         "--adapter-path",   ADAPTER_PATH,
-        "--kg-source",      KG_SOURCE,
-        "--osm-cache",      OSM_CACHE,
-        "--model-tag",      MODEL_TAG,
         "--filter-indices", INDICES_FILE,
+        "--strategy",       args.strategy,
         "--output-dir",     OUTPUT_DIR,
+        "--model-tag",      MODEL_TAG,
         "--temperature",    str(TEMPERATURE),
         "--max-new-tokens", str(MAX_NEW_TOKENS),
     ]
 
-    from eval_kg_instruction_finetuned import main
+    from run_eval_osm_gpu import main
     main()
 
 

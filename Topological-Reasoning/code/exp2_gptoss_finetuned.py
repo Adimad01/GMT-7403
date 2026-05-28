@@ -1,25 +1,29 @@
 """
 Experiment 2 — GPTOSS Fine-tuné
 ================================================================================
-Evaluates the GPT-OSS-20B model fine-tuned on raw topological data (no KG) on
-the 96 balanced test examples.
+GPT-OSS-20B fine-tuned on raw topological data (no KG) evaluated with CoT, ToT,
+and GoT reasoning strategies grounded on OSM KG.
 
-The LoRA adapter was trained with SFT on triplet_update_v3_70.csv — the model
-learns the topological task from (vernacular, geometry) → predicate pairs only,
-without any knowledge-graph evidence.
+The LoRA adapter was trained with SFT on (vernacular, geometry) → predicate
+pairs only — no KG evidence was seen during training.  At evaluation, OSM KG
+evidence is provided to the CoT/ToT/GoT reasoning strategies.
 
 Model     : openai/gpt-oss-20b + finetuned_gptoss_topological/final_adapter
-KG        : none  (no KG evidence at inference)
-Eval set  : 96 balanced examples from triplet_update_v3_30.csv
-Output    : results/kg_eval_gptoss_finetuned_96_none.csv
+KG        : OSM (Nominatim)
+Strategies: CoT, ToT, GoT
+Eval set  : 96 balanced examples — 16 per predicate
+Outputs   :
+  results/voletc_exp2_finetuned_topo_gpu_{cot|tot|got}_*_ckpt.json
 
 Run:
     python exp2_gptoss_finetuned.py
+    python exp2_gptoss_finetuned.py --strategy cot
 """
 
 import os
 import sys
-import pandas as pd
+import json
+import argparse
 
 # ---------------------------------------------------------------------------
 # CONFIGURATION
@@ -28,13 +32,14 @@ DATASET        = "../dataset/triplet_update_v3_30.csv"
 INDICES_FILE   = "../dataset/eval_96_balanced_indices.json"
 MODEL_ID       = "openai/gpt-oss-20b"
 ADAPTER_PATH   = "finetuned_gptoss_topological/final_adapter"
-KG_SOURCE      = "none"
-MODEL_TAG      = "gptoss_finetuned_96"
+OSM_CACHE      = "results/osm_cache.json"
+MODEL_TAG      = "exp2_finetuned_topo_gpu"
 OUTPUT_DIR     = "results"
 TEMPERATURE    = 0.1
-MAX_NEW_TOKENS = 150
+MAX_NEW_TOKENS = 512
 
-OUTPUT_CSV = os.path.join(OUTPUT_DIR, f"kg_eval_{MODEL_TAG}_{KG_SOURCE}.csv")
+SUFFIX     = "neighborhood_details_spatial_relation_16_sample"
+STRATEGIES = ["cot", "tot", "got"]
 # ---------------------------------------------------------------------------
 
 
@@ -49,49 +54,69 @@ def preflight():
     print(f"[OK] Dataset : {DATASET}")
     print(f"[OK] Indices : {INDICES_FILE}")
     print(f"[OK] Adapter : {ADAPTER_PATH}")
-
-
-def check_existing_results():
-    if os.path.exists(OUTPUT_CSV):
-        df = pd.read_csv(OUTPUT_CSV)
-        done = len(df)
-        print(f"[RESUME] Found {done} rows already evaluated in {OUTPUT_CSV}")
-        if done >= 96:
-            acc = df["match"].astype(str).str.lower().eq("true").mean()
-            print(f"[DONE]   All 96 rows complete. Accuracy = {acc:.2%}")
-            print("         Delete the CSV to force a re-run.")
-            sys.exit(0)
+    if os.path.exists(OSM_CACHE):
+        print(f"[OK] OSM cache: {len(json.load(open(OSM_CACHE)))} entries")
     else:
-        print(f"[NEW]  Starting fresh — output will be saved to {OUTPUT_CSV}")
+        print(f"[WARN] OSM cache not found — will query Nominatim live")
+
+
+def check_strategy_status(strategies: list) -> bool:
+    print("\n[STATUS] Checkpoint summary:")
+    all_done = True
+    for strat in strategies:
+        ckpt = os.path.join(OUTPUT_DIR, f"voletc_{MODEL_TAG}_{strat}_{SUFFIX}_ckpt.json")
+        if os.path.exists(ckpt):
+            data   = json.load(open(ckpt))
+            done    = len(data.get("processed_indices", []))
+            results = data.get("results", [])
+            if done >= 96 and results:
+                acc = sum(1 for r in results if r.get("match")) / len(results) * 100
+                print(f"  {strat.upper():3s} : COMPLETE  ({done}/96, acc={acc:.1f}%)  ✅")
+            else:
+                print(f"  {strat.upper():3s} : PARTIAL   ({done}/96) — will resume")
+                all_done = False
+        else:
+            print(f"  {strat.upper():3s} : NOT STARTED")
+            all_done = False
+    return all_done
 
 
 def run():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--strategy", choices=STRATEGIES + ["all"], default="all")
+    args = parser.parse_args()
+    target = STRATEGIES if args.strategy == "all" else [args.strategy]
+
     preflight()
-    check_existing_results()
 
     print("\n" + "=" * 70)
-    print("  EXPERIMENT 2 — GPTOSS Fine-tuné (adapter, no KG)")
+    print("  EXPERIMENT 2 — GPTOSS Fine-tuné + CoT/ToT/GoT")
     print("=" * 70)
-    print(f"  Model  : {MODEL_ID}")
-    print(f"  Adapter: {ADAPTER_PATH}")
-    print(f"  KG     : {KG_SOURCE}")
-    print(f"  Output : {OUTPUT_CSV}")
-    print("=" * 70 + "\n")
+    print(f"  Model      : {MODEL_ID}")
+    print(f"  Adapter    : {ADAPTER_PATH}")
+    print(f"  Strategies : {', '.join(s.upper() for s in target)}")
+    print(f"  Output tag : {MODEL_TAG}")
+    print("=" * 70)
 
+    if check_strategy_status(target):
+        print("\n[DONE] All strategies complete. Delete checkpoints to re-run.")
+        sys.exit(0)
+
+    print()
     sys.argv = [
-        "eval_kg_instruction_finetuned.py",
+        "run_eval_osm_gpu.py",
         "--dataset",        DATASET,
         "--model-id",       MODEL_ID,
         "--adapter-path",   ADAPTER_PATH,
-        "--kg-source",      KG_SOURCE,
-        "--model-tag",      MODEL_TAG,
         "--filter-indices", INDICES_FILE,
+        "--strategy",       args.strategy,
         "--output-dir",     OUTPUT_DIR,
+        "--model-tag",      MODEL_TAG,
         "--temperature",    str(TEMPERATURE),
         "--max-new-tokens", str(MAX_NEW_TOKENS),
     ]
 
-    from eval_kg_instruction_finetuned import main
+    from run_eval_osm_gpu import main
     main()
 
 
