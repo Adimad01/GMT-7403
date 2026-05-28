@@ -49,13 +49,16 @@ import importlib.abc
 class _TorchvisionStubFinder(importlib.abc.MetaPathFinder, importlib.abc.Loader):
     def find_spec(self, fullname, path, target=None):
         if fullname == "torchvision" or fullname.startswith("torchvision."):
-            return importlib.machinery.ModuleSpec(fullname, self)
+            # is_package=True sets submodule_search_locations=[] and __path__=[]
+            # so Python treats this as a package (allows torchvision.io etc.)
+            return importlib.machinery.ModuleSpec(fullname, self, is_package=True)
         return None
 
     def create_module(self, spec):
-        return None  # default: new module object with __spec__ set by machinery
+        return None  # default module creation — __spec__ set by import machinery
 
     def exec_module(self, module):
+        module.__path__ = []   # confirm package status
         if module.__name__ == "torchvision.io":
             class _ImageReadMode:
                 RGB = 0; GRAY = 1; RGB_ALPHA = 2; GRAY_ALPHA = 3; UNCHANGED = 4
