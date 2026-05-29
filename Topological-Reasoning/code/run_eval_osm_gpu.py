@@ -355,16 +355,33 @@ def main():
         adapter_abs = os.path.abspath(args.adapter_path)
         print(f"[MODEL] Applying LoRA adapter: {adapter_abs}")
         import peft.utils.save_and_load as _peft_sl
+
+        # Patch 1 — file_exists (older PEFT versions)
         _orig_fe = _peft_sl.file_exists
         def _local_file_exists(repo_id, *a, **kw):
             if os.path.isabs(str(repo_id)):
                 return False
             return _orig_fe(repo_id, *a, **kw)
         _peft_sl.file_exists = _local_file_exists
+
+        # Patch 2 — hf_hub_download (newer PEFT versions go here directly)
+        _orig_hhd = getattr(_peft_sl, "hf_hub_download", None)
+        def _local_hf_hub_download(repo_id, filename, **kw):
+            if os.path.isabs(str(repo_id)):
+                local = os.path.join(repo_id, filename)
+                if os.path.exists(local):
+                    return local
+                raise FileNotFoundError(f"Adapter weight not found: {local}")
+            return _orig_hhd(repo_id, filename, **kw)
+        if _orig_hhd is not None:
+            _peft_sl.hf_hub_download = _local_hf_hub_download
+
         try:
             model = PeftModel.from_pretrained(model, adapter_abs, local_files_only=True)
         finally:
             _peft_sl.file_exists = _orig_fe
+            if _orig_hhd is not None:
+                _peft_sl.hf_hub_download = _orig_hhd
         adapter_tag = os.path.basename(args.adapter_path.rstrip("/"))
 
     model.eval()
