@@ -340,14 +340,46 @@ def main():
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
-    dtype = torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float16
+    # --- GPU diagnostics ---------------------------------------------------
+    cuda_ok = torch.cuda.is_available()
+    if cuda_ok:
+        gpu_name = torch.cuda.get_device_name(0)
+        gpu_mem  = torch.cuda.get_device_properties(0).total_memory / 1e9
+        print(f"[GPU] CUDA available ✅  {gpu_name}  ({gpu_mem:.1f} GB)")
+    else:
+        print("[GPU] ⚠️  CUDA not available — model will load on CPU (very slow!)")
+        print("[GPU] Check: nvidia-smi  and  python -c 'import torch; print(torch.version.cuda)'")
+
+    dtype = torch.bfloat16 if (cuda_ok and torch.cuda.is_bf16_supported()) else torch.float16
+
+    # Choose quantization: Mxfp4 (preferred) → BitsAndBytes 4-bit → none
+    quant_cfg = None
+    if cuda_ok:
+        try:
+            quant_cfg = Mxfp4Config(dequantize=True)
+            print("[MODEL] Quantization: Mxfp4 (dequantize=True)")
+        except Exception as _mxfp4_err:
+            print(f"[MODEL] Mxfp4 unavailable ({_mxfp4_err}), trying BitsAndBytes 4-bit ...")
+            try:
+                from transformers import BitsAndBytesConfig
+                quant_cfg = BitsAndBytesConfig(
+                    load_in_4bit=True,
+                    bnb_4bit_compute_dtype=torch.bfloat16,
+                    bnb_4bit_use_double_quant=True,
+                )
+                print("[MODEL] Quantization: BitsAndBytes 4-bit")
+            except Exception as _bnb_err:
+                print(f"[MODEL] BitsAndBytes also failed ({_bnb_err}), loading fp16/bf16")
+    else:
+        print("[MODEL] No GPU — loading without quantization (expect OOM or very slow)")
+
     print(f"[MODEL] Loading base model ...")
     model = AutoModelForCausalLM.from_pretrained(
         args.model_id,
-        quantization_config=Mxfp4Config(dequantize=True),
+        quantization_config=quant_cfg,
         device_map="auto",
         trust_remote_code=True,
-        dtype=dtype,
+        torch_dtype=dtype,
     )
 
     adapter_tag = "base"
@@ -400,7 +432,8 @@ def main():
         adapter_tag = os.path.basename(args.adapter_path.rstrip("/"))
 
     model.eval()
-    print(f"[MODEL] Ready. Adapter: {adapter_tag}")
+    _model_device = next(model.parameters()).device
+    print(f"[MODEL] Ready. Adapter: {adapter_tag}  |  Device: {_model_device}")
 
     # ------------------------------------------------------------------
     # 3. Build GPU inference callable
@@ -408,9 +441,25 @@ def main():
     _temperature     = args.temperature
     _max_new_tokens  = args.max_new_tokens
 
+    # Determine safe max input length (model config takes precedence over tokenizer)
+    _model_max_len = getattr(model.config, "max_position_embeddings", None) \
+                  or getattr(tokenizer, "model_max_length", 2048)
+    # Leave room for the generated tokens
+    _max_input_len = max(64, _model_max_len - _max_new_tokens - 32)
+    print(f"[MODEL] max_position_embeddings={_model_max_len}  →  truncating inputs to {_max_input_len} tokens")
+
+    import time as _time
+    _t0_first = [None]
+
     def gpu_inference_fn(prompt: str) -> str:
-        inputs    = tokenizer(prompt, return_tensors="pt").to(model.device)
+        inputs = tokenizer(
+            prompt,
+            return_tensors="pt",
+            truncation=True,
+            max_length=_max_input_len,
+        ).to(model.device)
         input_len = inputs["input_ids"].shape[-1]
+        t0 = _time.time()
         with torch.no_grad():
             out = model.generate(
                 **inputs,
@@ -419,6 +468,10 @@ def main():
                 temperature=_temperature,
                 pad_token_id=tokenizer.eos_token_id,
             )
+        elapsed = _time.time() - t0
+        if _t0_first[0] is None:
+            _t0_first[0] = elapsed
+            print(f"[TIMING] First sample: {elapsed:.1f}s  ({input_len} input tokens → {_max_new_tokens} max new)")
         return tokenizer.decode(out[0][input_len:], skip_special_tokens=True).strip()
 
     # ------------------------------------------------------------------
