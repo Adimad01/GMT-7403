@@ -369,15 +369,24 @@ def main():
         _orig_hhd = getattr(_peft_sl, "hf_hub_download", None)
         def _local_hf_hub_download(repo_id, filename, **kw):
             if os.path.isabs(str(repo_id)):
-                local = os.path.join(repo_id, filename)
-                if os.path.exists(local):
-                    return local
-                # .bin not found → try the safetensors equivalent
-                if filename.endswith(".bin"):
-                    sf = os.path.join(repo_id, filename[:-4] + ".safetensors")
-                    if os.path.exists(sf):
-                        return sf
-                raise FileNotFoundError(f"Adapter weight not found: {local}")
+                # Candidate directories to search (given dir + parent)
+                candidates = [repo_id, os.path.dirname(repo_id)]
+                stem, ext = os.path.splitext(filename)
+                alt_exts = [".safetensors", ".bin"] if ext == ".bin" else [ext, ".safetensors", ".bin"]
+                for d in candidates:
+                    for e in alt_exts:
+                        p = os.path.join(d, stem + e)
+                        if os.path.exists(p):
+                            print(f"[PEFT-PATCH] resolved {filename} → {p}")
+                            return p
+                # Emit a diagnostic listing so the server log shows what IS there
+                for d in candidates:
+                    if os.path.isdir(d):
+                        files = os.listdir(d)
+                        print(f"[PEFT-PATCH] dir {d!r} contents: {files}")
+                raise FileNotFoundError(
+                    f"Adapter weight not found: tried {[os.path.join(c, filename) for c in candidates]}"
+                )
             return _orig_hhd(repo_id, filename, **kw)
         if _orig_hhd is not None:
             _peft_sl.hf_hub_download = _local_hf_hub_download
