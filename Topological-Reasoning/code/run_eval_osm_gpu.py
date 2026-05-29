@@ -379,7 +379,7 @@ def main():
         quantization_config=quant_cfg,
         device_map="auto",
         trust_remote_code=True,
-        torch_dtype=dtype,
+        dtype=dtype,
     )
 
     adapter_tag = "base"
