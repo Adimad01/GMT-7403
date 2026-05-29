@@ -57,15 +57,26 @@ class _TorchvisionStubFinder(importlib.abc.MetaPathFinder, importlib.abc.Loader)
 
     def exec_module(self, module):
         module.__path__ = []
+        # Must be a real string so inspect.getsourcefile / os.fspath never
+        # receive a _Stub object (bitsandbytes iterates sys.modules calling
+        # inspect on each one during @torch.library.register).
+        module.__file__ = "<torchvision-stub>"
 
-        # Self-referencing catch-all so any attribute access on any sub-module
-        # returns something harmless (prevents future AttributeError surprises).
+        # Self-referencing catch-all for non-dunder attribute access.
+        # Dunders raise AttributeError so Python's default machinery handles
+        # them (avoids _Stub objects leaking into inspect / os.fspath paths).
         class _Stub:
             def __init__(self, n=""):  self._n = n
             def __getattr__(self, n):  return _Stub(n)
             def __call__(self, *a, **k): return _Stub()
             def __iter__(self):        return iter([])
-        module.__getattr__ = lambda name: _Stub(name)
+
+        def _catchall(name):
+            if name.startswith("__") and name.endswith("__"):
+                raise AttributeError(name)
+            return _Stub(name)
+
+        module.__getattr__ = _catchall
 
         if module.__name__ == "torchvision.io":
             class _ImageReadMode:
