@@ -364,13 +364,19 @@ def main():
             return _orig_fe(repo_id, *a, **kw)
         _peft_sl.file_exists = _local_file_exists
 
-        # Patch 2 — hf_hub_download (newer PEFT versions go here directly)
+        # Patch 2 — hf_hub_download (newer PEFT versions go here directly).
+        # PEFT may request "adapter_model.bin" first; fall back to .safetensors.
         _orig_hhd = getattr(_peft_sl, "hf_hub_download", None)
         def _local_hf_hub_download(repo_id, filename, **kw):
             if os.path.isabs(str(repo_id)):
                 local = os.path.join(repo_id, filename)
                 if os.path.exists(local):
                     return local
+                # .bin not found → try the safetensors equivalent
+                if filename.endswith(".bin"):
+                    sf = os.path.join(repo_id, filename[:-4] + ".safetensors")
+                    if os.path.exists(sf):
+                        return sf
                 raise FileNotFoundError(f"Adapter weight not found: {local}")
             return _orig_hhd(repo_id, filename, **kw)
         if _orig_hhd is not None:
