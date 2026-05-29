@@ -362,15 +362,16 @@ def main():
 
     # Patch transformers ≥5.9.0 bug: supports_quant_method crashes when model's
     # quantization_config is None instead of a dict.
+    # Use getattr (not __dict__) so the descriptor protocol binds correctly.
     try:
         from transformers.quantizers.auto import AutoHfQuantizer as _AHQ
-        _orig_sqm = _AHQ.__dict__.get("supports_quant_method")
+        _orig_sqm = getattr(_AHQ, "supports_quant_method", None)
         if _orig_sqm is not None:
-            @classmethod  # type: ignore[misc]
-            def _safe_sqm(cls, qcfg):
+            @staticmethod  # type: ignore[misc]
+            def _safe_sqm(qcfg):
                 if qcfg is None:
                     return False
-                return _orig_sqm.__func__(cls, qcfg)
+                return _orig_sqm(qcfg)
             _AHQ.supports_quant_method = _safe_sqm
     except Exception:
         pass
