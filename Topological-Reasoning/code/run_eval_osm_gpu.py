@@ -352,31 +352,32 @@ def main():
 
     dtype = torch.bfloat16 if (cuda_ok and torch.cuda.is_bf16_supported()) else torch.float16
 
-    # Choose quantization: Mxfp4 (preferred) → BitsAndBytes 4-bit → none
-    quant_cfg = None
+    # On an A100 80 GB, GPT-OSS-20B in bf16 needs ~40 GB — no quantization required.
+    # Quantization configs (Mxfp4, BitsAndBytes) interact poorly with some model
+    # configs in newer transformers versions.  Load plain bf16/fp16 on GPU; warn on CPU.
     if cuda_ok:
-        try:
-            quant_cfg = Mxfp4Config(dequantize=True)
-            print("[MODEL] Quantization: Mxfp4 (dequantize=True)")
-        except Exception as _mxfp4_err:
-            print(f"[MODEL] Mxfp4 unavailable ({_mxfp4_err}), trying BitsAndBytes 4-bit ...")
-            try:
-                from transformers import BitsAndBytesConfig
-                quant_cfg = BitsAndBytesConfig(
-                    load_in_4bit=True,
-                    bnb_4bit_compute_dtype=torch.bfloat16,
-                    bnb_4bit_use_double_quant=True,
-                )
-                print("[MODEL] Quantization: BitsAndBytes 4-bit")
-            except Exception as _bnb_err:
-                print(f"[MODEL] BitsAndBytes also failed ({_bnb_err}), loading fp16/bf16")
+        print(f"[MODEL] Loading in {dtype} (no quantization — fits in {gpu_mem:.0f} GB GPU)")
     else:
         print("[MODEL] No GPU — loading without quantization (expect OOM or very slow)")
+
+    # Patch transformers ≥5.9.0 bug: supports_quant_method crashes when model's
+    # quantization_config is None instead of a dict.
+    try:
+        from transformers.quantizers.auto import AutoHfQuantizer as _AHQ
+        _orig_sqm = _AHQ.__dict__.get("supports_quant_method")
+        if _orig_sqm is not None:
+            @classmethod  # type: ignore[misc]
+            def _safe_sqm(cls, qcfg):
+                if qcfg is None:
+                    return False
+                return _orig_sqm.__func__(cls, qcfg)
+            _AHQ.supports_quant_method = _safe_sqm
+    except Exception:
+        pass
 
     print(f"[MODEL] Loading base model ...")
     model = AutoModelForCausalLM.from_pretrained(
         args.model_id,
-        quantization_config=quant_cfg,
         device_map="auto",
         trust_remote_code=True,
         dtype=dtype,
