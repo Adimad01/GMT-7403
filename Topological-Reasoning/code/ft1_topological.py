@@ -23,6 +23,36 @@ import os
 import sys
 
 # ---------------------------------------------------------------------------
+# Torchvision stub — torchvision on this server has a broken native extension
+# (_cast_Long missing).  Install a MetaPathFinder stub BEFORE peft/transformers
+# are imported so torchvision imports are silently intercepted.
+# ---------------------------------------------------------------------------
+import importlib.machinery
+import importlib.abc
+
+class _TvStubFinder(importlib.abc.MetaPathFinder, importlib.abc.Loader):
+    def find_spec(self, fullname, path, target=None):
+        if fullname == "torchvision" or fullname.startswith("torchvision."):
+            return importlib.machinery.ModuleSpec(fullname, self, is_package=True)
+        return None
+    def create_module(self, spec):
+        return None
+    def exec_module(self, module):
+        module.__path__ = []
+        module.__file__ = "<torchvision-stub>"
+        def _ga(n):
+            if n.startswith("__") and n.endswith("__"):
+                raise AttributeError(n)
+            import types
+            return types.SimpleNamespace()
+        module.__getattr__ = _ga
+
+for _k in [k for k in list(sys.modules) if k == "torchvision" or k.startswith("torchvision.")]:
+    del sys.modules[_k]
+sys.meta_path.insert(0, _TvStubFinder())
+# ---------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------
 DATASET     = "../dataset/triplet_update_v3_70.csv"
 OUTPUT_DIR  = "finetuned_gptoss_topological"
 MODEL_ID    = "openai/gpt-oss-20b"
