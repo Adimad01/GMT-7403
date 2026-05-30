@@ -3,10 +3,7 @@ import os
 import torch
 
 # ===========================================================================
-# DEPENDENCY HELL MONKEY PATCH
-# Transformers' new MXFP4 quantizer expects PyTorch >= 2.5.
-# Since our server drivers restrict us to PyTorch 2.4.0, we spoof the
-# missing modules/functions here BEFORE importing transformers.
+# DEPENDENCY MONKEY PATCHES
 # ===========================================================================
 
 # Patch 1: Missing torch.accelerator (PyTorch < 2.4/2.5)
@@ -20,7 +17,6 @@ if not hasattr(torch, "accelerator"):
 # Patch 2: Missing torch.nn.Module.set_submodule (PyTorch < 2.5)
 if not hasattr(torch.nn.Module, "set_submodule"):
     def _set_submodule(self, target: str, module: torch.nn.Module) -> None:
-        """Polyfill for torch.nn.Module.set_submodule missing in PyTorch < 2.5."""
         if target == "":
             raise ValueError("target cannot be empty")
         atoms = target.split(".")
@@ -34,6 +30,21 @@ if not hasattr(torch.nn.Module, "set_submodule"):
                 raise AttributeError(f"'{item}' is not an nn.Module")
         setattr(mod, name, module)
     torch.nn.Module.set_submodule = _set_submodule
+
+# Patch 3: transformers >=5.9.0 bug — supports_quant_method crashes when
+# the model's config.quantization_config is None instead of a dict.
+try:
+    from transformers.quantizers.auto import AutoHfQuantizer as _AHQ
+    _orig_sqm = getattr(_AHQ, "supports_quant_method", None)
+    if _orig_sqm is not None:
+        @staticmethod  # type: ignore[misc]
+        def _safe_sqm(qcfg):
+            if qcfg is None:
+                return False
+            return _orig_sqm(qcfg)
+        _AHQ.supports_quant_method = _safe_sqm
+except Exception:
+    pass
 # ===========================================================================
 
 import inspect
@@ -44,7 +55,7 @@ from peft import LoraConfig, get_peft_model, TaskType
 # It is a bitsandbytes helper for 4-bit/8-bit bnb models only.
 # Our model is dequantized to plain bf16, so calling it causes a
 # CUDA allocator crash when it tries to upcast params to float32.
-from transformers import AutoTokenizer, AutoModelForCausalLM, Mxfp4Config
+from transformers import AutoTokenizer, AutoModelForCausalLM
 import trl
 from trl import SFTTrainer, SFTConfig
 
@@ -152,13 +163,18 @@ def main():
     # Mxfp4Config(dequantize=True) decompresses weights to bf16 on load.
     # Using `dtype=` instead of the deprecated `torch_dtype=`.
     # ------------------------------------------------------------------
-    print(f"[3/5] Loading model {args.model_id} (dequantizing MXFP4 -> bf16 for training)...")
+    cuda_ok = torch.cuda.is_available()
+    if cuda_ok:
+        print(f"[GPU] CUDA available ✅  {torch.cuda.get_device_name(0)}")
+    else:
+        print("[GPU] ⚠️  CUDA not available — training will be very slow on CPU!")
+    dtype = torch.bfloat16 if (cuda_ok and torch.cuda.is_bf16_supported()) else torch.float16
+    print(f"[3/5] Loading model {args.model_id} in {dtype} ...")
     model = AutoModelForCausalLM.from_pretrained(
         args.model_id,
         device_map="auto",
         trust_remote_code=True,
-        dtype=torch.bfloat16,                          # replaces deprecated torch_dtype
-        quantization_config=Mxfp4Config(dequantize=True),
+        dtype=dtype,
     )
     print(f"      -> Model dtype: {next(model.parameters()).dtype}")
 
@@ -201,7 +217,8 @@ def main():
         per_device_train_batch_size=1,
         gradient_accumulation_steps=16,
         learning_rate=2e-4,
-        bf16=True,
+        bf16=cuda_ok and torch.cuda.is_bf16_supported(),
+        fp16=cuda_ok and not torch.cuda.is_bf16_supported(),
         optim="paged_adamw_8bit",
         dataset_text_field="text",
         report_to="none",
