@@ -40,12 +40,27 @@ class _TvStubFinder(importlib.abc.MetaPathFinder, importlib.abc.Loader):
     def exec_module(self, module):
         module.__path__ = []
         module.__file__ = "<torchvision-stub>"
-        def _ga(n):
-            if n.startswith("__") and n.endswith("__"):
-                raise AttributeError(n)
-            import types
-            return types.SimpleNamespace()
-        module.__getattr__ = _ga
+        class _Stub:
+            def __init__(self, n=""): self._n = n
+            def __getattr__(self, n): return _Stub(n)
+            def __call__(self, *a, **k): return _Stub()
+            def __iter__(self): return iter([])
+        def _catchall(name):
+            if name.startswith("__") and name.endswith("__"):
+                raise AttributeError(name)
+            return _Stub(name)
+        module.__getattr__ = _catchall
+        if module.__name__ == "torchvision.io":
+            class _ImageReadMode:
+                RGB = 0; GRAY = 1; RGB_ALPHA = 2; GRAY_ALPHA = 3; UNCHANGED = 4
+            module.ImageReadMode = _ImageReadMode
+            module.decode_image = None
+        elif module.__name__ == "torchvision.transforms":
+            class _InterpolationMode:
+                NEAREST = "nearest"; NEAREST_EXACT = "nearest-exact"
+                BILINEAR = "bilinear"; BICUBIC = "bicubic"
+                BOX = "box"; HAMMING = "hamming"; LANCZOS = "lanczos"
+            module.InterpolationMode = _InterpolationMode
 
 for _k in [k for k in list(sys.modules) if k == "torchvision" or k.startswith("torchvision.")]:
     del sys.modules[_k]
