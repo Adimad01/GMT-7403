@@ -34,11 +34,11 @@ SUFFIX           = "neighborhood_details_spatial_relation_16_sample"
 # Experiment registry — (label, model_tag, adapter_note)
 # ---------------------------------------------------------------------------
 EXPERIMENTS = [
-    ("Exp1 — Base",                  "exp1_base_gpu",               "no adapter"),
-    ("Exp2 — FT topo",               "exp2_finetuned_topo_gpu",     "topo adapter, 512 tok"),
-    ("Exp3 — FT OSM-KG",             "exp3_finetuned_kg_in_gpu",    "osm-kg adapter, 1024 tok"),
-    ("Exp4 — FT topo étendu",        "exp5_finetuned_enriched_gpu", "topo adapter, 1024 tok"),
-    ("Exp5 — Base + Ollama",         "dynamic_osm_improved_version","no adapter (Ollama)"),
+    ("GPTOSS Base",                                    "exp1_base_gpu",               "no adapter"),
+    ("GPTOSS Fine-tuné",                               "exp2_finetuned_topo_gpu",     "topo adapter, 512 tok"),
+    ("GPTOSS Fine-tuné + KG en entrée",                "exp3_finetuned_kg_in_gpu",    "osm-kg adapter, 1024 tok"),
+    ("GPTOSS Fine-tuné + Inférence LLM enrichie/KG",  "exp5_finetuned_enriched_gpu", "topo adapter, 1024 tok"),
+    ("GPTOSS + Inférence LLM enrichie par KG",        "dynamic_osm_improved_version","no adapter (Ollama)"),
 ]
 
 
