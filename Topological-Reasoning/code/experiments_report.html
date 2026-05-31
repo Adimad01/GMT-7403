@@ -7,21 +7,31 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#06060f;
-  --bg2:#0d0d1a;
-  --bg3:#11111f;
-  --border:rgba(255,255,255,.07);
-  --text:#e8e8f0;
+  --bg:#ffffff;
+  --bg2:#f7f7fa;
+  --bg3:#f0f0f5;
+  --border:#e4e4ec;
+  --border2:#d0d0e0;
+  --text:#1a1a2e;
   --muted:#6b6b85;
-  --blue:#4f8ef7;
-  --purple:#8b5cf6;
-  --cyan:#22d3ee;
-  --green:#10b981;
-  --orange:#f59e0b;
-  --red:#ef4444;
-  --grad1:linear-gradient(135deg,#4f8ef7,#8b5cf6);
-  --grad2:linear-gradient(135deg,#22d3ee,#4f8ef7);
-  --grad3:linear-gradient(135deg,#10b981,#22d3ee);
+  --muted2:#9898b0;
+  --blue:#2563eb;
+  --blue-lt:#eff6ff;
+  --blue-md:#dbeafe;
+  --purple:#7c3aed;
+  --purple-lt:#f5f3ff;
+  --cyan:#0891b2;
+  --green:#059669;
+  --green-lt:#ecfdf5;
+  --orange:#d97706;
+  --orange-lt:#fffbeb;
+  --red:#dc2626;
+  --grad1:linear-gradient(135deg,#2563eb,#7c3aed);
+  --grad2:linear-gradient(135deg,#0891b2,#2563eb);
+  --grad3:linear-gradient(135deg,#059669,#0891b2);
+  --shadow-sm:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --shadow:0 4px 16px rgba(0,0,0,.08),0 2px 6px rgba(0,0,0,.04);
+  --shadow-lg:0 20px 48px rgba(0,0,0,.12),0 8px 20px rgba(0,0,0,.06);
   --font:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter","Helvetica Neue",sans-serif;
   --mono:"SF Mono","JetBrains Mono","Fira Code",monospace;
   --r:16px;
@@ -29,296 +39,302 @@
 html{scroll-behavior:smooth;background:var(--bg)}
 body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;overflow-x:hidden;line-height:1.6}
 
-/* ─── SCROLLBAR ─── */
+/* ── SCROLLBAR ── */
 ::-webkit-scrollbar{width:6px}
-::-webkit-scrollbar-track{background:var(--bg)}
-::-webkit-scrollbar-thumb{background:rgba(79,142,247,.4);border-radius:99px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:#c7c7d8;border-radius:99px}
 
-/* ─── NAV ─── */
+/* ── NAV ── */
 nav{
   position:sticky;top:0;z-index:999;
-  background:rgba(6,6,15,.8);
+  background:rgba(255,255,255,.88);
   backdrop-filter:blur(24px) saturate(180%);
+  -webkit-backdrop-filter:blur(24px) saturate(180%);
   border-bottom:1px solid var(--border);
   padding:0 60px;height:58px;
   display:flex;align-items:center;justify-content:space-between;
 }
 .nav-logo{
-  font-size:15px;font-weight:700;letter-spacing:-.02em;
+  font-size:15px;font-weight:800;letter-spacing:-.03em;
   background:var(--grad1);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
   text-decoration:none;
 }
-nav ul{list-style:none;display:flex;gap:36px}
-nav ul a{font-size:13px;color:var(--muted);text-decoration:none;letter-spacing:.01em;transition:color .2s}
+nav ul{list-style:none;display:flex;gap:32px}
+nav ul a{font-size:13px;color:var(--muted);text-decoration:none;font-weight:500;transition:color .18s}
 nav ul a:hover{color:var(--text)}
 .nav-btn{
-  font-size:13px;font-weight:600;padding:8px 18px;
-  background:rgba(79,142,247,.15);border:1px solid rgba(79,142,247,.3);
-  border-radius:8px;color:var(--blue);text-decoration:none;
-  transition:all .2s;
+  font-size:13px;font-weight:600;padding:7px 18px;
+  background:var(--text);color:#fff;
+  border-radius:8px;text-decoration:none;
+  transition:opacity .18s;
 }
-.nav-btn:hover{background:rgba(79,142,247,.25);border-color:rgba(79,142,247,.5)}
+.nav-btn:hover{opacity:.85}
 
-/* ─── HERO ─── */
+/* ── HERO ── */
 .hero{
-  position:relative;padding:160px 24px 120px;text-align:center;
+  position:relative;padding:130px 24px 100px;text-align:center;
   overflow:hidden;
+  background:linear-gradient(170deg,#f0f4ff 0%,#faf5ff 40%,#f0fdf9 70%,#ffffff 100%);
 }
-.hero-bg{
-  position:absolute;inset:0;
-  background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(79,142,247,.18) 0%,transparent 65%),
-             radial-gradient(ellipse 50% 40% at 80% 60%,rgba(139,92,246,.12) 0%,transparent 60%),
-             radial-gradient(ellipse 40% 30% at 20% 70%,rgba(34,211,238,.08) 0%,transparent 55%);
-}
-.hero-grid{
-  position:absolute;inset:0;
-  background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
-                   linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
-  background-size:64px 64px;
-  -webkit-mask:radial-gradient(ellipse 90% 80% at 50% 0%,black 30%,transparent 80%);
-  mask:radial-gradient(ellipse 90% 80% at 50% 0%,black 30%,transparent 80%);
+.hero-dots{
+  position:absolute;inset:0;pointer-events:none;
+  background-image:radial-gradient(circle,#c7d4f0 1px,transparent 1px);
+  background-size:32px 32px;
+  opacity:.5;
+  -webkit-mask:radial-gradient(ellipse 100% 100% at 50% 0%,black 20%,transparent 80%);
+  mask:radial-gradient(ellipse 100% 100% at 50% 0%,black 20%,transparent 80%);
 }
 .hero-eyebrow{
   display:inline-flex;align-items:center;gap:8px;
-  font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+  font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
   color:var(--blue);margin-bottom:28px;
-  background:rgba(79,142,247,.1);border:1px solid rgba(79,142,247,.2);
+  background:var(--blue-lt);border:1px solid var(--blue-md);
   padding:6px 16px;border-radius:99px;position:relative;
 }
 .hero h1{
-  font-size:clamp(44px,7vw,88px);font-weight:800;letter-spacing:-.04em;line-height:1;
-  margin-bottom:28px;position:relative;
+  font-size:clamp(40px,7vw,84px);font-weight:800;letter-spacing:-.04em;line-height:1;
+  color:var(--text);margin-bottom:24px;position:relative;
 }
 .grad-text{
-  background:linear-gradient(135deg,#fff 0%,#c7d7ff 40%,#a78bfa 70%,#67e8f9 100%);
-  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  background:var(--grad1);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
 }
 .hero-sub{
-  font-size:clamp(16px,2vw,20px);color:var(--muted);max-width:600px;
-  margin:0 auto 56px;line-height:1.7;position:relative;
+  font-size:clamp(15px,2vw,19px);color:var(--muted);max-width:580px;
+  margin:0 auto 52px;line-height:1.7;position:relative;
 }
 .hero-stats{
-  display:flex;flex-wrap:wrap;justify-content:center;gap:12px;
-  position:relative;margin-bottom:64px;
+  display:flex;flex-wrap:wrap;justify-content:center;gap:10px;
+  position:relative;margin-bottom:60px;
 }
 .stat-chip{
   display:flex;align-items:center;gap:8px;
-  background:rgba(255,255,255,.04);border:1px solid var(--border);
-  border-radius:10px;padding:10px 18px;font-size:13px;color:var(--muted);
-  transition:all .2s;
+  background:#fff;border:1px solid var(--border);
+  border-radius:99px;padding:8px 16px;font-size:13px;color:var(--muted);
+  box-shadow:var(--shadow-sm);font-weight:500;
+  transition:box-shadow .2s,border-color .2s;
 }
-.stat-chip:hover{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.12);color:var(--text)}
-.stat-chip .dot{width:6px;height:6px;border-radius:50%}
+.stat-chip:hover{box-shadow:var(--shadow);border-color:var(--border2)}
+.stat-chip .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
 
 .hero-score{
   display:inline-flex;flex-direction:column;align-items:center;
-  background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);
-  border-radius:20px;padding:28px 48px;position:relative;
+  background:#fff;border:2px solid #a7f3d0;
+  border-radius:24px;padding:32px 56px;
+  box-shadow:0 8px 40px rgba(5,150,105,.12),0 2px 8px rgba(5,150,105,.08);
+  position:relative;
 }
-.hero-score .label{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--green);margin-bottom:8px}
-.hero-score .value{font-size:72px;font-weight:800;letter-spacing:-.04em;color:#fff;line-height:1}
-.hero-score .desc{font-size:13px;color:var(--muted);margin-top:8px}
-
-/* ─── SECTIONS ─── */
-section{padding:100px 24px}
-.s-alt{background:var(--bg2)}
-.container{max-width:980px;margin:0 auto}
-.container-lg{max-width:1160px;margin:0 auto}
-
-.eyebrow{
-  display:inline-block;font-size:11px;font-weight:700;letter-spacing:.12em;
-  text-transform:uppercase;color:var(--blue);margin-bottom:16px;
-}
-h2{font-size:clamp(28px,4vw,52px);font-weight:800;letter-spacing:-.03em;line-height:1.1;margin-bottom:16px}
-.lead{font-size:17px;color:var(--muted);line-height:1.7;max-width:580px;margin-bottom:60px}
-
-/* ─── EXP CARDS ─── */
-.exp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px}
-.exp-card{
-  background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);
-  padding:32px;position:relative;overflow:hidden;
-  transition:transform .3s,border-color .3s,box-shadow .3s;
-}
-.exp-card::before{
-  content:"";position:absolute;inset:0;
-  background:var(--card-grad,linear-gradient(135deg,rgba(79,142,247,.06),transparent));
+.hero-score::before{
+  content:"";position:absolute;inset:-1px;border-radius:24px;
+  background:linear-gradient(135deg,rgba(5,150,105,.08),rgba(8,145,178,.06));
   pointer-events:none;
 }
-.exp-card:hover{
-  transform:translateY(-6px);
-  border-color:rgba(255,255,255,.15);
-  box-shadow:0 24px 64px rgba(0,0,0,.4);
+.hero-score .label{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--green);margin-bottom:8px}
+.hero-score .value{font-size:72px;font-weight:800;letter-spacing:-.04em;color:var(--text);line-height:1}
+.hero-score .desc{font-size:13px;color:var(--muted);margin-top:8px;font-weight:500}
+
+/* ── SECTIONS ── */
+section{padding:96px 24px}
+.s-alt{background:var(--bg2)}
+.container{max-width:960px;margin:0 auto}
+.container-lg{max-width:1140px;margin:0 auto}
+
+.eyebrow{
+  display:inline-block;font-size:11px;font-weight:800;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--blue);margin-bottom:14px;
 }
-.exp-card.best{border-color:rgba(16,185,129,.3)}
-.exp-card.best::after{
-  content:"";position:absolute;top:0;left:0;right:0;height:2px;
-  background:var(--grad3);
+h2{font-size:clamp(26px,4vw,48px);font-weight:800;letter-spacing:-.03em;line-height:1.1;margin-bottom:14px;color:var(--text)}
+.lead{font-size:16px;color:var(--muted);line-height:1.75;max-width:560px;margin-bottom:56px}
+
+/* ── EXP CARDS ── */
+.exp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
+.exp-card{
+  background:#fff;border:1px solid var(--border);border-radius:var(--r);
+  padding:30px;position:relative;overflow:hidden;
+  box-shadow:var(--shadow-sm);
+  transition:transform .28s,box-shadow .28s,border-color .28s;
 }
-.exp-num{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
-.exp-title{font-size:17px;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:24px}
-.scores-row{display:flex;gap:10px;margin-bottom:24px}
+.exp-card::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,#e4e4ec,#e4e4ec);
+  transition:background .3s;
+}
+.exp-card:hover{transform:translateY(-5px);box-shadow:var(--shadow-lg);border-color:var(--border2)}
+.exp-card:hover::before{background:var(--grad1)}
+.exp-card.best{border-color:#a7f3d0;box-shadow:0 4px 20px rgba(5,150,105,.1)}
+.exp-card.best::before{background:var(--grad3)}
+.exp-num{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted2);margin-bottom:10px}
+.exp-title{font-size:16px;font-weight:700;color:var(--text);line-height:1.35;margin-bottom:24px}
+.scores-row{display:flex;gap:10px;margin-bottom:20px}
 .sc{
   flex:1;display:flex;flex-direction:column;align-items:center;
-  background:rgba(255,255,255,.04);border:1px solid var(--border);
-  border-radius:10px;padding:12px 8px;
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:10px;padding:12px 8px;transition:background .2s;
 }
-.sc.winner{background:rgba(79,142,247,.1);border-color:rgba(79,142,247,.25)}
+.sc.winner{background:var(--blue-lt);border-color:var(--blue-md)}
 .sc.winner .sv{color:var(--blue)}
-.sc.star{background:rgba(16,185,129,.1);border-color:rgba(16,185,129,.25)}
+.sc.star{background:var(--green-lt);border-color:#a7f3d0}
 .sc.star .sv{color:var(--green)}
-.sl{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-.sv{font-size:22px;font-weight:800;color:var(--text);margin-top:4px;letter-spacing:-.02em}
+.sl{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted2)}
+.sv{font-size:22px;font-weight:800;color:var(--text);margin-top:3px;letter-spacing:-.02em}
 .exp-tag{
   font-family:var(--mono);font-size:11px;color:var(--muted);
-  background:rgba(255,255,255,.04);border:1px solid var(--border);
+  background:var(--bg2);border:1px solid var(--border);
   border-radius:6px;padding:5px 10px;display:inline-block;
 }
+.best-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--green);background:var(--green-lt);border:1px solid #a7f3d0;
+  border-radius:6px;padding:4px 10px;margin-bottom:12px;
+}
 
-/* ─── BAR CHART ─── */
+/* ── BAR CHART ── */
 .chart-wrap{
-  background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);
-  padding:40px;overflow-x:auto;
+  background:#fff;border:1px solid var(--border);border-radius:var(--r);
+  padding:40px;box-shadow:var(--shadow);
 }
-.chart-title{font-size:15px;font-weight:700;margin-bottom:32px;color:var(--text)}
-.chart-row{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+.chart-legend{display:flex;gap:24px;margin-bottom:32px}
+.legend-item{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);font-weight:500}
+.legend-dot{width:12px;height:4px;border-radius:2px}
+.chart-row{display:flex;align-items:center;gap:20px;margin-bottom:22px}
 .chart-row:last-child{margin-bottom:0}
-.chart-lbl{
-  width:220px;flex-shrink:0;font-size:12px;color:var(--muted);
-  text-align:right;line-height:1.3;
-}
-.bar-group{flex:1;display:flex;flex-direction:column;gap:5px}
+.chart-lbl{width:200px;flex-shrink:0;font-size:12px;color:var(--muted);font-weight:600;text-align:right;line-height:1.3}
+.bar-group{flex:1;display:flex;flex-direction:column;gap:6px}
 .bar-wrap{display:flex;align-items:center;gap:10px}
-.bar{height:10px;border-radius:99px;min-width:4px;transition:width .8s cubic-bezier(.4,0,.2,1)}
-.bar-cot{background:linear-gradient(90deg,#4f8ef7,#818cf8)}
-.bar-tot{background:linear-gradient(90deg,#f59e0b,#f87171)}
-.bar-got{background:linear-gradient(90deg,#10b981,#22d3ee)}
-.bar-val{font-size:12px;font-weight:700;color:var(--muted);min-width:40px}
-.chart-legend{display:flex;gap:24px;margin-bottom:28px}
-.legend-item{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
-.legend-dot{width:10px;height:10px;border-radius:3px}
+.bar{height:10px;border-radius:99px;min-width:4px;transition:width .9s cubic-bezier(.4,0,.2,1)}
+.bar-cot{background:linear-gradient(90deg,#3b82f6,#6366f1)}
+.bar-tot{background:linear-gradient(90deg,#f59e0b,#ef4444)}
+.bar-got{background:linear-gradient(90deg,#10b981,#06b6d4)}
+.bar-val{font-size:12px;font-weight:700;color:var(--muted);min-width:42px}
+.chart-best-row{
+  background:linear-gradient(90deg,rgba(5,150,105,.04),transparent);
+  border-radius:10px;padding:8px 0;margin-top:8px;
+}
+.chart-best-row .chart-lbl{color:var(--green);font-weight:700}
 
-/* ─── ARCH ─── */
-.arch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+/* ── ARCHITECTURE ── */
+.arch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
 .arch-card{
-  background:var(--bg3);border:1px solid var(--border);border-radius:14px;
-  padding:28px 24px;transition:border-color .2s,transform .2s;
+  background:#fff;border:1px solid var(--border);border-radius:14px;
+  padding:28px 24px;box-shadow:var(--shadow-sm);
+  transition:box-shadow .2s,transform .2s,border-color .2s;
 }
-.arch-card:hover{border-color:rgba(255,255,255,.15);transform:translateY(-3px)}
-.arch-icon{
-  width:42px;height:42px;border-radius:12px;display:flex;align-items:center;
-  justify-content:center;font-size:20px;margin-bottom:16px;
-}
-.arch-card h4{font-size:14px;font-weight:700;margin-bottom:8px;color:var(--text)}
+.arch-card:hover{box-shadow:var(--shadow);transform:translateY(-3px);border-color:var(--border2)}
+.arch-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:16px}
+.arch-card h4{font-size:14px;font-weight:700;margin-bottom:6px;color:var(--text)}
 .arch-card p{font-size:13px;color:var(--muted);line-height:1.6}
-.arch-file{font-family:var(--mono);font-size:12px;color:var(--blue);display:block;margin-bottom:10px}
+.arch-file{font-family:var(--mono);font-size:11px;color:var(--blue);display:block;margin-bottom:8px;font-weight:600}
 
-/* ─── STRATEGY ─── */
+/* ── STRATEGY ── */
 .strat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px}
 .strat-card{
-  border-radius:var(--r);padding:36px 32px;position:relative;
-  border:1px solid var(--border);overflow:hidden;
-  transition:transform .25s,border-color .25s;
+  border-radius:var(--r);padding:36px 30px;
+  border:1px solid var(--border);
+  box-shadow:var(--shadow-sm);
+  transition:transform .25s,box-shadow .25s;
 }
-.strat-card:hover{transform:translateY(-4px)}
-.strat-card .glow{
-  position:absolute;width:200px;height:200px;border-radius:50%;
-  filter:blur(60px);opacity:.15;pointer-events:none;
-  top:-40px;right:-40px;
-}
-.strat-card.cot{background:linear-gradient(135deg,#0d1a2e,#0f1535)}
-.strat-card.cot .glow{background:#4f8ef7}
-.strat-card.tot{background:linear-gradient(135deg,#1f1007,#201206)}
-.strat-card.tot .glow{background:#f59e0b}
-.strat-card.got{background:linear-gradient(135deg,#071a12,#071a12)}
-.strat-card.got .glow{background:#10b981}
+.strat-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
+.strat-card.cot{background:linear-gradient(145deg,#eff6ff,#f5f3ff)}
+.strat-card.tot{background:linear-gradient(145deg,#fffbeb,#fff7ed)}
+.strat-card.got{background:linear-gradient(145deg,#ecfdf5,#f0fdfa)}
 .strat-tag{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px}
 .strat-card.cot .strat-tag{color:var(--blue)}
 .strat-card.tot .strat-tag{color:var(--orange)}
 .strat-card.got .strat-tag{color:var(--green)}
-.strat-card h3{font-size:22px;font-weight:800;letter-spacing:-.02em;margin-bottom:14px}
-.strat-card p{font-size:13px;color:var(--muted);line-height:1.7}
+.strat-card h3{font-size:21px;font-weight:800;letter-spacing:-.02em;margin-bottom:14px;color:var(--text)}
+.strat-card p{font-size:13px;color:var(--muted);line-height:1.75}
 .strat-calls{
-  display:inline-block;margin-top:16px;font-size:12px;font-weight:600;
-  padding:4px 12px;border-radius:6px;
+  display:inline-block;margin-top:18px;font-size:12px;font-weight:700;
+  padding:5px 12px;border-radius:6px;
 }
-.strat-card.cot .strat-calls{background:rgba(79,142,247,.12);color:var(--blue)}
-.strat-card.tot .strat-calls{background:rgba(245,158,11,.12);color:var(--orange)}
-.strat-card.got .strat-calls{background:rgba(16,185,129,.12);color:var(--green)}
+.strat-card.cot .strat-calls{background:var(--blue-md);color:var(--blue)}
+.strat-card.tot .strat-calls{background:#fde68a;color:#92400e}
+.strat-card.got .strat-calls{background:#a7f3d0;color:#065f46}
 
-/* ─── FUNCTIONS ─── */
+/* ── FUNCTIONS ── */
 .func-list{display:flex;flex-direction:column;gap:2px}
 .func-item{
-  display:grid;grid-template-columns:280px 1fr;
-  background:var(--bg3);border:1px solid var(--border);
-  padding:22px 28px;transition:background .2s;
+  display:grid;grid-template-columns:260px 1fr;gap:20px;
+  background:#fff;border:1px solid var(--border);
+  padding:22px 28px;transition:background .18s;
 }
 .func-item:first-child{border-radius:14px 14px 0 0}
 .func-item:last-child{border-radius:0 0 14px 14px}
-.func-item:hover{background:rgba(255,255,255,.03)}
-.fn{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--blue);line-height:1.4}
-.fd{font-size:13px;color:var(--muted);line-height:1.7}
-.fd strong{color:var(--text)}
+.func-item:not(:last-child){border-bottom:none}
+.func-item:hover{background:var(--blue-lt)}
+.fn{font-family:var(--mono);font-size:12.5px;font-weight:700;color:var(--blue);line-height:1.4;word-break:break-all}
+.fd{font-size:13px;color:var(--muted);line-height:1.75}
+.fd strong{color:var(--text);font-weight:600}
 
-/* ─── PATCHES ─── */
-.patch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+/* ── PATCHES ── */
+.patch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
 .patch{
-  background:rgba(245,158,11,.05);border:1px solid rgba(245,158,11,.15);
-  border-radius:12px;padding:22px 20px;
+  background:var(--orange-lt);border:1px solid #fde68a;
+  border-radius:12px;padding:20px 18px;
+  transition:box-shadow .2s;
 }
+.patch:hover{box-shadow:var(--shadow)}
 .patch h4{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--orange);margin-bottom:8px}
-.patch p{font-size:12px;color:var(--muted);line-height:1.6}
+.patch p{font-size:12px;color:#78350f;line-height:1.6}
 
-/* ─── TABLE ─── */
-.tbl-wrap{overflow-x:auto;border-radius:14px;border:1px solid var(--border)}
-table{width:100%;border-collapse:collapse;font-size:13px}
-thead tr{background:rgba(255,255,255,.04)}
-th{padding:14px 18px;text-align:left;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);white-space:nowrap}
-td{padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.04)}
-td:first-child{color:var(--text);font-weight:500}
+/* ── TABLES ── */
+.tbl-wrap{overflow-x:auto;border-radius:14px;border:1px solid var(--border);box-shadow:var(--shadow-sm)}
+table{width:100%;border-collapse:collapse;font-size:13px;background:#fff}
+thead tr{background:var(--bg2)}
+th{padding:13px 18px;text-align:left;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:14px 18px;border-bottom:1px solid rgba(0,0,0,.04)}
+td:first-child{color:var(--text);font-weight:600}
 tbody tr:last-child td{border-bottom:none}
-tbody tr:hover td{background:rgba(255,255,255,.025)}
-.best-r td{background:rgba(16,185,129,.05)!important}
+tbody tr:hover td{background:var(--bg2)}
+.best-r td{background:var(--green-lt)!important}
 .best-r td:first-child{color:var(--green);font-weight:700}
-.pct{font-weight:700;font-variant-numeric:tabular-nums}
-.pct-hi{color:var(--green)}
-.pct-lo{color:var(--muted)}
-.strat-head-cot{color:var(--blue)!important}
-.strat-head-tot{color:var(--orange)!important}
-.strat-head-got{color:var(--green)!important}
+.pct{font-weight:700;font-variant-numeric:tabular-nums;color:var(--text)}
+.pct-hi{color:var(--green)!important}
+.pct-lo{color:var(--muted2)!important}
+.s-cot{color:var(--blue)!important}
+.s-tot{color:var(--orange)!important}
+.s-got{color:var(--green)!important}
 
-/* ─── INSIGHTS ─── */
-.insight-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+/* ── INSIGHTS ── */
+.insight-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
 .insight{
-  border-radius:14px;padding:32px 28px;
-  background:rgba(255,255,255,.03);border:1px solid var(--border);
-  transition:border-color .2s,transform .2s;
+  background:#fff;border:1px solid var(--border);
+  border-radius:14px;padding:30px 26px;
+  box-shadow:var(--shadow-sm);
+  transition:box-shadow .2s,transform .2s;
 }
-.insight:hover{border-color:rgba(255,255,255,.12);transform:translateY(-3px)}
-.insight .ico{font-size:28px;margin-bottom:16px;display:block}
-.insight h4{font-size:16px;font-weight:700;margin-bottom:10px}
+.insight:hover{box-shadow:var(--shadow);transform:translateY(-3px)}
+.insight .ico{font-size:28px;margin-bottom:14px;display:block}
+.insight h4{font-size:15px;font-weight:700;margin-bottom:8px;color:var(--text)}
 .insight p{font-size:13px;color:var(--muted);line-height:1.7}
 
-/* ─── FOOTER ─── */
+/* ── DIVIDER ── */
+.section-divider{height:1px;background:var(--border);max-width:1140px;margin:0 auto}
+
+/* ── KG BOX ── */
+.kg-box{
+  background:#fff;border:1px solid var(--border);border-radius:var(--r);
+  padding:32px 36px;box-shadow:var(--shadow-sm);margin-top:28px;
+}
+
+/* ── FOOTER ── */
 footer{
-  background:var(--bg2);border-top:1px solid var(--border);
-  padding:60px 24px 48px;text-align:center;
+  background:var(--text);
+  padding:64px 24px 52px;text-align:center;
 }
 footer .f-logo{
-  font-size:18px;font-weight:800;letter-spacing:-.03em;margin-bottom:16px;
-  background:var(--grad1);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
-  display:inline-block;
+  font-size:18px;font-weight:800;letter-spacing:-.03em;margin-bottom:14px;
+  color:#fff;display:inline-block;
 }
-footer p{font-size:13px;color:var(--muted);line-height:1.8}
+footer p{font-size:13px;color:rgba(255,255,255,.5);line-height:1.9}
 
-/* ─── UTILS ─── */
-.divider{width:100%;height:1px;background:var(--border);margin:60px 0}
-code{font-family:var(--mono);font-size:12px;background:rgba(255,255,255,.07);border:1px solid var(--border);padding:2px 8px;border-radius:5px;color:var(--cyan)}
+code{font-family:var(--mono);font-size:12px;background:var(--bg2);border:1px solid var(--border);padding:2px 7px;border-radius:5px;color:var(--blue)}
 
 @media(max-width:700px){
   nav ul,.nav-btn{display:none}
   nav{padding:0 20px}
-  .func-item{grid-template-columns:1fr;gap:12px}
-  .chart-lbl{width:140px;font-size:11px}
+  .func-item{grid-template-columns:1fr;gap:10px}
+  .chart-lbl{width:130px;font-size:11px}
 }
 </style>
 </head>
@@ -339,14 +355,13 @@ code{font-family:var(--mono);font-size:12px;background:rgba(255,255,255,.07);bor
 
 <!-- HERO -->
 <div class="hero">
-  <div class="hero-bg"></div>
-  <div class="hero-grid"></div>
+  <div class="hero-dots"></div>
   <div style="position:relative">
     <div class="hero-eyebrow">
       <span class="dot" style="background:var(--green)"></span>
       Toutes les expérimentations complètes · 15/15 résultats
     </div>
-    <h1><span class="grad-text">Raisonnement<br/>Topologique</span><br/>par GPT-OSS 20B</h1>
+    <h1>Raisonnement<br/><span class="grad-text">Topologique</span><br/>par GPT-OSS 20B</h1>
     <p class="hero-sub">5 configurations de GPT-OSS-20B évaluées sur 96 exemples équilibrés de relations DE-9IM avec trois stratégies de raisonnement enrichies par Knowledge Graph OSM.</p>
     <div class="hero-stats">
       <div class="stat-chip"><span class="dot" style="background:var(--blue)"></span>96 exemples · 16/prédicat</div>
@@ -368,10 +383,10 @@ code{font-family:var(--mono);font-size:12px;background:rgba(255,255,255,.07);bor
   <div class="container-lg">
     <div class="eyebrow">Les 5 expérimentations</div>
     <h2>Ce que nous avons testé</h2>
-    <p class="lead">Chaque expérimentation varie l'adaptateur LoRA et le budget de raisonnement. La case la plus brillante indique la meilleure stratégie par expérience.</p>
+    <p class="lead">Chaque expérimentation varie l'adaptateur LoRA et le budget de raisonnement. Le badge bleu indique la meilleure stratégie de l'expérience.</p>
 
     <div class="exp-grid">
-      <div class="exp-card" style="--card-grad:linear-gradient(135deg,rgba(79,142,247,.08),transparent)">
+      <div class="exp-card">
         <div class="exp-num">Expérimentation 01</div>
         <div class="exp-title">GPTOSS Base</div>
         <div class="scores-row">
@@ -382,7 +397,7 @@ code{font-family:var(--mono);font-size:12px;background:rgba(255,255,255,.07);bor
         <div class="exp-tag">exp1_base_gpu · 512 tok · sans adaptateur</div>
       </div>
 
-      <div class="exp-card" style="--card-grad:linear-gradient(135deg,rgba(139,92,246,.08),transparent)">
+      <div class="exp-card">
         <div class="exp-num">Expérimentation 02</div>
         <div class="exp-title">GPTOSS Fine-tuné</div>
         <div class="scores-row">
@@ -393,7 +408,7 @@ code{font-family:var(--mono);font-size:12px;background:rgba(255,255,255,.07);bor
         <div class="exp-tag">exp2_finetuned_topo_gpu · 512 tok · topo adapter</div>
       </div>
 
-      <div class="exp-card" style="--card-grad:linear-gradient(135deg,rgba(34,211,238,.08),transparent)">
+      <div class="exp-card">
         <div class="exp-num">Expérimentation 03</div>
         <div class="exp-title">GPTOSS Fine-tuné + KG en entrée</div>
         <div class="scores-row">
@@ -404,7 +419,7 @@ code{font-family:var(--mono);font-size:12px;background:rgba(255,255,255,.07);bor
         <div class="exp-tag">exp3_finetuned_kg_in_gpu · 1024 tok · osm-kg</div>
       </div>
 
-      <div class="exp-card" style="--card-grad:linear-gradient(135deg,rgba(245,158,11,.08),transparent)">
+      <div class="exp-card">
         <div class="exp-num">Expérimentation 04</div>
         <div class="exp-title">GPTOSS Fine-tuné + Inférence LLM enrichie par KG</div>
         <div class="scores-row">
@@ -415,8 +430,9 @@ code{font-family:var(--mono);font-size:12px;background:rgba(255,255,255,.07);bor
         <div class="exp-tag">exp5_finetuned_enriched_gpu · 1024 tok · topo</div>
       </div>
 
-      <div class="exp-card best" style="--card-grad:linear-gradient(135deg,rgba(16,185,129,.1),transparent)">
-        <div class="exp-num" style="color:var(--green)">Expérimentation 05 · Meilleure performance ★</div>
+      <div class="exp-card best">
+        <div class="best-badge">★ Meilleure performance</div>
+        <div class="exp-num">Expérimentation 05</div>
         <div class="exp-title">GPTOSS + Inférence LLM enrichie par KG</div>
         <div class="scores-row">
           <div class="sc"><span class="sl">CoT</span><span class="sv">66.7%</span></div>
@@ -438,9 +454,9 @@ code{font-family:var(--mono);font-size:12px;background:rgba(255,255,255,.07);bor
 
     <div class="chart-wrap">
       <div class="chart-legend">
-        <div class="legend-item"><div class="legend-dot" style="background:linear-gradient(90deg,#4f8ef7,#818cf8)"></div>CoT</div>
-        <div class="legend-item"><div class="legend-dot" style="background:linear-gradient(90deg,#f59e0b,#f87171)"></div>ToT</div>
-        <div class="legend-item"><div class="legend-dot" style="background:linear-gradient(90deg,#10b981,#22d3ee)"></div>GoT</div>
+        <div class="legend-item"><div class="legend-dot" style="background:linear-gradient(90deg,#3b82f6,#6366f1)"></div>CoT</div>
+        <div class="legend-item"><div class="legend-dot" style="background:linear-gradient(90deg,#f59e0b,#ef4444)"></div>ToT</div>
+        <div class="legend-item"><div class="legend-dot" style="background:linear-gradient(90deg,#10b981,#06b6d4)"></div>GoT</div>
       </div>
 
       <div class="chart-row">
@@ -479,12 +495,12 @@ code{font-family:var(--mono);font-size:12px;background:rgba(255,255,255,.07);bor
         </div>
       </div>
 
-      <div class="chart-row" style="background:rgba(16,185,129,.04);padding:12px 0;border-radius:8px;margin-top:4px">
-        <div class="chart-lbl" style="color:var(--green);font-weight:700">★ Inférence LLM enrichie</div>
+      <div class="chart-row chart-best-row">
+        <div class="chart-lbl">★ Inférence LLM enrichie</div>
         <div class="bar-group">
-          <div class="bar-wrap"><div class="bar bar-cot" style="width:66.7%"></div><span class="bar-val" style="color:var(--blue);font-weight:700">66.7%</span></div>
-          <div class="bar-wrap"><div class="bar bar-tot" style="width:69.8%"></div><span class="bar-val" style="color:var(--orange);font-weight:700">69.8%</span></div>
-          <div class="bar-wrap"><div class="bar bar-got" style="width:74.0%"></div><span class="bar-val" style="color:var(--green);font-weight:700">74.0%</span></div>
+          <div class="bar-wrap"><div class="bar bar-cot" style="width:66.7%"></div><span class="bar-val" style="color:var(--blue);font-weight:800">66.7%</span></div>
+          <div class="bar-wrap"><div class="bar bar-tot" style="width:69.8%"></div><span class="bar-val" style="color:var(--orange);font-weight:800">69.8%</span></div>
+          <div class="bar-wrap"><div class="bar bar-got" style="width:74.0%"></div><span class="bar-val" style="color:var(--green);font-weight:800">74.0%</span></div>
         </div>
       </div>
     </div>
@@ -500,40 +516,40 @@ code{font-family:var(--mono);font-size:12px;background:rgba(255,255,255,.07);bor
 
     <div class="arch-grid">
       <div class="arch-card">
-        <div class="arch-icon" style="background:rgba(79,142,247,.12)">⚙️</div>
+        <div class="arch-icon" style="background:#eff6ff">⚙️</div>
         <span class="arch-file">run_eval_osm_gpu.py</span>
         <h4>Moteur d'inférence GPU</h4>
         <p>Charge le modèle, applique l'adaptateur LoRA, boucle d'évaluation avec checkpoints atomiques et reprise automatique.</p>
       </div>
       <div class="arch-card">
-        <div class="arch-icon" style="background:rgba(16,185,129,.12)">🧠</div>
+        <div class="arch-icon" style="background:var(--green-lt)">🧠</div>
         <span class="arch-file">strategies_osm.py</span>
         <h4>Stratégies CoT / ToT / GoT</h4>
-        <p>Implémentation des trois stratégies. Accès au KG OSM via Nominatim avec cache local de 1107 entrées.</p>
+        <p>Implémentation des trois stratégies. Accès au KG OSM via Nominatim avec cache local de 1 107 entrées.</p>
       </div>
       <div class="arch-card">
-        <div class="arch-icon" style="background:rgba(245,158,11,.12)">🔧</div>
+        <div class="arch-icon" style="background:var(--orange-lt)">🔧</div>
         <span class="arch-file">finetune_gptoss.py</span>
         <h4>Fine-tuning LoRA</h4>
         <p>Fine-tuning avec SFTTrainer (TRL). Construit les prompts instruction-following, attache les adaptateurs LoRA r=8.</p>
       </div>
       <div class="arch-card">
-        <div class="arch-icon" style="background:rgba(139,92,246,.12)">📊</div>
+        <div class="arch-icon" style="background:var(--purple-lt)">📊</div>
         <span class="arch-file">analyze_96_experiments.py</span>
         <h4>Analyse & Visualisation</h4>
         <p>Charge les 15 checkpoints, calcule métriques globales et par prédicat, génère matrices de confusion et graphiques PNG.</p>
       </div>
       <div class="arch-card">
-        <div class="arch-icon" style="background:rgba(34,211,238,.12)">🧪</div>
+        <div class="arch-icon" style="background:#f0fdfa">🧪</div>
         <span class="arch-file">exp1…exp6_*.py</span>
         <h4>Scripts d'expérimentation</h4>
         <p>Définissent la configuration (adaptateur, budget tokens), vérifient les checkpoints existants, appellent le moteur central.</p>
       </div>
       <div class="arch-card">
-        <div class="arch-icon" style="background:rgba(239,68,68,.12)">💾</div>
+        <div class="arch-icon" style="background:#fff1f2">💾</div>
         <span class="arch-file">results/ + osm_cache.json</span>
         <h4>Sorties</h4>
-        <p>Cache OSM, checkpoints JSON par stratégie avec reprise, PNG des matrices de confusion et graphique comparatif.</p>
+        <p>Cache OSM, checkpoints JSON par stratégie, PNG des matrices de confusion et graphique comparatif global.</p>
       </div>
     </div>
   </div>
@@ -548,21 +564,18 @@ code{font-family:var(--mono);font-size:12px;background:rgba(255,255,255,.07);bor
 
     <div class="strat-grid">
       <div class="strat-card cot">
-        <div class="glow"></div>
         <div class="strat-tag">CoT · Chain-of-Thought</div>
         <h3>Raisonnement en chaîne</h3>
         <p>Construit un unique prompt enrichi avec toutes les preuves OSM (coordonnées, bounding box, hiérarchie administrative) et demande au modèle de raisonner étape par étape avant de donner un prédicat DE-9IM.</p>
         <span class="strat-calls">1 appel LLM / exemple</span>
       </div>
       <div class="strat-card tot">
-        <div class="glow"></div>
         <div class="strat-tag">ToT · Tree-of-Thought</div>
         <h3>Raisonnement arborescent</h3>
         <p>Génère plusieurs hypothèses de prédicats (branches), évalue chacune avec un prompt distinct, puis sélectionne la meilleure via vote ou score de confiance.</p>
         <span class="strat-calls">N appels LLM / exemple</span>
       </div>
       <div class="strat-card got">
-        <div class="glow"></div>
         <div class="strat-tag">GoT · Graph-of-Thought</div>
         <h3>Raisonnement en graphe</h3>
         <p>Décompose en étapes interdépendantes : extraction des preuves → analyse géométrique → comparaison → conclusion. Chaque nœud est une génération LLM distincte avec contexte accumulé.</p>
@@ -570,8 +583,8 @@ code{font-family:var(--mono);font-size:12px;background:rgba(255,255,255,.07);bor
       </div>
     </div>
 
-    <div style="margin-top:32px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:32px 36px">
-      <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--cyan);margin-bottom:14px">GeographicKnowledgeGraph · strategies_osm.py</div>
+    <div class="kg-box">
+      <div style="font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--cyan);margin-bottom:12px">GeographicKnowledgeGraph · strategies_osm.py</div>
       <p style="font-size:14px;color:var(--muted);line-height:1.8">
         Classe centrale d'accès au KG OSM. <code>get_neighborhood_details(place)</code> interroge <strong style="color:var(--text)">Nominatim</strong> et retourne coordonnées, type de lieu, bounding box et hiérarchie administrative. Résultats mis en cache dans <code>results/osm_cache.json</code> (1 107 entrées) pour éviter les requêtes réseau répétées.
       </p>
@@ -587,19 +600,19 @@ code{font-family:var(--mono);font-size:12px;background:rgba(255,255,255,.07);bor
     <p class="lead">Logique interne du moteur d'inférence central : patches, checkpoints, boucle d'évaluation.</p>
 
     <div style="margin-bottom:40px">
-      <h3 style="font-size:16px;font-weight:700;color:var(--orange);margin-bottom:16px">Patches de compatibilité appliqués au démarrage</h3>
+      <h3 style="font-size:15px;font-weight:700;color:var(--orange);margin-bottom:16px">Patches de compatibilité appliqués au démarrage</h3>
       <div class="patch-grid">
-        <div class="patch"><h4>_TorchvisionStubFinder</h4><p>torchvision cassé sur ce serveur (<code>_cast_Long</code> manquant). MetaPathFinder qui intercepte tous les imports <code>torchvision.*</code> et retourne des stubs vides avec <code>InterpolationMode</code> correct.</p></div>
+        <div class="patch"><h4>_TorchvisionStubFinder</h4><p>torchvision cassé sur ce serveur (<code>_cast_Long</code> manquant). MetaPathFinder interceptant tous les imports <code>torchvision.*</code> avec stubs vides et <code>InterpolationMode</code> correct.</p></div>
         <div class="patch"><h4>torch.accelerator</h4><p>Attribut manquant dans PyTorch &lt; 2.4. Polyfill ajouté avant tout import de transformers pour éviter <code>AttributeError</code> au chargement.</p></div>
         <div class="patch"><h4>nn.Module.set_submodule</h4><p>Méthode absente avant PyTorch 2.5. Polyfill implémentant la traversée récursive du graphe de sous-modules.</p></div>
-        <div class="patch"><h4>supports_quant_method</h4><p>Bug transformers ≥5.9 : crash si <code>quantization_config=None</code>. Méthode remplacée par une version qui retourne <code>False</code> sur entrée nulle.</p></div>
+        <div class="patch"><h4>supports_quant_method</h4><p>Bug transformers ≥5.9 : crash si <code>quantization_config=None</code>. Méthode remplacée retournant <code>False</code> sur entrée nulle.</p></div>
       </div>
     </div>
 
     <div class="func-list">
       <div class="func-item">
         <div class="fn">_save_json_atomic(path, data)</div>
-        <div class="fd">Sauvegarde via fichier temporaire + <strong>os.replace</strong> atomique. Garantit que le checkpoint JSON est toujours valide, même si le processus est interrompu en cours d'écriture.</div>
+        <div class="fd">Sauvegarde via fichier temporaire + <strong>os.replace</strong> atomique. Garantit que le checkpoint JSON est toujours valide même si le processus est interrompu en cours d'écriture.</div>
       </div>
       <div class="func-item">
         <div class="fn">_load_checkpoint(ckpt_path)</div>
@@ -621,20 +634,20 @@ code{font-family:var(--mono);font-size:12px;background:rgba(255,255,255,.07);bor
   </div>
 </section>
 
-<!-- DETAILED RESULTS -->
+<!-- RESULTS -->
 <section id="analyse">
   <div class="container-lg">
     <div class="eyebrow">Métriques détaillées</div>
     <h2>Résultats par prédicat DE-9IM</h2>
     <p class="lead">Précision de chaque configuration sur les 6 prédicats topologiques. La ligne verte indique la meilleure expérimentation.</p>
 
-    <h3 style="font-size:15px;font-weight:700;color:var(--blue);margin-bottom:16px;display:flex;align-items:center;gap:8px">
-      <span style="background:linear-gradient(90deg,#4f8ef7,#818cf8);width:16px;height:3px;border-radius:2px;display:inline-block"></span>
+    <h3 style="font-size:14px;font-weight:700;color:var(--blue);margin-bottom:14px;display:flex;align-items:center;gap:8px">
+      <span style="background:linear-gradient(90deg,#3b82f6,#6366f1);width:20px;height:4px;border-radius:2px;display:inline-block"></span>
       CoT — Chain-of-Thought
     </h3>
-    <div class="tbl-wrap" style="margin-bottom:36px">
+    <div class="tbl-wrap" style="margin-bottom:32px">
       <table>
-        <thead><tr><th>Expérimentation</th><th class="strat-head-cot">Précision</th><th>contains</th><th>within</th><th>touches</th><th>crosses</th><th>disjoint</th><th>overlaps</th></tr></thead>
+        <thead><tr><th>Expérimentation</th><th class="s-cot">Précision</th><th>contains</th><th>within</th><th>touches</th><th>crosses</th><th>disjoint</th><th>overlaps</th></tr></thead>
         <tbody>
           <tr><td>GPTOSS Base</td><td class="pct">57.3%</td><td>75.0%</td><td class="pct-hi">100.0%</td><td>50.0%</td><td>37.5%</td><td>62.5%</td><td class="pct-lo">18.8%</td></tr>
           <tr><td>GPTOSS Fine-tuné</td><td class="pct">53.1%</td><td class="pct-lo">18.8%</td><td>43.8%</td><td>43.8%</td><td>75.0%</td><td>75.0%</td><td>62.5%</td></tr>
@@ -645,13 +658,13 @@ code{font-family:var(--mono);font-size:12px;background:rgba(255,255,255,.07);bor
       </table>
     </div>
 
-    <h3 style="font-size:15px;font-weight:700;color:var(--orange);margin-bottom:16px;display:flex;align-items:center;gap:8px">
-      <span style="background:linear-gradient(90deg,#f59e0b,#f87171);width:16px;height:3px;border-radius:2px;display:inline-block"></span>
+    <h3 style="font-size:14px;font-weight:700;color:var(--orange);margin-bottom:14px;display:flex;align-items:center;gap:8px">
+      <span style="background:linear-gradient(90deg,#f59e0b,#ef4444);width:20px;height:4px;border-radius:2px;display:inline-block"></span>
       ToT — Tree-of-Thought
     </h3>
-    <div class="tbl-wrap" style="margin-bottom:36px">
+    <div class="tbl-wrap" style="margin-bottom:32px">
       <table>
-        <thead><tr><th>Expérimentation</th><th class="strat-head-tot">Précision</th><th>contains</th><th>within</th><th>touches</th><th>crosses</th><th>disjoint</th><th>overlaps</th></tr></thead>
+        <thead><tr><th>Expérimentation</th><th class="s-tot">Précision</th><th>contains</th><th>within</th><th>touches</th><th>crosses</th><th>disjoint</th><th>overlaps</th></tr></thead>
         <tbody>
           <tr><td>GPTOSS Base</td><td class="pct">37.5%</td><td>75.0%</td><td>50.0%</td><td>31.2%</td><td class="pct-lo">6.2%</td><td>50.0%</td><td class="pct-lo">12.5%</td></tr>
           <tr><td>GPTOSS Fine-tuné</td><td class="pct pct-lo">19.8%</td><td>31.2%</td><td class="pct-lo">18.8%</td><td>25.0%</td><td class="pct-lo">6.2%</td><td class="pct-lo">18.8%</td><td class="pct-lo">18.8%</td></tr>
@@ -662,13 +675,13 @@ code{font-family:var(--mono);font-size:12px;background:rgba(255,255,255,.07);bor
       </table>
     </div>
 
-    <h3 style="font-size:15px;font-weight:700;color:var(--green);margin-bottom:16px;display:flex;align-items:center;gap:8px">
-      <span style="background:linear-gradient(90deg,#10b981,#22d3ee);width:16px;height:3px;border-radius:2px;display:inline-block"></span>
+    <h3 style="font-size:14px;font-weight:700;color:var(--green);margin-bottom:14px;display:flex;align-items:center;gap:8px">
+      <span style="background:linear-gradient(90deg,#10b981,#06b6d4);width:20px;height:4px;border-radius:2px;display:inline-block"></span>
       GoT — Graph-of-Thought
     </h3>
     <div class="tbl-wrap" style="margin-bottom:60px">
       <table>
-        <thead><tr><th>Expérimentation</th><th class="strat-head-got">Précision</th><th>contains</th><th>within</th><th>touches</th><th>crosses</th><th>disjoint</th><th>overlaps</th></tr></thead>
+        <thead><tr><th>Expérimentation</th><th class="s-got">Précision</th><th>contains</th><th>within</th><th>touches</th><th>crosses</th><th>disjoint</th><th>overlaps</th></tr></thead>
         <tbody>
           <tr><td>GPTOSS Base</td><td class="pct pct-lo">26.0%</td><td>56.2%</td><td>37.5%</td><td class="pct-lo">0.0%</td><td class="pct-lo">12.5%</td><td>43.8%</td><td class="pct-lo">6.2%</td></tr>
           <tr><td>GPTOSS Fine-tuné</td><td class="pct">61.5%</td><td>62.5%</td><td>62.5%</td><td>75.0%</td><td>62.5%</td><td>62.5%</td><td>43.8%</td></tr>
@@ -679,10 +692,9 @@ code{font-family:var(--mono);font-size:12px;background:rgba(255,255,255,.07);bor
       </table>
     </div>
 
-    <!-- Insights -->
     <div class="eyebrow">Conclusions</div>
     <h2>Observations clés</h2>
-    <div class="insight-grid" style="margin-top:36px">
+    <div class="insight-grid" style="margin-top:32px">
       <div class="insight">
         <span class="ico">🏆</span>
         <h4>GoT + KG Ollama domine</h4>
@@ -696,7 +708,7 @@ code{font-family:var(--mono);font-size:12px;background:rgba(255,255,255,.07);bor
       <div class="insight">
         <span class="ico">📈</span>
         <h4>GoT &gt; CoT &gt; ToT</h4>
-        <p>GoT bénéficie le plus du KG OSM. ToT est systématiquement la stratégie la moins performante sur ce type de tâche de classification topologique.</p>
+        <p>GoT bénéficie le plus du KG OSM. ToT est systématiquement la stratégie la moins performante sur cette tâche de classification topologique.</p>
       </div>
       <div class="insight">
         <span class="ico">🗺️</span>
@@ -711,7 +723,7 @@ code{font-family:var(--mono);font-size:12px;background:rgba(255,255,255,.07);bor
 <footer>
   <div class="f-logo">GPT-OSS 20B · Raisonnement Topologique</div>
   <p>5 expérimentations · 96 exemples · 15 configurations · CoT · ToT · GoT · KG OSM</p>
-  <p style="margin-top:6px">DE-9IM · contains · within · touches · crosses · disjoint · overlaps · Université Laval</p>
+  <p>DE-9IM · contains · within · touches · crosses · disjoint · overlaps · Université Laval</p>
 </footer>
 
 </body>
