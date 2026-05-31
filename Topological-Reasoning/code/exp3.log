@@ -1,0 +1,196 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+[transformers] MXFP4 quantization requires Triton: CUDA requires Triton >= 3.4.0, XPU/CPU requires Triton >= 3.5.0. Please install triton: `pip install triton`. We will default to dequantizing the model to bf16.
+[OK] Dataset : ../dataset/triplet_update_v3_30.csv
+[OK] Indices : ../dataset/eval_96_balanced_indices.json
+[OK] Adapter : finetuned_gptoss_osm_kg/final_adapter
+[OK] OSM cache: 1107 entries
+
+======================================================================
+  EXPERIMENT 3 — GPTOSS FT OSM-KG + Inférence enrichie OSM
+  (OSM-KG adapter, OSM KG in training AND at inference)
+======================================================================
+  Model      : openai/gpt-oss-20b
+  Adapter    : finetuned_gptoss_osm_kg/final_adapter  [trained WITH OSM KG evidence]
+  KG         : OSM evidence in training + CoT/ToT/GoT at inference
+  Strategies : COT, TOT, GOT
+  Output tag : exp3_finetuned_kg_in_gpu
+======================================================================
+
+[STATUS] Checkpoint summary:
+  COT : COMPLETE  (96/96, acc=47.9%)  ✅
+  TOT : COMPLETE  (96/96, acc=24.0%)  ✅
+  GOT : PARTIAL   (64/96) — will resume
+
+[DATA] Filtered to 96 rows using ../dataset/eval_96_balanced_indices.json
+[DATA] 96 test rows ready.
+[MODEL] Tokenizer from: finetuned_gptoss_osm_kg/final_adapter
+[GPU] CUDA available ✅  NVIDIA A100 80GB PCIe MIG 7g.80gb  (85.0 GB)
+[MODEL] Loading in torch.bfloat16 (no quantization — fits in 85 GB GPU)
+[MODEL] Loading base model ...
+Loading weights:   0%|                                                                                                                                                       | 0/411 [00:00<?, ?it/s]Loading weights:   0%|▎                                                                                                                                              | 1/411 [00:00<01:52,  3.65it/s]Loading weights:   0%|▋                                                                                                                                              | 2/411 [00:00<01:41,  4.01it/s]Loading weights:   1%|█▋                                                                                                                                             | 5/411 [00:00<00:55,  7.37it/s]Loading weights:   2%|██▍                                                                                                                                            | 7/411 [00:01<00:52,  7.64it/s]Loading weights:   5%|███████▌                                                                                                                                      | 22/411 [00:01<00:12, 30.15it/s]Loading weights:   6%|████████▉                                                                                                                                     | 26/411 [00:01<00:15, 24.32it/s]Loading weights:   9%|█████████████▍                                                                                                                                | 39/411 [00:01<00:11, 32.33it/s]Loading weights:  10%|██████████████▊                                                                                                                               | 43/411 [00:01<00:11, 31.36it/s]Loading weights:  14%|███████████████████▎                                                                                                                          | 56/411 [00:02<00:09, 37.74it/s]Loading weights:  15%|████████████████████▋                                                                                                                         | 60/411 [00:02<00:09, 36.21it/s]Loading weights:  18%|█████████████████████████▏                                                                                                                    | 73/411 [00:02<00:08, 40.90it/s]Loading weights:  19%|██████████████████████████▌                                                                                                                   | 77/411 [00:02<00:08, 37.28it/s]Loading weights:  22%|███████████████████████████████                                                                                                               | 90/411 [00:02<00:07, 40.40it/s]Loading weights:  23%|████████████████████████████████▍                                                                                                             | 94/411 [00:03<00:09, 33.71it/s]Loading weights:  26%|████████████████████████████████████▋                                                                                                        | 107/411 [00:03<00:06, 46.96it/s]Loading weights:  27%|██████████████████████████████████████▊                                                                                                      | 113/411 [00:03<00:07, 38.29it/s]Loading weights:  30%|██████████████████████████████████████████▌                                                                                                  | 124/411 [00:03<00:05, 48.03it/s]Loading weights:  43%|███████████████████████████████████████████████████████████▌                                                                                | 175/411 [00:03<00:01, 131.87it/s]Loading weights:  55%|████████████████████████████████████████████████████████████████████████████▉                                                               | 226/411 [00:03<00:00, 206.93it/s]Loading weights:  67%|██████████████████████████████████████████████████████████████████████████████████████████████▎                                             | 277/411 [00:04<00:00, 270.62it/s]Loading weights:  80%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████▋                            | 328/411 [00:04<00:00, 322.01it/s]Loading weights:  92%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████           | 379/411 [00:04<00:00, 361.99it/s]Loading weights: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 411/411 [00:04<00:00, 95.36it/s]
+[MODEL] Applying LoRA adapter: /home/jovyan/GMT-7403/Topological-Reasoning/code/finetuned_gptoss_osm_kg/final_adapter
+[MODEL] Ready. Adapter: final_adapter  |  Device: cuda:0
+[MODEL] max_position_embeddings=131072  →  truncating inputs to 130016 tokens
+
+🚀 Running COT with GPU inference (adapter=final_adapter)
+♻️  Resuming — 96 rows already done.
+[exp3_finetuned_kg_in_gpu/cot]:   0%|                                                                                                                                         | 0/96 [00:00<?, ?it/s][exp3_finetuned_kg_in_gpu/cot]: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 96/96 [00:00<00:00, 37424.78it/s]
+
+✅ [exp3_finetuned_kg_in_gpu/cot] Finished — Accuracy: 47.92%
+   Log : results/voletc_exp3_finetuned_kg_in_gpu_cot_neighborhood_details_spatial_relation_16_sample.txt
+   CKPT: results/voletc_exp3_finetuned_kg_in_gpu_cot_neighborhood_details_spatial_relation_16_sample_ckpt.json
+
+🚀 Running TOT with GPU inference (adapter=final_adapter)
+♻️  Resuming — 96 rows already done.
+[exp3_finetuned_kg_in_gpu/tot]:   0%|                                                                                                                                         | 0/96 [00:00<?, ?it/s][exp3_finetuned_kg_in_gpu/tot]: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 96/96 [00:00<00:00, 40545.08it/s]
+
+✅ [exp3_finetuned_kg_in_gpu/tot] Finished — Accuracy: 23.96%
+   Log : results/voletc_exp3_finetuned_kg_in_gpu_tot_neighborhood_details_spatial_relation_16_sample.txt
+   CKPT: results/voletc_exp3_finetuned_kg_in_gpu_tot_neighborhood_details_spatial_relation_16_sample_ckpt.json
+
+🚀 Running GOT with GPU inference (adapter=final_adapter)
+♻️  Resuming — 64 rows already done.
+[exp3_finetuned_kg_in_gpu/got]:   0%|                                                                                                                                         | 0/96 [00:00<?, ?it/s]                                                                                                                                                                                                     [exp3_finetuned_kg_in_gpu/got]:   0%|                                                                                                                                         | 0/96 [01:29<?, ?it/s][exp3_finetuned_kg_in_gpu/got]:  68%|██████████████████████████████████████████████████████████████████████████████████████▋                                         | 65/96 [01:29<00:42,  1.38s/it]                                                                                                                                                                                                     [exp3_finetuned_kg_in_gpu/got]:  68%|██████████████████████████████████████████████████████████████████████████████████████▋                                         | 65/96 [01:42<00:42,  1.38s/it][exp3_finetuned_kg_in_gpu/got]:  69%|████████████████████████████████████████████████████████████████████████████████████████                                        | 66/96 [01:42<00:48,  1.63s/it]                                                                                                                                                                                                     [exp3_finetuned_kg_in_gpu/got]:  69%|████████████████████████████████████████████████████████████████████████████████████████                                        | 66/96 [02:06<00:48,  1.63s/it][exp3_finetuned_kg_in_gpu/got]:  70%|█████████████████████████████████████████████████████████████████████████████████████████▎                                      | 67/96 [02:06<01:06,  2.30s/it]                                                                                                                                                                                                     [exp3_finetuned_kg_in_gpu/got]:  70%|█████████████████████████████████████████████████████████████████████████████████████████▎                                      | 67/96 [02:54<01:06,  2.30s/it][exp3_finetuned_kg_in_gpu/got]:  71%|██████████████████████████████████████████████████████████████████████████████████████████▋                                     | 68/96 [02:54<01:56,  4.17s/it]                                                                                                                                                                                                     [exp3_finetuned_kg_in_gpu/got]:  71%|██████████████████████████████████████████████████████████████████████████████████████████▋                                     | 68/96 [03:37<01:56,  4.17s/it][exp3_finetuned_kg_in_gpu/got]:  72%|████████████████████████████████████████████████████████████████████████████████████████████                                    | 69/96 [03:37<02:49,  6.28s/it]                                                                                                                                                                                                     [exp3_finetuned_kg_in_gpu/got]:  72%|████████████████████████████████████████████████████████████████████████████████████████████                                    | 69/96 [03:42<02:49,  6.28s/it][exp3_finetuned_kg_in_gpu/got]:  73%|█████████████████████████████████████████████████████████████████████████████████████████████▎                                  | 70/96 [03:42<02:41,  6.21s/it]                                                                                                                                                                                                     [exp3_finetuned_kg_in_gpu/got]:  73%|█████████████████████████████████████████████████████████████████████████████████████████████▎                                  | 70/96 [03:44<02:41,  6.21s/it][exp3_finetuned_kg_in_gpu/got]:  74%|██████████████████████████████████████████████████████████████████████████████████████████████▋                                 | 71/96 [03:44<02:24,  5.79s/it]                                                                                                                                                                                                     [exp3_finetuned_kg_in_gpu/got]:  74%|██████████████████████████████████████████████████████████████████████████████████████████████▋                                 | 71/96 [03:52<02:24,  5.79s/it][exp3_finetuned_kg_in_gpu/got]:  75%|████████████████████████████████████████████████████████████████████████████████████████████████                                | 72/96 [03:52<02:24,  6.04s/it]                                                                                                                                                                                                     [exp3_finetuned_kg_in_gpu/got]:  75%|████████████████████████████████████████████████████████████████████████████████████████████████                                | 72/96 [04:07<02:24,  6.04s/it][exp3_finetuned_kg_in_gpu/got]:  76%|█████████████████████████████████████████████████████████████████████████████████████████████████▎                              | 73/96 [04:07<02:49,  7.38s/it]                                                                                                                                                                                                     [exp3_finetuned_kg_in_gpu/got]:  76%|█████████████████████████████████████████████████████████████████████████████████████████████████▎                              | 73/96 [04:28<02:49,  7.38s/it][exp3_finetuned_kg_in_gpu/got]:  77%|██████████████████████████████████████████████████████████████████████████████████████████████████▋                             | 74/96 [04:28<03:32,  9.68s/it]                                                                                                                                                                                                     [exp3_finetuned_kg_in_gpu/got]:  77%|██████████████████████████████████████████████████████████████████████████████████████████████████▋                             | 74/96 [04:36<03:32,  9.68s/it][exp3_finetuned_kg_in_gpu/got]:  78%|████████████████████████████████████████████████████████████████████████████████████████████████████                            | 75/96 [04:36<03:19,  9.48s/it]                                                                                                                                                                                                     [exp3_finetuned_kg_in_gpu/got]:  78%|████████████████████████████████████████████████████████████████████████████████████████████████████                            | 75/96 [06:04<03:19,  9.48s/it][exp3_finetuned_kg_in_gpu/got]:  79%|█████████████████████████████████████████████████████████████████████████████████████████████████████▎                          | 76/96 [06:04<08:50, 26.54s/it]                                                                                                                                                                                                     [exp3_finetuned_kg_in_gpu/got]:  79%|█████████████████████████████████████████████████████████████████████████████████████████████████████▎                          | 76/96 [06:09<08:50, 26.54s/it][exp3_finetuned_kg_in_gpu/got]:  80%|██████████████████████████████████████████████████████████████████████████████████████████████████████▋                         | 77/96 [06:09<06:50, 21.59s/it]                                                                                                                                                                                                     [exp3_finetuned_kg_in_gpu/got]:  80%|██████████████████████████████████████████████████████████████████████████████████████████████████████▋                         | 77/96 [06:27<06:50, 21.59s/it][exp3_finetuned_kg_in_gpu/got]:  81%|████████████████████████████████████████████████████████████████████████████████████████████████████████                        | 78/96 [06:27<06:08, 20.47s/it]                                                                                                                                                                                                     [exp3_finetuned_kg_in_gpu/got]:  81%|████████████████████████████████████████████████████████████████████████████████████████████████████████                        | 78/96 [07:09<06:08, 20.47s/it][exp3_finetuned_kg_in_gpu/got]:  82%|█████████████████████████████████████████████████████████████████████████████████████████████████████████▎                      | 79/96 [07:09<07:26, 26.28s/it]                                                                                                                                                                                                     [exp3_finetuned_kg_in_gpu/got]:  82%|█████████████████████████████████████████████████████████████████████████████████████████████████████████▎                      | 79/96 [07:40<07:26, 26.28s/it][exp3_finetuned_kg_in_gpu/got]:  83%|██████████████████████████████████████████████████████████████████████████████████████████████████████████▋                     | 80/96 [07:40<07:22, 27.63s/it]                                                                                                                                                                                                     [exp3_finetuned_kg_in_gpu/got]:  83%|██████████████████████████████████████████████████████████████████████████████████████████████████████████▋                     | 80/96 [07:58<07:22, 27.63s/it][exp3_finetuned_kg_in_gpu/got]:  84%|████████████████████████████████████████████████████████████████████████████████████████████████████████████                    | 81/96 [07:58<06:11, 24.77s/it]                                                                                                                                                                                                     [exp3_finetuned_kg_in_gpu/got]:  84%|████████████████████████████████████████████████████████████████████████████████████████████████████████████                    | 81/96 [08:07<06:11, 24.77s/it][exp3_finetuned_kg_in_gpu/got]:  85%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████▎                  | 82/96 [08:07<04:43, 20.27s/it]                                                                                                                                                                                                     [exp3_finetuned_kg_in_gpu/got]:  85%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████▎                  | 82/96 [08:26<04:43, 20.27s/it][exp3_finetuned_kg_in_gpu/got]:  86%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████▋                 | 83/96 [08:26<04:20, 20.01s/it]                                                                                                                                                                                                     [exp3_finetuned_kg_in_gpu/got]:  86%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████▋                 | 83/96 [09:09<04:20, 20.01s/it][exp3_finetuned_kg_in_gpu/got]:  88%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████                | 84/96 [09:09<05:19, 26.60s/it]                                                                                                                                                                                                     [exp3_finetuned_kg_in_gpu/got]:  88%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████                | 84/96 [09:46<05:19, 26.60s/it][exp3_finetuned_kg_in_gpu/got]:  89%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████▎              | 85/96 [09:46<05:26, 29.72s/it]                                                                                                                                                                                                     [exp3_finetuned_kg_in_gpu/got]:  89%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████▎              | 85/96 [10:28<05:26, 29.72s/it][exp3_finetuned_kg_in_gpu/got]:  90%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████▋             | 86/96 [10:28<05:35, 33.51s/it]                                                                                                                                                                                                     [exp3_finetuned_kg_in_gpu/got]:  90%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████▋             | 86/96 [10:39<05:35, 33.51s/it][exp3_finetuned_kg_in_gpu/got]:  91%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████            | 87/96 [10:39<04:00, 26.75s/it]                                                                                                                                                                                                     [exp3_finetuned_kg_in_gpu/got]:  91%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████            | 87/96 [11:21<04:00, 26.75s/it][exp3_finetuned_kg_in_gpu/got]:  92%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████▎          | 88/96 [11:21<04:11, 31.45s/it]                                                                                                                                                                                                     [exp3_finetuned_kg_in_gpu/got]:  92%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████▎          | 88/96 [13:01<04:11, 31.45s/it][exp3_finetuned_kg_in_gpu/got]:  93%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████▋         | 89/96 [13:01<06:03, 51.92s/it]                                                                                                                                                                                                     [exp3_finetuned_kg_in_gpu/got]:  93%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████▋         | 89/96 [13:08<06:03, 51.92s/it][exp3_finetuned_kg_in_gpu/got]:  94%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████        | 90/96 [13:08<03:51, 38.50s/it]                                                                                                                                                                                                     [exp3_finetuned_kg_in_gpu/got]:  94%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████        | 90/96 [14:24<03:51, 38.50s/it][exp3_finetuned_kg_in_gpu/got]:  95%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████▎      | 91/96 [14:24<04:08, 49.71s/it]                                                                                                                                                                                                     [exp3_finetuned_kg_in_gpu/got]:  95%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████▎      | 91/96 [16:01<04:08, 49.71s/it][exp3_finetuned_kg_in_gpu/got]:  96%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████▋     | 92/96 [16:01<04:14, 63.68s/it]                                                                                                                                                                                                     [exp3_finetuned_kg_in_gpu/got]:  96%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████▋     | 92/96 [16:08<04:14, 63.68s/it][exp3_finetuned_kg_in_gpu/got]:  97%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████    | 93/96 [16:08<02:20, 46.91s/it]                                                                                                                                                                                                     [exp3_finetuned_kg_in_gpu/got]:  97%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████    | 93/96 [16:38<02:20, 46.91s/it][exp3_finetuned_kg_in_gpu/got]:  98%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████▎  | 94/96 [16:38<01:23, 41.77s/it]                                                                                                                                                                                                     [exp3_finetuned_kg_in_gpu/got]:  98%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████▎  | 94/96 [16:50<01:23, 41.77s/it][exp3_finetuned_kg_in_gpu/got]:  99%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████▋ | 95/96 [16:50<00:32, 32.67s/it]                                                                                                                                                                                                     [exp3_finetuned_kg_in_gpu/got]:  99%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████▋ | 95/96 [17:13<00:32, 32.67s/it][exp3_finetuned_kg_in_gpu/got]: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 96/96 [17:13<00:00, 29.99s/it][exp3_finetuned_kg_in_gpu/got]: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 96/96 [17:13<00:00, 10.77s/it]
+
+[OSM EVIDENCE Fetched for San Marcos, California & Carlsbad, California]
+[TIMING] First sample: 30.4s  (1851 input tokens → 1024 max new)
+
+[OSM EVIDENCE Fetched for San Marcos, California & Carlsbad, California]
+
+[OSM EVIDENCE Fetched for San Marcos, California & Carlsbad, California]
+195 touches → None | acc=30.8%
+
+[OSM EVIDENCE Fetched for River Falls,wisconsin & university of wisconsin‚Äìriver falls ,wisconsin]
+202 contains → within | acc=30.3%
+
+[OSM EVIDENCE Fetched for Milwaukee,wisconsin & rockwell automation,wisconsin]
+208 contains → contains | acc=31.3%
+
+[OSM EVIDENCE Fetched for Edgerton,wisconsin & dane county,wisconsin]
+
+[OSM EVIDENCE Fetched for Edgerton,wisconsin & dane county,wisconsin]
+
+[OSM EVIDENCE Fetched for Edgerton,wisconsin & dane county,wisconsin]
+210 overlaps → None | acc=30.9%
+
+[OSM EVIDENCE Fetched for Loyal,wisconsin & clark county,wisconsin]
+211 within → disjoint | acc=30.4%
+
+[OSM EVIDENCE Fetched for Greater Houston & Interstate 10]
+221 crosses → disjoint | acc=30.0%
+
+[OSM EVIDENCE Fetched for Orchard, Texas & State Highway 36 (SH 36), Texas]
+222 crosses → within | acc=29.6%
+
+[OSM EVIDENCE Fetched for Texas Highways 35, Texas & Texas Highway 36, Texas]
+225 crosses → disjoint | acc=29.2%
+
+[OSM EVIDENCE Fetched for Sand City, California & Seaside, California]
+230 touches → within | acc=28.8%
+
+[OSM EVIDENCE Fetched for O'Brien, Texas & Farm Road 2229 and Texas State Highway 6, Texas]
+231 crosses → crosses | acc=29.7%
+
+[OSM EVIDENCE Fetched for Grand Terrace, California & Colton, California]
+238 touches → crosses | acc=29.3%
+
+[OSM EVIDENCE Fetched for Beverly Hills, Texas & Waco, Texas]
+
+[OSM EVIDENCE Fetched for Beverly Hills, Texas & Waco, Texas]
+
+[OSM EVIDENCE Fetched for Beverly Hills, Texas & Waco, Texas]
+240 touches → contains | acc=28.9%
+
+[OSM EVIDENCE Fetched for Palo Alto, California & Stanford University, California]
+
+[OSM EVIDENCE Fetched for Palo Alto, California & Stanford University, California]
+
+[OSM EVIDENCE Fetched for Palo Alto, California & Stanford University, California]
+249 overlaps → None | acc=28.6%
+
+[OSM EVIDENCE Fetched for Hill Country Village, Texas & San Antonio, Texas]
+263 touches → within | acc=28.2%
+
+[OSM EVIDENCE Fetched for Texhoma, Texas & Texhoma,Oklahoma]
+268 touches → touches | acc=29.1%
+
+[OSM EVIDENCE Fetched for Chippewa River & lake wissota,wisconsin]
+
+[OSM EVIDENCE Fetched for Chippewa River & lake wissota,wisconsin]
+271 crosses → contains | acc=28.7%
+
+[OSM EVIDENCE Fetched for Abilene, Texas & Interstate 20, Texas]
+
+[OSM EVIDENCE Fetched for Abilene, Texas & Interstate 20, Texas]
+
+[OSM EVIDENCE Fetched for Abilene, Texas & Interstate 20, Texas]
+275 crosses → None | acc=28.4%
+
+[OSM EVIDENCE Fetched for Santa Rosa, California & Sonoma County, California]
+276 within → overlaps | acc=28.0%
+
+[OSM EVIDENCE Fetched for Burleson, Texas & Fort Worth, Texas]
+277 disjoint → disjoint | acc=28.9%
+
+[OSM EVIDENCE Fetched for Riverbank, California & Stanislaus County, California]
+281 overlaps → disjoint | acc=28.6%
+
+[OSM EVIDENCE Fetched for Fontana, California & Los Angeles, California]
+
+[OSM EVIDENCE Fetched for Fontana, California & Los Angeles, California]
+
+[OSM EVIDENCE Fetched for Fontana, California & Los Angeles, California]
+283 disjoint → None | acc=28.2%
+
+[OSM EVIDENCE Fetched for Madison,wisconsin & exact sciences,wisconsin]
+284 contains → disjoint | acc=27.9%
+
+[OSM EVIDENCE Fetched for East Palo Alto,california & San Francisco, California]
+287 disjoint → disjoint | acc=28.7%
+
+[OSM EVIDENCE Fetched for New Richmond,wisconsin & st. croix county ,wisconsin]
+288 within → disjoint | acc=28.4%
+
+[OSM EVIDENCE Fetched for Racine,wisconsin & root river,wisconsin]
+
+[OSM EVIDENCE Fetched for Racine,wisconsin & root river,wisconsin]
+
+[OSM EVIDENCE Fetched for Racine,wisconsin & root river,wisconsin]
+291 crosses → None | acc=28.1%
+
+[OSM EVIDENCE Fetched for Dodgeville,wisconsin & iowa county,wisconsin]
+293 within → overlaps | acc=27.8%
+
+[OSM EVIDENCE Fetched for South Lake Tahoe, California & Lake Tahoe, California]
+
+[OSM EVIDENCE Fetched for South Lake Tahoe, California & Lake Tahoe, California]
+
+[OSM EVIDENCE Fetched for South Lake Tahoe, California & Lake Tahoe, California]
+296 overlaps → None | acc=27.5%
+
+[OSM EVIDENCE Fetched for Chandler, Texas & Lake Palestine, Texas]
+
+[OSM EVIDENCE Fetched for Chandler, Texas & Lake Palestine, Texas]
+
+[OSM EVIDENCE Fetched for Chandler, Texas & Lake Palestine, Texas]
+298 overlaps → None | acc=27.2%
+
+[OSM EVIDENCE Fetched for La Grange, Texas & Colorado River, Texas]
+308 crosses → disjoint | acc=26.9%
+
+[OSM EVIDENCE Fetched for central park,wisconsin & Superior,wisconsin]
+313 contains → crosses | acc=26.6%
+
+[OSM EVIDENCE Fetched for Waupun,wisconsin & fond du lac county,wisconsin]
+314 overlaps → overlaps | acc=27.4%
+
+[OSM EVIDENCE Fetched for San Marcos, Texas & Hays County, Texas]
+
+[OSM EVIDENCE Fetched for San Marcos, Texas & Hays County, Texas]
+
+[OSM EVIDENCE Fetched for San Marcos, Texas & Hays County, Texas]
+321 overlaps → None | acc=27.1%
+
+✅ [exp3_finetuned_kg_in_gpu/got] Finished — Accuracy: 27.08%
+   Log : results/voletc_exp3_finetuned_kg_in_gpu_got_neighborhood_details_spatial_relation_16_sample.txt
+   CKPT: results/voletc_exp3_finetuned_kg_in_gpu_got_neighborhood_details_spatial_relation_16_sample_ckpt.json
