@@ -439,164 +439,292 @@ code{font-family:var(--mono);font-size:12px;background:var(--bg2);border:1px sol
   <div class="container-lg">
     <div class="eyebrow">Jeu de données</div>
     <h2>Les données utilisées</h2>
-    <p class="lead">Triplets géospatiaux extraits de descriptions textuelles réelles de lieux nord-américains. Chaque exemple associe une paire de lieux à une relation vernaculaire et un prédicat DE-9IM.</p>
+    <p class="lead">Triplets géospatiaux extraits de descriptions textuelles réelles de lieux nord-américains (majoritairement Wisconsin, Texas, Californie). Chaque exemple : paire de lieux + relation vernaculaire + prédicat DE-9IM cible.</p>
 
-    <!-- Stats summary -->
-    <div class="stat-row" style="margin-bottom:28px">
-      <div class="stat-box"><div class="sv">323</div><div class="sl">Exemples · jeu de test</div></div>
-      <div class="stat-box"><div class="sv">755</div><div class="sl">Exemples · entraînement</div></div>
-      <div class="stat-box"><div class="sv">15.8</div><div class="sl">Mots / phrase (moy.)</div></div>
-      <div class="stat-box"><div class="sv">6</div><div class="sl">Prédicats DE-9IM</div></div>
-    </div>
-
-    <!-- Distribution + geometries -->
-    <div class="ds-grid" style="margin-bottom:24px">
-      <div class="ds-card">
-        <h4>Distribution des prédicats (jeu complet · 323 ex.)</h4>
-        <div class="hbar-row"><div class="hbar-lbl">touches</div><div class="hbar-track"><div class="hbar-fill" style="width:95%;background:linear-gradient(90deg,#f59e0b,#fbbf24)"></div></div><div class="hbar-val">95</div></div>
-        <div class="hbar-row"><div class="hbar-lbl">within</div><div class="hbar-track"><div class="hbar-fill" style="width:80%;background:linear-gradient(90deg,#10b981,#34d399)"></div></div><div class="hbar-val">80</div></div>
-        <div class="hbar-row"><div class="hbar-lbl">disjoint</div><div class="hbar-track"><div class="hbar-fill" style="width:79%;background:linear-gradient(90deg,#ef4444,#f87171)"></div></div><div class="hbar-val">79</div></div>
-        <div class="hbar-row"><div class="hbar-lbl">overlaps</div><div class="hbar-track"><div class="hbar-fill" style="width:36%;background:linear-gradient(90deg,#f97316,#fb923c)"></div></div><div class="hbar-val">36</div></div>
-        <div class="hbar-row"><div class="hbar-lbl">crosses</div><div class="hbar-track"><div class="hbar-fill" style="width:17%;background:linear-gradient(90deg,#8b5cf6,#a78bfa)"></div></div><div class="hbar-val">17</div></div>
-        <div class="hbar-row"><div class="hbar-lbl">contains</div><div class="hbar-track"><div class="hbar-fill" style="width:16%;background:linear-gradient(90deg,#2563eb,#60a5fa)"></div></div><div class="hbar-val">16</div></div>
-        <div style="margin-top:16px;padding:12px 14px;background:var(--blue-lt);border:1px solid var(--blue-md);border-radius:10px;font-size:12px;color:var(--blue);font-weight:600">
-          ⚖️ Jeu d'évaluation équilibré : 16 exemples / prédicat → 96 exemples au total
-        </div>
+    <!-- ── OVERVIEW ── -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:40px">
+      <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:24px 20px;box-shadow:var(--shadow-sm);border-top:3px solid var(--purple)">
+        <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--purple);margin-bottom:12px">Dataset complet</div>
+        <div style="font-size:11px;color:var(--muted);font-family:var(--mono);margin-bottom:10px">triplet_update_v3_30.csv</div>
+        <div style="font-size:40px;font-weight:800;color:var(--text);letter-spacing:-.03em">323</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px">exemples · déséquilibré</div>
+        <div style="margin-top:14px;font-size:12px;color:var(--muted);line-height:1.6">Distribution naturelle : touches domine (95), contains rare (16)</div>
       </div>
-
-      <div class="ds-card">
-        <h4>Types de géométries</h4>
-        <p style="font-size:12px;color:var(--muted);margin-bottom:14px;font-weight:600">Entité A (sujet)</p>
-        <div class="geo-grid" style="margin-bottom:20px">
-          <div class="geo-pill"><span class="name">Polygon</span><span class="count">231</span></div>
-          <div class="geo-pill"><span class="name">MultiPolygon</span><span class="count">86</span></div>
-          <div class="geo-pill"><span class="name">LineString</span><span class="count">5</span></div>
-          <div class="geo-pill"><span class="name">Autre</span><span class="count">1</span></div>
-        </div>
-        <p style="font-size:12px;color:var(--muted);margin-bottom:14px;font-weight:600">Entité B (objet)</p>
-        <div class="geo-grid">
-          <div class="geo-pill"><span class="name">Polygon</span><span class="count">228</span></div>
-          <div class="geo-pill"><span class="name">MultiPolygon</span><span class="count">82</span></div>
-          <div class="geo-pill"><span class="name">LineString</span><span class="count">12</span></div>
-          <div class="geo-pill"><span class="name">Point</span><span class="count">1</span></div>
-        </div>
+      <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:24px 20px;box-shadow:var(--shadow-sm);border-top:3px solid var(--orange)">
+        <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--orange);margin-bottom:12px">Fine-tuning</div>
+        <div style="font-size:11px;color:var(--muted);font-family:var(--mono);margin-bottom:10px">triplet_update_v3_70.csv</div>
+        <div style="font-size:40px;font-weight:800;color:var(--text);letter-spacing:-.03em">755</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px">exemples · entraînement</div>
+        <div style="margin-top:14px;font-size:12px;color:var(--muted);line-height:1.6">Superset du dataset complet · mêmes proportions · 16.1 mots/phrase</div>
+      </div>
+      <div style="background:#fff;border:2px solid #a7f3d0;border-radius:14px;padding:24px 20px;box-shadow:0 4px 16px rgba(5,150,105,.1);border-top:3px solid var(--green)">
+        <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--green);margin-bottom:12px">Test équilibré ★</div>
+        <div style="font-size:11px;color:var(--muted);font-family:var(--mono);margin-bottom:10px">eval_96_balanced_indices.json</div>
+        <div style="font-size:40px;font-weight:800;color:var(--text);letter-spacing:-.03em">96</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px">exemples · parfaitement équilibré</div>
+        <div style="margin-top:14px;font-size:12px;color:var(--green);font-weight:600;line-height:1.6">16 exemples exactement par prédicat → évaluation équitable</div>
       </div>
     </div>
 
-    <!-- Place types + sentence lengths -->
-    <div class="ds-grid" style="margin-bottom:32px">
-      <div class="ds-card">
-        <h4>Types de lieux les plus fréquents</h4>
-        <p style="font-size:12px;color:var(--muted);margin-bottom:12px;font-weight:600">Entité A (sujet)</p>
-        <div class="hbar-row"><div class="hbar-lbl">city</div><div class="hbar-track"><div class="hbar-fill" style="width:93%;background:linear-gradient(90deg,#2563eb,#6366f1)"></div></div><div class="hbar-val">219</div></div>
-        <div class="hbar-row"><div class="hbar-lbl">town</div><div class="hbar-track"><div class="hbar-fill" style="width:22%;background:linear-gradient(90deg,#7c3aed,#a78bfa)"></div></div><div class="hbar-val">53</div></div>
-        <div class="hbar-row"><div class="hbar-lbl">village</div><div class="hbar-track"><div class="hbar-fill" style="width:10%;background:linear-gradient(90deg,#0891b2,#22d3ee)"></div></div><div class="hbar-val">23</div></div>
-        <div class="hbar-row"><div class="hbar-lbl">water</div><div class="hbar-track"><div class="hbar-fill" style="width:3%;background:linear-gradient(90deg,#10b981,#34d399)"></div></div><div class="hbar-val">6</div></div>
-        <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:14px">
-        <p style="font-size:12px;color:var(--muted);margin-bottom:12px;font-weight:600">Entité B (objet)</p>
-        <div class="hbar-row"><div class="hbar-lbl">city</div><div class="hbar-track"><div class="hbar-fill" style="width:52%;background:linear-gradient(90deg,#2563eb,#6366f1)"></div></div><div class="hbar-val">122</div></div>
-        <div class="hbar-row"><div class="hbar-lbl">county</div><div class="hbar-track"><div class="hbar-fill" style="width:43%;background:linear-gradient(90deg,#7c3aed,#a78bfa)"></div></div><div class="hbar-val">100</div></div>
-        <div class="hbar-row"><div class="hbar-lbl">town</div><div class="hbar-track"><div class="hbar-fill" style="width:10%;background:linear-gradient(90deg,#0891b2,#22d3ee)"></div></div><div class="hbar-val">23</div></div>
-        <div class="hbar-row"><div class="hbar-lbl">amenity</div><div class="hbar-track"><div class="hbar-fill" style="width:5%;background:linear-gradient(90deg,#10b981,#34d399)"></div></div><div class="hbar-val">11</div></div>
+    <!-- ═══════════════════════════════════════════
+         FINE-TUNING DATASET
+    ═══════════════════════════════════════════ -->
+    <div style="background:#fff;border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:28px;box-shadow:var(--shadow)">
+      <div style="background:linear-gradient(135deg,#fffbeb,#fff7ed);border-bottom:1px solid #fde68a;padding:22px 28px;display:flex;align-items:center;gap:16px">
+        <div style="width:40px;height:40px;background:#fef3c7;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🔧</div>
+        <div>
+          <div style="font-size:13px;font-weight:800;color:var(--orange)">Données de Fine-tuning — triplet_update_v3_70.csv</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px">755 exemples · sans KG · relations vernaculaires brutes + types géométriques → prédicat DE-9IM</div>
         </div>
       </div>
-
-      <div class="ds-card">
-        <h4>Longueur des phrases (en mots)</h4>
-        <div style="display:flex;gap:20px;margin-bottom:24px">
-          <div style="text-align:center"><div style="font-size:28px;font-weight:800;color:var(--text)">1</div><div style="font-size:11px;color:var(--muted);font-weight:600">Minimum</div></div>
-          <div style="text-align:center"><div style="font-size:28px;font-weight:800;color:var(--blue)">15.8</div><div style="font-size:11px;color:var(--muted);font-weight:600">Moyenne</div></div>
-          <div style="text-align:center"><div style="font-size:28px;font-weight:800;color:var(--text)">100</div><div style="font-size:11px;color:var(--muted);font-weight:600">Maximum</div></div>
+      <div style="padding:28px;display:grid;grid-template-columns:1fr 1fr;gap:24px">
+        <div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:16px">Distribution des prédicats</div>
+          <div class="hbar-row"><div class="hbar-lbl">touches</div><div class="hbar-track"><div class="hbar-fill" style="width:95%;background:linear-gradient(90deg,#f59e0b,#fbbf24)"></div></div><div class="hbar-val">223</div></div>
+          <div class="hbar-row"><div class="hbar-lbl">within</div><div class="hbar-track"><div class="hbar-fill" style="width:79%;background:linear-gradient(90deg,#10b981,#34d399)"></div></div><div class="hbar-val">186</div></div>
+          <div class="hbar-row"><div class="hbar-lbl">disjoint</div><div class="hbar-track"><div class="hbar-fill" style="width:78%;background:linear-gradient(90deg,#ef4444,#f87171)"></div></div><div class="hbar-val">183</div></div>
+          <div class="hbar-row"><div class="hbar-lbl">overlaps</div><div class="hbar-track"><div class="hbar-fill" style="width:35%;background:linear-gradient(90deg,#f97316,#fb923c)"></div></div><div class="hbar-val">83</div></div>
+          <div class="hbar-row"><div class="hbar-lbl">crosses</div><div class="hbar-track"><div class="hbar-fill" style="width:17%;background:linear-gradient(90deg,#8b5cf6,#a78bfa)"></div></div><div class="hbar-val">41</div></div>
+          <div class="hbar-row"><div class="hbar-lbl">contains</div><div class="hbar-track"><div class="hbar-fill" style="width:17%;background:linear-gradient(90deg,#2563eb,#60a5fa)"></div></div><div class="hbar-val">39</div></div>
         </div>
-        <div class="len-vis">
-          <div class="len-row"><div class="len-label">1–5 mots</div><div class="len-bar" style="width:35%;background:#dbeafe"></div><span style="font-size:11px;color:var(--muted);margin-left:6px">relations courtes</span></div>
-          <div class="len-row"><div class="len-label">6–15 mots</div><div class="len-bar" style="width:70%;background:#93c5fd"></div><span style="font-size:11px;color:var(--muted);margin-left:6px">phrases simples</span></div>
-          <div class="len-row"><div class="len-label">16–30 mots</div><div class="len-bar" style="width:55%;background:#60a5fa"></div><span style="font-size:11px;color:var(--muted);margin-left:6px">phrases composées</span></div>
-          <div class="len-row"><div class="len-label">31–100 mots</div><div class="len-bar" style="width:20%;background:#3b82f6"></div><span style="font-size:11px;color:var(--muted);margin-left:6px">extraits longs</span></div>
+        <div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:14px">Géométries · Types de lieux</div>
+          <div style="font-size:12px;color:var(--muted);font-weight:600;margin-bottom:8px">Géométrie sujet</div>
+          <div class="geo-grid" style="margin-bottom:14px">
+            <div class="geo-pill"><span class="name">Polygon</span><span class="count">567</span></div>
+            <div class="geo-pill"><span class="name">MultiPolygon</span><span class="count">175</span></div>
+            <div class="geo-pill"><span class="name">LineString</span><span class="count">10</span></div>
+            <div class="geo-pill"><span class="name">Autre</span><span class="count">3</span></div>
+          </div>
+          <div style="font-size:12px;color:var(--muted);font-weight:600;margin-bottom:8px">Types de lieux sujet (top 4)</div>
+          <div class="hbar-row"><div class="hbar-lbl" style="width:70px">city</div><div class="hbar-track"><div class="hbar-fill" style="width:90%;background:linear-gradient(90deg,#2563eb,#6366f1)"></div></div><div class="hbar-val">500</div></div>
+          <div class="hbar-row"><div class="hbar-lbl" style="width:70px">town</div><div class="hbar-track"><div class="hbar-fill" style="width:27%;background:linear-gradient(90deg,#7c3aed,#a78bfa)"></div></div><div class="hbar-val">150</div></div>
+          <div class="hbar-row"><div class="hbar-lbl" style="width:70px">village</div><div class="hbar-track"><div class="hbar-fill" style="width:8%;background:linear-gradient(90deg,#0891b2,#22d3ee)"></div></div><div class="hbar-val">45</div></div>
+          <div style="margin-top:14px;padding:10px 12px;background:var(--orange-lt);border:1px solid #fde68a;border-radius:8px;font-size:12px;color:#92400e;font-weight:600">
+            Longueur phrases : min 1 · moy 16.1 · max 100 mots
+          </div>
         </div>
-        <div style="margin-top:20px;padding:12px 14px;background:var(--bg2);border-radius:10px;font-size:12px;color:var(--muted);line-height:1.6">
-          Longueur en caractères : min <strong style="color:var(--text)">2</strong> · moy <strong style="color:var(--text)">92.9</strong> · max <strong style="color:var(--text)">626</strong>
+      </div>
+      <!-- FT examples -->
+      <div style="border-top:1px solid var(--border);padding:24px 28px">
+        <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:16px">Exemple de prompt d'entraînement (format instruction-following)</div>
+        <div style="background:#f9f9f9;border:1px solid var(--border);border-radius:10px;padding:16px 18px;font-family:var(--mono);font-size:12px;line-height:1.8;color:var(--text)">
+          <span style="color:var(--muted)">### TASK ###</span><br/>
+          Determine the DE-9IM topological predicate between A and B.<br/>
+          <span style="color:var(--muted)">### INPUT ###</span><br/>
+          Relation: A <span style="color:var(--blue);font-weight:700">home to</span> B<br/>
+          Entity A: <span style="color:var(--purple)">city</span> (geometry: <span style="color:var(--cyan)">MultiPolygon</span>)<br/>
+          Entity B: <span style="color:var(--purple)">tourism</span> (geometry: <span style="color:var(--cyan)">MultiPolygon</span>)<br/>
+          <span style="color:var(--muted)">### OUTPUT ###</span><br/>
+          Reasoning: A city hosting a museum within its boundaries maps to 'contains'.<br/>
+          Answer: A [<span style="color:var(--green);font-weight:700">contains</span>] B
         </div>
       </div>
     </div>
 
-    <!-- Examples -->
-    <div class="ds-card" style="background:var(--bg)">
-      <h4 style="margin-bottom:20px">Exemples réels du jeu de données</h4>
-      <div class="example-list">
-
-        <div class="ex-card">
-          <div class="ex-flow">
-            <div class="ex-entity">Baraboo, Wisconsin <span style="font-size:11px;color:var(--muted);font-weight:400">(city · MultiPolygon)</span></div>
-            <div class="ex-arrow">→</div>
-            <div class="ex-rel">is home to</div>
-            <div class="ex-arrow">→</div>
-            <div class="ex-entity">Circus World Museum, Wisconsin <span style="font-size:11px;color:var(--muted);font-weight:400">(tourism · MultiPolygon)</span></div>
-          </div>
-          <div class="ex-sentence">« home to » — ville hébergeant un musée à l'intérieur de ses limites.</div>
-          <div class="ex-footer"><span class="ex-badge pred-contains">contains</span><span class="ex-geom">Polygon ⊇ Point/Area</span></div>
+    <!-- ═══════════════════════════════════════════
+         96 BALANCED TEST SET
+    ═══════════════════════════════════════════ -->
+    <div style="background:#fff;border:2px solid #a7f3d0;border-radius:var(--r);overflow:hidden;box-shadow:0 4px 20px rgba(5,150,105,.08)">
+      <div style="background:linear-gradient(135deg,var(--green-lt),#f0fdfa);border-bottom:1px solid #a7f3d0;padding:22px 28px;display:flex;align-items:center;gap:16px">
+        <div style="width:40px;height:40px;background:#a7f3d0;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">⚖️</div>
+        <div>
+          <div style="font-size:13px;font-weight:800;color:var(--green)">Jeu de test équilibré — eval_96_balanced_indices.json</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px">96 exemples · exactement 16 par prédicat · sélectionnés aléatoirement (random_state=42) depuis le dataset complet</div>
         </div>
-
-        <div class="ex-card">
-          <div class="ex-flow">
-            <div class="ex-entity">Independence, Wisconsin <span style="font-size:11px;color:var(--muted);font-weight:400">(city · Polygon)</span></div>
-            <div class="ex-arrow">→</div>
-            <div class="ex-rel">is in</div>
-            <div class="ex-arrow">→</div>
-            <div class="ex-entity">Trempealeau County, Wisconsin <span style="font-size:11px;color:var(--muted);font-weight:400">(county · Polygon)</span></div>
-          </div>
-          <div class="ex-sentence">« in » — ville entièrement incluse dans les limites du comté.</div>
-          <div class="ex-footer"><span class="ex-badge pred-within">within</span><span class="ex-geom">Polygon ⊂ Polygon</span></div>
+        <div style="margin-left:auto;text-align:center;flex-shrink:0">
+          <div style="font-size:32px;font-weight:800;color:var(--green)">16×6</div>
+          <div style="font-size:11px;color:var(--muted);font-weight:600">exemples/prédicat</div>
         </div>
+      </div>
 
-        <div class="ex-card">
-          <div class="ex-flow">
-            <div class="ex-entity">Daly City, California <span style="font-size:11px;color:var(--muted);font-weight:400">(city · Polygon)</span></div>
-            <div class="ex-arrow">→</div>
-            <div class="ex-rel">immediately south of</div>
-            <div class="ex-arrow">→</div>
-            <div class="ex-entity">San Francisco, California <span style="font-size:11px;color:var(--muted);font-weight:400">(city · MultiPolygon)</span></div>
-          </div>
-          <div class="ex-sentence">« Located in the San Francisco Bay Area, and immediately south of San Francisco (sharing its northern border)… »</div>
-          <div class="ex-footer"><span class="ex-badge pred-touches">touches</span><span class="ex-geom">Polygon ∂ MultiPolygon</span></div>
+      <div style="padding:28px;display:grid;grid-template-columns:1fr 1fr;gap:24px;border-bottom:1px solid var(--border)">
+        <div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:16px">Distribution — parfaitement équilibrée</div>
+          <div class="hbar-row"><div class="hbar-lbl">contains</div><div class="hbar-track"><div class="hbar-fill" style="width:100%;background:linear-gradient(90deg,#2563eb,#60a5fa)"></div></div><div class="hbar-val" style="color:var(--green);font-weight:800">16</div></div>
+          <div class="hbar-row"><div class="hbar-lbl">within</div><div class="hbar-track"><div class="hbar-fill" style="width:100%;background:linear-gradient(90deg,#10b981,#34d399)"></div></div><div class="hbar-val" style="color:var(--green);font-weight:800">16</div></div>
+          <div class="hbar-row"><div class="hbar-lbl">touches</div><div class="hbar-track"><div class="hbar-fill" style="width:100%;background:linear-gradient(90deg,#f59e0b,#fbbf24)"></div></div><div class="hbar-val" style="color:var(--green);font-weight:800">16</div></div>
+          <div class="hbar-row"><div class="hbar-lbl">crosses</div><div class="hbar-track"><div class="hbar-fill" style="width:100%;background:linear-gradient(90deg,#8b5cf6,#a78bfa)"></div></div><div class="hbar-val" style="color:var(--green);font-weight:800">16</div></div>
+          <div class="hbar-row"><div class="hbar-lbl">disjoint</div><div class="hbar-track"><div class="hbar-fill" style="width:100%;background:linear-gradient(90deg,#ef4444,#f87171)"></div></div><div class="hbar-val" style="color:var(--green);font-weight:800">16</div></div>
+          <div class="hbar-row"><div class="hbar-lbl">overlaps</div><div class="hbar-track"><div class="hbar-fill" style="width:100%;background:linear-gradient(90deg,#f97316,#fb923c)"></div></div><div class="hbar-val" style="color:var(--green);font-weight:800">16</div></div>
         </div>
-
-        <div class="ex-card">
-          <div class="ex-flow">
-            <div class="ex-entity">Chippewa River <span style="font-size:11px;color:var(--muted);font-weight:400">(water · LineString)</span></div>
-            <div class="ex-arrow">→</div>
-            <div class="ex-rel">upstream from</div>
-            <div class="ex-arrow">→</div>
-            <div class="ex-entity">Chippewa Falls, Wisconsin <span style="font-size:11px;color:var(--muted);font-weight:400">(water · Polygon)</span></div>
+        <div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:14px">Statistiques du sous-ensemble</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+            <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center">
+              <div style="font-size:22px;font-weight:800;color:var(--text)">14.8</div>
+              <div style="font-size:11px;color:var(--muted);font-weight:600">mots / phrase</div>
+            </div>
+            <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center">
+              <div style="font-size:22px;font-weight:800;color:var(--text)">87.3</div>
+              <div style="font-size:11px;color:var(--muted);font-weight:600">caractères / phrase</div>
+            </div>
+            <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center">
+              <div style="font-size:22px;font-weight:800;color:var(--text)">63</div>
+              <div style="font-size:11px;color:var(--muted);font-weight:600">Polygon (sujet)</div>
+            </div>
+            <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center">
+              <div style="font-size:22px;font-weight:800;color:var(--text)">27</div>
+              <div style="font-size:11px;color:var(--muted);font-weight:600">MultiPolygon (sujet)</div>
+            </div>
           </div>
-          <div class="ex-sentence">« upstream from » — cours d'eau traversant les limites d'une zone géographique.</div>
-          <div class="ex-footer"><span class="ex-badge pred-crosses">crosses</span><span class="ex-geom">LineString ✕ Polygon</span></div>
+          <div style="font-size:12px;color:var(--muted);font-weight:600;margin-bottom:8px">Types de lieux dominants</div>
+          <div class="hbar-row"><div class="hbar-lbl" style="width:70px">city</div><div class="hbar-track"><div class="hbar-fill" style="width:63%;background:linear-gradient(90deg,#2563eb,#6366f1)"></div></div><div class="hbar-val">61</div></div>
+          <div class="hbar-row"><div class="hbar-lbl" style="width:70px">county</div><div class="hbar-track"><div class="hbar-fill" style="width:28%;background:linear-gradient(90deg,#7c3aed,#a78bfa)"></div></div><div class="hbar-val">27</div></div>
+          <div class="hbar-row"><div class="hbar-lbl" style="width:70px">town</div><div class="hbar-track"><div class="hbar-fill" style="width:17%;background:linear-gradient(90deg,#0891b2,#22d3ee)"></div></div><div class="hbar-val">16</div></div>
         </div>
+      </div>
 
-        <div class="ex-card">
-          <div class="ex-flow">
-            <div class="ex-entity">Rosenberg, Texas <span style="font-size:11px;color:var(--muted);font-weight:400">(city · Polygon)</span></div>
-            <div class="ex-arrow">→</div>
-            <div class="ex-rel">is between … and</div>
-            <div class="ex-arrow">→</div>
-            <div class="ex-entity">Sealy, Texas <span style="font-size:11px;color:var(--muted);font-weight:400">(city · Polygon)</span></div>
+      <!-- Per-predicate examples -->
+      <div style="padding:28px">
+        <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:20px">2 exemples réels par prédicat (depuis les 96 exemples de test)</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+
+          <!-- contains -->
+          <div style="border:1px solid #dbeafe;border-radius:12px;overflow:hidden">
+            <div style="background:var(--blue-lt);padding:10px 16px;display:flex;align-items:center;gap:8px">
+              <span class="ex-badge pred-contains">contains</span>
+              <span style="font-size:11px;color:var(--blue);font-weight:600">A géométriquement contient B</span>
+            </div>
+            <div style="padding:14px 16px">
+              <div class="ex-flow" style="margin-bottom:8px">
+                <div class="ex-entity" style="font-size:12px">Baraboo, WI <span style="font-size:10px;color:var(--muted);font-weight:400">(city·MultiPolygon)</span></div>
+                <div class="ex-rel" style="font-size:11px">home to</div>
+                <div class="ex-entity" style="font-size:12px">Circus World Museum <span style="font-size:10px;color:var(--muted);font-weight:400">(tourism·MultiPolygon)</span></div>
+              </div>
+              <div style="font-size:11px;color:var(--muted);font-style:italic">« home to »</div>
+              <div style="margin-top:8px;border-top:1px solid var(--border);padding-top:8px">
+              <div class="ex-flow">
+                <div class="ex-entity" style="font-size:12px">Milwaukee, WI <span style="font-size:10px;color:var(--muted);font-weight:400">(city·MultiPolygon)</span></div>
+                <div class="ex-rel" style="font-size:11px">home to</div>
+                <div class="ex-entity" style="font-size:12px">Discovery World <span style="font-size:10px;color:var(--muted);font-weight:400">(tourism·Polygon)</span></div>
+              </div>
+              <div style="font-size:11px;color:var(--muted);font-style:italic;margin-top:4px">« home to »</div>
+              </div>
+            </div>
           </div>
-          <div class="ex-sentence">« The city is located along State Highway 36 (SH 36) and the BNSF Railway between Rosenberg and Sealy. »</div>
-          <div class="ex-footer"><span class="ex-badge pred-disjoint">disjoint</span><span class="ex-geom">Polygon ∅ Polygon</span></div>
-        </div>
 
-        <div class="ex-card">
-          <div class="ex-flow">
-            <div class="ex-entity">Rio Grande, Texas <span style="font-size:11px;color:var(--muted);font-weight:400">(water · Polygon)</span></div>
-            <div class="ex-arrow">→</div>
-            <div class="ex-rel">forms the border</div>
-            <div class="ex-arrow">→</div>
-            <div class="ex-entity">United States <span style="font-size:11px;color:var(--muted);font-weight:400">(country · MultiPolygon)</span></div>
+          <!-- within -->
+          <div style="border:1px solid #a7f3d0;border-radius:12px;overflow:hidden">
+            <div style="background:var(--green-lt);padding:10px 16px;display:flex;align-items:center;gap:8px">
+              <span class="ex-badge pred-within">within</span>
+              <span style="font-size:11px;color:var(--green);font-weight:600">A entièrement inclus dans B</span>
+            </div>
+            <div style="padding:14px 16px">
+              <div class="ex-flow" style="margin-bottom:8px">
+                <div class="ex-entity" style="font-size:12px">Greenwood, WI <span style="font-size:10px;color:var(--muted);font-weight:400">(city·Polygon)</span></div>
+                <div class="ex-rel" style="font-size:11px">in</div>
+                <div class="ex-entity" style="font-size:12px">Clark County, WI <span style="font-size:10px;color:var(--muted);font-weight:400">(county·Polygon)</span></div>
+              </div>
+              <div style="font-size:11px;color:var(--muted);font-style:italic">« in »</div>
+              <div style="margin-top:8px;border-top:1px solid var(--border);padding-top:8px">
+              <div class="ex-flow">
+                <div class="ex-entity" style="font-size:12px">Hawaiian Gardens, CA <span style="font-size:10px;color:var(--muted);font-weight:400">(town·Polygon)</span></div>
+                <div class="ex-rel" style="font-size:11px">in</div>
+                <div class="ex-entity" style="font-size:12px">Los Angeles County <span style="font-size:10px;color:var(--muted);font-weight:400">(county·MultiPolygon)</span></div>
+              </div>
+              <div style="font-size:11px;color:var(--muted);font-style:italic;margin-top:4px">« Hawaiian Gardens is a city in Los Angeles County… »</div>
+              </div>
+            </div>
           </div>
-          <div class="ex-sentence">« It lies on the Rio Grande, which forms the border between the United States and Mexico. »</div>
-          <div class="ex-footer"><span class="ex-badge pred-overlaps">overlaps</span><span class="ex-geom">Polygon ∩ MultiPolygon</span></div>
-        </div>
 
+          <!-- touches -->
+          <div style="border:1px solid #fde68a;border-radius:12px;overflow:hidden">
+            <div style="background:var(--orange-lt);padding:10px 16px;display:flex;align-items:center;gap:8px">
+              <span class="ex-badge pred-touches">touches</span>
+              <span style="font-size:11px;color:var(--orange);font-weight:600">Frontières communes, intérieurs disjoints</span>
+            </div>
+            <div style="padding:14px 16px">
+              <div class="ex-flow" style="margin-bottom:8px">
+                <div class="ex-entity" style="font-size:12px">Nassau Bay, TX <span style="font-size:10px;color:var(--muted);font-weight:400">(city·Polygon)</span></div>
+                <div class="ex-rel" style="font-size:11px">borders</div>
+                <div class="ex-entity" style="font-size:12px">Houston, TX <span style="font-size:10px;color:var(--muted);font-weight:400">(city·MultiPolygon)</span></div>
+              </div>
+              <div style="font-size:11px;color:var(--muted);font-style:italic">« bordering the southeastern edge of Houston »</div>
+              <div style="margin-top:8px;border-top:1px solid var(--border);padding-top:8px">
+              <div class="ex-flow">
+                <div class="ex-entity" style="font-size:12px">Delavan, WI <span style="font-size:10px;color:var(--muted);font-weight:400">(city·Polygon)</span></div>
+                <div class="ex-rel" style="font-size:11px">partly in</div>
+                <div class="ex-entity" style="font-size:12px">Town of Delavan <span style="font-size:10px;color:var(--muted);font-weight:400">(municipality·Polygon)</span></div>
+              </div>
+              <div style="font-size:11px;color:var(--muted);font-style:italic;margin-top:4px">« partially within »</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- crosses -->
+          <div style="border:1px solid #ede9fe;border-radius:12px;overflow:hidden">
+            <div style="background:var(--purple-lt);padding:10px 16px;display:flex;align-items:center;gap:8px">
+              <span class="ex-badge pred-crosses">crosses</span>
+              <span style="font-size:11px;color:var(--purple);font-weight:600">Ligne traversant une zone</span>
+            </div>
+            <div style="padding:14px 16px">
+              <div class="ex-flow" style="margin-bottom:8px">
+                <div class="ex-entity" style="font-size:12px">State Route 17 <span style="font-size:10px;color:var(--muted);font-weight:400">(road·LineString)</span></div>
+                <div class="ex-rel" style="font-size:11px">connects</div>
+                <div class="ex-entity" style="font-size:12px">San Jose, CA <span style="font-size:10px;color:var(--muted);font-weight:400">(city·MultiPolygon)</span></div>
+              </div>
+              <div style="font-size:11px;color:var(--muted);font-style:italic">« connects San Jose and Santa Cruz »</div>
+              <div style="margin-top:8px;border-top:1px solid var(--border);padding-top:8px">
+              <div class="ex-flow">
+                <div class="ex-entity" style="font-size:12px">Chippewa River <span style="font-size:10px;color:var(--muted);font-weight:400">(water·LineString)</span></div>
+                <div class="ex-rel" style="font-size:11px">upstream from</div>
+                <div class="ex-entity" style="font-size:12px">Chippewa Falls, WI <span style="font-size:10px;color:var(--muted);font-weight:400">(water·Polygon)</span></div>
+              </div>
+              <div style="font-size:11px;color:var(--muted);font-style:italic;margin-top:4px">« upstream from »</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- disjoint -->
+          <div style="border:1px solid #fecaca;border-radius:12px;overflow:hidden">
+            <div style="background:#fff5f5;padding:10px 16px;display:flex;align-items:center;gap:8px">
+              <span class="ex-badge pred-disjoint">disjoint</span>
+              <span style="font-size:11px;color:var(--red);font-weight:600">Aucune intersection</span>
+            </div>
+            <div style="padding:14px 16px">
+              <div class="ex-flow" style="margin-bottom:8px">
+                <div class="ex-entity" style="font-size:12px">Rosenberg, TX <span style="font-size:10px;color:var(--muted);font-weight:400">(city·Polygon)</span></div>
+                <div class="ex-rel" style="font-size:11px">between … and</div>
+                <div class="ex-entity" style="font-size:12px">Sealy, TX <span style="font-size:10px;color:var(--muted);font-weight:400">(city·Polygon)</span></div>
+              </div>
+              <div style="font-size:11px;color:var(--muted);font-style:italic">« located along SH 36 between Rosenberg and Sealy »</div>
+              <div style="margin-top:8px;border-top:1px solid var(--border);padding-top:8px">
+              <div class="ex-flow">
+                <div class="ex-entity" style="font-size:12px">Midland, TX <span style="font-size:10px;color:var(--muted);font-weight:400">(city·Polygon)</span></div>
+                <div class="ex-rel" style="font-size:11px">midway between</div>
+                <div class="ex-entity" style="font-size:12px">El Paso, TX <span style="font-size:10px;color:var(--muted);font-weight:400">(city·MultiPolygon)</span></div>
+              </div>
+              <div style="font-size:11px;color:var(--muted);font-style:italic;margin-top:4px">« midway point between Fort Worth and El Paso »</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- overlaps -->
+          <div style="border:1px solid #fed7aa;border-radius:12px;overflow:hidden">
+            <div style="background:#fff7ed;padding:10px 16px;display:flex;align-items:center;gap:8px">
+              <span class="ex-badge pred-overlaps">overlaps</span>
+              <span style="font-size:11px;color:var(--orange);font-weight:600">Intersection partielle</span>
+            </div>
+            <div style="padding:14px 16px">
+              <div class="ex-flow" style="margin-bottom:8px">
+                <div class="ex-entity" style="font-size:12px">Eau Claire, WI <span style="font-size:10px;color:var(--muted);font-weight:400">(city·MultiPolygon)</span></div>
+                <div class="ex-rel" style="font-size:11px">partly in</div>
+                <div class="ex-entity" style="font-size:12px">Chippewa County <span style="font-size:10px;color:var(--muted);font-weight:400">(county·Polygon)</span></div>
+              </div>
+              <div style="font-size:11px;color:var(--muted);font-style:italic">« a small portion in »</div>
+              <div style="margin-top:8px;border-top:1px solid var(--border);padding-top:8px">
+              <div class="ex-flow">
+                <div class="ex-entity" style="font-size:12px">Abbotsford, WI <span style="font-size:10px;color:var(--muted);font-weight:400">(city·MultiPolygon)</span></div>
+                <div class="ex-rel" style="font-size:11px">part of … in</div>
+                <div class="ex-entity" style="font-size:12px">Marathon County, WI <span style="font-size:10px;color:var(--muted);font-weight:400">(county·Polygon)</span></div>
+              </div>
+              <div style="font-size:11px;color:var(--muted);font-style:italic;margin-top:4px">« 1,665 in Clark County, 610 in Marathon County »</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
       </div>
     </div>
   </div>
