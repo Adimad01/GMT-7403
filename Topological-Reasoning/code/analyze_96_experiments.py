@@ -1,19 +1,15 @@
 """
 analyze_96_experiments.py
 ================================================================================
-Unified comparison of all 6 experiments × 3 strategies (CoT, ToT, GoT) on the
+Unified comparison of 5 experiments × 3 strategies (CoT, ToT, GoT) on the
 96 balanced test examples.
-
-Each experiment uses a different model/adapter configuration; all 6 are evaluated
-with CoT, ToT, and GoT — producing 18 result sets total.
 
 Experiment configurations (all use CoT/ToT/GoT + OSM KG at inference):
   Exp 1 — Base (no adapter)                          tag: exp1_base_gpu              512 tok
   Exp 2 — FT topo (raw data, no KG in training)      tag: exp2_finetuned_topo_gpu    512 tok
   Exp 3 — FT OSM-KG (KG in training AND inference)   tag: exp3_finetuned_kg_in_gpu   1024 tok
-  Exp 4 — FT Wikidata-KG (Wikidata in training)      tag: exp4_finetuned_osm_kg_gpu  1024 tok
-  Exp 5 — FT topo, extended reasoning budget         tag: exp5_finetuned_enriched_gpu 1024 tok
-  Exp 6 — Base + Ollama inference                    tag: dynamic_osm_improved_version  ✅ done
+  Exp 4 — FT topo, extended reasoning budget         tag: exp5_finetuned_enriched_gpu 1024 tok
+  Exp 5 — Base + Ollama inference                    tag: dynamic_osm_improved_version
 
 Usage:
     cd /path/to/Topological-Reasoning/code
@@ -41,9 +37,8 @@ EXPERIMENTS = [
     ("Exp1 — Base",                  "exp1_base_gpu",               "no adapter"),
     ("Exp2 — FT topo",               "exp2_finetuned_topo_gpu",     "topo adapter, 512 tok"),
     ("Exp3 — FT OSM-KG",             "exp3_finetuned_kg_in_gpu",    "osm-kg adapter, 1024 tok"),
-    ("Exp4 — FT Wikidata-KG",        "exp4_finetuned_osm_kg_gpu",   "wikidata-kg adapter, 1024 tok"),
-    ("Exp5 — FT topo étendu",        "exp5_finetuned_enriched_gpu", "topo adapter, 1024 tok"),
-    ("Exp6 — Base + Ollama",         "dynamic_osm_improved_version","no adapter (Ollama)"),
+    ("Exp4 — FT topo étendu",        "exp5_finetuned_enriched_gpu", "topo adapter, 1024 tok"),
+    ("Exp5 — Base + Ollama",         "dynamic_osm_improved_version","no adapter (Ollama)"),
 ]
 
 
@@ -199,7 +194,7 @@ def plot_grouped_bar(results_matrix: dict, save_path: str):
     ax.set_xticklabels(exp_labels, rotation=20, ha="right", fontsize=8)
     ax.set_ylabel("Accuracy (%)")
     ax.set_ylim(0, 115)
-    ax.set_title("Accuracy per Experiment × Strategy  (96 balanced examples, OSM KG at inference)")
+    ax.set_title("Accuracy per Experiment × Strategy  (96 balanced examples, OSM KG at inference, 5 experiments)")
     ax.legend(title="Strategy", loc="upper left")
     ax.yaxis.set_major_formatter(mtick.PercentFormatter())
     plt.tight_layout()
@@ -281,7 +276,7 @@ def main():
             rows.append(row)
 
     summary_df  = pd.DataFrame(rows)
-    summary_path = os.path.join(od, "summary_96_6exp_3strat.csv")
+    summary_path = os.path.join(od, "summary_96_5exp_3strat.csv")
     summary_df.to_csv(summary_path, index=False)
     print(f"\nSummary CSV → {summary_path}")
 
