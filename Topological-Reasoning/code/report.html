@@ -422,14 +422,14 @@ code{font-family:var(--mono);font-size:12px;background:var(--bg2);border:1px sol
     <div class="hero-stats">
       <div class="stat-chip"><span class="dot" style="background:var(--blue)"></span>96 exemples · 16/prédicat</div>
       <div class="stat-chip"><span class="dot" style="background:var(--purple)"></span>CoT · ToT · GoT</div>
-      <div class="stat-chip"><span class="dot" style="background:var(--cyan)"></span>5 expérimentations</div>
+      <div class="stat-chip"><span class="dot" style="background:var(--cyan)"></span>4 expérimentations GPU</div>
       <div class="stat-chip"><span class="dot" style="background:var(--orange)"></span>KG OSM · Nominatim</div>
       <div class="stat-chip"><span class="dot" style="background:var(--green)"></span>A100 80 GB · GPU</div>
     </div>
     <div class="hero-score">
-      <div class="label">Meilleur score global</div>
-      <div class="value">74.0%</div>
-      <div class="desc">GPTOSS + Inférence LLM enrichie par KG · GoT</div>
+      <div class="label">Meilleur score global · GPU A100</div>
+      <div class="value">61.5%</div>
+      <div class="desc">GPTOSS Fine-tuné · GoT · A100 80 GB</div>
     </div>
   </div>
 </div>
@@ -782,17 +782,6 @@ code{font-family:var(--mono);font-size:12px;background:var(--bg2);border:1px sol
         <div class="exp-tag">exp5_finetuned_enriched_gpu · 1024 tok · topo</div>
       </div>
 
-      <div class="exp-card best">
-        <div class="best-badge">★ Meilleure performance</div>
-        <div class="exp-num">Expérimentation 05</div>
-        <div class="exp-title">GPTOSS + Inférence LLM enrichie par KG</div>
-        <div class="scores-row">
-          <div class="sc"><span class="sl">CoT</span><span class="sv">66.7%</span></div>
-          <div class="sc"><span class="sl">ToT</span><span class="sv">69.8%</span></div>
-          <div class="sc star"><span class="sl">GoT</span><span class="sv">74.0%</span></div>
-        </div>
-        <div class="exp-tag">dynamic_osm_improved_version · 1024 tok · Ollama</div>
-      </div>
     </div>
   </div>
 </section>
@@ -820,12 +809,12 @@ code{font-family:var(--mono);font-size:12px;background:var(--bg2);border:1px sol
         </div>
       </div>
 
-      <div class="chart-row">
-        <div class="chart-lbl">GPTOSS Fine-tuné</div>
+      <div class="chart-row chart-best-row">
+        <div class="chart-lbl">★ GPTOSS Fine-tuné</div>
         <div class="bar-group">
           <div class="bar-wrap"><div class="bar bar-cot" style="width:53.1%"></div><span class="bar-val">53.1%</span></div>
           <div class="bar-wrap"><div class="bar bar-tot" style="width:19.8%"></div><span class="bar-val">19.8%</span></div>
-          <div class="bar-wrap"><div class="bar bar-got" style="width:61.5%"></div><span class="bar-val">61.5%</span></div>
+          <div class="bar-wrap"><div class="bar bar-got" style="width:61.5%"></div><span class="bar-val" style="color:var(--green);font-weight:800">61.5%</span></div>
         </div>
       </div>
 
@@ -844,15 +833,6 @@ code{font-family:var(--mono);font-size:12px;background:var(--bg2);border:1px sol
           <div class="bar-wrap"><div class="bar bar-cot" style="width:49.0%"></div><span class="bar-val">49.0%</span></div>
           <div class="bar-wrap"><div class="bar bar-tot" style="width:29.2%"></div><span class="bar-val">29.2%</span></div>
           <div class="bar-wrap"><div class="bar bar-got" style="width:56.2%"></div><span class="bar-val">56.2%</span></div>
-        </div>
-      </div>
-
-      <div class="chart-row chart-best-row">
-        <div class="chart-lbl">★ Inférence LLM enrichie</div>
-        <div class="bar-group">
-          <div class="bar-wrap"><div class="bar bar-cot" style="width:66.7%"></div><span class="bar-val" style="color:var(--blue);font-weight:800">66.7%</span></div>
-          <div class="bar-wrap"><div class="bar bar-tot" style="width:69.8%"></div><span class="bar-val" style="color:var(--orange);font-weight:800">69.8%</span></div>
-          <div class="bar-wrap"><div class="bar bar-got" style="width:74.0%"></div><span class="bar-val" style="color:var(--green);font-weight:800">74.0%</span></div>
         </div>
       </div>
     </div>
@@ -1001,11 +981,10 @@ code{font-family:var(--mono);font-size:12px;background:var(--bg2);border:1px sol
       <table>
         <thead><tr><th>Expérimentation</th><th class="s-cot">Précision</th><th>contains</th><th>within</th><th>touches</th><th>crosses</th><th>disjoint</th><th>overlaps</th></tr></thead>
         <tbody>
-          <tr><td>GPTOSS Base</td><td class="pct">57.3%</td><td>75.0%</td><td class="pct-hi">100.0%</td><td>50.0%</td><td>37.5%</td><td>62.5%</td><td class="pct-lo">18.8%</td></tr>
+          <tr class="best-r"><td>★ GPTOSS Base</td><td class="pct pct-hi">57.3%</td><td>75.0%</td><td class="pct-hi">100.0%</td><td>50.0%</td><td>37.5%</td><td>62.5%</td><td class="pct-lo">18.8%</td></tr>
           <tr><td>GPTOSS Fine-tuné</td><td class="pct">53.1%</td><td class="pct-lo">18.8%</td><td>43.8%</td><td>43.8%</td><td>75.0%</td><td>75.0%</td><td>62.5%</td></tr>
           <tr><td>FT + KG en entrée</td><td class="pct">47.9%</td><td>31.2%</td><td>93.8%</td><td>37.5%</td><td>37.5%</td><td>62.5%</td><td>25.0%</td></tr>
           <tr><td>FT + Inférence enrichie</td><td class="pct">49.0%</td><td class="pct-lo">6.2%</td><td>37.5%</td><td>43.8%</td><td>62.5%</td><td>81.2%</td><td>62.5%</td></tr>
-          <tr class="best-r"><td>★ Inférence LLM enrichie</td><td class="pct pct-hi">66.7%</td><td>75.0%</td><td class="pct-hi">100.0%</td><td>56.2%</td><td>68.8%</td><td>81.2%</td><td class="pct-lo">18.8%</td></tr>
         </tbody>
       </table>
     </div>
@@ -1022,7 +1001,6 @@ code{font-family:var(--mono);font-size:12px;background:var(--bg2);border:1px sol
           <tr><td>GPTOSS Fine-tuné</td><td class="pct pct-lo">19.8%</td><td>31.2%</td><td class="pct-lo">18.8%</td><td>25.0%</td><td class="pct-lo">6.2%</td><td class="pct-lo">18.8%</td><td class="pct-lo">18.8%</td></tr>
           <tr><td>FT + KG en entrée</td><td class="pct">24.0%</td><td>43.8%</td><td>50.0%</td><td class="pct-lo">12.5%</td><td class="pct-lo">6.2%</td><td>25.0%</td><td class="pct-lo">6.2%</td></tr>
           <tr><td>FT + Inférence enrichie</td><td class="pct">29.2%</td><td>43.8%</td><td>31.2%</td><td>31.2%</td><td>25.0%</td><td>25.0%</td><td class="pct-lo">18.8%</td></tr>
-          <tr class="best-r"><td>★ Inférence LLM enrichie</td><td class="pct pct-hi">69.8%</td><td>81.2%</td><td class="pct-hi">100.0%</td><td>62.5%</td><td>62.5%</td><td>93.8%</td><td class="pct-lo">18.8%</td></tr>
         </tbody>
       </table>
     </div>
@@ -1036,10 +1014,9 @@ code{font-family:var(--mono);font-size:12px;background:var(--bg2);border:1px sol
         <thead><tr><th>Expérimentation</th><th class="s-got">Précision</th><th>contains</th><th>within</th><th>touches</th><th>crosses</th><th>disjoint</th><th>overlaps</th></tr></thead>
         <tbody>
           <tr><td>GPTOSS Base</td><td class="pct pct-lo">26.0%</td><td>56.2%</td><td>37.5%</td><td class="pct-lo">0.0%</td><td class="pct-lo">12.5%</td><td>43.8%</td><td class="pct-lo">6.2%</td></tr>
-          <tr><td>GPTOSS Fine-tuné</td><td class="pct">61.5%</td><td>62.5%</td><td>62.5%</td><td>75.0%</td><td>62.5%</td><td>62.5%</td><td>43.8%</td></tr>
+          <tr class="best-r"><td>★ GPTOSS Fine-tuné</td><td class="pct pct-hi">61.5%</td><td>62.5%</td><td>62.5%</td><td>75.0%</td><td>62.5%</td><td>62.5%</td><td>43.8%</td></tr>
           <tr><td>FT + KG en entrée</td><td class="pct pct-lo">27.1%</td><td>31.2%</td><td>50.0%</td><td class="pct-lo">12.5%</td><td class="pct-lo">18.8%</td><td>37.5%</td><td class="pct-lo">12.5%</td></tr>
           <tr><td>FT + Inférence enrichie</td><td class="pct">56.2%</td><td>50.0%</td><td>81.2%</td><td>62.5%</td><td>56.2%</td><td>50.0%</td><td>37.5%</td></tr>
-          <tr class="best-r"><td>★ Inférence LLM enrichie</td><td class="pct pct-hi">74.0%</td><td>75.0%</td><td class="pct-hi">100.0%</td><td>75.0%</td><td>56.2%</td><td>93.8%</td><td>43.8%</td></tr>
         </tbody>
       </table>
     </div>
@@ -1049,8 +1026,8 @@ code{font-family:var(--mono);font-size:12px;background:var(--bg2);border:1px sol
     <div class="insight-grid" style="margin-top:32px">
       <div class="insight">
         <span class="ico">🏆</span>
-        <h4>GoT + KG Ollama domine</h4>
-        <p>Le modèle base sans fine-tuning avec GoT enrichi par KG OSM atteint <strong>74.0%</strong> — meilleure performance toutes configurations confondues.</p>
+        <h4>GoT Fine-tuné · Meilleur GPU</h4>
+        <p>GPTOSS Fine-tuné avec GoT atteint <strong>61.5%</strong> — meilleure performance parmi les 4 expérimentations GPU A100.</p>
       </div>
       <div class="insight">
         <span class="ico">⚠️</span>
@@ -1074,7 +1051,7 @@ code{font-family:var(--mono);font-size:12px;background:var(--bg2);border:1px sol
 <!-- FOOTER -->
 <footer>
   <div class="f-logo">GPT-OSS 20B · Raisonnement Topologique</div>
-  <p>5 expérimentations · 96 exemples · 15 configurations · CoT · ToT · GoT · KG OSM</p>
+  <p>4 expérimentations GPU A100 · 96 exemples · 12 configurations · CoT · ToT · GoT · KG OSM</p>
   <p>DE-9IM · contains · within · touches · crosses · disjoint · overlaps · Université Laval</p>
 </footer>
 

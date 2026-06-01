@@ -1,15 +1,13 @@
 #!/usr/bin/env bash
 # =============================================================================
 # run_experiments.sh
-# Master runner — 5 experiments × 3 strategies (CoT/ToT/GoT) on 96 examples
-#
-# All experiments use OSM KG evidence at inference via CoT, ToT, GoT strategies.
+# Master runner — 4 experiments × 3 strategies (CoT/ToT/GoT) on 96 examples
+# All experiments run on GPU A100 80GB with OSM KG evidence at inference.
 #
 #  Exp 1 — Base (no adapter),          512 tok   → exp1_base_gpu
 #  Exp 2 — FT topo (raw data),         512 tok   → exp2_finetuned_topo_gpu
 #  Exp 3 — FT OSM-KG (KG in training), 1024 tok  → exp3_finetuned_kg_in_gpu
 #  Exp 4 — FT topo, extended budget,   1024 tok  → exp5_finetuned_enriched_gpu
-#  Exp 5 — Base + Ollama (DONE ✅)     N/A       → dynamic_osm_improved_version
 #
 # Usage:
 #   cd /path/to/Topological-Reasoning/code
@@ -46,13 +44,6 @@ echo "  Experiment 4 — FT topo extended + CoT/ToT/GoT (GPU, 1024 tok)"
 echo "  [Same topo adapter as Exp 2, longer reasoning budget]"
 echo "============================================================"
 $PYTHON exp05_finetuned_extended.py
-
-echo ""
-echo "============================================================"
-echo "  Experiment 5 — Base + Ollama (ALREADY COMPLETE)"
-echo "  [Will print existing results and exit]"
-echo "============================================================"
-$PYTHON exp06_base_ollama.py
 
 echo ""
 echo "All experiments complete."
