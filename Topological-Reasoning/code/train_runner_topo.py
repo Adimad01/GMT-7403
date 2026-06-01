@@ -1,17 +1,18 @@
 """
-Fine-tuning 1 — GPTOSS Fine-tuné (raw topological data)
+Fine-tuning 1 — GPTOSS Fine-tuné (balanced topological data)
 ================================================================================
-Fine-tunes GPT-OSS-20B with LoRA on the raw topological dataset
-(triplet_update_v3_70.csv — 756 training rows).
+Fine-tunes GPT-OSS-20B with LoRA on the BALANCED topological dataset
+(triplet_balanced_train.csv — 234 rows, 39 per DE-9IM predicate).
+
+Original dataset (triplet_update_v3_70.csv, 755 rows) was imbalanced:
+  touches 223, within 186, disjoint 183, overlaps 83, crosses 41, contains 39.
+The balanced version keeps 39 examples per predicate (minimum class count).
+
+Generate balanced dataset with:
+    python build_balanced_training_data.py
 
 No KG evidence is included in the training prompts.  The model learns
 purely from (vernacular relation, geometry types) → predicate pairs.
-
-STATUS: ✅ ALREADY DONE — adapter exists at finetuned_gptoss_topological/final_adapter
-This script is kept for reproducibility.  It will skip automatically if the
-final_adapter directory already exists.
-
-Used by: Experiments 2, 3, 5
 
 Output: finetuned_gptoss_topological/final_adapter
 
@@ -68,7 +69,7 @@ sys.meta_path.insert(0, _TvStubFinder())
 # ---------------------------------------------------------------------------
 
 # ---------------------------------------------------------------------------
-DATASET     = "../dataset/triplet_update_v3_70.csv"
+DATASET     = "../dataset/triplet_balanced_train.csv"
 OUTPUT_DIR  = "finetuned_gptoss_topological"
 MODEL_ID    = "openai/gpt-oss-20b"
 # ---------------------------------------------------------------------------
@@ -92,7 +93,7 @@ def preflight():
 
 def run():
     print("\n" + "=" * 70)
-    print("  FINE-TUNING 1 — Raw Topological Data (no KG)")
+    print("  FINE-TUNING 1 — Balanced Topological Data (39/predicate, no KG)")
     print("=" * 70)
     print(f"  Model      : {MODEL_ID}")
     print(f"  Dataset    : {DATASET}")
