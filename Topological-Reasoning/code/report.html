@@ -391,6 +391,54 @@ code{font-family:var(--mono);font-size:12px;background:var(--bg2);border:1px sol
   .func-item{grid-template-columns:1fr;gap:10px}
   .chart-lbl{width:130px;font-size:11px}
 }
+
+/* ── PIPELINES ── */
+.pipe-nav{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:32px}
+.pnav-btn{display:flex;flex-direction:column;align-items:flex-start;padding:12px 16px;border:1px solid var(--border);border-radius:12px;background:#fff;cursor:pointer;transition:all .2s;font-family:var(--font);flex:1;min-width:130px;text-align:left}
+.pnav-btn:hover{border-color:var(--border2);box-shadow:var(--shadow-sm);transform:translateY(-2px)}
+.pnav-btn.active{border-color:var(--blue);background:var(--blue-lt);box-shadow:0 0 0 2px rgba(37,99,235,.15)}
+.pnav-num{font-size:10px;font-weight:800;letter-spacing:.1em;color:var(--muted2);margin-bottom:4px}
+.pnav-name{font-size:12px;font-weight:700;color:var(--text);line-height:1.3}
+.pnav-btn.active .pnav-num,.pnav-btn.active .pnav-name{color:var(--blue)}
+.pipe-panel{display:none}
+.pipe-panel.active{display:block;animation:pipe-in .3s ease}
+@keyframes pipe-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.pipe-header{margin-bottom:24px}
+.pipe-exp-num{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted2);margin-bottom:6px}
+.pipe-title{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-.02em;margin-bottom:8px}
+.pipe-desc{font-size:14px;color:var(--muted);line-height:1.7;max-width:680px;margin-bottom:14px}
+.pipe-meta{display:flex;flex-wrap:wrap;gap:8px}
+.pipe-meta-chip{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:#fff;color:var(--muted)}
+.pipe-phase-label{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:5px 14px;border-radius:99px;margin:20px 0 12px}
+.phase-train{background:#fffbeb;color:var(--orange);border:1px solid #fde68a}
+.phase-infer{background:var(--blue-lt);color:var(--blue);border:1px solid var(--blue-md)}
+.pipe-flow{display:flex;align-items:center;flex-wrap:wrap;background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:24px 20px;box-shadow:var(--shadow-sm);margin-bottom:4px;overflow-x:auto}
+.pipe-step{display:flex;flex-direction:column;align-items:center;padding:14px 12px;border-radius:12px;cursor:pointer;border:2px solid transparent;transition:all .22s;min-width:96px;flex-shrink:0}
+.pipe-step:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
+.pipe-step.active{border-color:var(--blue)!important;box-shadow:0 0 0 3px rgba(37,99,235,.18)!important}
+.pipe-step-icon{font-size:26px;margin-bottom:8px}
+.pipe-step-label{font-size:11px;font-weight:700;text-align:center;color:var(--text);line-height:1.35;max-width:88px}
+.pipe-step-type{font-size:9px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-top:6px;padding:2px 8px;border-radius:99px}
+.type-input{background:#f8f9ff}.type-input .pipe-step-type{background:#e0e7ff;color:#3730a3}
+.type-kg{background:#f0fdf4}.type-kg .pipe-step-type{background:#a7f3d0;color:#065f46}
+.type-training{background:#fffbeb}.type-training .pipe-step-type{background:#fde68a;color:#92400e}
+.type-model{background:#f5f3ff}.type-model .pipe-step-type{background:#ddd6fe;color:#5b21b6}
+.type-strategy{background:var(--blue-lt)}.type-strategy .pipe-step-type{background:var(--blue-md);color:var(--blue)}
+.type-output{background:#ecfdf5;border-color:#a7f3d0}.type-output .pipe-step-label{color:var(--green);font-weight:800}.type-output .pipe-step-type{background:#a7f3d0;color:#065f46}
+.type-adapter{background:#f5f3ff}.type-adapter .pipe-step-type{background:#ddd6fe;color:#5b21b6}
+.pipe-arrow{display:flex;align-items:center;padding:0 8px;color:var(--muted2);font-size:18px;flex-shrink:0;user-select:none}
+.pipe-step-detail{background:#fff;border:1px solid var(--border);border-left:3px solid var(--blue);border-radius:0 var(--r) var(--r) 0;padding:22px 26px;margin-bottom:8px;animation:pipe-in .22s ease}
+.psd-header{display:flex;align-items:flex-start;gap:14px;margin-bottom:12px}
+.psd-icon{font-size:26px;flex-shrink:0}
+.psd-title{font-size:15px;font-weight:800;color:var(--text);margin-bottom:3px}
+.psd-sub{font-size:12px;color:var(--muted);line-height:1.5}
+.psd-body{font-size:13px;color:var(--muted);line-height:1.8}
+.psd-body strong{color:var(--text);font-weight:700}
+.pipe-diff-note{display:flex;align-items:flex-start;gap:10px;background:linear-gradient(135deg,var(--blue-lt),var(--purple-lt));border:1px solid var(--blue-md);border-radius:12px;padding:14px 18px;margin-top:20px;font-size:13px;color:var(--blue);line-height:1.65}
+.dn-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+.pipe-legend{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:28px}
+.pl-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);font-weight:500}
+.pl-dot{width:12px;height:12px;border-radius:4px;flex-shrink:0}
 </style>
 </head>
 <body>
@@ -401,6 +449,7 @@ code{font-family:var(--mono);font-size:12px;background:var(--bg2);border:1px sol
   <ul>
     <li><a href="#donnees">Données</a></li>
     <li><a href="#experiences">Expériences</a></li>
+    <li><a href="#pipelines">Pipelines</a></li>
     <li><a href="#chart">Résultats</a></li>
     <li><a href="#architecture">Architecture</a></li>
     <li><a href="#strategies">Stratégies</a></li>
@@ -786,6 +835,27 @@ code{font-family:var(--mono);font-size:12px;background:var(--bg2);border:1px sol
   </div>
 </section>
 
+<!-- PIPELINES -->
+<section id="pipelines">
+<div class="container-lg">
+  <div class="eyebrow">Architecture des systèmes</div>
+  <h2>Pipelines des 6 Configurations</h2>
+  <p class="lead">Du texte brut à la prédiction topologique — chaque pipeline illustre comment les composants s'assemblent. Cliquez sur une étape pour les détails techniques.</p>
+
+  <div class="pipe-legend">
+    <div class="pl-item"><div class="pl-dot" style="background:#e0e7ff"></div>Entrée / Dataset</div>
+    <div class="pl-item"><div class="pl-dot" style="background:#a7f3d0"></div>KG OSM (Nominatim)</div>
+    <div class="pl-item"><div class="pl-dot" style="background:#fde68a"></div>Fine-tuning LoRA</div>
+    <div class="pl-item"><div class="pl-dot" style="background:#ddd6fe"></div>Modèle / Adaptateur</div>
+    <div class="pl-item"><div class="pl-dot" style="background:#bfdbfe"></div>Stratégie raisonnement</div>
+    <div class="pl-item"><div class="pl-dot" style="background:#a7f3d0;border:1px solid var(--green)"></div>Sortie DE-9IM</div>
+  </div>
+
+  <div class="pipe-nav" id="pipe-nav"></div>
+  <div id="pipe-container"></div>
+</div>
+</section>
+
 <!-- CHART -->
 <section id="chart">
   <div class="container-lg">
@@ -1055,5 +1125,181 @@ code{font-family:var(--mono);font-size:12px;background:var(--bg2);border:1px sol
   <p>DE-9IM · contains · within · touches · crosses · disjoint · overlaps · Université Laval</p>
 </footer>
 
+
+<script>
+(function(){
+var PIPES=[
+{num:'01',name:'GPTOSS Base',
+ desc:'Modèle GPT-OSS-20B sans fine-tuning. Les preuves OSM sont récupérées dynamiquement à l\'inférence via Nominatim et injectées dans le prompt.',
+ tag:'exp1_base_gpu · 512 tok · sans adaptateur',bestScore:'57.3%',bestStrat:'CoT',
+ diffNote:'Configuration de référence : aucun fine-tuning. Le KG OSM enrichit uniquement le prompt à l\'inférence.',
+ phases:[{label:'⚡ Phase d\'inférence',cls:'phase-infer',steps:[
+  {icon:'&#128196;',label:'Texte\nrequête',type:'input',typeLabel:'Entrée',dTitle:'Texte requête',dSub:'Phrase vernaculaire décrivant la relation spatiale',dBody:'Ex. : <strong>« Baraboo is home to the Circus World Museum »</strong>. Le modèle doit inférer le prédicat DE-9IM (<code>contains</code>) sans coordonnées explicites.'},
+  {icon:'&#128256;',label:'Stratégie\nCoT/ToT/GoT',type:'strategy',typeLabel:'Stratégie',dTitle:'3 stratégies de raisonnement',dSub:'Testées indépendamment sur 96 exemples',dBody:'<strong>CoT</strong> (1 appel) : raisonnement étape par étape.<br><strong>ToT</strong> (N appels) : hypothèses multiples + vote.<br><strong>GoT</strong> (K nœuds) : extraction → analyse géométrique → comparaison → conclusion.'},
+  {icon:'&#129302;',label:'GPT-OSS-20B\nBase',type:'model',typeLabel:'Modèle base',dTitle:'GPT-OSS-20B · Sans adaptateur',dSub:'openai/gpt-oss-20b · aucun LoRA',dBody:'Chargé en 4-bit (bitsandbytes) sur A100 80 GB. Température <code>0.1</code>, <code>max_new_tokens=512</code>. Latence premier appel : ~5 s.'},
+  {icon:'&#9989;',label:'Prédicat\nDE-9IM',type:'output',typeLabel:'Sortie',dTitle:'Prédicat DE-9IM prédit',dSub:'6 classes : contains · within · touches · crosses · disjoint · overlaps',dBody:'Extraction par regex. Meilleur score : <strong>57.3 % CoT</strong>. Excelle sur <code>within</code> (100 % CoT) mais échoue sur <code>overlaps</code> (18.8 %).'}
+ ]}]
+},
+{num:'02',name:'GPTOSS Fine-tuné',
+ desc:'GPT-OSS-20B fine-tuné sur 755 exemples topologiques bruts (sans KG). L\'adaptateur LoRA r=8 spécialise le modèle sur la classification DE-9IM.',
+ tag:'exp2_finetuned_topo_gpu · 512 tok · topo adapter',bestScore:'61.5%',bestStrat:'GoT',
+ diffNote:'Meilleure configuration globale. Le fine-tuning améliore GoT (+35 pts) mais dégrade légèrement CoT (53.1 % vs 57.3 %). Pas de KG à l\'inférence.',
+ phases:[
+  {label:'🔧 Phase d\'entraînement',cls:'phase-train',steps:[
+   {icon:'&#128202;',label:'Données topo\n755 exemples',type:'input',typeLabel:'Dataset',dTitle:'Dataset de fine-tuning',dSub:'triplet_update_v3_70.csv · 755 exemples · sans KG',dBody:'Paires (texte vernaculaire, prédicat DE-9IM). Déséquilibré : touches 223, within 186, disjoint 183. Format <code>### TASK / INPUT / OUTPUT ###</code>.'},
+   {icon:'&#128295;',label:'Fine-tuning\nLoRA r=8',type:'training',typeLabel:'Entraînement',dTitle:'Fine-tuning LoRA r=8',dSub:'SFTTrainer (TRL) · A100 80 GB',dBody:'LoRA sur couches d\'attention (<code>r=8, alpha=16</code>). ~144 steps (checkpoint), résultat final dans <code>finetuned_gptoss_topological/final_adapter/</code>.'},
+   {icon:'&#129513;',label:'Adaptateur\ntopo LoRA',type:'adapter',typeLabel:'Adaptateur',dTitle:'Adaptateur LoRA topologique',dSub:'PEFT · chargé à l\'inférence',dBody:'Stocké dans <code>final_adapter/adapter_config.json</code>. Chargé via <code>PeftModel.from_pretrained()</code> avec patch <code>_local_hf_hub_download</code>.'}
+  ]},
+  {label:'⚡ Phase d\'inférence',cls:'phase-infer',steps:[
+   {icon:'&#128196;',label:'Texte\nrequête',type:'input',typeLabel:'Entrée',dTitle:'Texte requête · Sans KG',dSub:'Le modèle s\'appuie uniquement sur ses poids fine-tunés',dBody:'Phrase vernaculaire seule. <strong>Différence clé</strong> : aucune preuve KG OSM — le modèle utilise uniquement ses poids fine-tunés.'},
+   {icon:'&#128256;',label:'Stratégie\nCoT/ToT/GoT',type:'strategy',typeLabel:'Stratégie',dTitle:'3 stratégies · Budget 512 tok',dSub:'Même structure qu\'Exp 01',dBody:'Identiques à Exp 01 sans contexte KG. GoT bénéficie le plus des poids fine-tunés : <strong>61.5 %</strong>.'},
+   {icon:'&#129302;',label:'GPT-OSS-20B\n+ topo LoRA',type:'model',typeLabel:'Modèle FT',dTitle:'GPT-OSS-20B + adaptateur topo',dSub:'Modèle base + LoRA topologique',dBody:'Même modèle de base avec l\'adaptateur LoRA appliqué. Les poids baisent les prédictions vers les patterns appris.'},
+   {icon:'&#9989;',label:'Prédicat\nDE-9IM',type:'output',typeLabel:'Sortie',dTitle:'★ Meilleur score global : GoT = 61.5%',dSub:'Meilleure configuration toutes expérimentations confondues',dBody:'GoT : <strong>61.5 %</strong> · CoT : 53.1 % · ToT : 19.8 %. GoT atteint 75 % sur <code>touches</code> et <code>crosses</code>.'}
+  ]}
+ ]
+},
+{num:'03',name:'FT + KG en entrée',
+ desc:'Modèle fine-tuné (adaptateur topo) + preuves OSM injectées dans le prompt à l\'inférence. Double enrichissement : poids spécialisés + contexte géographique externe.',
+ tag:'exp3_finetuned_kg_in_gpu · 1024 tok · topo + osm',bestScore:'47.9%',bestStrat:'CoT',
+ diffNote:'Combiner fine-tuning et KG en entrée ne cumule pas les avantages. Mismatch : modèle entraîné sans KG, inféré avec KG.',
+ phases:[
+  {label:'🔧 Phase d\'entraînement',cls:'phase-train',steps:[
+   {icon:'&#128202;',label:'Données topo\n755 ex. sans KG',type:'input',typeLabel:'Dataset',dTitle:'Même dataset que Exp 02',dSub:'Sans KG dans les données d\'entraînement',dBody:'Le modèle est fine-tuné sur des exemples <strong>sans preuves KG</strong>. Il recevra du KG à l\'inférence — tension principale de cette configuration.'},
+   {icon:'&#128295;',label:'Fine-tuning\nLoRA r=8',type:'training',typeLabel:'Entraînement',dTitle:'Fine-tuning identique à Exp 02',dSub:'Même adaptateur topo LoRA',dBody:'L\'adaptateur appris ici est identique à celui de Exp 02. La différence est uniquement à l\'inférence : présence du contexte KG OSM.'},
+   {icon:'&#129513;',label:'Adaptateur\ntopo LoRA',type:'adapter',typeLabel:'Adaptateur',dTitle:'Adaptateur topo (réutilisé)',dSub:'N\'a pas été entraîné avec du KG',dBody:'L\'adaptateur voit des preuves KG pour la <strong>première fois</strong> à l\'inférence — distribution différente de celle d\'entraînement.'}
+  ]},
+  {label:'⚡ Phase d\'inférence',cls:'phase-infer',steps:[
+   {icon:'&#128196;',label:'Texte\nrequête',type:'input',typeLabel:'Entrée',dTitle:'Texte + OSM KG',dSub:'Double entrée : texte + preuves géographiques',dBody:'Budget token étendu à <code>1024</code> pour accommoder le contexte KG en plus du texte.'},
+   {icon:'&#128506;',label:'OSM KG\nLookup',type:'kg',typeLabel:'KG OSM',dTitle:'KG OSM injecté dans le prompt',dSub:'Même source que Exp 01',dBody:'Preuves identiques à Exp 01, injectées dans un prompt destiné à un modèle qui n\'a jamais vu de KG pendant l\'entraînement.'},
+   {icon:'&#128256;',label:'Stratégie\nCoT/ToT/GoT',type:'strategy',typeLabel:'Stratégie',dTitle:'3 stratégies · Budget 1024 tok',dSub:'Budget doublé pour le KG',dBody:'Même structure CoT/ToT/GoT. Le budget 1024 tok permet d\'inclure les preuves OSM dans le prompt.'},
+   {icon:'&#129302;',label:'GPT-OSS-20B\n+ topo + KG',type:'model',typeLabel:'Modèle FT+KG',dTitle:'GPT-OSS-20B + topo LoRA + KG en entrée',dSub:'Combinaison fine-tuning + contexte KG',dBody:'Le modèle reçoit du KG qu\'il n\'a pas vu à l\'entraînement → mismatch distribution. Résultat : 47.9 % CoT, inférieur aux deux configurations séparées.'},
+   {icon:'&#9989;',label:'Prédicat\nDE-9IM',type:'output',typeLabel:'Sortie',dTitle:'Score : 47.9 % (CoT)',dSub:'Inférieur aux configurations séparées',dBody:'La combinaison FT + KG en entrée ne cumule pas les avantages. GoT chute à 27.1 %. Le mismatch distribution nuit significativement.'}
+  ]}
+ ]
+},
+{num:'04',name:'FT + KG comme entrée FT',
+ desc:'Le KG OSM est intégré dès l\'entraînement : chaque exemple de fine-tuning inclut les preuves géographiques. L\'adaptateur OSM-KG est entraîné avec et pour le KG.',
+ tag:'exp3 · osm-kg adapter · KG in training',bestScore:'47.9%',bestStrat:'CoT',
+ diffNote:'KG cohérent entre entraînement et inférence — pas de mismatch. Le modèle a appris à exploiter les preuves KG dès l\'entraînement.',
+ phases:[
+  {label:'🔧 Phase d\'entraînement avec KG',cls:'phase-train',steps:[
+   {icon:'&#128202;',label:'Données topo\n+ preuves KG',type:'input',typeLabel:'Dataset + KG',dTitle:'Dataset augmenté avec preuves OSM',dSub:'Chaque exemple inclut coordonnées, bbox, hiérarchie',dBody:'Les 755 exemples de fine-tuning sont enrichis avec les preuves OSM correspondantes. L\'adaptateur apprend à exploiter le KG comme source de raisonnement.'},
+   {icon:'&#128295;',label:'Fine-tuning\nLoRA + KG',type:'training',typeLabel:'Entraînement+KG',dTitle:'Fine-tuning avec preuves KG dans les prompts',dSub:'SFTTrainer voit texte + KG',dBody:'L\'adaptateur développe une capacité à interpréter les preuves géographiques externes. Chaque prompt d\'entraînement inclut les données OSM.'},
+   {icon:'&#129513;',label:'Adaptateur\nOSM-KG LoRA',type:'adapter',typeLabel:'Adapt. OSM-KG',dTitle:'Adaptateur LoRA OSM-KG',dSub:'Spécifiquement entraîné pour exploiter le KG',dBody:'Contrairement à l\'adaptateur topo, celui-ci a été entraîné <strong>avec</strong> les preuves KG. Il est conçu pour recevoir du contexte géographique à l\'inférence.'}
+  ]},
+  {label:'⚡ Phase d\'inférence',cls:'phase-infer',steps:[
+   {icon:'&#128196;',label:'Texte\nrequête',type:'input',typeLabel:'Entrée',dTitle:'Texte requête',dSub:'Sans KG à l\'inférence — KG encodé dans l\'adaptateur OSM-KG',dBody:'L\'entrée à l\'inférence est cohérente avec ce que le modèle a vu pendant le fine-tuning : même format texte + KG.'},
+   {icon:'&#128256;',label:'Stratégie\nCoT/ToT/GoT',type:'strategy',typeLabel:'Stratégie',dTitle:'3 stratégies · Budget 1024 tok',dSub:'Budget étendu pour le KG',dBody:'Identique aux autres expérimentations avec KG. Le contexte OSM est accommodé par le budget de 1024 tokens.'},
+   {icon:'&#129302;',label:'GPT-OSS-20B\n+ OSM-KG LoRA',type:'model',typeLabel:'Modèle OSM-KG',dTitle:'GPT-OSS-20B + adaptateur OSM-KG',dSub:'KG intégré à l\'entraînement, absent à l\'inférence',dBody:'Configuration la plus cohérente pour le KG : le modèle a été spécialisé pour exploiter les preuves géographiques. Distribution entraînement = distribution inférence.'},
+   {icon:'&#9989;',label:'Prédicat\nDE-9IM',type:'output',typeLabel:'Sortie',dTitle:'Score : 47.9 % (CoT)',dSub:'Comparable à Exp 03 malgré la cohérence',dBody:'Malgré l\'alignement entraînement/inférence, les performances restent à 47.9 %. La qualité et l\'interprétabilité des preuves OSM restent limitantes.'}
+  ]}
+ ]
+},
+{num:'05',name:'FT + Inférence enrichie KG',
+ desc:'Modèle fine-tuné (adaptateur topo) avec budget de raisonnement étendu (1024 tok) et preuves KG détaillées. GoT tire pleinement parti de ce budget élargi.',
+ tag:'exp5_finetuned_enriched_gpu · 1024 tok · topo + enrichi',bestScore:'56.2%',bestStrat:'GoT',
+ diffNote:'L\'extension du budget (512→ 1024 tok) et le KG enrichi relancent GoT à 56.2 %. <code>within</code> atteint 81.2 % — 2e meilleure configuration globale.',
+ phases:[
+  {label:'🔧 Phase d\'entraînement',cls:'phase-train',steps:[
+   {icon:'&#128202;',label:'Données topo\n755 exemples',type:'input',typeLabel:'Dataset',dTitle:'Même dataset que Exp 02',dSub:'Sans KG — différence uniquement à l\'inférence',dBody:'L\'adaptateur est identique à Exp 02. L\'amélioration vient entièrement du pipeline d\'inférence : budget étendu + KG enrichi.'},
+   {icon:'&#128295;',label:'Fine-tuning\nLoRA r=8',type:'training',typeLabel:'Entraînement',dTitle:'Fine-tuning identique à Exp 02',dSub:'Adaptateur topo réutilisé',dBody:'Même fine-tuning que Exp 02. La puissance de cette configuration vient de l\'inférence, pas de l\'entraînement.'},
+   {icon:'&#129513;',label:'Adaptateur\ntopo LoRA',type:'adapter',typeLabel:'Adaptateur',dTitle:'Adaptateur topo LoRA (Exp 02)',dSub:'Réutilisé sans modification',dBody:'Même adaptateur que Exp 02, utilisé avec un pipeline d\'inférence enrichi.'}
+  ]},
+  {label:'⚡ Phase d\'inférence enrichie',cls:'phase-infer',steps:[
+   {icon:'&#128196;',label:'Texte\nrequête',type:'input',typeLabel:'Entrée',dTitle:'Texte requête',dSub:'Identique aux autres',dBody:'Phrase vernaculaire standard. La différence est dans le traitement KG et le budget token étendu.'},
+   {icon:'&#128256;',label:'GoT\nmulti-étapes',type:'strategy',typeLabel:'GoT enrichi',dTitle:'Graph-of-Thought enrichi par KG OSM',dSub:'Chaque nœud GoT intègre les preuves OSM · 1024 tok',dBody:'GoT décompose en nœuds interdependants, chacun enrichi par les preuves KG OSM :<br>① <strong>Extraction KG</strong> → coordonnées, bbox, hiérarchie<br>② <strong>Analyse géométrique</strong> → types DE-9IM candidats<br>③ <strong>Comparaison</strong> → preuves pour/contre<br>④ <strong>Conclusion</strong> → prédicat final. Budget 1024 tok par appel.'},
+   {icon:'&#129302;',label:'GPT-OSS-20B\n+ topo + 1024',type:'model',typeLabel:'Modèle FT',dTitle:'GPT-OSS-20B + topo LoRA + 1024 tok',dSub:'Fine-tuning + contexte riche',dBody:'La combinaison modèle fine-tuné + GoT + budget étendu donne <strong>56.2 %</strong> — 2e meilleur score global. GoT exploite efficacement le budget étendu.'},
+   {icon:'&#9989;',label:'Prédicat\nDE-9IM',type:'output',typeLabel:'Sortie',dTitle:'Score : 56.2 % (GoT)',dSub:'2e meilleure configuration globale',dBody:'GoT : <strong>56.2 %</strong> · CoT : 49.0 % · ToT : 29.2 %. <code>within</code> atteint 81.2 % en GoT. Confirme que GoT bénéficie d\'un contexte plus riche.'}
+  ]}
+ ]
+},
+{num:'06',name:'GPTOSS + Inférence enrichie',
+ desc:'Modèle de base (sans fine-tuning) avec inférence enrichie par KG étendu et budget 1024 tokens. Explore si le KG enrichi compense l\'absence de fine-tuning.',
+ tag:'base + KG enrichi · 1024 tok · configuration hybride',bestScore:'—',bestStrat:'à évaluer',
+ diffNote:'Configuration complémentaire à Exp 01 et 05. Quantifie l\'apport pur du budget étendu et du KG enrichi, indépendamment du fine-tuning.',
+ phases:[{label:'⚡ Phase d\'inférence enrichie',cls:'phase-infer',steps:[
+  {icon:'&#128196;',label:'Texte\nrequête',type:'input',typeLabel:'Entrée',dTitle:'Texte requête · Sans fine-tuning',dSub:'Aucune spécialisation topologique',dBody:'Le modèle de base s\'appuie entièrement sur le KG enrichi et ses connaissances générales pré-entraînées.'},
+  {icon:'&#128256;',label:'GoT\nmulti-étapes',type:'strategy',typeLabel:'GoT enrichi',dTitle:'Graph-of-Thought enrichi par KG · Modèle base',dSub:'KG intégré dans chaque nœud GoT · 1024 tok',dBody:'Même structure GoT enrichie que Exp 05, appliquée au modèle de base sans adaptateur. KG OSM intégré dans chaque nœud de raisonnement. Compare Exp 05 (FT + GoT enrichi = 56.2 %) vs modèle base.',
+  {icon:'&#129302;',label:'GPT-OSS-20B\nBase (1024)',type:'model',typeLabel:'Modèle base',dTitle:'GPT-OSS-20B Base · Budget 1024 tok',dSub:'Aucun adaptateur · KG seul comme guide',dBody:'Hypothèse : le KG enrichi suffit-il à compenser l\'absence de fine-tuning ? Attendu entre Exp 01 (57.3 %) et Exp 05 (56.2 %).'},
+  {icon:'&#9989;',label:'Prédicat\nDE-9IM',type:'output',typeLabel:'Sortie',dTitle:'Résultats à venir',dSub:'Configuration en cours d\'évaluation',dBody:'Permettra de quantifier l\'apport pur du budget étendu et du KG enrichi sur le modèle de base, sans interférence du fine-tuning.'}
+ ]}]
+}
+];
+
+var _cur=0,_curStep=null;
+function mkId(pi,phi,si){return pi+'_'+phi+'_'+si;}
+
+function renderNav(){
+  var nav=document.getElementById('pipe-nav');
+  nav.innerHTML=PIPES.map(function(p,i){
+    return '<button class="pnav-btn'+(i===0?' active':'')+'" onclick="window._openPipe('+i+')">'
+      +'<span class="pnav-num">Exp '+p.num+'</span>'
+      +'<span class="pnav-name">'+p.name+'</span>'
+      +'</button>';
+  }).join('');
+}
+
+function renderPanels(){
+  var c=document.getElementById('pipe-container');
+  c.innerHTML=PIPES.map(function(p,pi){
+    var phasesHTML=p.phases.map(function(ph,phi){
+      var stepsHTML=ph.steps.map(function(s,si){
+        var id=mkId(pi,phi,si);
+        return (si>0?'<div class="pipe-arrow">&#8594;</div>':'')
+          +'<div class="pipe-step type-'+s.type+'" id="pstep-'+id+'" onclick="window._selStep(\''+id+'\','+pi+','+phi+','+si+')">'
+          +'<div class="pipe-step-icon">'+s.icon+'</div>'
+          +'<div class="pipe-step-label">'+s.label.replace('\n','<br>')+'</div>'
+          +'<div class="pipe-step-type">'+s.typeLabel+'</div>'
+          +'</div>';
+      }).join('');
+      return '<div class="pipe-phase-label '+ph.cls+'">'+ph.label+'</div>'
+        +'<div class="pipe-flow">'+stepsHTML+'</div>'
+        +'<div class="pipe-step-detail" id="pdetail-'+pi+'-'+phi+'" style="display:none"></div>';
+    }).join('');
+    var bc=p.bestScore==='—'?'var(--muted)':'var(--green)';
+    return '<div class="pipe-panel'+(pi===0?' active':'')+'" id="pipe-panel-'+pi+'">'
+      +'<div class="pipe-header">'
+      +'<div class="pipe-exp-num">Expérimentation '+p.num+'</div>'
+      +'<div class="pipe-title">'+p.name+'</div>'
+      +'<div class="pipe-desc">'+p.desc+'</div>'
+      +'<div class="pipe-meta">'
+      +'<div class="pipe-meta-chip" style="color:'+bc+';border-color:'+bc+'">&#9733; Meilleur : '+p.bestScore+' ('+p.bestStrat+')</div>'
+      +'<div class="pipe-meta-chip" style="font-family:var(--mono);font-size:11px">'+p.tag+'</div>'
+      +'</div></div>'
+      +phasesHTML
+      +'<div class="pipe-diff-note"><span class="dn-icon">&#128161;</span><span>'+p.diffNote+'</span></div>'
+      +'</div>';
+  }).join('');
+}
+
+window._openPipe=function(idx){
+  _cur=idx;_curStep=null;
+  document.querySelectorAll('.pnav-btn').forEach(function(b,i){b.classList.toggle('active',i===idx);});
+  document.querySelectorAll('.pipe-panel').forEach(function(p,i){p.classList.toggle('active',i===idx);});
+  document.querySelectorAll('.pipe-step-detail').forEach(function(d){d.style.display='none';});
+  document.querySelectorAll('.pipe-step').forEach(function(s){s.classList.remove('active');});
+};
+
+window._selStep=function(id,pi,phi,si){
+  var step=PIPES[pi].phases[phi].steps[si];
+  var detailEl=document.getElementById('pdetail-'+pi+'-'+phi);
+  var stepEl=document.getElementById('pstep-'+id);
+  if(_curStep===id&&detailEl.style.display!=='none'){
+    detailEl.style.display='none';stepEl.classList.remove('active');_curStep=null;return;
+  }
+  document.querySelectorAll('#pipe-panel-'+pi+' .pipe-step-detail').forEach(function(d){d.style.display='none';});
+  document.querySelectorAll('#pipe-panel-'+pi+' .pipe-step').forEach(function(s){s.classList.remove('active');});
+  stepEl.classList.add('active');_curStep=id;
+  detailEl.innerHTML='<div class="psd-header"><span class="psd-icon">'+step.icon+'</span><div>'
+    +'<div class="psd-title">'+step.dTitle+'</div>'
+    +'<div class="psd-sub">'+step.dSub+'</div>'
+    +'</div></div><div class="psd-body">'+step.dBody+'</div>';
+  detailEl.style.display='block';
+  detailEl.scrollIntoView({behavior:'smooth',block:'nearest'});
+};
+
+document.addEventListener('DOMContentLoaded',function(){renderNav();renderPanels();});
+})();
+</script>
 </body>
 </html>
