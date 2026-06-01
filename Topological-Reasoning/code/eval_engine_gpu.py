@@ -1,11 +1,11 @@
 """
-run_eval_osm_gpu.py
+eval_engine_gpu.py
 ================================================================================
 GPU-based enriched LLM inference (CoT / ToT / GoT) grounded on OSM KG evidence.
 Supports an optional PEFT adapter for the fine-tuned model.
 
 Experiment 5 — GPTOSS Fine-tuné + Inférence LLM enrichie par KG:
-  python run_eval_osm_gpu.py \\
+  python eval_engine_gpu.py \\
       --dataset  ../dataset/triplet_update_v3_30.csv \\
       --model-id openai/gpt-oss-20b \\
       --adapter-path finetuned_gptoss_topological/final_adapter \\
@@ -15,7 +15,7 @@ Experiment 5 — GPTOSS Fine-tuné + Inférence LLM enrichie par KG:
       --model-tag dynamic_osm_finetuned_gpu
 
 Base-model GPU variant (no adapter):
-  python run_eval_osm_gpu.py \\
+  python eval_engine_gpu.py \\
       --dataset  ../dataset/triplet_update_v3_30.csv \\
       --model-id openai/gpt-oss-20b \\
       --filter-indices ../dataset/eval_96_balanced_indices.json \\

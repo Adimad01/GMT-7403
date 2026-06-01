@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # =============================================================================
-# run_all_96_experiments.sh
+# run_experiments.sh
 # Master runner — 5 experiments × 3 strategies (CoT/ToT/GoT) on 96 examples
 #
 # All experiments use OSM KG evidence at inference via CoT, ToT, GoT strategies.
@@ -13,8 +13,8 @@
 #
 # Usage:
 #   cd /path/to/Topological-Reasoning/code
-#   bash run_all_96_experiments.sh
-#   PYTHON=/path/to/python bash run_all_96_experiments.sh   # custom interpreter
+#   bash run_experiments.sh
+#   PYTHON=/path/to/python bash run_experiments.sh   # custom interpreter
 # =============================================================================
 
 set -euo pipefail
@@ -25,35 +25,35 @@ echo ""
 echo "============================================================"
 echo "  Experiment 1 — Base GPT-OSS + CoT/ToT/GoT (GPU, 512 tok)"
 echo "============================================================"
-$PYTHON exp1_gptoss_base.py
+$PYTHON exp01_base_model.py
 
 echo ""
 echo "============================================================"
 echo "  Experiment 2 — FT topo + CoT/ToT/GoT (GPU, 512 tok)"
 echo "============================================================"
-$PYTHON exp2_gptoss_finetuned.py
+$PYTHON exp02_finetuned_topo.py
 
 echo ""
 echo "============================================================"
 echo "  Experiment 3 — FT OSM-KG + CoT/ToT/GoT (GPU, 1024 tok)"
 echo "  [OSM-KG adapter: trained WITH KG evidence]"
 echo "============================================================"
-$PYTHON exp3_gptoss_finetuned_kg_input.py
+$PYTHON exp03_finetuned_osm_kg.py
 
 echo ""
 echo "============================================================"
 echo "  Experiment 4 — FT topo extended + CoT/ToT/GoT (GPU, 1024 tok)"
 echo "  [Same topo adapter as Exp 2, longer reasoning budget]"
 echo "============================================================"
-$PYTHON exp5_gptoss_finetuned_enriched_gpu.py
+$PYTHON exp05_finetuned_extended.py
 
 echo ""
 echo "============================================================"
 echo "  Experiment 5 — Base + Ollama (ALREADY COMPLETE)"
 echo "  [Will print existing results and exit]"
 echo "============================================================"
-$PYTHON exp6_gptoss_enriched_ollama.py
+$PYTHON exp06_base_ollama.py
 
 echo ""
 echo "All experiments complete."
-echo "Run: $PYTHON analyze_96_experiments.py"
+echo "Run: $PYTHON analyze_experiments.py"

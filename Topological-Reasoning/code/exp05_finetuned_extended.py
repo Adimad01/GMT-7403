@@ -1,25 +1,26 @@
 """
-Experiment 3 — GPTOSS Fine-tuné KG-OSM + Inférence enrichie OSM
+Experiment 5 — GPTOSS Fine-tuné topo + Inférence enrichie étendue (GPU)
 ================================================================================
-GPT-OSS-20B fine-tuned on OSM-KG instruction data (osm_kg_train.jsonl), then
-evaluated with CoT/ToT/GoT reasoning strategies grounded on OSM KG.
+GPT-OSS-20B fine-tuned on raw topological data (same adapter as Exp 2), evaluated
+with an extended CoT/ToT/GoT reasoning budget (max_new_tokens=1024 vs 512).
 
-Key distinction from Experiment 2: the adapter was trained on instruction
-examples that ALREADY contained OSM KG evidence (coordinates, bounding boxes,
-administrative hierarchy).  At inference, the same OSM evidence is provided
-via CoT/ToT/GoT — so the model has seen this kind of evidence both during
-fine-tuning AND at evaluation.
+Key distinction from Experiment 2: the model is given twice the token budget to
+develop its chain-of-thought, tree-of-thought, or graph-of-thought reasoning
+over the OSM KG evidence.  This tests whether longer reasoning improves accuracy
+for the fine-tuned-but-no-KG-trained model.
 
-Model     : openai/gpt-oss-20b + finetuned_gptoss_osm_kg/final_adapter
-KG        : OSM (Nominatim) — in training AND at inference via CoT/ToT/GoT
+Model     : openai/gpt-oss-20b + finetuned_gptoss_topological/final_adapter
+KG        : OSM (Nominatim) — same as Exp 2
+Inference : GPU (local)
 Strategies: CoT, ToT, GoT
+Max tokens: 1024 (vs 512 in Exp 2)
 Eval set  : 96 balanced examples — 16 per predicate
 Outputs   :
-  results/voletc_exp3_finetuned_kg_in_gpu_{cot|tot|got}_*_ckpt.json
+  results/voletc_exp5_finetuned_enriched_gpu_{cot|tot|got}_*_ckpt.json
 
 Run:
-    python exp3_gptoss_finetuned_kg_input.py
-    python exp3_gptoss_finetuned_kg_input.py --strategy cot
+    python exp05_finetuned_extended.py
+    python exp05_finetuned_extended.py --strategy cot
 """
 
 import os
@@ -33,9 +34,9 @@ import argparse
 DATASET        = "../dataset/triplet_update_v3_30.csv"
 INDICES_FILE   = "../dataset/eval_96_balanced_indices.json"
 MODEL_ID       = "openai/gpt-oss-20b"
-ADAPTER_PATH   = "finetuned_gptoss_osm_kg/final_adapter"
+ADAPTER_PATH   = "finetuned_gptoss_topological/final_adapter"
 OSM_CACHE      = "results/osm_cache.json"
-MODEL_TAG      = "exp3_finetuned_kg_in_gpu"
+MODEL_TAG      = "exp5_finetuned_enriched_gpu"
 OUTPUT_DIR     = "results"
 TEMPERATURE    = 0.1
 MAX_NEW_TOKENS = 1024
@@ -92,12 +93,12 @@ def run():
     preflight()
 
     print("\n" + "=" * 70)
-    print("  EXPERIMENT 3 — GPTOSS FT OSM-KG + Inférence enrichie OSM")
-    print("  (OSM-KG adapter, OSM KG in training AND at inference)")
+    print("  EXPERIMENT 5 — GPTOSS FT topo + Inférence enrichie étendue (GPU)")
+    print(f"  [max_new_tokens={MAX_NEW_TOKENS} — extended reasoning vs Exp 2 (512)]")
     print("=" * 70)
     print(f"  Model      : {MODEL_ID}")
-    print(f"  Adapter    : {ADAPTER_PATH}  [trained WITH OSM KG evidence]")
-    print(f"  KG         : OSM evidence in training + CoT/ToT/GoT at inference")
+    print(f"  Adapter    : {ADAPTER_PATH}")
+    print(f"  KG         : OSM (dynamic Nominatim, same as Exp 2)")
     print(f"  Strategies : {', '.join(s.upper() for s in target)}")
     print(f"  Output tag : {MODEL_TAG}")
     print("=" * 70)
@@ -108,7 +109,7 @@ def run():
 
     print()
     sys.argv = [
-        "run_eval_osm_gpu.py",
+        "eval_engine_gpu.py",
         "--dataset",        DATASET,
         "--model-id",       MODEL_ID,
         "--adapter-path",   ADAPTER_PATH,
@@ -120,7 +121,7 @@ def run():
         "--max-new-tokens", str(MAX_NEW_TOKENS),
     ]
 
-    from run_eval_osm_gpu import main
+    from eval_engine_gpu import main
     main()
 
 

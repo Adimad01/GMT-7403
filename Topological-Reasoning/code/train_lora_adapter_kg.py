@@ -1,5 +1,5 @@
 """
-finetune_gptoss_kg.py
+train_lora_adapter_kg.py
 ================================================================================
 Phase 3 — KGs Instruction-Tuning Fine-Tuning
 
@@ -11,19 +11,19 @@ This script is intentionally dataset-agnostic: point --dataset at either
 
 The JSONL records are produced by the two dataset-builder scripts and already
 contain the full instruction text (KG evidence in INPUT, label in OUTPUT).
-The fine-tuning objective is identical to the data-only baseline (finetune_gptoss.py):
+The fine-tuning objective is identical to the data-only baseline (train_lora_adapter.py):
 SFT with LoRA (r=8, lora_alpha=16) on the full text — same hyperparameters for
 a fair comparison.
 
 Usage:
   # Run A — OSM-KG
-  python finetune_gptoss_kg.py \
+  python train_lora_adapter_kg.py \
       --dataset   ../dataset/osm_kg_train.jsonl \
       --run-name  osm_kg \
       --output-dir finetuned_gptoss_osm_kg
 
   # Run B — Wikidata-KG
-  python finetune_gptoss_kg.py \
+  python train_lora_adapter_kg.py \
       --dataset   ../dataset/wikidata_kg_train.jsonl \
       --run-name  wikidata_kg \
       --output-dir finetuned_gptoss_wikidata_kg
@@ -37,7 +37,7 @@ import json
 import torch
 
 # ===========================================================================
-# DEPENDENCY MONKEY PATCH (same as finetune_gptoss.py)
+# DEPENDENCY MONKEY PATCH (same as train_lora_adapter.py)
 # Transformers' MXFP4 quantizer requires PyTorch >= 2.5.
 # Our server is locked at PyTorch 2.4.0 — spoof missing attributes before import.
 # ===========================================================================
@@ -166,7 +166,7 @@ def main():
 
     # ------------------------------------------------------------------
     # 4. Attach LoRA adapters
-    # Identical configuration to finetune_gptoss.py for a fair comparison.
+    # Identical configuration to train_lora_adapter.py for a fair comparison.
     # prepare_model_for_kbit_training() is intentionally skipped — this is
     # a plain bf16 model, not a bnb quantized one (would crash the allocator).
     # ------------------------------------------------------------------

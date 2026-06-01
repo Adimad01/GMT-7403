@@ -16,7 +16,7 @@ Used by: Experiments 2, 3, 5
 Output: finetuned_gptoss_topological/final_adapter
 
 Run:
-    python ft1_topological.py
+    python train_runner_topo.py
 """
 
 import os
@@ -105,13 +105,13 @@ def run():
     preflight()
 
     sys.argv = [
-        "finetune_gptoss.py",
+        "train_lora_adapter.py",
         "--dataset",    DATASET,
         "--model-id",   MODEL_ID,
         "--output-dir", OUTPUT_DIR,
     ]
 
-    from finetune_gptoss import main
+    from train_lora_adapter import main
     main()
 
 

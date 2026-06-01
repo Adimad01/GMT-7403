@@ -1,5 +1,5 @@
 """
-analyze_96_experiments.py
+analyze_experiments.py
 ================================================================================
 Unified comparison of 5 experiments × 3 strategies (CoT, ToT, GoT) on the
 96 balanced test examples.
@@ -13,7 +13,7 @@ Experiment configurations (all use CoT/ToT/GoT + OSM KG at inference):
 
 Usage:
     cd /path/to/Topological-Reasoning/code
-    python analyze_96_experiments.py [--results-dir results] [--output-dir results]
+    python analyze_experiments.py [--results-dir results] [--output-dir results]
 """
 
 import os

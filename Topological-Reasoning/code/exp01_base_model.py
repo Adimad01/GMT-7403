@@ -1,23 +1,21 @@
 """
-Experiment 2 — GPTOSS Fine-tuné
+Experiment 1 — GPTOSS Base
 ================================================================================
-GPT-OSS-20B fine-tuned on raw topological data (no KG) evaluated with CoT, ToT,
-and GoT reasoning strategies grounded on OSM KG.
+Base GPT-OSS-20B (no fine-tuning, no adapter) evaluated on 96 balanced test
+examples using CoT, ToT, and GoT reasoning strategies grounded on OSM KG.
 
-The LoRA adapter was trained with SFT on (vernacular, geometry) → predicate
-pairs only — no KG evidence was seen during training.  At evaluation, OSM KG
-evidence is provided to the CoT/ToT/GoT reasoning strategies.
-
-Model     : openai/gpt-oss-20b + finetuned_gptoss_topological/final_adapter
-KG        : OSM (Nominatim)
-Strategies: CoT, ToT, GoT
-Eval set  : 96 balanced examples — 16 per predicate
+Model     : openai/gpt-oss-20b  (base, no adapter)
+KG        : OSM (Nominatim) — fetched dynamically, cached in osm_cache.json
+Strategies: CoT, ToT, GoT  (all three run sequentially)
+Eval set  : 96 balanced examples — 16 per DE-9IM predicate
 Outputs   :
-  results/voletc_exp2_finetuned_topo_gpu_{cot|tot|got}_*_ckpt.json
+  results/voletc_exp1_base_gpu_cot_neighborhood_details_spatial_relation_16_sample_ckpt.json
+  results/voletc_exp1_base_gpu_tot_neighborhood_details_spatial_relation_16_sample_ckpt.json
+  results/voletc_exp1_base_gpu_got_neighborhood_details_spatial_relation_16_sample_ckpt.json
 
 Run:
-    python exp2_gptoss_finetuned.py
-    python exp2_gptoss_finetuned.py --strategy cot
+    python exp01_base_model.py
+    python exp01_base_model.py --strategy cot   # single strategy
 """
 
 import os
@@ -31,9 +29,9 @@ import argparse
 DATASET        = "../dataset/triplet_update_v3_30.csv"
 INDICES_FILE   = "../dataset/eval_96_balanced_indices.json"
 MODEL_ID       = "openai/gpt-oss-20b"
-ADAPTER_PATH   = "finetuned_gptoss_topological/final_adapter"
+ADAPTER_PATH   = None                   # base model — no adapter
 OSM_CACHE      = "results/osm_cache.json"
-MODEL_TAG      = "exp2_finetuned_topo_gpu"
+MODEL_TAG      = "exp1_base_gpu"
 OUTPUT_DIR     = "results"
 TEMPERATURE    = 0.1
 MAX_NEW_TOKENS = 512
@@ -45,19 +43,19 @@ STRATEGIES = ["cot", "tot", "got"]
 
 def preflight():
     ok = True
-    for path in [DATASET, INDICES_FILE, ADAPTER_PATH]:
+    for path in [DATASET, INDICES_FILE]:
         if not os.path.exists(path):
-            print(f"[ERROR] Required path not found: {path}")
+            print(f"[ERROR] Required file not found: {path}")
             ok = False
     if not ok:
         sys.exit(1)
     print(f"[OK] Dataset : {DATASET}")
     print(f"[OK] Indices : {INDICES_FILE}")
-    print(f"[OK] Adapter : {ADAPTER_PATH}")
     if os.path.exists(OSM_CACHE):
-        print(f"[OK] OSM cache: {len(json.load(open(OSM_CACHE)))} entries")
+        cache = json.load(open(OSM_CACHE))
+        print(f"[OK] OSM cache: {len(cache)} entries ({OSM_CACHE})")
     else:
-        print(f"[WARN] OSM cache not found — will query Nominatim live")
+        print(f"[WARN] OSM cache not found — will query Nominatim live (slower)")
 
 
 def check_strategy_status(strategies: list) -> bool:
@@ -90,10 +88,10 @@ def run():
     preflight()
 
     print("\n" + "=" * 70)
-    print("  EXPERIMENT 2 — GPTOSS Fine-tuné + CoT/ToT/GoT")
+    print("  EXPERIMENT 1 — GPTOSS Base + CoT/ToT/GoT")
     print("=" * 70)
     print(f"  Model      : {MODEL_ID}")
-    print(f"  Adapter    : {ADAPTER_PATH}")
+    print(f"  Adapter    : none (base model)")
     print(f"  Strategies : {', '.join(s.upper() for s in target)}")
     print(f"  Output tag : {MODEL_TAG}")
     print("=" * 70)
@@ -104,10 +102,9 @@ def run():
 
     print()
     sys.argv = [
-        "run_eval_osm_gpu.py",
+        "eval_engine_gpu.py",
         "--dataset",        DATASET,
         "--model-id",       MODEL_ID,
-        "--adapter-path",   ADAPTER_PATH,
         "--filter-indices", INDICES_FILE,
         "--strategy",       args.strategy,
         "--output-dir",     OUTPUT_DIR,
@@ -116,7 +113,7 @@ def run():
         "--max-new-tokens", str(MAX_NEW_TOKENS),
     ]
 
-    from run_eval_osm_gpu import main
+    from eval_engine_gpu import main
     main()
 
 

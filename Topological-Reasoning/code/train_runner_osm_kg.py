@@ -18,7 +18,7 @@ Used by: Experiment 4
 Output: finetuned_gptoss_osm_kg/final_adapter
 
 Run:
-    python ft4_osm_kg.py
+    python train_runner_osm_kg.py
 """
 
 import os
@@ -63,13 +63,13 @@ def run():
     preflight()
 
     sys.argv = [
-        "finetune_gptoss_kg.py",
+        "train_lora_adapter_kg.py",
         "--dataset",    DATASET,
         "--model-id",   MODEL_ID,
         "--output-dir", OUTPUT_DIR,
     ]
 
-    from finetune_gptoss_kg import main
+    from train_lora_adapter_kg import main
     main()
 
 

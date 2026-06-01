@@ -1,24 +1,23 @@
 """
-Experiment 6 — GPTOSS + Inférence LLM enrichie par KG  (base model, Ollama)
+Experiment 2 — GPTOSS Fine-tuné
 ================================================================================
-Base GPT-OSS-20B (no fine-tuning) evaluated with enriched LLM inference: CoT,
-ToT, and GoT reasoning strategies grounded on OSM KG via remote Ollama endpoint.
+GPT-OSS-20B fine-tuned on raw topological data (no KG) evaluated with CoT, ToT,
+and GoT reasoning strategies grounded on OSM KG.
 
-STATUS: ALL 96 RESULTS ALREADY EXIST in the checkpoint files below.
+The LoRA adapter was trained with SFT on (vernacular, geometry) → predicate
+pairs only — no KG evidence was seen during training.  At evaluation, OSM KG
+evidence is provided to the CoT/ToT/GoT reasoning strategies.
 
-Model     : gpt-oss (base, no adapter, via Ollama)
-Endpoint  : http://ollama.apps.crdig.ulaval.ca
+Model     : openai/gpt-oss-20b + finetuned_gptoss_topological/final_adapter
 KG        : OSM (Nominatim)
-Strategies: CoT, ToT, GoT  — ALL COMPLETE ✅
-Eval set  : 96 balanced examples (random_state=42, same as eval_96_balanced_indices.json)
-Results   :
-  CoT — results/voletc_dynamic_osm_improved_version_cot_*_ckpt.json  ✅ 66.7%
-  ToT — results/voletc_dynamic_osm_improved_version_tot_*_ckpt.json  ✅ 69.8%
-  GoT — results/voletc_dynamic_osm_improved_version_got_*_ckpt.json  ✅ 74.0%
+Strategies: CoT, ToT, GoT
+Eval set  : 96 balanced examples — 16 per predicate
+Outputs   :
+  results/voletc_exp2_finetuned_topo_gpu_{cot|tot|got}_*_ckpt.json
 
-Run (only if checkpoints are deleted):
-    python exp6_gptoss_enriched_ollama.py
-    python exp6_gptoss_enriched_ollama.py --strategy cot
+Run:
+    python exp02_finetuned_topo.py
+    python exp02_finetuned_topo.py --strategy cot
 """
 
 import os
@@ -30,14 +29,35 @@ import argparse
 # CONFIGURATION
 # ---------------------------------------------------------------------------
 DATASET        = "../dataset/triplet_update_v3_30.csv"
-MODEL_TAG      = "dynamic_osm_improved_version"   # keep existing tag (results exist)
+INDICES_FILE   = "../dataset/eval_96_balanced_indices.json"
+MODEL_ID       = "openai/gpt-oss-20b"
+ADAPTER_PATH   = "finetuned_gptoss_topological/final_adapter"
+OSM_CACHE      = "results/osm_cache.json"
+MODEL_TAG      = "exp2_finetuned_topo_gpu"
 OUTPUT_DIR     = "results"
 TEMPERATURE    = 0.1
-MAX_NEW_TOKENS = 1024
+MAX_NEW_TOKENS = 512
 
 SUFFIX     = "neighborhood_details_spatial_relation_16_sample"
 STRATEGIES = ["cot", "tot", "got"]
 # ---------------------------------------------------------------------------
+
+
+def preflight():
+    ok = True
+    for path in [DATASET, INDICES_FILE, ADAPTER_PATH]:
+        if not os.path.exists(path):
+            print(f"[ERROR] Required path not found: {path}")
+            ok = False
+    if not ok:
+        sys.exit(1)
+    print(f"[OK] Dataset : {DATASET}")
+    print(f"[OK] Indices : {INDICES_FILE}")
+    print(f"[OK] Adapter : {ADAPTER_PATH}")
+    if os.path.exists(OSM_CACHE):
+        print(f"[OK] OSM cache: {len(json.load(open(OSM_CACHE)))} entries")
+    else:
+        print(f"[WARN] OSM cache not found — will query Nominatim live")
 
 
 def check_strategy_status(strategies: list) -> bool:
@@ -67,31 +87,28 @@ def run():
     args = parser.parse_args()
     target = STRATEGIES if args.strategy == "all" else [args.strategy]
 
+    preflight()
+
     print("\n" + "=" * 70)
-    print("  EXPERIMENT 6 — GPTOSS Base + Inférence enrichie (Ollama)")
+    print("  EXPERIMENT 2 — GPTOSS Fine-tuné + CoT/ToT/GoT")
     print("=" * 70)
-    print(f"  Model      : gpt-oss  (base, no adapter)")
-    print(f"  Endpoint   : http://ollama.apps.crdig.ulaval.ca")
-    print(f"  KG         : OSM (dynamic Nominatim)")
+    print(f"  Model      : {MODEL_ID}")
+    print(f"  Adapter    : {ADAPTER_PATH}")
     print(f"  Strategies : {', '.join(s.upper() for s in target)}")
     print(f"  Output tag : {MODEL_TAG}")
     print("=" * 70)
 
     if check_strategy_status(target):
-        print("\n[DONE] All strategies already complete.")
-        print("       Delete checkpoint files to force a re-run.")
+        print("\n[DONE] All strategies complete. Delete checkpoints to re-run.")
         sys.exit(0)
 
-    if not os.path.exists(DATASET):
-        print(f"[ERROR] Dataset not found: {DATASET}")
-        sys.exit(1)
-
     print()
-    # run_eval_osm.py performs stratified sampling with random_state=42,
-    # producing the same 96 indices as eval_96_balanced_indices.json
     sys.argv = [
-        "run_eval_osm.py",
+        "eval_engine_gpu.py",
         "--dataset",        DATASET,
+        "--model-id",       MODEL_ID,
+        "--adapter-path",   ADAPTER_PATH,
+        "--filter-indices", INDICES_FILE,
         "--strategy",       args.strategy,
         "--output-dir",     OUTPUT_DIR,
         "--model-tag",      MODEL_TAG,
@@ -99,7 +116,7 @@ def run():
         "--max-new-tokens", str(MAX_NEW_TOKENS),
     ]
 
-    from run_eval_osm import main
+    from eval_engine_gpu import main
     main()
 
 

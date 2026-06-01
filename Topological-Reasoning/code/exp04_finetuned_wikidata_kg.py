@@ -18,8 +18,8 @@ Outputs   :
   results/voletc_exp4_finetuned_osm_kg_gpu_{cot|tot|got}_*_ckpt.json
 
 Run:
-    python exp4_gptoss_finetuned_kg_ft.py
-    python exp4_gptoss_finetuned_kg_ft.py --strategy got
+    python exp04_finetuned_wikidata_kg.py
+    python exp04_finetuned_wikidata_kg.py --strategy got
 """
 
 import os
@@ -108,7 +108,7 @@ def run():
 
     print()
     sys.argv = [
-        "run_eval_osm_gpu.py",
+        "eval_engine_gpu.py",
         "--dataset",        DATASET,
         "--model-id",       MODEL_ID,
         "--adapter-path",   ADAPTER_PATH,
@@ -120,7 +120,7 @@ def run():
         "--max-new-tokens", str(MAX_NEW_TOKENS),
     ]
 
-    from run_eval_osm_gpu import main
+    from eval_engine_gpu import main
     main()
 
 

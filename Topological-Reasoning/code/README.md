@@ -11,15 +11,15 @@ Chaque expérimentation est évaluée sur **96 exemples équilibrés** (16 par p
 ## Architecture du code
 
 ```
-run_eval_osm_gpu.py       ← moteur principal d'inférence GPU
+eval_engine_gpu.py       ← moteur principal d'inférence GPU
 strategies_osm.py         ← implémentation CoT / ToT / GoT + accès KG OSM
-finetune_gptoss.py        ← script de fine-tuning LoRA
-analyze_96_experiments.py ← analyse et visualisation des 5 × 3 résultats
-exp1_gptoss_base.py       ← Expérimentation 1
-exp2_gptoss_finetuned.py  ← Expérimentation 2
-exp3_gptoss_finetuned_kg_input.py    ← Expérimentation 3
-exp5_gptoss_finetuned_enriched_gpu.py ← Expérimentation 4
-exp6_gptoss_enriched_ollama.py       ← Expérimentation 5
+train_lora_adapter.py        ← script de fine-tuning LoRA
+analyze_experiments.py ← analyse et visualisation des 5 × 3 résultats
+exp01_base_model.py       ← Expérimentation 1
+exp02_finetuned_topo.py  ← Expérimentation 2
+exp03_finetuned_osm_kg.py    ← Expérimentation 3
+exp05_finetuned_extended.py ← Expérimentation 4
+exp06_base_ollama.py       ← Expérimentation 5
 ```
 
 ---
@@ -43,9 +43,9 @@ Décompose le raisonnement en étapes interdépendantes (nœuds d'un graphe) : e
 
 ---
 
-## Moteur d'inférence GPU (`run_eval_osm_gpu.py`)
+## Moteur d'inférence GPU (`eval_engine_gpu.py`)
 
-Script central appelé par tous les scripts d'expérimentation via `sys.argv` + `from run_eval_osm_gpu import main`.
+Script central appelé par tous les scripts d'expérimentation via `sys.argv` + `from eval_engine_gpu import main`.
 
 ### Patches appliqués au démarrage
 | Patch | Raison |
@@ -84,7 +84,7 @@ Fonction d'inférence locale GPU passée aux stratégies à la place d'Ollama :
 
 ---
 
-## Script de fine-tuning (`finetune_gptoss.py`)
+## Script de fine-tuning (`train_lora_adapter.py`)
 
 Utilisé pour créer les adaptateurs LoRA.
 
@@ -104,7 +104,7 @@ Construit un exemple d'entraînement complet au format instruction-following :
 
 ---
 
-## Expérimentation 1 — GPTOSS Base (`exp1_gptoss_base.py`)
+## Expérimentation 1 — GPTOSS Base (`exp01_base_model.py`)
 
 **Objectif** : établir une ligne de base sans fine-tuning ni adaptateur.
 
@@ -123,11 +123,11 @@ Construit un exemple d'entraînement complet au format instruction-following :
 **Logique du script** :
 - `preflight()` : vérifie que le dataset et le fichier d'indices existent.
 - `check_strategy_status()` : lit les checkpoints et affiche l'état de chaque stratégie (COMPLETE / PARTIAL / NOT STARTED).
-- `run()` : configure `sys.argv` puis appelle `run_eval_osm_gpu.main()` sans passer d'`adapter_path`.
+- `run()` : configure `sys.argv` puis appelle `eval_engine_gpu.main()` sans passer d'`adapter_path`.
 
 ---
 
-## Expérimentation 2 — GPTOSS Fine-tuné (`exp2_gptoss_finetuned.py`)
+## Expérimentation 2 — GPTOSS Fine-tuné (`exp02_finetuned_topo.py`)
 
 **Objectif** : évaluer l'apport du fine-tuning sur données topologiques brutes (sans KG en entraînement).
 
@@ -144,11 +144,11 @@ Construit un exemple d'entraînement complet au format instruction-following :
 | ToT | 19.8% |
 | GoT | **61.5%** ← meilleure |
 
-**Logique du script** : identique à Exp1 mais passe `ADAPTER_PATH = "finetuned_gptoss_topological/final_adapter"` à `run_eval_osm_gpu`.
+**Logique du script** : identique à Exp1 mais passe `ADAPTER_PATH = "finetuned_gptoss_topological/final_adapter"` à `eval_engine_gpu`.
 
 ---
 
-## Expérimentation 3 — GPTOSS Fine-tuné + KG en entrée (`exp3_gptoss_finetuned_kg_input.py`)
+## Expérimentation 3 — GPTOSS Fine-tuné + KG en entrée (`exp03_finetuned_osm_kg.py`)
 
 **Objectif** : évaluer un modèle fine-tuné *avec* KG OSM en entraînement ET à l'inférence.
 
@@ -169,7 +169,7 @@ Construit un exemple d'entraînement complet au format instruction-following :
 
 ---
 
-## Expérimentation 4 — GPTOSS Fine-tuné + Inférence LLM enrichie par KG (`exp5_gptoss_finetuned_enriched_gpu.py`)
+## Expérimentation 4 — GPTOSS Fine-tuné + Inférence LLM enrichie par KG (`exp05_finetuned_extended.py`)
 
 **Objectif** : tester si un budget de raisonnement plus large (1024 vs 512 tokens) améliore un modèle fine-tuné sur données brutes.
 
@@ -191,7 +191,7 @@ Construit un exemple d'entraînement complet au format instruction-following :
 
 ---
 
-## Expérimentation 5 — GPTOSS + Inférence LLM enrichie par KG (`exp6_gptoss_enriched_ollama.py`)
+## Expérimentation 5 — GPTOSS + Inférence LLM enrichie par KG (`exp06_base_ollama.py`)
 
 **Objectif** : ligne de base avec inférence via Ollama (endpoint distant) et raisonnement enrichi par KG OSM.
 
@@ -201,7 +201,7 @@ Construit un exemple d'entraînement complet au format instruction-following :
 - Budget tokens : 1024
 - KG à l'inférence : OSM
 
-**Particularité** : contrairement aux expérimentations 1–4 qui utilisent `run_eval_osm_gpu.py` (inférence GPU locale), cette expérimentation appelle le modèle via l'API Ollama distante. La fonction `model_fn` est passée à `get_strategy()` dans `strategies_osm.py`.
+**Particularité** : contrairement aux expérimentations 1–4 qui utilisent `eval_engine_gpu.py` (inférence GPU locale), cette expérimentation appelle le modèle via l'API Ollama distante. La fonction `model_fn` est passée à `get_strategy()` dans `strategies_osm.py`.
 
 **Résultats** :
 | Stratégie | Précision |
@@ -212,7 +212,7 @@ Construit un exemple d'entraînement complet au format instruction-following :
 
 ---
 
-## Analyse et visualisation (`analyze_96_experiments.py`)
+## Analyse et visualisation (`analyze_experiments.py`)
 
 ### `load_ckpt(ckpt_path)`
 Charge un fichier checkpoint JSON et retourne un DataFrame pandas avec colonnes `index`, `expected`, `predicted`, `match`.
