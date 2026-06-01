@@ -1,19 +1,19 @@
 """
-Fine-tuning 4 — GPTOSS Fine-tuné sur KG OSM (instruction tuning)
+Fine-tuning 4 — GPTOSS Fine-tuné sur KG OSM (instruction tuning, balanced)
 ================================================================================
-Fine-tunes GPT-OSS-20B with LoRA on the OSM KG instruction dataset
-(osm_kg_train.jsonl — training rows built from triplet_update_v3_30.csv
-enriched with Nominatim/OSM evidence).
+Fine-tunes GPT-OSS-20B with LoRA on the BALANCED OSM KG instruction dataset
+(osm_kg_balanced_train.jsonl — 234 rows, 39 per DE-9IM predicate).
+
+Original dataset (osm_kg_train.jsonl, 754 rows) was imbalanced:
+  touches 223, within 186, disjoint 183, overlaps 83, crosses 40, contains 39.
+The balanced version keeps 39 examples per predicate (minimum class count).
 
 Each training example includes a structured KG context (coordinates, bounding
 box, admin hierarchy) so the model learns to ground topological reasoning on
 real geographic evidence.
 
-STATUS: ✅ ALREADY DONE — adapter exists at finetuned_gptoss_osm_kg/final_adapter
-This script is kept for reproducibility.  It will skip automatically if the
-final_adapter directory already exists.
-
-Used by: Experiment 4
+Generate balanced dataset with:
+    python build_balanced_training_data.py
 
 Output: finetuned_gptoss_osm_kg/final_adapter
 
@@ -25,7 +25,7 @@ import os
 import sys
 
 # ---------------------------------------------------------------------------
-DATASET     = "../dataset/osm_kg_train.jsonl"
+DATASET     = "../dataset/osm_kg_balanced_train.jsonl"
 OUTPUT_DIR  = "finetuned_gptoss_osm_kg"
 MODEL_ID    = "openai/gpt-oss-20b"
 # ---------------------------------------------------------------------------
