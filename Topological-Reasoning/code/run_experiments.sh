@@ -1,50 +1,119 @@
 #!/usr/bin/env bash
 # =============================================================================
 # run_experiments.sh
-# Master runner — 4 experiments × 3 strategies (CoT/ToT/GoT) on 96 examples
-# All experiments run on GPU A100 80GB with OSM KG evidence at inference.
+# Master runner — full pipeline: fine-tuning + 4 experiments × 3 strategies
 #
-#  Exp 1 — Base (no adapter),          512 tok   → exp1_base_gpu
-#  Exp 2 — FT topo (raw data),         512 tok   → exp2_finetuned_topo_gpu
-#  Exp 3 — FT OSM-KG (KG in training), 1024 tok  → exp3_finetuned_kg_in_gpu
-#  Exp 4 — FT topo, extended budget,   1024 tok  → exp5_finetuned_enriched_gpu
+# Pipeline
+# ─────────────────────────────────────────────────────────────────────────────
+#  PHASE 0  Build balanced training datasets (39 examples/predicate, 234 total)
+#             from triplet_update_v3_70.csv and osm_kg_train.jsonl
 #
-# Usage:
+#  PHASE 1  Fine-tune adapters from scratch on balanced data
+#             FT-1  Topo-LoRA       → finetuned_gptoss_topological/final_adapter
+#             FT-2  OSM-KG LoRA     → finetuned_gptoss_osm_kg/final_adapter
+#
+#  PHASE 2  Evaluate 4 configurations × 3 strategies (CoT / ToT / GoT)
+#             Config 1  Base model (no adapter)              512 tok
+#             Config 2  Topo-LoRA                            512 tok
+#             Config 3  OSM-KG LoRA + KG evidence at test    1024 tok
+#             Config 5  Topo-LoRA + extended reasoning       1024 tok
+#
+#  PHASE 3  Analyse and summarise results
+# ─────────────────────────────────────────────────────────────────────────────
+# Usage
 #   cd /path/to/Topological-Reasoning/code
-#   bash run_experiments.sh
-#   PYTHON=/path/to/python bash run_experiments.sh   # custom interpreter
+#   bash run_experiments.sh                         # full run (fresh start)
+#   PYTHON=/path/to/python bash run_experiments.sh  # custom interpreter
+#   bash run_experiments.sh --skip-train            # reuse existing adapters
 # =============================================================================
 
 set -euo pipefail
 
 PYTHON="${PYTHON:-python}"
+SKIP_TRAIN=0
 
+for arg in "$@"; do
+    [[ "$arg" == "--skip-train" ]] && SKIP_TRAIN=1
+done
+
+line() { echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"; }
+header() { line; printf "  %s\n" "$1"; line; echo ""; }
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PHASE 0 — Build balanced training datasets
+# ─────────────────────────────────────────────────────────────────────────────
 echo ""
-echo "============================================================"
-echo "  Experiment 1 — Base GPT-OSS + CoT/ToT/GoT (GPU, 512 tok)"
-echo "============================================================"
+header "PHASE 0 — Building balanced training datasets (39/predicate · 234 total)"
+
+$PYTHON build_balanced_training_data.py
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PHASE 1 — Fine-tuning (from scratch unless --skip-train)
+# ─────────────────────────────────────────────────────────────────────────────
+if [[ $SKIP_TRAIN -eq 0 ]]; then
+    echo ""
+    header "PHASE 1 — Fine-tuning adapters from scratch"
+
+    # Remove old adapters so train_runner.py does not skip
+    echo "  Cleaning old adapter artefacts..."
+    rm -rf finetuned_gptoss_topological/
+    rm -rf finetuned_gptoss_osm_kg/
+    echo "  Done. Starting fine-tuning."
+    echo ""
+
+    echo "  FT-1 · Topo-LoRA  (triplet_balanced_train.csv — 234 rows, no KG in input)"
+    line
+    $PYTHON train_runner_topo.py
+
+    echo ""
+    echo "  FT-2 · OSM-KG LoRA  (osm_kg_balanced_train.jsonl — 234 rows)"
+    line
+    $PYTHON train_runner_osm_kg.py
+else
+    echo ""
+    header "PHASE 1 — Skipping fine-tuning (--skip-train flag)"
+    echo "  Using existing adapters:"
+    echo "    finetuned_gptoss_topological/final_adapter"
+    echo "    finetuned_gptoss_osm_kg/final_adapter"
+fi
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PHASE 2 — Evaluation
+# ─────────────────────────────────────────────────────────────────────────────
+echo ""
+header "PHASE 2 — Evaluating 4 configurations × 3 strategies on 96 balanced examples"
+
+echo "  Config 1 · Base GPT-OSS-20B · CoT / ToT / GoT (512 tok)"
+line
 $PYTHON exp01_base_model.py
 
 echo ""
-echo "============================================================"
-echo "  Experiment 2 — FT topo + CoT/ToT/GoT (GPU, 512 tok)"
-echo "============================================================"
+echo "  Config 2 · Topo-LoRA · CoT / ToT / GoT (512 tok)"
+line
 $PYTHON exp02_finetuned_topo.py
 
 echo ""
-echo "============================================================"
-echo "  Experiment 3 — FT OSM-KG + CoT/ToT/GoT (GPU, 1024 tok)"
-echo "  [OSM-KG adapter: trained WITH KG evidence]"
-echo "============================================================"
+echo "  Config 3 · OSM-KG LoRA + KG evidence at inference · CoT / ToT / GoT (1024 tok)"
+line
 $PYTHON exp03_finetuned_osm_kg.py
 
 echo ""
-echo "============================================================"
-echo "  Experiment 4 — FT topo extended + CoT/ToT/GoT (GPU, 1024 tok)"
-echo "  [Same topo adapter as Exp 2, longer reasoning budget]"
-echo "============================================================"
+echo "  Config 5 · Topo-LoRA + extended reasoning budget · CoT / ToT / GoT (1024 tok)"
+line
 $PYTHON exp05_finetuned_extended.py
 
+# ─────────────────────────────────────────────────────────────────────────────
+# PHASE 3 — Analysis
+# ─────────────────────────────────────────────────────────────────────────────
 echo ""
-echo "All experiments complete."
-echo "Run: $PYTHON analyze_experiments.py"
+header "PHASE 3 — Analysing results"
+$PYTHON analyze_experiments.py
+
+echo ""
+line
+echo "  Pipeline complete."
+echo ""
+echo "  Results  : results/"
+echo "  Report   : open report.html in a browser"
+line
+echo ""
