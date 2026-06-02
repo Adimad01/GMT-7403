@@ -25,6 +25,52 @@ import os
 import sys
 
 # ---------------------------------------------------------------------------
+# Torchvision stub — torchvision on this server has a broken native extension.
+# Install a MetaPathFinder stub BEFORE peft/transformers are imported so that
+# torchvision imports are silently intercepted and InterpolationMode.NEAREST_EXACT
+# is available, preventing the AttributeError in transformers.image_utils.
+# ---------------------------------------------------------------------------
+import importlib.machinery
+import importlib.abc
+
+class _TvStubFinder(importlib.abc.MetaPathFinder, importlib.abc.Loader):
+    def find_spec(self, fullname, path, target=None):
+        if fullname == "torchvision" or fullname.startswith("torchvision."):
+            return importlib.machinery.ModuleSpec(fullname, self, is_package=True)
+        return None
+    def create_module(self, spec):
+        return None
+    def exec_module(self, module):
+        module.__path__ = []
+        module.__file__ = "<torchvision-stub>"
+        class _Stub:
+            def __init__(self, n=""): self._n = n
+            def __getattr__(self, n): return _Stub(n)
+            def __call__(self, *a, **k): return _Stub()
+            def __iter__(self): return iter([])
+        def _catchall(name):
+            if name.startswith("__") and name.endswith("__"):
+                raise AttributeError(name)
+            return _Stub(name)
+        module.__getattr__ = _catchall
+        if module.__name__ == "torchvision.io":
+            class _ImageReadMode:
+                RGB = 0; GRAY = 1; RGB_ALPHA = 2; GRAY_ALPHA = 3; UNCHANGED = 4
+            module.ImageReadMode = _ImageReadMode
+            module.decode_image = None
+        elif module.__name__ == "torchvision.transforms":
+            class _InterpolationMode:
+                NEAREST = "nearest"; NEAREST_EXACT = "nearest-exact"
+                BILINEAR = "bilinear"; BICUBIC = "bicubic"
+                BOX = "box"; HAMMING = "hamming"; LANCZOS = "lanczos"
+            module.InterpolationMode = _InterpolationMode
+
+for _k in [k for k in list(sys.modules) if k == "torchvision" or k.startswith("torchvision.")]:
+    del sys.modules[_k]
+sys.meta_path.insert(0, _TvStubFinder())
+# ---------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------
 DATASET     = "../dataset/osm_kg_balanced_train.jsonl"
 OUTPUT_DIR  = "finetuned_gptoss_osm_kg"
 MODEL_ID    = "openai/gpt-oss-20b"
