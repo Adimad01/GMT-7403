@@ -477,8 +477,8 @@ code{font-family:var(--mono);font-size:12px;background:var(--bg2);border:1px sol
     </div>
     <div class="hero-score">
       <div class="label">Meilleur score global · GPU A100</div>
-      <div class="value">61.5%</div>
-      <div class="desc">GPTOSS Fine-tuné · GoT · A100 80 GB</div>
+      <div class="value">57.3%</div>
+      <div class="desc">GPTOSS Base · CoT · A100 80 GB</div>
     </div>
   </div>
 </div>
@@ -782,14 +782,14 @@ code{font-family:var(--mono);font-size:12px;background:var(--bg2);border:1px sol
 <!-- EXPERIMENTS -->
 <section id="experiences" class="s-alt">
   <div class="container-lg">
-    <div class="eyebrow">Les 5 expérimentations</div>
+    <div class="eyebrow">Les 6 configurations</div>
     <h2>Ce que nous avons testé</h2>
-    <p class="lead">Chaque expérimentation varie l'adaptateur LoRA et le budget de raisonnement. Le badge bleu indique la meilleure stratégie de l'expérience.</p>
+    <p class="lead">Six configurations évaluent l'impact du fine-tuning, du Knowledge Graph et de la stratégie de raisonnement (CoT / ToT / GoT). Le badge bleu indique la meilleure stratégie de l'expérimentation.</p>
 
     <div class="exp-grid">
       <div class="exp-card">
-        <div class="exp-num">Expérimentation 01</div>
-        <div class="exp-title">GPTOSS Base</div>
+        <div class="exp-num">Configuration 01</div>
+        <div class="exp-title">GPT-OSS-20B Base</div>
         <div class="scores-row">
           <div class="sc winner"><span class="sl">CoT</span><span class="sv">57.3%</span></div>
           <div class="sc"><span class="sl">ToT</span><span class="sv">37.5%</span></div>
@@ -799,36 +799,58 @@ code{font-family:var(--mono);font-size:12px;background:var(--bg2);border:1px sol
       </div>
 
       <div class="exp-card">
-        <div class="exp-num">Expérimentation 02</div>
-        <div class="exp-title">GPTOSS Fine-tuné</div>
+        <div class="exp-num">Configuration 02</div>
+        <div class="exp-title">GPT-OSS-20B + Topo-LoRA</div>
         <div class="scores-row">
-          <div class="sc"><span class="sl">CoT</span><span class="sv">53.1%</span></div>
-          <div class="sc"><span class="sl">ToT</span><span class="sv">19.8%</span></div>
-          <div class="sc winner"><span class="sl">GoT</span><span class="sv">61.5%</span></div>
+          <div class="sc"><span class="sl">CoT</span><span class="sv">49.0%</span></div>
+          <div class="sc"><span class="sl">ToT</span><span class="sv">32.3%</span></div>
+          <div class="sc winner"><span class="sl">GoT</span><span class="sv">52.1%</span></div>
         </div>
-        <div class="exp-tag">exp2_finetuned_topo_gpu · 512 tok · topo adapter</div>
+        <div class="exp-tag">exp2_finetuned_topo_gpu · 512 tok · topo-lora</div>
       </div>
 
       <div class="exp-card">
-        <div class="exp-num">Expérimentation 03</div>
-        <div class="exp-title">GPTOSS Fine-tuné + KG en entrée</div>
+        <div class="exp-num">Configuration 03</div>
+        <div class="exp-title">Topo-LoRA + KG en entrée</div>
         <div class="scores-row">
           <div class="sc winner"><span class="sl">CoT</span><span class="sv">47.9%</span></div>
           <div class="sc"><span class="sl">ToT</span><span class="sv">24.0%</span></div>
           <div class="sc"><span class="sl">GoT</span><span class="sv">27.1%</span></div>
         </div>
-        <div class="exp-tag">exp3_finetuned_kg_in_gpu · 1024 tok · osm-kg</div>
+        <div class="exp-tag">exp3_finetuned_kg_in_gpu · 1024 tok · knowledge injection</div>
       </div>
 
       <div class="exp-card">
-        <div class="exp-num">Expérimentation 04</div>
-        <div class="exp-title">GPTOSS Fine-tuné + Inférence LLM enrichie par KG</div>
+        <div class="exp-num">Configuration 04</div>
+        <div class="exp-title">OSM-KG LoRA — KG internalisé</div>
+        <div class="scores-row">
+          <div class="sc"><span class="sl">CoT</span><span class="sv">—</span></div>
+          <div class="sc"><span class="sl">ToT</span><span class="sv">—</span></div>
+          <div class="sc"><span class="sl">GoT</span><span class="sv">—</span></div>
+        </div>
+        <div class="exp-tag">exp4 · osm-kg-lora · 512 tok · à évaluer</div>
+      </div>
+
+      <div class="exp-card">
+        <div class="exp-num">Configuration 05</div>
+        <div class="exp-title">Topo-LoRA + KG grounding</div>
         <div class="scores-row">
           <div class="sc"><span class="sl">CoT</span><span class="sv">49.0%</span></div>
           <div class="sc"><span class="sl">ToT</span><span class="sv">29.2%</span></div>
           <div class="sc winner"><span class="sl">GoT</span><span class="sv">56.2%</span></div>
         </div>
-        <div class="exp-tag">exp5_finetuned_enriched_gpu · 1024 tok · topo</div>
+        <div class="exp-tag">exp5_finetuned_enriched_gpu · 1024 tok · inference-time grounding</div>
+      </div>
+
+      <div class="exp-card">
+        <div class="exp-num">Configuration 06</div>
+        <div class="exp-title">Base + KG grounding</div>
+        <div class="scores-row">
+          <div class="sc"><span class="sl">CoT</span><span class="sv">—</span></div>
+          <div class="sc"><span class="sl">ToT</span><span class="sv">—</span></div>
+          <div class="sc"><span class="sl">GoT</span><span class="sv">—</span></div>
+        </div>
+        <div class="exp-tag">exp6 · base · KG grounding · à évaluer</div>
       </div>
 
     </div>
@@ -861,7 +883,7 @@ code{font-family:var(--mono);font-size:12px;background:var(--bg2);border:1px sol
   <div class="container-lg">
     <div class="eyebrow">Visualisation</div>
     <h2>Précision par expérimentation</h2>
-    <p class="lead">Comparaison des 15 configurations (5 expérimentations × 3 stratégies) sur les 96 exemples équilibrés.</p>
+    <p class="lead">Comparaison des configurations évaluées (stratégies CoT / ToT / GoT) sur les 96 exemples équilibrés.</p>
 
     <div class="chart-wrap">
       <div class="chart-legend">
@@ -870,8 +892,8 @@ code{font-family:var(--mono);font-size:12px;background:var(--bg2);border:1px sol
         <div class="legend-item"><div class="legend-dot" style="background:linear-gradient(90deg,#10b981,#06b6d4)"></div>GoT</div>
       </div>
 
-      <div class="chart-row">
-        <div class="chart-lbl">GPTOSS Base</div>
+      <div class="chart-row chart-best-row">
+        <div class="chart-lbl">★ GPTOSS Base</div>
         <div class="bar-group">
           <div class="bar-wrap"><div class="bar bar-cot" style="width:57.3%"></div><span class="bar-val">57.3%</span></div>
           <div class="bar-wrap"><div class="bar bar-tot" style="width:37.5%"></div><span class="bar-val">37.5%</span></div>
@@ -879,12 +901,12 @@ code{font-family:var(--mono);font-size:12px;background:var(--bg2);border:1px sol
         </div>
       </div>
 
-      <div class="chart-row chart-best-row">
-        <div class="chart-lbl">★ GPTOSS Fine-tuné</div>
+      <div class="chart-row">
+        <div class="chart-lbl">GPTOSS Fine-tuné</div>
         <div class="bar-group">
-          <div class="bar-wrap"><div class="bar bar-cot" style="width:53.1%"></div><span class="bar-val">53.1%</span></div>
-          <div class="bar-wrap"><div class="bar bar-tot" style="width:19.8%"></div><span class="bar-val">19.8%</span></div>
-          <div class="bar-wrap"><div class="bar bar-got" style="width:61.5%"></div><span class="bar-val" style="color:var(--green);font-weight:800">61.5%</span></div>
+          <div class="bar-wrap"><div class="bar bar-cot" style="width:49.0%"></div><span class="bar-val">49.0%</span></div>
+          <div class="bar-wrap"><div class="bar bar-tot" style="width:32.3%"></div><span class="bar-val">32.3%</span></div>
+          <div class="bar-wrap"><div class="bar bar-got" style="width:52.1%"></div><span class="bar-val">52.1%</span></div>
         </div>
       </div>
 
@@ -1052,7 +1074,7 @@ code{font-family:var(--mono);font-size:12px;background:var(--bg2);border:1px sol
         <thead><tr><th>Expérimentation</th><th class="s-cot">Précision</th><th>contains</th><th>within</th><th>touches</th><th>crosses</th><th>disjoint</th><th>overlaps</th></tr></thead>
         <tbody>
           <tr class="best-r"><td>★ GPTOSS Base</td><td class="pct pct-hi">57.3%</td><td>75.0%</td><td class="pct-hi">100.0%</td><td>50.0%</td><td>37.5%</td><td>62.5%</td><td class="pct-lo">18.8%</td></tr>
-          <tr><td>GPTOSS Fine-tuné</td><td class="pct">53.1%</td><td class="pct-lo">18.8%</td><td>43.8%</td><td>43.8%</td><td>75.0%</td><td>75.0%</td><td>62.5%</td></tr>
+          <tr><td>GPTOSS Fine-tuné</td><td class="pct">49.0%</td><td class="pct-lo">18.8%</td><td>43.8%</td><td>43.8%</td><td>75.0%</td><td>75.0%</td><td>62.5%</td></tr>
           <tr><td>FT + KG en entrée</td><td class="pct">47.9%</td><td>31.2%</td><td>93.8%</td><td>37.5%</td><td>37.5%</td><td>62.5%</td><td>25.0%</td></tr>
           <tr><td>FT + Inférence enrichie</td><td class="pct">49.0%</td><td class="pct-lo">6.2%</td><td>37.5%</td><td>43.8%</td><td>62.5%</td><td>81.2%</td><td>62.5%</td></tr>
         </tbody>
@@ -1068,7 +1090,7 @@ code{font-family:var(--mono);font-size:12px;background:var(--bg2);border:1px sol
         <thead><tr><th>Expérimentation</th><th class="s-tot">Précision</th><th>contains</th><th>within</th><th>touches</th><th>crosses</th><th>disjoint</th><th>overlaps</th></tr></thead>
         <tbody>
           <tr><td>GPTOSS Base</td><td class="pct">37.5%</td><td>75.0%</td><td>50.0%</td><td>31.2%</td><td class="pct-lo">6.2%</td><td>50.0%</td><td class="pct-lo">12.5%</td></tr>
-          <tr><td>GPTOSS Fine-tuné</td><td class="pct pct-lo">19.8%</td><td>31.2%</td><td class="pct-lo">18.8%</td><td>25.0%</td><td class="pct-lo">6.2%</td><td class="pct-lo">18.8%</td><td class="pct-lo">18.8%</td></tr>
+          <tr><td>GPTOSS Fine-tuné</td><td class="pct">32.3%</td><td>31.2%</td><td class="pct-lo">18.8%</td><td>25.0%</td><td class="pct-lo">6.2%</td><td class="pct-lo">18.8%</td><td class="pct-lo">18.8%</td></tr>
           <tr><td>FT + KG en entrée</td><td class="pct">24.0%</td><td>43.8%</td><td>50.0%</td><td class="pct-lo">12.5%</td><td class="pct-lo">6.2%</td><td>25.0%</td><td class="pct-lo">6.2%</td></tr>
           <tr><td>FT + Inférence enrichie</td><td class="pct">29.2%</td><td>43.8%</td><td>31.2%</td><td>31.2%</td><td>25.0%</td><td>25.0%</td><td class="pct-lo">18.8%</td></tr>
         </tbody>
@@ -1084,7 +1106,7 @@ code{font-family:var(--mono);font-size:12px;background:var(--bg2);border:1px sol
         <thead><tr><th>Expérimentation</th><th class="s-got">Précision</th><th>contains</th><th>within</th><th>touches</th><th>crosses</th><th>disjoint</th><th>overlaps</th></tr></thead>
         <tbody>
           <tr><td>GPTOSS Base</td><td class="pct pct-lo">26.0%</td><td>56.2%</td><td>37.5%</td><td class="pct-lo">0.0%</td><td class="pct-lo">12.5%</td><td>43.8%</td><td class="pct-lo">6.2%</td></tr>
-          <tr class="best-r"><td>★ GPTOSS Fine-tuné</td><td class="pct pct-hi">61.5%</td><td>62.5%</td><td>62.5%</td><td>75.0%</td><td>62.5%</td><td>62.5%</td><td>43.8%</td></tr>
+          <tr><td>GPTOSS Fine-tuné</td><td class="pct">52.1%</td><td>62.5%</td><td>62.5%</td><td>75.0%</td><td>62.5%</td><td>62.5%</td><td>43.8%</td></tr>
           <tr><td>FT + KG en entrée</td><td class="pct pct-lo">27.1%</td><td>31.2%</td><td>50.0%</td><td class="pct-lo">12.5%</td><td class="pct-lo">18.8%</td><td>37.5%</td><td class="pct-lo">12.5%</td></tr>
           <tr><td>FT + Inférence enrichie</td><td class="pct">56.2%</td><td>50.0%</td><td>81.2%</td><td>62.5%</td><td>56.2%</td><td>50.0%</td><td>37.5%</td></tr>
         </tbody>
@@ -1096,13 +1118,13 @@ code{font-family:var(--mono);font-size:12px;background:var(--bg2);border:1px sol
     <div class="insight-grid" style="margin-top:32px">
       <div class="insight">
         <span class="ico">🏆</span>
-        <h4>GoT Fine-tuné · Meilleur GPU</h4>
-        <p>GPTOSS Fine-tuné avec GoT atteint <strong>61.5%</strong> — meilleure performance parmi les 4 expérimentations GPU A100.</p>
+        <h4>CoT Base · Meilleur GPU</h4>
+        <p>GPTOSS Base avec CoT atteint <strong>57.3%</strong> — meilleure performance parmi les 4 expérimentations GPU A100.</p>
       </div>
       <div class="insight">
         <span class="ico">⚠️</span>
         <h4>Fine-tuning non suffisant seul</h4>
-        <p>Les modèles fine-tunés ne surpassent pas systématiquement le base. Le fine-tuning améliore GoT (61.5%) mais dégrade CoT (53.1% vs 57.3%).</p>
+        <p>Les modèles fine-tunés ne surpassent pas systématiquement le base. Le fine-tuning dégrade CoT (49.0% vs 57.3%) et GoT (52.1% vs 56.2% enrichi).</p>
       </div>
       <div class="insight">
         <span class="ico">📈</span>
@@ -1141,20 +1163,20 @@ var PIPES=[
  ]}]
 },
 {num:'02',name:'GPTOSS Fine-tuné',
- desc:'GPT-OSS-20B fine-tuné sur 755 exemples topologiques bruts (sans KG). L\'adaptateur LoRA r=8 spécialise le modèle sur la classification DE-9IM.',
- tag:'exp2_finetuned_topo_gpu · 512 tok · topo adapter',bestScore:'61.5%',bestStrat:'GoT',
- diffNote:'Meilleure configuration globale. Le fine-tuning améliore GoT (+35 pts) mais dégrade légèrement CoT (53.1 % vs 57.3 %). Pas de KG à l\'inférence.',
+ desc:'GPT-OSS-20B fine-tuné sur 234 exemples topologiques équilibrés (sans KG). L\'adaptateur LoRA r=8 spécialise le modèle sur la classification DE-9IM.',
+ tag:'exp2_finetuned_topo_gpu · 512 tok · topo adapter',bestScore:'52.1%',bestStrat:'GoT',
+ diffNote:'Le fine-tuning dégrade CoT (49.0 % vs 57.3 %) et GoT (52.1 % vs 57.3 % base). GoT reste la meilleure stratégie au sein de l\'expérimentation. Pas de KG à l\'inférence.',
  phases:[
   {label:'🔧 Phase d\'entraînement',cls:'phase-train',steps:[
-   {icon:'&#128202;',label:'Données topo\n755 exemples',type:'input',typeLabel:'Dataset',dTitle:'Dataset de fine-tuning',dSub:'triplet_update_v3_70.csv · 755 exemples · sans KG',dBody:'Paires (texte vernaculaire, prédicat DE-9IM). Déséquilibré : touches 223, within 186, disjoint 183. Format <code>### TASK / INPUT / OUTPUT ###</code>.'},
+   {icon:'&#128202;',label:'Données topo\n234 exemples',type:'input',typeLabel:'Dataset',dTitle:'Dataset de fine-tuning équilibré',dSub:'234 exemples · 39/prédicat · sans KG',dBody:'Paires (texte vernaculaire, prédicat DE-9IM). Équilibré : 39 exemples par prédicat (6 classes). Format <code>### TASK / INPUT / OUTPUT ###</code>.'},
    {icon:'&#128295;',label:'Fine-tuning\nLoRA r=8',type:'training',typeLabel:'Entraînement',dTitle:'Fine-tuning LoRA r=8',dSub:'SFTTrainer (TRL) · A100 80 GB',dBody:'LoRA sur couches d\'attention (<code>r=8, alpha=16</code>). ~144 steps (checkpoint), résultat final dans <code>finetuned_gptoss_topological/final_adapter/</code>.'},
    {icon:'&#129513;',label:'Adaptateur\ntopo LoRA',type:'adapter',typeLabel:'Adaptateur',dTitle:'Adaptateur LoRA topologique',dSub:'PEFT · chargé à l\'inférence',dBody:'Stocké dans <code>final_adapter/adapter_config.json</code>. Chargé via <code>PeftModel.from_pretrained()</code> avec patch <code>_local_hf_hub_download</code>.'}
   ]},
   {label:'⚡ Phase d\'inférence',cls:'phase-infer',steps:[
    {icon:'&#128196;',label:'Texte\nrequête',type:'input',typeLabel:'Entrée',dTitle:'Texte requête · Sans KG',dSub:'Le modèle s\'appuie uniquement sur ses poids fine-tunés',dBody:'Phrase vernaculaire seule. <strong>Différence clé</strong> : aucune preuve KG OSM — le modèle utilise uniquement ses poids fine-tunés.'},
-   {icon:'&#128256;',label:'Stratégie\nCoT/ToT/GoT',type:'strategy',typeLabel:'Stratégie',dTitle:'3 stratégies · Budget 512 tok',dSub:'Même structure qu\'Exp 01',dBody:'Identiques à Exp 01 sans contexte KG. GoT bénéficie le plus des poids fine-tunés : <strong>61.5 %</strong>.'},
+   {icon:'&#128256;',label:'Stratégie\nCoT/ToT/GoT',type:'strategy',typeLabel:'Stratégie',dTitle:'3 stratégies · Budget 512 tok',dSub:'Même structure qu\'Exp 01',dBody:'Identiques à Exp 01 sans contexte KG. GoT reste la meilleure stratégie au sein de l\'Exp 02 : <strong>52.1 %</strong>.'},
    {icon:'&#129302;',label:'GPT-OSS-20B\n+ topo LoRA',type:'model',typeLabel:'Modèle FT',dTitle:'GPT-OSS-20B + adaptateur topo',dSub:'Modèle base + LoRA topologique',dBody:'Même modèle de base avec l\'adaptateur LoRA appliqué. Les poids baisent les prédictions vers les patterns appris.'},
-   {icon:'&#9989;',label:'Prédicat\nDE-9IM',type:'output',typeLabel:'Sortie',dTitle:'★ Meilleur score global : GoT = 61.5%',dSub:'Meilleure configuration toutes expérimentations confondues',dBody:'GoT : <strong>61.5 %</strong> · CoT : 53.1 % · ToT : 19.8 %. GoT atteint 75 % sur <code>touches</code> et <code>crosses</code>.'}
+   {icon:'&#9989;',label:'Prédicat\nDE-9IM',type:'output',typeLabel:'Sortie',dTitle:'Meilleur score Exp 02 : GoT = 52.1%',dSub:'GoT meilleur au sein de l\'Exp 02',dBody:'GoT : <strong>52.1 %</strong> · CoT : 49.0 % · ToT : 32.3 %. Le fine-tuning dégrade les scores vs le modèle base (CoT 57.3 %).}
   ]}
  ]
 },
@@ -1177,54 +1199,56 @@ var PIPES=[
   ]}
  ]
 },
-{num:'04',name:'FT + KG comme entrée FT',
- desc:'Le KG OSM est intégré dès l\'entraînement : chaque exemple de fine-tuning inclut les preuves géographiques. L\'adaptateur OSM-KG est entraîné avec et pour le KG.',
- tag:'exp3 · osm-kg adapter · KG in training',bestScore:'47.9%',bestStrat:'CoT',
- diffNote:'KG cohérent entre entraînement et inférence — pas de mismatch. Le modèle a appris à exploiter les preuves KG dès l\'entraînement.',
- phases:[
-  {label:'🔧 Phase d\'entraînement avec KG',cls:'phase-train',steps:[
-   {icon:'&#128202;',label:'Données topo\n+ preuves KG',type:'input',typeLabel:'Dataset + KG',dTitle:'Dataset augmenté avec preuves OSM',dSub:'Chaque exemple inclut coordonnées, bbox, hiérarchie',dBody:'Les 755 exemples de fine-tuning sont enrichis avec les preuves OSM correspondantes. L\'adaptateur apprend à exploiter le KG comme source de raisonnement.'},
-   {icon:'&#128295;',label:'Fine-tuning\nLoRA + KG',type:'training',typeLabel:'Entraînement+KG',dTitle:'Fine-tuning avec preuves KG dans les prompts',dSub:'SFTTrainer voit texte + KG',dBody:'L\'adaptateur développe une capacité à interpréter les preuves géographiques externes. Chaque prompt d\'entraînement inclut les données OSM.'},
-   {icon:'&#129513;',label:'Adaptateur\nOSM-KG LoRA',type:'adapter',typeLabel:'Adapt. OSM-KG',dTitle:'Adaptateur LoRA OSM-KG',dSub:'Spécifiquement entraîné pour exploiter le KG',dBody:'Contrairement à l\'adaptateur topo, celui-ci a été entraîné <strong>avec</strong> les preuves KG. Il est conçu pour recevoir du contexte géographique à l\'inférence.'}
-  ]},
-  {label:'⚡ Phase d\'inférence',cls:'phase-infer',steps:[
-   {icon:'&#128196;',label:'Texte\nrequête',type:'input',typeLabel:'Entrée',dTitle:'Texte requête',dSub:'Sans KG à l\'inférence — KG encodé dans l\'adaptateur OSM-KG',dBody:'L\'entrée à l\'inférence est cohérente avec ce que le modèle a vu pendant le fine-tuning : même format texte + KG.'},
-   {icon:'&#128256;',label:'Stratégie\nCoT/ToT/GoT',type:'strategy',typeLabel:'Stratégie',dTitle:'3 stratégies · Budget 1024 tok',dSub:'Budget étendu pour le KG',dBody:'Identique aux autres expérimentations avec KG. Le contexte OSM est accommodé par le budget de 1024 tokens.'},
-   {icon:'&#129302;',label:'GPT-OSS-20B\n+ OSM-KG LoRA',type:'model',typeLabel:'Modèle OSM-KG',dTitle:'GPT-OSS-20B + adaptateur OSM-KG',dSub:'KG intégré à l\'entraînement, absent à l\'inférence',dBody:'Configuration la plus cohérente pour le KG : le modèle a été spécialisé pour exploiter les preuves géographiques. Distribution entraînement = distribution inférence.'},
-   {icon:'&#9989;',label:'Prédicat\nDE-9IM',type:'output',typeLabel:'Sortie',dTitle:'Score : 47.9 % (CoT)',dSub:'Comparable à Exp 03 malgré la cohérence',dBody:'Malgré l\'alignement entraînement/inférence, les performances restent à 47.9 %. La qualité et l\'interprétabilité des preuves OSM restent limitantes.'}
-  ]}
- ]
-},
-{num:'05',name:'FT + Inférence enrichie KG',
- desc:'Modèle fine-tuné (adaptateur topo) avec budget de raisonnement étendu (1024 tok) et preuves KG détaillées. GoT tire pleinement parti de ce budget élargi.',
- tag:'exp5_finetuned_enriched_gpu · 1024 tok · topo + enrichi',bestScore:'56.2%',bestStrat:'GoT',
- diffNote:'L\'extension du budget (512→ 1024 tok) et le KG enrichi relancent GoT à 56.2 %. <code>within</code> atteint 81.2 % — 2e meilleure configuration globale.',
+{num:'04',name:'FT + KG internalisé (Option A)',
+ desc:'Le KG OSM supervise la génération des exemples d\'entraînement. L\'input (texte seul) est identique à l\'inférence — aucun mismatch de distribution. La connaissance géospatiale est encodée dans les poids.',
+ tag:'exp4 · osm-kg adapter · KG internalized · 512 tok',bestScore:'—',bestStrat:'à évaluer',
+ diffNote:'Option A (internalisation pure). Train et test sont disjoints (aucun exemple commun) mais de structure identique (texte seul). On mesure la généralisation, pas la mémorisation — aucun mismatch de format.',
  phases:[
   {label:'🔧 Phase d\'entraînement',cls:'phase-train',steps:[
-   {icon:'&#128202;',label:'Données topo\n755 exemples',type:'input',typeLabel:'Dataset',dTitle:'Même dataset que Exp 02',dSub:'Sans KG — différence uniquement à l\'inférence',dBody:'L\'adaptateur est identique à Exp 02. L\'amélioration vient entièrement du pipeline d\'inférence : budget étendu + KG enrichi.'},
-   {icon:'&#128295;',label:'Fine-tuning\nLoRA r=8',type:'training',typeLabel:'Entraînement',dTitle:'Fine-tuning identique à Exp 02',dSub:'Adaptateur topo réutilisé',dBody:'Même fine-tuning que Exp 02. La puissance de cette configuration vient de l\'inférence, pas de l\'entraînement.'},
-   {icon:'&#129513;',label:'Adaptateur\ntopo LoRA',type:'adapter',typeLabel:'Adaptateur',dTitle:'Adaptateur topo LoRA (Exp 02)',dSub:'Réutilisé sans modification',dBody:'Même adaptateur que Exp 02, utilisé avec un pipeline d\'inférence enrichi.'}
+   {icon:'&#128506;',label:'OSM KG\nsupervision',type:'kg',typeLabel:'KG OSM',dTitle:'OSM KG — supervision des exemples',dSub:'Le KG génère/valide les labels, pas l\'input',dBody:'Le KG OSM est utilisé pour générer et superviser les exemples d\'entraînement. L\'input reste <strong>texte seul</strong> — identique à l\'inférence. La connaissance géospatiale est encodée dans les poids, pas dans le contexte.'},
+   {icon:'&#128202;',label:'Données KG-supervisées\n234 exemples',type:'input',typeLabel:'Dataset supervisé',dTitle:'Dataset supervisé par OSM KG',dSub:'234 exemples · texte seul · labels validés par KG',dBody:'Paires (texte vernaculaire → prédicat DE-9IM correct). L\'input est <strong>texte seul</strong> — identique à ce que le modèle recevra à l\'inférence. Aucun mismatch de distribution.'},
+   {icon:'&#128295;',label:'Fine-tuning\nLoRA r=8',type:'training',typeLabel:'Entraînement',dTitle:'Fine-tuning LoRA r=8',dSub:'SFTTrainer (TRL) · A100 80 GB',dBody:'Même procédure que Exp 02. L\'adaptateur spécialise le modèle sur les prédicats DE-9IM à partir d\'exemples dont les labels ont été supervisés par le KG OSM.'},
+   {icon:'&#129513;',label:'Adaptateur\nOSM-KG LoRA',type:'adapter',typeLabel:'Adapt. OSM-KG',dTitle:'Adaptateur OSM-KG LoRA',dSub:'Connaissance géospatiale encodée dans les poids',dBody:'L\'adaptateur encode implicitement la connaissance OSM dans ses poids. À l\'inférence, aucun KG n\'est nécessaire — la connaissance est restituée directement par le modèle.'}
   ]},
-  {label:'⚡ Phase d\'inférence enrichie',cls:'phase-infer',steps:[
-   {icon:'&#128196;',label:'Texte\nrequête',type:'input',typeLabel:'Entrée',dTitle:'Texte requête',dSub:'Identique aux autres',dBody:'Phrase vernaculaire standard. La différence est dans le traitement KG et le budget token étendu.'},
-   {icon:'&#128256;',label:'GoT\nmulti-étapes',type:'strategy',typeLabel:'GoT enrichi',dTitle:'Graph-of-Thought enrichi par KG OSM',dSub:'Chaque nœud GoT intègre les preuves OSM · 1024 tok',dBody:'GoT décompose en nœuds interdependants, chacun enrichi par les preuves KG OSM :<br>① <strong>Extraction KG</strong> → coordonnées, bbox, hiérarchie<br>② <strong>Analyse géométrique</strong> → types DE-9IM candidats<br>③ <strong>Comparaison</strong> → preuves pour/contre<br>④ <strong>Conclusion</strong> → prédicat final. Budget 1024 tok par appel.'},
-   {icon:'&#129302;',label:'GPT-OSS-20B\n+ topo + 1024',type:'model',typeLabel:'Modèle FT',dTitle:'GPT-OSS-20B + topo LoRA + 1024 tok',dSub:'Fine-tuning + contexte riche',dBody:'La combinaison modèle fine-tuné + GoT + budget étendu donne <strong>56.2 %</strong> — 2e meilleur score global. GoT exploite efficacement le budget étendu.'},
-   {icon:'&#9989;',label:'Prédicat\nDE-9IM',type:'output',typeLabel:'Sortie',dTitle:'Score : 56.2 % (GoT)',dSub:'2e meilleure configuration globale',dBody:'GoT : <strong>56.2 %</strong> · CoT : 49.0 % · ToT : 29.2 %. <code>within</code> atteint 81.2 % en GoT. Confirme que GoT bénéficie d\'un contexte plus riche.'}
+  {label:'⚡ Phase d\'inférence',cls:'phase-infer',steps:[
+   {icon:'&#128196;',label:'Texte\nrequête',type:'input',typeLabel:'Entrée',dTitle:'Texte requête · Identique à l\'entraînement',dSub:'Texte seul — aucun KG dans le prompt',dBody:'Input identique à celui de l\'entraînement : texte vernaculaire seul. <strong>Aucun mismatch</strong> de distribution. La connaissance géospatiale est dans les poids OSM-KG LoRA.'},
+   {icon:'&#128256;',label:'Stratégie\nCoT/ToT/GoT',type:'strategy',typeLabel:'Stratégie',dTitle:'3 stratégies · Budget 512 tok',dSub:'Même budget qu\'Exp 02 — pas de KG dans le prompt',dBody:'Même structure CoT/ToT/GoT qu\'Exp 02. Budget 512 tok suffisant (aucun KG injecté dans le contexte).'},
+   {icon:'&#129302;',label:'GPT-OSS-20B\n+ OSM-KG LoRA',type:'model',typeLabel:'Modèle OSM-KG',dTitle:'GPT-OSS-20B + adaptateur OSM-KG',dSub:'Connaissance OSM encodée dans les poids',dBody:'Le modèle restitue la connaissance géospatiale apprise via la supervision KG. Distribution identique entraînement/inférence — pas de KG externe.'},
+   {icon:'&#9989;',label:'Prédicat\nDE-9IM',type:'output',typeLabel:'Sortie',dTitle:'Résultats Exp 04 — Option A',dSub:'Configuration en cours d\'évaluation',dBody:'Mesure la capacité d\'internalisation du KG dans les poids. Comparaison clé : Exp 04 (KG internalisé) vs Exp 02 (topo sans KG) vs Exp 03 (KG en entrée).'}
   ]}
  ]
 },
-{num:'06',name:'GPTOSS + Inférence enrichie',
- desc:'Modèle de base (sans fine-tuning) avec inférence enrichie par KG étendu et budget 1024 tokens. Explore si le KG enrichi compense l\'absence de fine-tuning.',
- tag:'base + KG enrichi · 1024 tok · configuration hybride',bestScore:'—',bestStrat:'à évaluer',
- diffNote:'Configuration complémentaire à Exp 01 et 05. Quantifie l\'apport pur du budget étendu et du KG enrichi, indépendamment du fine-tuning.',
- phases:[{label:'⚡ Phase d\'inférence enrichie',cls:'phase-infer',steps:[
-  {icon:'&#128196;',label:'Texte\nrequête',type:'input',typeLabel:'Entrée',dTitle:'Texte requête · Sans fine-tuning',dSub:'Aucune spécialisation topologique',dBody:'Le modèle de base s\'appuie entièrement sur le KG enrichi et ses connaissances générales pré-entraînées.'},
-  {icon:'&#128256;',label:'GoT\nmulti-étapes',type:'strategy',typeLabel:'GoT enrichi',dTitle:'Graph-of-Thought enrichi par KG · Modèle base',dSub:'KG intégré dans chaque nœud GoT · 1024 tok',dBody:'Même structure GoT enrichie que Exp 05, appliquée au modèle de base sans adaptateur. KG OSM intégré dans chaque nœud de raisonnement. Compare Exp 05 (FT + GoT enrichi = 56.2 %) vs modèle base.',
-  {icon:'&#129302;',label:'GPT-OSS-20B\nBase (1024)',type:'model',typeLabel:'Modèle base',dTitle:'GPT-OSS-20B Base · Budget 1024 tok',dSub:'Aucun adaptateur · KG seul comme guide',dBody:'Hypothèse : le KG enrichi suffit-il à compenser l\'absence de fine-tuning ? Attendu entre Exp 01 (57.3 %) et Exp 05 (56.2 %).'},
-  {icon:'&#9989;',label:'Prédicat\nDE-9IM',type:'output',typeLabel:'Sortie',dTitle:'Résultats à venir',dSub:'Configuration en cours d\'évaluation',dBody:'Permettra de quantifier l\'apport pur du budget étendu et du KG enrichi sur le modèle de base, sans interférence du fine-tuning.'}
+{num:'05',name:'Topo-LoRA + raisonnement ancré (KG grounding)',
+ desc:'Modèle fine-tuné (Topo-LoRA) avec raisonnement ancré sur le KG OSM à l\'inférence. Le KG ne figure pas dans le prompt : le modèle génère d\'abord ses étapes de raisonnement, puis chaque étape est alignée et vérifiée contre le graphe (reasoning path validation).',
+ tag:'exp5_finetuned_enriched_gpu · 1024 tok · inference-time grounding',bestScore:'56.2%',bestStrat:'GoT',
+ diffNote:'GoT exploite pleinement le mécanisme d\'ancrage KG : 56.2 %. <code>within</code> atteint 81.2 %. 2e meilleure configuration globale. Le KG vérificateur améliore la robustesse et l\'interprétabilité des prédictions.',
+ phases:[
+  {label:'🔧 Phase d\'entraînement',cls:'phase-train',steps:[
+   {icon:'&#128202;',label:'Données topo\n234 exemples',type:'input',typeLabel:'Dataset',dTitle:'Dataset de fine-tuning (Topo-LoRA)',dSub:'Identique à Config 02',dBody:'Même dataset que Config 02 (234 exemples équilibrés, texte seul). L\'adaptateur Topo-LoRA est commun à Config 02, 03 et 05.'},
+   {icon:'&#128295;',label:'Fine-tuning\nLoRA r=8',type:'training',typeLabel:'Entraînement',dTitle:'Fine-tuning Topo-LoRA',dSub:'SFTTrainer (TRL) · A100 80 GB',dBody:'Identique à Config 02. L\'adaptateur est réutilisé — la différence de cette configuration réside entièrement dans la phase d\'inférence.'},
+   {icon:'&#129513;',label:'Adaptateur\nTopo-LoRA',type:'adapter',typeLabel:'Adaptateur',dTitle:'Adaptateur Topo-LoRA (Config 02)',dSub:'Réutilisé sans modification',dBody:'Même adaptateur que Config 02. La puissance de cette configuration vient du pipeline d\'inférence avec ancrage KG, pas de l\'entraînement.'}
+  ]},
+  {label:'⚡ Phase d\'inférence — KG grounding',cls:'phase-infer',steps:[
+   {icon:'&#128196;',label:'Texte\nrequête',type:'input',typeLabel:'Entrée',dTitle:'Texte requête',dSub:'Phrase vernaculaire — identique aux autres configs',dBody:'Entrée standard : texte vernaculaire décrivant la relation spatiale. Aucun fait KG injecté dans le prompt.'},
+   {icon:'&#128256;',label:'Stratégie\nCoT/ToT/GoT',type:'strategy',typeLabel:'Stratégie',dTitle:'3 stratégies de raisonnement',dSub:'Génération d\'étapes de raisonnement',dBody:'Le modèle génère ses étapes de raisonnement (CoT : chaîne, ToT : arbre, GoT : graphe). Ces étapes constituent le <em>reasoning path</em> soumis à la vérification KG.'},
+   {icon:'&#129302;',label:'GPT-OSS-20B\n+ Topo-LoRA',type:'model',typeLabel:'Modèle FT',dTitle:'GPT-OSS-20B + Topo-LoRA',dSub:'Génère les étapes de raisonnement',dBody:'Le modèle fine-tuné produit un raisonnement structuré. GoT (Graph-of-Thought) bénéficie le plus de l\'ancrage KG : chaque nœud du graphe est vérifiable indépendamment.'},
+   {icon:'&#128506;',label:'Ancrage KG OSM\nvérification',type:'kg',typeLabel:'KG OSM',dTitle:'Alignement & vérification des étapes — KG OSM',dSub:'Reasoning path validation · KG-Enhanced Interpretability',dBody:'Chaque étape de raisonnement est alignée contre le KG OSM (coordonnées, bbox, hiérarchie). Approche inspirée de LAMA, KagNet, QA-GNN. Améliore factualité <strong>et</strong> interprétabilité.'},
+   {icon:'&#9989;',label:'Prédicat\nDE-9IM',type:'output',typeLabel:'Sortie',dTitle:'Score : GoT = 56.2 %',dSub:'2e meilleure configuration globale',dBody:'GoT : <strong>56.2 %</strong> · CoT : 49.0 % · ToT : 29.2 %. <code>within</code> : 81.2 % (GoT). Sortie accompagnée de traçabilité : chaque étape est liée à une vérification KG.'}
+  ]}
+ ]
+},
+{num:'06',name:'Base + raisonnement ancré (KG grounding)',
+ desc:'Modèle de base (sans fine-tuning) avec raisonnement ancré sur le KG OSM à l\'inférence. Même mécanisme d\'ancrage que Config 05, appliqué au modèle Base. Isole l\'apport du KG grounding indépendamment du fine-tuning.',
+ tag:'exp6 · base · KG grounding · 1024 tok',bestScore:'—',bestStrat:'à évaluer',
+ diffNote:'Comparaison directe avec Config 01 (Base sans KG) et Config 05 (FT + KG grounding). Permet d\'isoler la contribution propre du KG grounding et d\'évaluer sa complémentarité avec le fine-tuning.',
+ phases:[{label:'⚡ Phase d\'inférence — KG grounding',cls:'phase-infer',steps:[
+  {icon:'&#128196;',label:'Texte\nrequête',type:'input',typeLabel:'Entrée',dTitle:'Texte requête · Modèle base',dSub:'Aucun fine-tuning — connaissances générales du modèle',dBody:'Le modèle s\'appuie uniquement sur ses connaissances pré-entraînées et le mécanisme d\'ancrage KG. Aucun adaptateur LoRA.'},
+  {icon:'&#128256;',label:'Stratégie\nCoT/ToT/GoT',type:'strategy',typeLabel:'Stratégie',dTitle:'3 stratégies de raisonnement',dSub:'Génération d\'étapes de raisonnement',dBody:'Même structure CoT/ToT/GoT. Le modèle génère ses étapes de raisonnement sans spécialisation topologique — vérifiées par le KG OSM.'},
+  {icon:'&#129302;',label:'GPT-OSS-20B\nBase',type:'model',typeLabel:'Modèle base',dTitle:'GPT-OSS-20B Base — sans adaptateur',dSub:'Connaissances générales + KG grounding',dBody:'Hypothèse : le KG grounding seul peut-il compenser l\'absence de fine-tuning ? Attendu entre Config 01 (57.3 %) et Config 05 (56.2 %).'},
+  {icon:'&#128506;',label:'Ancrage KG OSM\nvérification',type:'kg',typeLabel:'KG OSM',dTitle:'Alignement & vérification — KG OSM',dSub:'Reasoning path validation · modèle base',dBody:'Identique à Config 05 : chaque étape de raisonnement est vérifiée contre le KG OSM. Isole l\'apport pur du grounding sans adaptation du modèle.'},
+  {icon:'&#9989;',label:'Prédicat\nDE-9IM',type:'output',typeLabel:'Sortie',dTitle:'Résultats Config 06 — à évaluer',dSub:'En cours d\'évaluation',dBody:'Quantifiera l\'apport pur du KG grounding sans fine-tuning. Comparaison : Config 01 (Base seul), Config 05 (FT + grounding), Config 06 (Base + grounding).'}
  ]}]
-}
-];
+}];
 
 var _cur=0,_curStep=null;
 function mkId(pi,phi,si){return pi+'_'+phi+'_'+si;}
