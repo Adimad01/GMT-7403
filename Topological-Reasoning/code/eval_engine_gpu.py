@@ -126,6 +126,10 @@ if not hasattr(torch.nn.Module, "set_submodule"):
                 raise AttributeError(f"'{item}' is not an nn.Module")
         setattr(mod, name, module)
     torch.nn.Module.set_submodule = _set_submodule
+
+# Patch: transformers >=5.9.0 on torch <2.6 — float8_e8m0fnu added in torch 2.6
+if not hasattr(torch, "float8_e8m0fnu"):
+    torch.float8_e8m0fnu = getattr(torch, "float8_e5m2", None)
 # ===========================================================================
 
 from transformers import AutoTokenizer, AutoModelForCausalLM, Mxfp4Config

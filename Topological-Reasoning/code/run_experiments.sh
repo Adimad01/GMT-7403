@@ -54,10 +54,11 @@ if [[ $SKIP_TRAIN -eq 0 ]]; then
     echo ""
     header "PHASE 1 — Fine-tuning adapters from scratch"
 
-    # Remove old adapters so train_runner.py does not skip
-    echo "  Cleaning old adapter artefacts..."
+    # Remove old adapters and stale result checkpoints
+    echo "  Cleaning old adapter artefacts and result checkpoints..."
     rm -rf finetuned_gptoss_topological/
     rm -rf finetuned_gptoss_osm_kg/
+    rm -f  results/*_ckpt.json
     echo "  Done. Starting fine-tuning."
     echo ""
 
