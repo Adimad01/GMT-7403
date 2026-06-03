@@ -31,7 +31,11 @@ if not hasattr(torch.nn.Module, "set_submodule"):
         setattr(mod, name, module)
     torch.nn.Module.set_submodule = _set_submodule
 
-# Patch 3: transformers >=5.9.0 bug — supports_quant_method crashes when
+# Patch 3: transformers >=5.9.0 on torch <2.6 — float8_e8m0fnu added in torch 2.6
+if not hasattr(torch, "float8_e8m0fnu"):
+    torch.float8_e8m0fnu = getattr(torch, "float8_e5m2", None)
+
+# Patch 4: transformers >=5.9.0 bug — supports_quant_method crashes when
 # the model's config.quantization_config is None instead of a dict.
 try:
     from transformers.quantizers.auto import AutoHfQuantizer as _AHQ
