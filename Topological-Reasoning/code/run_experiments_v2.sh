@@ -45,9 +45,16 @@ header() { line; printf "  %s\n" "$1"; line; echo ""; }
 # PHASE 0 — Build v2 dataset split
 # ─────────────────────────────────────────────────────────────────────────────
 echo ""
-header "PHASE 0 — Splitting topological_relations.csv (105 eval · 1204 train)"
+header "PHASE 0 — Dataset splits (105 eval · 1204 train)"
 
-$PYTHON build_dataset_topological_v2.py
+if [[ -f "../dataset/topo_v2_eval.csv" && -f "../dataset/topo_v2_train.csv" ]]; then
+    echo "  [OK] Splits already present — skipping build_dataset_topological_v2.py"
+    echo "       ../dataset/topo_v2_eval.csv  ($(tail -n +2 ../dataset/topo_v2_eval.csv | wc -l | tr -d ' ') rows)"
+    echo "       ../dataset/topo_v2_train.csv ($(tail -n +2 ../dataset/topo_v2_train.csv | wc -l | tr -d ' ') rows)"
+else
+    echo "  Splits not found — running build_dataset_topological_v2.py"
+    $PYTHON build_dataset_topological_v2.py
+fi
 
 # ─────────────────────────────────────────────────────────────────────────────
 # PHASE 1 — Fine-tune Topo-LoRA v2
