@@ -35,10 +35,10 @@ MODEL_NAME = "gpt-oss"
 # =====================================================================
 VALID_PREDICATES = {
     "disjoint", "touches", "crosses", "within",
-    "contains", "overlaps",
+    "contains", "overlaps", "equals",
 }
 
-VALID_LIST = "contains, within, touches, crosses, disjoint, overlaps"
+VALID_LIST = "contains, within, touches, crosses, disjoint, overlaps, equals"
 
 VERNACULAR_LEXICON = """Vernacular-to-Topology Reference:
   WITHIN    — "is in", "located in", "part of"              (A is fully inside B)
@@ -50,6 +50,9 @@ VERNACULAR_LEXICON = """Vernacular-to-Topology Reference:
   OVERLAPS  — "partly in", "extends into", "straddles",
               "part of population in", "county seat of" (may extend into adjacent counties)
   DISJOINT  — "far from", "miles away", "separate from" (confirmed large distance)
+  EQUALS    — "is identical to", "same boundary as", "mirrors exactly",
+              "exact same extent as", "identical perimeter", "perfect mapping symmetry"
+              (A and B share the exact same geometry: same interior, boundary, and exterior)
 
 WARNING — ambiguous vernacular (read carefully):
   "county seat of" → does NOT imply within — the city may extend into adjacent counties → overlaps
@@ -57,6 +60,7 @@ WARNING — ambiguous vernacular (read carefully):
   "surrounded by"  → may be touches (partial encirclement), not within (full containment)
   "enclave of"     → touches (shares boundary), NOT within (not inside interior)
   "along" + river/road → likely crosses (full LineString traversal), not just touches
+  "same as" / "mirrors" → may be equals only if BOTH geometries are truly identical extents
 """
 
 RULES_BLOCK = """Rules:
@@ -95,12 +99,27 @@ RULES_BLOCK = """Rules:
    — For rivers and roads, reason on the entire geometry, not just the centroid/representative point.
    — A river centroid may fall outside a city even if the river traverses it.
 
-8. Pick EXACTLY ONE predicate from: contains, within, touches, crosses, disjoint, overlaps.
-9. End with: Answer: [predicate]
+8. EQUALS CHECK (do before all other predicates):
+   — equals requires BOTH entities to have the exact same geometry (identical interior, boundary, exterior).
+   — Strong equals signals: "identical perimeter", "exact same extent", "perfect mapping symmetry",
+     "municipal limits mirror the county boundary", "coextensive", "same footprint".
+   — Do NOT use equals unless the text explicitly states geometric identity.
+
+9. Pick EXACTLY ONE predicate from: contains, within, touches, crosses, disjoint, overlaps, equals.
+10. End with: Answer: [predicate]
 """
 
 DISAMBIGUATION_TABLE = """
 CRITICAL DISTINCTIONS (most confused predicates):
+
+equals vs all others (CHECK THIS FIRST):
+  equals   → A and B have the IDENTICAL geometry. Every point of A is a point of B and vice versa.
+             Bbox sizes will be nearly identical; centroids will coincide.
+             Strong signals: "same boundary", "identical perimeter", "coextensive",
+             "municipal limits mirror county boundary", "perfect mapping symmetry".
+  contains / within → different size entities — one fully inside the other, NOT identical.
+  overlaps → partial overlap — NEVER equals.
+  If in doubt: equals is rare. Do not use it unless geometric identity is explicitly stated.
 
 touches vs overlaps:
   touches  → A and B share ONLY their boundary. Interiors do NOT intersect.
@@ -137,12 +156,15 @@ Do NOT default to "within" just because A is a sub-entity type or mentioned firs
 """
 
 OVERLAPS_DETECTION = """
-3-STEP CHECK to detect OVERLAPS (do this before concluding within or touches):
-  Step 1: Is A completely inside B? -> within (not overlaps)
-  Step 2: Is B completely inside A? -> contains (not overlaps)
-  Step 3: Do A and B share SOME area but NEITHER fully contains the other? -> overlaps
+4-STEP DISAMBIGUATION (run before concluding within, touches, or overlaps):
+  Step 1: Do A and B have the EXACT SAME geometry (identical extent)? -> equals (not within/contains)
+  Step 2: Is A completely inside B? -> within (not overlaps)
+  Step 3: Is B completely inside A? -> contains (not overlaps)
+  Step 4: Do A and B share SOME area but NEITHER fully contains the other? -> overlaps
   Strong overlaps signals: "extends into", "partly in", "straddles",
                            "part of population in", "county seat of" (city crosses county line).
+  Strong equals signals: "identical perimeter", "same boundary", "municipal limits mirror county lines",
+                         "perfect mapping symmetry", "coextensive".
 """
 
 # =====================================================================
@@ -538,10 +560,11 @@ class ChainOfThought(ReasoningStrategy):
 
 Think step-by-step:
 1. Check entity validation warnings — if a mismatch is flagged, treat that geometry as unreliable.
-2. Read the vernacular carefully for qualifiers like "partly", "extends into", "surrounded by", "enclave".
-3. Analyze the Bounding Box Analysis section — note any warnings about bbox vs. polygon.
-4. Verify the direction: does your predicate apply A→B or B→A?
-5. State your final predicate.
+2. Check for EQUALS first: does the vernacular explicitly describe identical extents or coextensive boundaries?
+3. Read the vernacular carefully for qualifiers like "partly", "extends into", "surrounded by", "enclave".
+4. Analyze the Bounding Box Analysis section — note any warnings about bbox vs. polygon.
+5. Verify the direction: does your predicate apply A→B or B→A?
+6. State your final predicate.
 
 Reasoning:"""
 
@@ -603,8 +626,9 @@ class TreeOfThought(ReasoningStrategy):
 
 Explore THREE different reasoning branches for "{place_a} {rel_phrase} {place_b}" using the OSM evidence.
 Each branch must:
+  - Check for EQUALS first: does the text describe geometrically identical / coextensive entities?
   - Check entity validation warnings before using geometry.
-  - Prioritize textual qualifiers ("partly", "extends into", "enclave", etc.) over bbox signals.
+  - Prioritize textual qualifiers ("partly", "extends into", "enclave", "identical perimeter", etc.) over bbox signals.
   - Explicitly verify the A→B direction of the predicate.
   - Note whether reasoning is based on polygon geometry (reliable) or bbox only (use with caution).
 
@@ -715,6 +739,7 @@ Analyze the provided OSM coordinates, bounding boxes, and administrative hierarc
 {kg_evidence}
 
 Each thought must:
+  - Check for EQUALS first: does the text describe geometrically identical / coextensive entities?
   - Check entity validation warnings before using any geometry.
   - Explicitly note if reasoning is based on polygon geometry (reliable) or bbox only (caution).
   - Prioritize textual qualifiers over geometric signals when they conflict.
