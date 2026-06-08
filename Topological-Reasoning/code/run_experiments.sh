@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # =============================================================================
 # run_experiments.sh
-# Master runner — full pipeline: fine-tuning + 4 experiments × 3 strategies
+# Master runner — full pipeline: fine-tuning + 5 experiments × 3 strategies
 #
 # Pipeline
 # ─────────────────────────────────────────────────────────────────────────────
@@ -11,11 +11,13 @@
 #  PHASE 1  Fine-tune adapters from scratch on balanced data
 #             FT-1  Topo-LoRA       → finetuned_gptoss_topological/final_adapter
 #             FT-2  OSM-KG LoRA     → finetuned_gptoss_osm_kg/final_adapter
+#             FT-3  Wikidata-KG LoRA → finetuned_gptoss_wikidata_kg/final_adapter
 #
-#  PHASE 2  Evaluate 4 configurations × 3 strategies (CoT / ToT / GoT)
+#  PHASE 2  Evaluate 5 configurations × 3 strategies (CoT / ToT / GoT)
 #             Config 1  Base model (no adapter)              512 tok
 #             Config 2  Topo-LoRA                            512 tok
 #             Config 3  OSM-KG LoRA + KG evidence at test    1024 tok
+#             Config 4  Wikidata-KG LoRA + OSM at inference  1024 tok
 #             Config 5  Topo-LoRA + extended reasoning       1024 tok
 #
 #  PHASE 3  Analyse and summarise results
@@ -82,7 +84,7 @@ fi
 # PHASE 2 — Evaluation
 # ─────────────────────────────────────────────────────────────────────────────
 echo ""
-header "PHASE 2 — Evaluating 4 configurations × 3 strategies on 96 balanced examples"
+header "PHASE 2 — Evaluating 5 configurations × 3 strategies on 96 balanced examples"
 
 echo "  Config 1 · Base GPT-OSS-20B · CoT / ToT / GoT (512 tok)"
 line
@@ -99,6 +101,11 @@ line
 $PYTHON exp03_finetuned_osm_kg.py
 
 echo ""
+echo "  Config 4 · Wikidata-KG LoRA + OSM evidence at inference · CoT / ToT / GoT (1024 tok)"
+line
+$PYTHON exp04_finetuned_wikidata_kg.py
+
+echo ""
 echo "  Config 5 · Topo-LoRA + extended reasoning budget · CoT / ToT / GoT (1024 tok)"
 line
 $PYTHON exp05_finetuned_extended.py
@@ -107,8 +114,8 @@ $PYTHON exp05_finetuned_extended.py
 # PHASE 3 — Analysis
 # ─────────────────────────────────────────────────────────────────────────────
 echo ""
-header "PHASE 3 — Analysing results"
-$PYTHON analyze_experiments.py
+header "PHASE 3 — Analysing vol-1 results"
+$PYTHON analyze_experiments_v1.py
 
 echo ""
 line
