@@ -31,7 +31,7 @@ TEMPERATURE    = 0.1
 MAX_NEW_TOKENS = 512
 N_EVAL         = 105
 
-SUFFIX     = "topo_v2"
+SUFFIX     = "neighborhood_details_spatial_relation_16_sample"
 STRATEGIES = ["cot", "tot", "got"]
 # ---------------------------------------------------------------------------
 

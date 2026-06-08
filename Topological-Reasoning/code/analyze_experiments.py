@@ -1,14 +1,15 @@
 """
 analyze_experiments.py
 ================================================================================
-Unified comparison of 4 experiments × 3 strategies (CoT, ToT, GoT) on the
+Unified comparison of 5 experiments × 3 strategies (CoT, ToT, GoT) on the
 105 v2 test examples (15/predicate × 7 predicates). All experiments on A100 80GB.
 
 Experiment configurations:
-  v2-01 — Base (no adapter)                         tag: v2_exp1_base         512 tok
-  v2-02 — Topo-LoRA v2                              tag: v2_exp2_topo         512 tok
-  v2-03 — OSM-KG LoRA (KG in training + inference)  tag: v2_exp3_osm_kg      1024 tok
-  v2-05 — Topo-LoRA v2 + extended budget            tag: v2_exp5_extended    1024 tok
+  v2-01 — Base (no adapter)                          tag: v2_exp1_base          512 tok
+  v2-02 — Topo-LoRA v2                               tag: v2_exp2_topo          512 tok
+  v2-03 — OSM-KG LoRA (KG in training + inference)   tag: v2_exp3_osm_kg       1024 tok
+  v2-04 — Wikidata-KG LoRA + OSM evidence at inf.    tag: v2_exp4_wikidata_kg  1024 tok
+  v2-05 — Topo-LoRA v2 + extended budget             tag: v2_exp5_extended     1024 tok
 
 Usage:
     cd /path/to/Topological-Reasoning/code
@@ -37,6 +38,7 @@ EXPERIMENTS = [
     ("Base GPT-OSS-20B",                          "v2_exp1_base",         "no adapter, 512 tok"),
     ("Topo-LoRA v2",                              "v2_exp2_topo",         "topo adapter, 512 tok"),
     ("OSM-KG LoRA  (KG at inference)",            "v2_exp3_osm_kg",       "osm-kg adapter, 1024 tok"),
+    ("Wikidata-KG LoRA  (OSM at inference)",      "v2_exp4_wikidata_kg",  "wikidata-kg adapter, 1024 tok"),
     ("Topo-LoRA v2 + extended budget",            "v2_exp5_extended",     "topo adapter, 1024 tok"),
 ]
 

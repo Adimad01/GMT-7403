@@ -14,11 +14,12 @@
 #             Note   : OSM-KG LoRA is reused from the v1 run
 #                      (finetuned_gptoss_osm_kg/final_adapter)
 #
-#  PHASE 2  Evaluate 4 configurations × 3 strategies on 105 v2 test examples
-#             v2-01  Base GPT-OSS-20B                      512 tok
-#             v2-02  Topo-LoRA v2                           512 tok
-#             v2-03  OSM-KG LoRA + KG evidence at test    1024 tok
-#             v2-05  Topo-LoRA v2 + extended budget        1024 tok
+#  PHASE 2  Evaluate 5 configurations × 3 strategies on 105 v2 test examples
+#             v2-01  Base GPT-OSS-20B                           512 tok
+#             v2-02  Topo-LoRA v2                                512 tok
+#             v2-03  OSM-KG LoRA + KG evidence at inference    1024 tok
+#             v2-04  Wikidata-KG LoRA + OSM evidence at inf.   1024 tok
+#             v2-05  Topo-LoRA v2 + extended budget             1024 tok
 #
 #  PHASE 3  Analyse and summarise v2 results
 # ─────────────────────────────────────────────────────────────────────────────
@@ -93,7 +94,7 @@ fi
 # PHASE 2 — Evaluation
 # ─────────────────────────────────────────────────────────────────────────────
 echo ""
-header "PHASE 2 — Evaluating 4 configurations × 3 strategies on 105 v2 examples"
+header "PHASE 2 — Evaluating 5 configurations × 3 strategies on 105 v2 examples"
 
 echo "  v2-01 · Base GPT-OSS-20B · CoT / ToT / GoT (512 tok)"
 line
@@ -108,6 +109,11 @@ echo ""
 echo "  v2-03 · OSM-KG LoRA + KG evidence at inference · CoT / ToT / GoT (1024 tok)"
 line
 $PYTHON exp_v2_03_osm_kg.py
+
+echo ""
+echo "  v2-04 · Wikidata-KG LoRA + OSM evidence at inference · CoT / ToT / GoT (1024 tok)"
+line
+$PYTHON exp_v2_04_wikidata_kg.py
 
 echo ""
 echo "  v2-05 · Topo-LoRA v2 + extended budget · CoT / ToT / GoT (1024 tok)"
