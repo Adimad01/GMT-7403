@@ -96,7 +96,7 @@ if not hasattr(torch, "float8_e8m0fnu"):
 
 from datasets import Dataset
 from peft import LoraConfig, get_peft_model, TaskType
-from transformers import AutoTokenizer, AutoModelForCausalLM, Mxfp4Config
+from transformers import AutoTokenizer, AutoModelForCausalLM
 import trl
 from trl import SFTTrainer, SFTConfig
 
@@ -164,13 +164,13 @@ def main():
     train_dataset = Dataset.from_list(records_with_eos)
     print(f"      -> {len(train_dataset)} training examples ready.")
 
-    print(f"[3/5] Loading {args.model_id} (dequantizing MXFP4 → bf16) ...")
+    dtype = torch.bfloat16 if _BF16 else torch.float16
+    print(f"[3/5] Loading {args.model_id} in {dtype} (no Mxfp4 dequantize — base weights frozen for LoRA) ...")
     model = AutoModelForCausalLM.from_pretrained(
         args.model_id,
         device_map="auto",
         trust_remote_code=True,
-        dtype=torch.bfloat16,
-        quantization_config=Mxfp4Config(dequantize=True),
+        dtype=dtype,
     )
 
     print("[4/5] Attaching LoRA adapters ...")
