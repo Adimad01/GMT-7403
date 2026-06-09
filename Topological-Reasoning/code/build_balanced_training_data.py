@@ -127,6 +127,10 @@ def main():
     parser.add_argument("--seed",         type=int, default=42)
     parser.add_argument("--exclude-eval", action="store_true",
                         help=f"Exclude eval indices ({EVAL_INDICES_FILE}) from training CSV")
+    parser.add_argument("--csv-only",     action="store_true",
+                        help="Only run the CSV job (skip JSONL)")
+    parser.add_argument("--jsonl-only",   action="store_true",
+                        help="Only run the JSONL job (skip CSV)")
     args = parser.parse_args()
 
     exclude_eval = None
@@ -139,9 +143,12 @@ def main():
             print(f"[INFO] Will exclude {len(exclude_eval)} eval indices from CSV training data")
 
     for job in JOBS:
+        fmt = job["format"]
+        if args.csv_only  and fmt != "csv":   continue
+        if args.jsonl_only and fmt != "jsonl": continue
         balance_dataset(job, args.n, args.seed, exclude_eval_indices=exclude_eval)
 
-    print("\n✅  All datasets balanced.")
+    print("\n✅  Done.")
 
 
 if __name__ == "__main__":

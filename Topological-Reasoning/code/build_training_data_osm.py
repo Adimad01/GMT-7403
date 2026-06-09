@@ -38,7 +38,7 @@ from tqdm import tqdm
 sys.path.insert(0, os.path.dirname(__file__))
 from strategies_osm import GeographicKnowledgeGraph
 
-VALID_PREDICATES = {"disjoint", "touches", "crosses", "within", "contains", "overlaps"}
+VALID_PREDICATES = {"disjoint", "touches", "crosses", "within", "contains", "overlaps", "equals"}
 
 # ---------------------------------------------------------------------------
 # Prompt sections (constant across all examples)
@@ -53,7 +53,7 @@ _TASK = (
     "DE-9IM topological predicate."
 )
 
-_VALID_PREDS = "contains, within, touches, crosses, disjoint, overlaps"
+_VALID_PREDS = "contains, within, touches, crosses, disjoint, overlaps, equals"
 
 _RULES = """\
 1. The relation is DIRECTED from entity A to entity B.
@@ -61,7 +61,8 @@ _RULES = """\
 to reason geometrically.
 3. Bounding box containment ≠ polygon containment — treat bbox as a clue, not proof.
 4. Direction: "contains" means A encloses B; "within" means A is inside B.
-5. You must pick EXACTLY ONE predicate from the list above."""
+5. equals: A and B share the EXACT same geometry (identical extent, same interior and boundary).
+6. You must pick EXACTLY ONE predicate from the list above."""
 
 # ---------------------------------------------------------------------------
 # Template-based output reasoning (one per predicate)
@@ -102,6 +103,12 @@ _REASONING_TEMPLATES: dict[str, str] = {
         "confirms they share no boundary or interior. The vernacular '{vernacular}' is "
         "consistent with spatial separation."
     ),
+    "equals": (
+        "Entity A ({subj_type}, {geom_A}) and Entity B ({obj_type}, {geom_B}) share the "
+        "exact same geometry — identical interior, boundary, and exterior. The OSM bounding "
+        "boxes are essentially congruent and the centroids coincide. The vernacular "
+        "'{vernacular}' explicitly signals geometric identity."
+    ),
 }
 
 
@@ -110,22 +117,22 @@ def _fill_reasoning(row: dict, label: str) -> str:
     return template.format(
         subj_type=row.get("placetype_subject", "place"),
         obj_type=row.get("placetype_object", "place"),
-        geom_A=row.get("geometry_type_subject", "unknown"),
-        geom_B=row.get("geometry_type_object", "unknown"),
-        vernacular=row.get("vernacular_relation") or row.get("relation_predicate", ""),
+        geom_A=row.get("source_geometry", row.get("geometry_type_subject", "unknown")),
+        geom_B=row.get("target_geometry",  row.get("geometry_type_object",  "unknown")),
+        vernacular=row.get("explanation", row.get("vernacular_relation", row.get("relation_predicate", ""))),
         label=label,
     )
 
 
 def build_record_text(row: dict, kg_evidence: str, label: str) -> str:
     """Assemble the full instruction-tuning text for one training example."""
-    subj = row.get("place_name_subject", "Entity A")
-    obj  = row.get("place_name_object",  "Entity B")
-    vernacular  = row.get("vernacular_relation") or row.get("relation_predicate", "")
+    subj = row.get("source_entity", row.get("place_name_subject", "Entity A"))
+    obj  = row.get("target_entity", row.get("place_name_object",  "Entity B"))
+    vernacular  = row.get("explanation", row.get("vernacular_relation", row.get("relation_predicate", "")))
     subj_type   = row.get("placetype_subject", "place")
     obj_type    = row.get("placetype_object",  "place")
-    geom_A      = row.get("geometry_type_subject", "unknown")
-    geom_B      = row.get("geometry_type_object",  "unknown")
+    geom_A      = row.get("source_geometry", row.get("geometry_type_subject", "unknown"))
+    geom_B      = row.get("target_geometry",  row.get("geometry_type_object",  "unknown"))
     reasoning   = _fill_reasoning(row, label)
 
     return (
@@ -178,8 +185,8 @@ def _load_checkpoint(ckpt_path: str) -> tuple[set, list]:
 # ---------------------------------------------------------------------------
 def main():
     parser = argparse.ArgumentParser(description="Build OSM-KG instruction-tuning dataset")
-    parser.add_argument("--dataset", default="../dataset/triplet_update_v3_70.csv",
-                        help="Path to the 70%% training CSV")
+    parser.add_argument("--dataset", default="../dataset/topological_balanced_train.csv",
+                        help="Path to the balanced training CSV (topological_balanced_train.csv)")
     parser.add_argument("--cache",   default="results/osm_cache.json",
                         help="Path to existing OSM Nominatim cache (reused to avoid re-fetching)")
     parser.add_argument("--output",  default="../dataset/osm_kg_train.jsonl",
@@ -203,15 +210,15 @@ def main():
             skipped += 1
             continue
 
-        label = str(row.get("spatial_relation", "")).lower().strip()
-        if pd.isna(row.get("spatial_relation")) or label not in VALID_PREDICATES:
+        label = str(row.get("relation_label", row.get("spatial_relation", ""))).lower().strip()
+        if not label or label not in VALID_PREDICATES:
             failed += 1
             processed_indices.add(idx)
             continue
 
-        place_a  = str(row.get("place_name_subject", ""))
-        place_b  = str(row.get("place_name_object",  ""))
-        sentence = str(row.get("Sentence", ""))
+        place_a  = str(row.get("source_entity", row.get("place_name_subject", "")))
+        place_b  = str(row.get("target_entity", row.get("place_name_object",  "")))
+        sentence = str(row.get("corpus",        row.get("Sentence", "")))
 
         try:
             kg_evidence = kg.gather_evidence(

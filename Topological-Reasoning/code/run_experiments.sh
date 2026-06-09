@@ -5,8 +5,10 @@
 #
 # Pipeline
 # ─────────────────────────────────────────────────────────────────────────────
-#  PHASE 0  Build balanced training datasets from topological_relations.csv
-#             (7 predicates, ~185/predicate → balanced at min) and osm_kg_train.jsonl
+#  PHASE 0  Build training datasets — all from topological_relations.csv (same source as test)
+#   PHASE 0a  Balance CSV → topological_balanced_train.csv (130/pred × 7, eval excluded)
+#   PHASE 0b  Generate OSM-KG instruction data from topological_balanced_train.csv (API calls)
+#   PHASE 0c  Balance JSONL → osm_kg_balanced_train.jsonl
 #
 #  PHASE 1  Fine-tune adapters from scratch on balanced data
 #             FT-1  Topo-LoRA       → finetuned_gptoss_topological/final_adapter
@@ -44,9 +46,25 @@ header() { line; printf "  %s\n" "$1"; line; echo ""; }
 # PHASE 0 — Build balanced training datasets
 # ─────────────────────────────────────────────────────────────────────────────
 echo ""
-header "PHASE 0 — Building balanced training datasets from topological_relations.csv + osm_kg_train.jsonl"
+header "PHASE 0 — Building training datasets from topological_relations.csv (same source as test)"
 
-$PYTHON build_balanced_training_data.py --exclude-eval
+echo "  Phase 0a · Balance CSV  (topological_relations.csv → topological_balanced_train.csv)"
+line
+$PYTHON build_balanced_training_data.py --exclude-eval --csv-only
+
+echo ""
+echo "  Phase 0b · Generate OSM-KG instruction data (topological_balanced_train.csv → osm_kg_train.jsonl)"
+echo "             [Nominatim API calls — checkpoint-resumable, cache reused from results/osm_cache.json]"
+line
+$PYTHON build_training_data_osm.py \
+    --dataset ../dataset/topological_balanced_train.csv \
+    --cache   results/osm_cache.json \
+    --output  ../dataset/osm_kg_train.jsonl
+
+echo ""
+echo "  Phase 0c · Balance JSONL  (osm_kg_train.jsonl → osm_kg_balanced_train.jsonl)"
+line
+$PYTHON build_balanced_training_data.py --jsonl-only
 
 # ─────────────────────────────────────────────────────────────────────────────
 # PHASE 1 — Fine-tuning (from scratch unless --skip-train)
@@ -55,12 +73,13 @@ if [[ $SKIP_TRAIN -eq 0 ]]; then
     echo ""
     header "PHASE 1 — Fine-tuning adapters from scratch"
 
-    # Remove old adapters and stale result checkpoints
-    echo "  Cleaning old adapter artefacts and result checkpoints..."
+    # Remove old adapters, stale result checkpoints, and old KG training data
+    echo "  Cleaning old adapter artefacts, result checkpoints, and stale KG data..."
     rm -rf finetuned_gptoss_topological/
     rm -rf finetuned_gptoss_osm_kg/
     rm -rf finetuned_gptoss_wikidata_kg/
     rm -f  results/*_ckpt.json
+    rm -f  ../dataset/osm_kg_train.jsonl ../dataset/osm_kg_train.jsonl.ckpt.json
     echo "  Done. Starting fine-tuning."
     echo ""
 
@@ -69,7 +88,7 @@ if [[ $SKIP_TRAIN -eq 0 ]]; then
     $PYTHON train_runner_topo.py
 
     echo ""
-    echo "  FT-2 · OSM-KG LoRA  (osm_kg_balanced_train.jsonl — 234 rows)"
+    echo "  FT-2 · OSM-KG LoRA  (osm_kg_balanced_train.jsonl — from topological_balanced_train.csv + OSM API)"
     line
     $PYTHON train_runner_osm_kg.py
 
