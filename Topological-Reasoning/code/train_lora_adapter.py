@@ -74,7 +74,7 @@ from peft import LoraConfig, get_peft_model, TaskType
 # It is a bitsandbytes helper for 4-bit/8-bit bnb models only.
 # Our model is dequantized to plain bf16, so calling it causes a
 # CUDA allocator crash when it tries to upcast params to float32.
-from transformers import AutoTokenizer, AutoModelForCausalLM
+from transformers import AutoTokenizer, AutoModelForCausalLM, Mxfp4Config
 import trl
 from trl import SFTTrainer, SFTConfig
 
@@ -194,6 +194,7 @@ def main():
         device_map="auto",
         trust_remote_code=True,
         dtype=dtype,
+        quantization_config=Mxfp4Config(dequantize=True),
     )
     print(f"      -> Model dtype: {next(model.parameters()).dtype}")
 
