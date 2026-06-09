@@ -60,6 +60,7 @@ if [[ $SKIP_TRAIN -eq 0 ]]; then
     echo "  Cleaning old adapter artefacts and result checkpoints..."
     rm -rf finetuned_gptoss_topological/
     rm -rf finetuned_gptoss_osm_kg/
+    rm -rf finetuned_gptoss_wikidata_kg/
     rm -f  results/*_ckpt.json
     echo "  Done. Starting fine-tuning."
     echo ""
@@ -72,12 +73,26 @@ if [[ $SKIP_TRAIN -eq 0 ]]; then
     echo "  FT-2 · OSM-KG LoRA  (osm_kg_balanced_train.jsonl — 234 rows)"
     line
     $PYTHON train_runner_osm_kg.py
+
+    echo ""
+    echo "  FT-3 · Wikidata-KG LoRA  (wikidata_kg_train.jsonl — 255 rows)"
+    line
+    $PYTHON train_runner_wikidata_kg.py
 else
     echo ""
     header "PHASE 1 — Skipping fine-tuning (--skip-train flag)"
     echo "  Using existing adapters:"
     echo "    finetuned_gptoss_topological/final_adapter"
     echo "    finetuned_gptoss_osm_kg/final_adapter"
+    echo ""
+    echo "  Checking Wikidata-KG adapter (required for Config 4)..."
+    if [[ ! -f "finetuned_gptoss_wikidata_kg/final_adapter/adapter_model.safetensors" ]]; then
+        echo "  [TRAIN] Wikidata-KG adapter not found — running train_runner_wikidata_kg.py"
+        line
+        $PYTHON train_runner_wikidata_kg.py
+    else
+        echo "  [OK] finetuned_gptoss_wikidata_kg/final_adapter  ✅"
+    fi
 fi
 
 # ─────────────────────────────────────────────────────────────────────────────
