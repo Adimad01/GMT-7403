@@ -31,8 +31,8 @@ import argparse
 # ---------------------------------------------------------------------------
 # CONFIGURATION
 # ---------------------------------------------------------------------------
-DATASET        = "../dataset/triplet_update_v3_30.csv"
-INDICES_FILE   = "../dataset/eval_96_balanced_indices.json"
+DATASET        = "../dataset/topological_relations.csv"
+INDICES_FILE   = "../dataset/eval_112_balanced_indices.json"
 MODEL_ID       = "openai/gpt-oss-20b"
 ADAPTER_PATH   = "finetuned_gptoss_topological/final_adapter"
 OSM_CACHE      = "results/osm_cache.json"

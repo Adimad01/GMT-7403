@@ -26,10 +26,10 @@ import argparse
 # ──────────────────────────────────────────────────────────────────────────────
 # Config
 # ──────────────────────────────────────────────────────────────────────────────
-VALID_PREDICATES = ["contains", "within", "touches", "crosses", "disjoint", "overlaps"]
+VALID_PREDICATES = ["contains", "within", "touches", "crosses", "disjoint", "overlaps", "equals"]
 STRATEGIES       = ["cot", "tot", "got"]
 SUFFIX           = "neighborhood_details_spatial_relation_16_sample"
-N_EVAL           = 96
+N_EVAL           = 112
 
 EXPERIMENTS = [
     ("exp1_base_gpu",               "Configuration 01", "GPT-OSS-20B Base",

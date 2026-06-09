@@ -49,6 +49,21 @@ try:
         _AHQ.supports_quant_method = _safe_sqm
 except Exception:
     pass
+
+# Patch 5: kernels.LayerRepository — newer versions require revision= or version=
+# Patching __init__ METHOD (not class) so the fix applies even when hub_kernels.py
+# already holds a direct reference to the class object.
+try:
+    from kernels.layer.layer import LayerRepository as _LayerRepo
+    _orig_lr_init = _LayerRepo.__init__
+    def _patched_lr_init(self, *args, revision=None, version=None, **kwargs):
+        if revision is None and version is None:
+            version = "0"
+        _orig_lr_init(self, *args, revision=revision, version=version, **kwargs)
+    _LayerRepo.__init__ = _patched_lr_init
+    print("[PATCH] kernels.LayerRepository patched OK")
+except Exception as _kp_err:
+    print(f"[WARN] kernels patch skipped: {_kp_err}")
 # ===========================================================================
 
 import inspect
@@ -89,11 +104,11 @@ def build_training_prompt(row, tokenizer):
     """Build a complete instruction-following training example string from a dataset row."""
     place_type_subject = str(row.get("placetype_subject", "place"))
     place_type_object  = str(row.get("placetype_object",  "place"))
-    geom_type_subject  = str(row.get("geometry_type_subject", "unknown"))
-    geom_type_object   = str(row.get("geometry_type_object",  "unknown"))
+    geom_type_subject  = str(row.get("source_geometry",   row.get("geometry_type_subject", "unknown")))
+    geom_type_object   = str(row.get("target_geometry",   row.get("geometry_type_object",  "unknown")))
 
-    relation_predicate = str(row.get("relation_predicate", row.get("Sentence", "")))
-    expected_truth     = str(row.get("spatial_relation", "")).lower().strip()
+    relation_predicate = str(row.get("corpus", row.get("Sentence", row.get("relation_predicate", ""))))
+    expected_truth     = str(row.get("relation_label", row.get("spatial_relation", ""))).lower().strip()
 
     prompt_text = (
         "### SYSTEM PROMPT ###\n"
@@ -155,7 +170,7 @@ def main():
     records = [
         {"text": build_training_prompt(row, tokenizer)}
         for _, row in df.iterrows()
-        if not pd.isna(row.get("spatial_relation"))
+        if not pd.isna(row.get("relation_label", row.get("spatial_relation")))
     ]
     train_dataset = Dataset.from_list(records)
     print(f"      -> {len(records)} training examples loaded.")

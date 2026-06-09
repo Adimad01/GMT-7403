@@ -103,20 +103,22 @@ sys.meta_path.insert(0, _TorchvisionStubFinder())
 
 # ===========================================================================
 # PATCH: kernels.LayerRepository — newer kernels versions require revision= or
-# version= in the constructor; transformers calls it without those args.
-# Patch the constructor to supply a default so the import doesn't crash.
+# version= in the constructor; transformers/hub_kernels.py calls it without
+# those args at module level.  Patching the __init__ METHOD on the class
+# (rather than replacing the class) ensures the fix applies even when
+# hub_kernels.py already holds a direct reference to the class object.
 # ===========================================================================
 try:
-    import kernels.layer.layer as _kll
-    _OrigLayerRepo = _kll.LayerRepository
-    class _PatchedLayerRepo(_OrigLayerRepo):
-        def __init__(self, *args, revision=None, version=None, **kwargs):
-            if revision is None and version is None:
-                version = "0"
-            super().__init__(*args, revision=revision, version=version, **kwargs)
-    _kll.LayerRepository = _PatchedLayerRepo
-except Exception:
-    pass
+    from kernels.layer.layer import LayerRepository as _LayerRepo
+    _orig_lr_init = _LayerRepo.__init__
+    def _patched_lr_init(self, *args, revision=None, version=None, **kwargs):
+        if revision is None and version is None:
+            version = "0"
+        _orig_lr_init(self, *args, revision=revision, version=version, **kwargs)
+    _LayerRepo.__init__ = _patched_lr_init
+    print("[PATCH] kernels.LayerRepository patched OK")
+except Exception as _kp_err:
+    print(f"[WARN] kernels patch skipped: {_kp_err}")
 # ===========================================================================
 
 # ===========================================================================
@@ -235,18 +237,18 @@ def evaluate_strategy(strategy, df: pd.DataFrame, output_dir: str,
                 continue
 
             entity = {
-                "place_name_subject":   str(row.get("place_name_subject", "")).strip(),
-                "place_name_object":    str(row.get("place_name_object",  "")).strip(),
-                "placetype_subject":    str(row.get("placetype_subject",  "")).strip(),
-                "placetype_object":     str(row.get("placetype_object",   "")).strip(),
-                "geometry_type_subject": str(row.get("geometry_type_subject", "unknown")).strip(),
-                "geometry_type_object":  str(row.get("geometry_type_object",  "unknown")).strip(),
-                "relation_predicate":   str(row.get("relation_predicate",  "")).strip(),
-                "vernacular_relation":  str(row.get("vernacular_relation", "")).strip(),
-                "sentence":             str(row.get("Sentence", "")).strip(),
+                "place_name_subject":    str(row.get("source_entity",        row.get("place_name_subject", ""))).strip(),
+                "place_name_object":     str(row.get("target_entity",         row.get("place_name_object",  ""))).strip(),
+                "placetype_subject":     str(row.get("placetype_subject",     "place")).strip(),
+                "placetype_object":      str(row.get("placetype_object",      "place")).strip(),
+                "geometry_type_subject": str(row.get("source_geometry",       row.get("geometry_type_subject", "unknown"))).strip(),
+                "geometry_type_object":  str(row.get("target_geometry",       row.get("geometry_type_object",  "unknown"))).strip(),
+                "relation_predicate":    str(row.get("corpus",                row.get("Sentence", row.get("relation_predicate", "")))).strip(),
+                "vernacular_relation":   str(row.get("explanation",           row.get("vernacular_relation", ""))).strip(),
+                "sentence":              str(row.get("corpus",                row.get("Sentence", ""))).strip(),
             }
 
-            expected = str(row.get("spatial_relation", "")).lower().strip()
+            expected = str(row.get("relation_label", row.get("spatial_relation", ""))).lower().strip()
 
             def row_logger(msg: str):
                 log_f.write(msg + "\n")
@@ -342,10 +344,12 @@ def main():
         df = df.loc[df.index.isin(keep)]
         print(f"[DATA] Filtered to {len(df)} rows using {args.filter_indices}")
     else:
-        df["_sr_clean"] = df["spatial_relation"].astype(str).str.lower().str.strip()
+        label_col = "relation_label" if "relation_label" in df.columns else "spatial_relation"
+        df["_sr_clean"] = df[label_col].astype(str).str.lower().str.strip()
         sampled = [
             grp.sample(n=min(16, len(grp)), random_state=42)
             for grp in (df[df["_sr_clean"] == p] for p in VALID_PREDICATES)
+            if len(grp) > 0
         ]
         df = pd.concat(sampled).drop(columns=["_sr_clean"])
         print(f"[DATA] Stratified sample: {len(df)} rows (16 per predicate)")

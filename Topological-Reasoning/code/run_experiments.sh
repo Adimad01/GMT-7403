@@ -5,8 +5,8 @@
 #
 # Pipeline
 # ─────────────────────────────────────────────────────────────────────────────
-#  PHASE 0  Build balanced training datasets (39 examples/predicate, 234 total)
-#             from triplet_update_v3_70.csv and osm_kg_train.jsonl
+#  PHASE 0  Build balanced training datasets from topological_relations.csv
+#             (7 predicates, ~185/predicate → balanced at min) and osm_kg_train.jsonl
 #
 #  PHASE 1  Fine-tune adapters from scratch on balanced data
 #             FT-1  Topo-LoRA       → finetuned_gptoss_topological/final_adapter
@@ -44,9 +44,9 @@ header() { line; printf "  %s\n" "$1"; line; echo ""; }
 # PHASE 0 — Build balanced training datasets
 # ─────────────────────────────────────────────────────────────────────────────
 echo ""
-header "PHASE 0 — Building balanced training datasets (39/predicate · 234 total)"
+header "PHASE 0 — Building balanced training datasets from topological_relations.csv + osm_kg_train.jsonl"
 
-$PYTHON build_balanced_training_data.py
+$PYTHON build_balanced_training_data.py --exclude-eval
 
 # ─────────────────────────────────────────────────────────────────────────────
 # PHASE 1 — Fine-tuning (from scratch unless --skip-train)
@@ -64,7 +64,7 @@ if [[ $SKIP_TRAIN -eq 0 ]]; then
     echo "  Done. Starting fine-tuning."
     echo ""
 
-    echo "  FT-1 · Topo-LoRA  (triplet_balanced_train.csv — 234 rows, no KG in input)"
+    echo "  FT-1 · Topo-LoRA  (topological_balanced_train.csv — 7 predicates, no KG in input)"
     line
     $PYTHON train_runner_topo.py
 
@@ -100,7 +100,7 @@ fi
 # PHASE 2 — Evaluation
 # ─────────────────────────────────────────────────────────────────────────────
 echo ""
-header "PHASE 2 — Evaluating 5 configurations × 3 strategies on 96 balanced examples"
+header "PHASE 2 — Evaluating 5 configurations × 3 strategies on 112 balanced examples (7 predicates)"
 
 echo "  Config 1 · Base GPT-OSS-20B · CoT / ToT / GoT (512 tok)"
 line
