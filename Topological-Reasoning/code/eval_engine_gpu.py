@@ -102,6 +102,24 @@ sys.meta_path.insert(0, _TorchvisionStubFinder())
 # ===========================================================================
 
 # ===========================================================================
+# PATCH: kernels.LayerRepository — newer kernels versions require revision= or
+# version= in the constructor; transformers calls it without those args.
+# Patch the constructor to supply a default so the import doesn't crash.
+# ===========================================================================
+try:
+    import kernels.layer.layer as _kll
+    _OrigLayerRepo = _kll.LayerRepository
+    class _PatchedLayerRepo(_OrigLayerRepo):
+        def __init__(self, *args, revision=None, version=None, **kwargs):
+            if revision is None and version is None:
+                version = "0"
+            super().__init__(*args, revision=revision, version=version, **kwargs)
+    _kll.LayerRepository = _PatchedLayerRepo
+except Exception:
+    pass
+# ===========================================================================
+
+# ===========================================================================
 # DEPENDENCY MONKEY PATCHES (same as eval_kg_instruction_finetuned.py)
 # ===========================================================================
 if not hasattr(torch, "accelerator"):
