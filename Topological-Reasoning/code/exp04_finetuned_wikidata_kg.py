@@ -1,21 +1,23 @@
 """
-Experiment 4 — GPTOSS Fine-tuné Wikidata-KG + Inférence enrichie OSM
+Experiment 4 — GPTOSS OSM-KG LoRA sans KG à l'inférence
 ================================================================================
-GPT-OSS-20B fine-tuned on Wikidata-KG instruction data (wikidata_kg_train.jsonl),
-evaluated with CoT, ToT, and GoT reasoning strategies grounded on OSM KG.
+GPT-OSS-20B fine-tuned on OSM-KG instruction data (same adapter as Exp 3),
+evaluated with CoT/ToT/GoT reasoning strategies WITHOUT OSM KG evidence at
+inference time.
 
-Key distinction from Experiment 3: the adapter was trained on Wikidata-based
-evidence (semantic, entity-level) rather than OSM geometric evidence.  At
-inference, OSM KG evidence (coordinates, bounding boxes, hierarchy) is provided
-via CoT/ToT/GoT — testing whether Wikidata-KG fine-tuning transfers to OSM-
-grounded inference.
+Key distinction from Experiment 3: both use the OSM-KG LoRA adapter, but
+  Exp 3 — KG in training AND at inference  (KG enriches both phases)
+  Exp 4 — KG in training ONLY              (ablates the inference-time KG)
 
-Model     : openai/gpt-oss-20b + finetuned_gptoss_wikidata_kg/final_adapter
-KG        : Wikidata in training / OSM (Nominatim) at inference via CoT/ToT/GoT
+This isolates the contribution of KG-enriched fine-tuning alone, independent
+of KG evidence at inference.
+
+Model     : openai/gpt-oss-20b + finetuned_gptoss_osm_kg/final_adapter
+KG        : OSM in training only — NO KG at inference (--no-kg)
 Strategies: CoT, ToT, GoT
 Eval set  : 96 balanced examples — 16 per predicate
 Outputs   :
-  results/voletc_exp4_finetuned_osm_kg_gpu_{cot|tot|got}_*_ckpt.json
+  results/voletc_exp4_osm_kg_ft_only_gpu_{cot|tot|got}_*_ckpt.json
 
 Run:
     python exp04_finetuned_wikidata_kg.py
@@ -33,12 +35,12 @@ import argparse
 DATASET        = "../dataset/triplet_update_v3_30.csv"
 INDICES_FILE   = "../dataset/eval_96_balanced_indices.json"
 MODEL_ID       = "openai/gpt-oss-20b"
-ADAPTER_PATH   = "finetuned_gptoss_wikidata_kg/final_adapter"
+ADAPTER_PATH   = "finetuned_gptoss_osm_kg/final_adapter"
 OSM_CACHE      = "results/osm_cache.json"
-MODEL_TAG      = "exp4_finetuned_osm_kg_gpu"
+MODEL_TAG      = "exp4_osm_kg_ft_only_gpu"
 OUTPUT_DIR     = "results"
 TEMPERATURE    = 0.1
-MAX_NEW_TOKENS = 1024
+MAX_NEW_TOKENS = 512
 
 SUFFIX     = "neighborhood_details_spatial_relation_16_sample"
 STRATEGIES = ["cot", "tot", "got"]
@@ -53,13 +55,10 @@ def preflight():
             ok = False
     if not ok:
         sys.exit(1)
-    print(f"[OK] Dataset : {DATASET}")
-    print(f"[OK] Indices : {INDICES_FILE}")
-    print(f"[OK] Adapter : {ADAPTER_PATH}")
-    if os.path.exists(OSM_CACHE):
-        print(f"[OK] OSM cache: {len(json.load(open(OSM_CACHE)))} entries")
-    else:
-        print(f"[WARN] OSM cache not found — will query Nominatim live")
+    print(f"[OK] Dataset  : {DATASET}")
+    print(f"[OK] Indices  : {INDICES_FILE}")
+    print(f"[OK] Adapter  : {ADAPTER_PATH}")
+    print(f"[INFO] KG at inference : DISABLED (--no-kg)")
 
 
 def check_strategy_status(strategies: list) -> bool:
@@ -68,7 +67,7 @@ def check_strategy_status(strategies: list) -> bool:
     for strat in strategies:
         ckpt = os.path.join(OUTPUT_DIR, f"voletc_{MODEL_TAG}_{strat}_{SUFFIX}_ckpt.json")
         if os.path.exists(ckpt):
-            data   = json.load(open(ckpt))
+            data    = json.load(open(ckpt))
             done    = len(data.get("processed_indices", []))
             results = data.get("results", [])
             if done >= 96 and results:
@@ -92,12 +91,11 @@ def run():
     preflight()
 
     print("\n" + "=" * 70)
-    print("  EXPERIMENT 4 — GPTOSS FT Wikidata-KG + Inférence OSM CoT/ToT/GoT")
-    print("  (Wikidata-KG adapter, OSM evidence at inference only)")
+    print("  EXPERIMENT 4 — GPTOSS OSM-KG LoRA (KG in training, NO KG at inference)")
     print("=" * 70)
     print(f"  Model      : {MODEL_ID}")
-    print(f"  Adapter    : {ADAPTER_PATH}  [trained WITH Wikidata KG evidence]")
-    print(f"  KG         : Wikidata in training / OSM via CoT/ToT/GoT at inference")
+    print(f"  Adapter    : {ADAPTER_PATH}  [trained WITH OSM KG evidence]")
+    print(f"  KG         : OSM in training only — inference runs WITHOUT evidence")
     print(f"  Strategies : {', '.join(s.upper() for s in target)}")
     print(f"  Output tag : {MODEL_TAG}")
     print("=" * 70)
@@ -118,6 +116,7 @@ def run():
         "--model-tag",      MODEL_TAG,
         "--temperature",    str(TEMPERATURE),
         "--max-new-tokens", str(MAX_NEW_TOKENS),
+        "--no-kg",
     ]
 
     from eval_engine_gpu import main

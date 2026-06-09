@@ -309,6 +309,8 @@ def main():
     parser.add_argument("--temperature",     type=float, default=0.1)
     parser.add_argument("--max-new-tokens",  type=int,   default=512)
     parser.add_argument("--model-tag",       default="dynamic_osm_finetuned_gpu")
+    parser.add_argument("--no-kg",           action="store_true",
+                        help="Disable OSM KG evidence at inference (Config 4: KG in training only)")
     args = parser.parse_args()
 
     # ------------------------------------------------------------------
@@ -483,7 +485,15 @@ def main():
     # ------------------------------------------------------------------
     # 4. Load OSM KG (uses existing cache — no extra API calls needed)
     # ------------------------------------------------------------------
-    kg = GeographicKnowledgeGraph("results/osm_cache.json")
+    if args.no_kg:
+        class _NullKG:
+            """Drop-in replacement that returns no evidence (Config 4: KG-trained, no KG at inference)."""
+            def gather_evidence(self, place_a, place_b, sentence="", entity=None, log_fn=None):
+                return ""
+        kg = _NullKG()
+        print("[KG] OSM KG disabled (--no-kg): adapter was trained with KG, inference runs without evidence")
+    else:
+        kg = GeographicKnowledgeGraph("results/osm_cache.json")
 
     # ------------------------------------------------------------------
     # 5. Run selected strategies

@@ -9,7 +9,7 @@ Experiment configurations:
   vol1-01 — Base (no adapter)                          tag: exp1_base_gpu          512 tok
   vol1-02 — Topo-LoRA                                  tag: exp2_finetuned_topo_gpu 512 tok
   vol1-03 — OSM-KG LoRA  (KG in training + inference)  tag: exp3_finetuned_kg_in_gpu 1024 tok
-  vol1-04 — Wikidata-KG LoRA  (OSM at inference)        tag: exp4_finetuned_osm_kg_gpu 1024 tok
+  vol1-04 — OSM-KG LoRA  (KG en training seulement)     tag: exp4_osm_kg_ft_only_gpu   512 tok
   vol1-05 — Topo-LoRA + extended budget                tag: exp5_finetuned_enriched_gpu 1024 tok
 
 Usage:
@@ -39,7 +39,7 @@ EXPERIMENTS = [
     ("Base GPT-OSS-20B",                          "exp1_base_gpu",               "no adapter, 512 tok"),
     ("Topo-LoRA",                                 "exp2_finetuned_topo_gpu",     "topo adapter, 512 tok"),
     ("OSM-KG LoRA  (KG at inference)",            "exp3_finetuned_kg_in_gpu",    "osm-kg adapter, 1024 tok"),
-    ("Wikidata-KG LoRA  (OSM at inference)",      "exp4_finetuned_osm_kg_gpu",   "wikidata-kg adapter, 1024 tok"),
+    ("OSM-KG LoRA  (KG en training seulement)",   "exp4_osm_kg_ft_only_gpu",     "osm-kg adapter, 512 tok, no KG at inference"),
     ("Topo-LoRA + extended budget",               "exp5_finetuned_enriched_gpu", "topo adapter, 1024 tok"),
 ]
 

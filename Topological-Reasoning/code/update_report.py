@@ -38,8 +38,8 @@ EXPERIMENTS = [
      "exp2_finetuned_topo_gpu · 512 tok · topo-lora"),
     ("exp3_finetuned_kg_in_gpu",    "Configuration 03", "Topo-LoRA + KG en entrée",
      "exp3_finetuned_kg_in_gpu · 1024 tok · knowledge injection"),
-    ("exp4_finetuned_osm_kg_gpu",   "Configuration 04", "Wikidata-KG LoRA",
-     "exp4_finetuned_osm_kg_gpu · 1024 tok · wikidata-kg adapter"),
+    ("exp4_osm_kg_ft_only_gpu",     "Configuration 04", "OSM-KG LoRA (FT only)",
+     "exp4_osm_kg_ft_only_gpu · 512 tok · osm-kg adapter, no KG at inference"),
     ("exp5_finetuned_enriched_gpu", "Configuration 05", "Topo-LoRA + budget étendu",
      "exp5_finetuned_enriched_gpu · 1024 tok · inference-time grounding"),
 ]
@@ -49,7 +49,7 @@ SHORT_NAMES = {
     "exp1_base_gpu":               "GPTOSS Base",
     "exp2_finetuned_topo_gpu":     "GPTOSS Fine-tuné",
     "exp3_finetuned_kg_in_gpu":    "FT + KG en entrée",
-    "exp4_finetuned_osm_kg_gpu":   "Wikidata-KG LoRA",
+    "exp4_osm_kg_ft_only_gpu":     "OSM-KG LoRA (FT only)",
     "exp5_finetuned_enriched_gpu": "FT + Inférence enrichie",
 }
 

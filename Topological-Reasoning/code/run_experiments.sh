@@ -11,14 +11,13 @@
 #  PHASE 1  Fine-tune adapters from scratch on balanced data
 #             FT-1  Topo-LoRA       → finetuned_gptoss_topological/final_adapter
 #             FT-2  OSM-KG LoRA     → finetuned_gptoss_osm_kg/final_adapter
-#             FT-3  Wikidata-KG LoRA → finetuned_gptoss_wikidata_kg/final_adapter
 #
 #  PHASE 2  Evaluate 5 configurations × 3 strategies (CoT / ToT / GoT)
-#             Config 1  Base model (no adapter)              512 tok
-#             Config 2  Topo-LoRA                            512 tok
-#             Config 3  OSM-KG LoRA + KG evidence at test    1024 tok
-#             Config 4  Wikidata-KG LoRA + OSM at inference  1024 tok
-#             Config 5  Topo-LoRA + extended reasoning       1024 tok
+#             Config 1  Base model (no adapter)                        512 tok
+#             Config 2  Topo-LoRA                                      512 tok
+#             Config 3  OSM-KG LoRA + KG evidence at inference        1024 tok
+#             Config 4  OSM-KG LoRA, NO KG at inference (FT only)      512 tok
+#             Config 5  Topo-LoRA + extended reasoning budget          1024 tok
 #
 #  PHASE 3  Analyse and summarise results
 # ─────────────────────────────────────────────────────────────────────────────
@@ -75,23 +74,25 @@ if [[ $SKIP_TRAIN -eq 0 ]]; then
     $PYTHON train_runner_osm_kg.py
 
     echo ""
-    echo "  FT-3 · Wikidata-KG LoRA  (wikidata_kg_train.jsonl — 255 rows)"
-    line
-    $PYTHON train_runner_wikidata_kg.py
 else
     echo ""
     header "PHASE 1 — Skipping fine-tuning (--skip-train flag)"
-    echo "  Using existing adapters:"
-    echo "    finetuned_gptoss_topological/final_adapter"
-    echo "    finetuned_gptoss_osm_kg/final_adapter"
-    echo ""
-    echo "  Checking Wikidata-KG adapter (required for Config 4)..."
-    if [[ ! -f "finetuned_gptoss_wikidata_kg/final_adapter/adapter_model.safetensors" ]]; then
-        echo "  [TRAIN] Wikidata-KG adapter not found — running train_runner_wikidata_kg.py"
+    echo "  Checking Topo-LoRA adapter ..."
+    if [[ ! -f "finetuned_gptoss_topological/final_adapter/adapter_model.safetensors" ]]; then
+        echo "  [TRAIN] Topo-LoRA not found — running train_runner_topo.py"
         line
-        $PYTHON train_runner_wikidata_kg.py
+        $PYTHON train_runner_topo.py
     else
-        echo "  [OK] finetuned_gptoss_wikidata_kg/final_adapter  ✅"
+        echo "  [OK] finetuned_gptoss_topological/final_adapter  ✅"
+    fi
+
+    echo "  Checking OSM-KG LoRA adapter (used by Config 3 AND Config 4) ..."
+    if [[ ! -f "finetuned_gptoss_osm_kg/final_adapter/adapter_model.safetensors" ]]; then
+        echo "  [TRAIN] OSM-KG LoRA not found — running train_runner_osm_kg.py"
+        line
+        $PYTHON train_runner_osm_kg.py
+    else
+        echo "  [OK] finetuned_gptoss_osm_kg/final_adapter  ✅"
     fi
 fi
 
@@ -116,7 +117,7 @@ line
 $PYTHON exp03_finetuned_osm_kg.py
 
 echo ""
-echo "  Config 4 · Wikidata-KG LoRA + OSM evidence at inference · CoT / ToT / GoT (1024 tok)"
+echo "  Config 4 · OSM-KG LoRA, NO KG at inference (ablation: FT only) · CoT / ToT / GoT (512 tok)"
 line
 $PYTHON exp04_finetuned_wikidata_kg.py
 
