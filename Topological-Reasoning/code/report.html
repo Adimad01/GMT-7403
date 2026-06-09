@@ -467,7 +467,7 @@ code{font-family:var(--mono);font-size:12px;background:var(--bg2);border:1px sol
       Toutes les expérimentations complètes · 15/15 résultats
     </div>
     <h1>Raisonnement<br/><span class="grad-text">Topologique</span><br/>par GPT-OSS 20B</h1>
-    <p class="hero-sub">5 configurations de GPT-OSS-20B évaluées sur 96 exemples équilibrés de relations DE-9IM avec trois stratégies de raisonnement enrichies par Knowledge Graph OSM.</p>
+    <p class="hero-sub">15 configurations de GPT-OSS-20B évaluées sur 96 exemples équilibrés de relations DE-9IM avec trois stratégies de raisonnement enrichies par Knowledge Graph OSM.</p>
     <div class="hero-stats">
       <div class="stat-chip"><span class="dot" style="background:var(--blue)"></span>96 exemples · 16/prédicat</div>
       <div class="stat-chip"><span class="dot" style="background:var(--purple)"></span>CoT · ToT · GoT</div>
@@ -477,7 +477,7 @@ code{font-family:var(--mono);font-size:12px;background:var(--bg2);border:1px sol
     </div>
     <div class="hero-score">
       <div class="label">Meilleur score global · GPU A100</div>
-      <div class="value">57.3%</div>
+      <div class="value">61.5%</div>
       <div class="desc">GPTOSS Base · CoT · A100 80 GB</div>
     </div>
   </div>
@@ -782,7 +782,7 @@ code{font-family:var(--mono);font-size:12px;background:var(--bg2);border:1px sol
 <!-- EXPERIMENTS -->
 <section id="experiences" class="s-alt">
   <div class="container-lg">
-    <div class="eyebrow">Les 6 configurations</div>
+    <div class="eyebrow">Les 15 configurations</div>
     <h2>Ce que nous avons testé</h2>
     <p class="lead">Six configurations évaluent l'impact du fine-tuning, du Knowledge Graph et de la stratégie de raisonnement (CoT / ToT / GoT). Le badge bleu indique la meilleure stratégie de l'expérimentation.</p>
 
@@ -791,70 +791,53 @@ code{font-family:var(--mono);font-size:12px;background:var(--bg2);border:1px sol
         <div class="exp-num">Configuration 01</div>
         <div class="exp-title">GPT-OSS-20B Base</div>
         <div class="scores-row">
-          <div class="sc winner"><span class="sl">CoT</span><span class="sv">57.3%</span></div>
-          <div class="sc"><span class="sl">ToT</span><span class="sv">37.5%</span></div>
-          <div class="sc"><span class="sl">GoT</span><span class="sv">26.0%</span></div>
+          <div class="sc winner"><span class="sl">COT</span><span class="sv">57.3%</span></div>
+          <div class="sc"><span class="sl">TOT</span><span class="sv">37.5%</span></div>
+          <div class="sc"><span class="sl">GOT</span><span class="sv">26.0%</span></div>
         </div>
         <div class="exp-tag">exp1_base_gpu · 512 tok · sans adaptateur</div>
       </div>
-
       <div class="exp-card">
         <div class="exp-num">Configuration 02</div>
         <div class="exp-title">GPT-OSS-20B + Topo-LoRA</div>
         <div class="scores-row">
-          <div class="sc"><span class="sl">CoT</span><span class="sv">49.0%</span></div>
-          <div class="sc"><span class="sl">ToT</span><span class="sv">32.3%</span></div>
-          <div class="sc winner"><span class="sl">GoT</span><span class="sv">52.1%</span></div>
+          <div class="sc"><span class="sl">COT</span><span class="sv">53.1%</span></div>
+          <div class="sc"><span class="sl">TOT</span><span class="sv">19.8%</span></div>
+          <div class="sc winner"><span class="sl">GOT</span><span class="sv">61.5%</span></div>
         </div>
         <div class="exp-tag">exp2_finetuned_topo_gpu · 512 tok · topo-lora</div>
       </div>
-
       <div class="exp-card">
         <div class="exp-num">Configuration 03</div>
         <div class="exp-title">Topo-LoRA + KG en entrée</div>
         <div class="scores-row">
-          <div class="sc winner"><span class="sl">CoT</span><span class="sv">47.9%</span></div>
-          <div class="sc"><span class="sl">ToT</span><span class="sv">24.0%</span></div>
-          <div class="sc"><span class="sl">GoT</span><span class="sv">27.1%</span></div>
+          <div class="sc winner"><span class="sl">COT</span><span class="sv">47.9%</span></div>
+          <div class="sc"><span class="sl">TOT</span><span class="sv">24.0%</span></div>
+          <div class="sc"><span class="sl">GOT</span><span class="sv">27.1%</span></div>
         </div>
         <div class="exp-tag">exp3_finetuned_kg_in_gpu · 1024 tok · knowledge injection</div>
       </div>
-
       <div class="exp-card">
         <div class="exp-num">Configuration 04</div>
-        <div class="exp-title">OSM-KG LoRA — KG internalisé</div>
+        <div class="exp-title">Wikidata-KG LoRA</div>
         <div class="scores-row">
-          <div class="sc"><span class="sl">CoT</span><span class="sv">—</span></div>
-          <div class="sc"><span class="sl">ToT</span><span class="sv">—</span></div>
-          <div class="sc"><span class="sl">GoT</span><span class="sv">—</span></div>
+          <div class="sc winner"><span class="sl">COT</span><span class="sv">58.3%</span></div>
+          <div class="sc"><span class="sl">TOT</span><span class="sv">39.6%</span></div>
+          <div class="sc"><span class="sl">GOT</span><span class="sv">29.2%</span></div>
         </div>
-        <div class="exp-tag">exp4 · osm-kg-lora · 512 tok · à évaluer</div>
+        <div class="exp-tag">exp4_finetuned_osm_kg_gpu · 1024 tok · wikidata-kg adapter</div>
       </div>
-
       <div class="exp-card">
         <div class="exp-num">Configuration 05</div>
-        <div class="exp-title">Topo-LoRA + KG grounding</div>
+        <div class="exp-title">Topo-LoRA + budget étendu</div>
         <div class="scores-row">
-          <div class="sc"><span class="sl">CoT</span><span class="sv">49.0%</span></div>
-          <div class="sc"><span class="sl">ToT</span><span class="sv">29.2%</span></div>
-          <div class="sc winner"><span class="sl">GoT</span><span class="sv">56.2%</span></div>
+          <div class="sc"><span class="sl">COT</span><span class="sv">49.0%</span></div>
+          <div class="sc"><span class="sl">TOT</span><span class="sv">29.2%</span></div>
+          <div class="sc winner"><span class="sl">GOT</span><span class="sv">56.2%</span></div>
         </div>
         <div class="exp-tag">exp5_finetuned_enriched_gpu · 1024 tok · inference-time grounding</div>
       </div>
-
-      <div class="exp-card">
-        <div class="exp-num">Configuration 06</div>
-        <div class="exp-title">Base + KG grounding</div>
-        <div class="scores-row">
-          <div class="sc"><span class="sl">CoT</span><span class="sv">—</span></div>
-          <div class="sc"><span class="sl">ToT</span><span class="sv">—</span></div>
-          <div class="sc"><span class="sl">GoT</span><span class="sv">—</span></div>
-        </div>
-        <div class="exp-tag">exp6 · base · KG grounding · à évaluer</div>
-      </div>
-
     </div>
-  </div>
 </section>
 
 <!-- PIPELINES -->
@@ -887,10 +870,7 @@ code{font-family:var(--mono);font-size:12px;background:var(--bg2);border:1px sol
 
     <div class="chart-wrap">
       <div class="chart-legend">
-        <div class="legend-item"><div class="legend-dot" style="background:linear-gradient(90deg,#3b82f6,#6366f1)"></div>CoT</div>
-        <div class="legend-item"><div class="legend-dot" style="background:linear-gradient(90deg,#f59e0b,#ef4444)"></div>ToT</div>
-        <div class="legend-item"><div class="legend-dot" style="background:linear-gradient(90deg,#10b981,#06b6d4)"></div>GoT</div>
-      </div>
+        <div class="legend-item"><div class="legend-dot" style="background:linear-gradient(90deg,#3b82f6,#6366f1)"></div>
 
       <div class="chart-row chart-best-row">
         <div class="chart-lbl">★ GPTOSS Base</div>
@@ -900,16 +880,14 @@ code{font-family:var(--mono);font-size:12px;background:var(--bg2);border:1px sol
           <div class="bar-wrap"><div class="bar bar-got" style="width:26.0%"></div><span class="bar-val">26.0%</span></div>
         </div>
       </div>
-
       <div class="chart-row">
         <div class="chart-lbl">GPTOSS Fine-tuné</div>
         <div class="bar-group">
-          <div class="bar-wrap"><div class="bar bar-cot" style="width:49.0%"></div><span class="bar-val">49.0%</span></div>
-          <div class="bar-wrap"><div class="bar bar-tot" style="width:32.3%"></div><span class="bar-val">32.3%</span></div>
-          <div class="bar-wrap"><div class="bar bar-got" style="width:52.1%"></div><span class="bar-val">52.1%</span></div>
+          <div class="bar-wrap"><div class="bar bar-cot" style="width:53.1%"></div><span class="bar-val">53.1%</span></div>
+          <div class="bar-wrap"><div class="bar bar-tot" style="width:19.8%"></div><span class="bar-val">19.8%</span></div>
+          <div class="bar-wrap"><div class="bar bar-got" style="width:61.5%"></div><span class="bar-val">61.5%</span></div>
         </div>
       </div>
-
       <div class="chart-row">
         <div class="chart-lbl">FT + KG en entrée</div>
         <div class="bar-group">
@@ -918,7 +896,14 @@ code{font-family:var(--mono);font-size:12px;background:var(--bg2);border:1px sol
           <div class="bar-wrap"><div class="bar bar-got" style="width:27.1%"></div><span class="bar-val">27.1%</span></div>
         </div>
       </div>
-
+      <div class="chart-row">
+        <div class="chart-lbl">Wikidata-KG LoRA</div>
+        <div class="bar-group">
+          <div class="bar-wrap"><div class="bar bar-cot" style="width:58.3%"></div><span class="bar-val">58.3%</span></div>
+          <div class="bar-wrap"><div class="bar bar-tot" style="width:39.6%"></div><span class="bar-val">39.6%</span></div>
+          <div class="bar-wrap"><div class="bar bar-got" style="width:29.2%"></div><span class="bar-val">29.2%</span></div>
+        </div>
+      </div>
       <div class="chart-row">
         <div class="chart-lbl">FT + Inférence enrichie</div>
         <div class="bar-group">
@@ -1073,11 +1058,12 @@ code{font-family:var(--mono);font-size:12px;background:var(--bg2);border:1px sol
       <table>
         <thead><tr><th>Expérimentation</th><th class="s-cot">Précision</th><th>contains</th><th>within</th><th>touches</th><th>crosses</th><th>disjoint</th><th>overlaps</th></tr></thead>
         <tbody>
-          <tr class="best-r"><td>★ GPTOSS Base</td><td class="pct pct-hi">57.3%</td><td>75.0%</td><td class="pct-hi">100.0%</td><td>50.0%</td><td>37.5%</td><td>62.5%</td><td class="pct-lo">18.8%</td></tr>
-          <tr><td>GPTOSS Fine-tuné</td><td class="pct">49.0%</td><td class="pct-lo">18.8%</td><td>43.8%</td><td>43.8%</td><td>75.0%</td><td>75.0%</td><td>62.5%</td></tr>
-          <tr><td>FT + KG en entrée</td><td class="pct">47.9%</td><td>31.2%</td><td>93.8%</td><td>37.5%</td><td>37.5%</td><td>62.5%</td><td>25.0%</td></tr>
-          <tr><td>FT + Inférence enrichie</td><td class="pct">49.0%</td><td class="pct-lo">6.2%</td><td>37.5%</td><td>43.8%</td><td>62.5%</td><td>81.2%</td><td>62.5%</td></tr>
-        </tbody>
+          <tr><td>GPTOSS Base</td><td class="pct">37.5%</td><td class="pct-hi">75.0%</td><td>50.0%</td><td>31.2%</td><td class="pct-lo">6.2%</td><td>50.0%</td><td class="pct-lo">12.5%</td></tr>
+          <tr><td>GPTOSS Fine-tuné</td><td class="pct pct-lo">19.8%</td><td>31.2%</td><td class="pct-lo">18.8%</td><td class="pct-lo">25.0%</td><td class="pct-lo">6.2%</td><td class="pct-lo">18.8%</td><td class="pct-lo">18.8%</td></tr>
+          <tr><td>FT + KG en entrée</td><td class="pct pct-lo">24.0%</td><td>43.8%</td><td>50.0%</td><td class="pct-lo">12.5%</td><td class="pct-lo">6.2%</td><td class="pct-lo">25.0%</td><td class="pct-lo">6.2%</td></tr>
+          <tr class="best-r"><td>★ Wikidata-KG LoRA</td><td class="pct">39.6%</td><td>68.8%</td><td>56.2%</td><td class="pct-lo">12.5%</td><td class="pct-lo">12.5%</td><td>62.5%</td><td class="pct-lo">25.0%</td></tr>
+          <tr><td>FT + Inférence enrichie</td><td class="pct">29.2%</td><td>43.8%</td><td>31.2%</td><td>31.2%</td><td class="pct-lo">25.0%</td><td class="pct-lo">25.0%</td><td class="pct-lo">18.8%</td></tr>
+          </tbody>
       </table>
     </div>
 
@@ -1105,11 +1091,12 @@ code{font-family:var(--mono);font-size:12px;background:var(--bg2);border:1px sol
       <table>
         <thead><tr><th>Expérimentation</th><th class="s-got">Précision</th><th>contains</th><th>within</th><th>touches</th><th>crosses</th><th>disjoint</th><th>overlaps</th></tr></thead>
         <tbody>
-          <tr><td>GPTOSS Base</td><td class="pct pct-lo">26.0%</td><td>56.2%</td><td>37.5%</td><td class="pct-lo">0.0%</td><td class="pct-lo">12.5%</td><td>43.8%</td><td class="pct-lo">6.2%</td></tr>
-          <tr><td>GPTOSS Fine-tuné</td><td class="pct">52.1%</td><td>62.5%</td><td>62.5%</td><td>75.0%</td><td>62.5%</td><td>62.5%</td><td>43.8%</td></tr>
-          <tr><td>FT + KG en entrée</td><td class="pct pct-lo">27.1%</td><td>31.2%</td><td>50.0%</td><td class="pct-lo">12.5%</td><td class="pct-lo">18.8%</td><td>37.5%</td><td class="pct-lo">12.5%</td></tr>
-          <tr><td>FT + Inférence enrichie</td><td class="pct">56.2%</td><td>50.0%</td><td>81.2%</td><td>62.5%</td><td>56.2%</td><td>50.0%</td><td>37.5%</td></tr>
-        </tbody>
+          <tr><td>GPTOSS Base</td><td class="pct">26.0%</td><td>56.2%</td><td>37.5%</td><td class="pct-lo">0.0%</td><td class="pct-lo">12.5%</td><td>43.8%</td><td class="pct-lo">6.2%</td></tr>
+          <tr class="best-r"><td>★ GPTOSS Fine-tuné</td><td class="pct">61.5%</td><td>62.5%</td><td>62.5%</td><td class="pct-hi">75.0%</td><td>62.5%</td><td>62.5%</td><td>43.8%</td></tr>
+          <tr><td>FT + KG en entrée</td><td class="pct">27.1%</td><td>31.2%</td><td>50.0%</td><td class="pct-lo">12.5%</td><td class="pct-lo">18.8%</td><td>37.5%</td><td class="pct-lo">12.5%</td></tr>
+          <tr><td>Wikidata-KG LoRA</td><td class="pct">29.2%</td><td class="pct-lo">25.0%</td><td>43.8%</td><td class="pct-lo">18.8%</td><td class="pct-lo">12.5%</td><td>43.8%</td><td>31.2%</td></tr>
+          <tr><td>FT + Inférence enrichie</td><td class="pct">56.2%</td><td>50.0%</td><td class="pct-hi">81.2%</td><td>62.5%</td><td>56.2%</td><td>50.0%</td><td>37.5%</td></tr>
+          </tbody>
       </table>
     </div>
 
@@ -1118,23 +1105,23 @@ code{font-family:var(--mono);font-size:12px;background:var(--bg2);border:1px sol
     <div class="insight-grid" style="margin-top:32px">
       <div class="insight">
         <span class="ico">🏆</span>
-        <h4>CoT Base · Meilleur GPU</h4>
-        <p>GPTOSS Base avec CoT atteint <strong>57.3%</strong> — meilleure performance parmi les 4 expérimentations GPU A100.</p>
+        <h4>GPTOSS Fine-tuné · GOT · Meilleur</h4>
+        <p>GPTOSS Fine-tuné avec GOT atteint <strong>61.5%</strong> — meilleure performance parmi les 5 expérimentations GPU A100.</p>
       </div>
       <div class="insight">
         <span class="ico">⚠️</span>
         <h4>Fine-tuning non suffisant seul</h4>
-        <p>Les modèles fine-tunés ne surpassent pas systématiquement le base. Le fine-tuning dégrade CoT (49.0% vs 57.3%) et GoT (52.1% vs 56.2% enrichi).</p>
+        <p>Le modèle de base (CoT 57.3%) reste compétitif. Le fine-tuning améliore GoT mais peut dégrader CoT selon la configuration.</p>
       </div>
       <div class="insight">
         <span class="ico">📈</span>
-        <h4>GoT &gt; CoT &gt; ToT</h4>
-        <p>GoT bénéficie le plus du KG OSM. ToT est systématiquement la stratégie la moins performante sur cette tâche de classification topologique.</p>
+        <h4>CoT dominant en moyenne</h4>
+        <p>GoT (40.0% avg) vs CoT (53.1% avg). ToT est systématiquement la stratégie la moins performante sur cette tâche de classification topologique.</p>
       </div>
       <div class="insight">
         <span class="ico">🗺️</span>
-        <h4>within et disjoint : faciles</h4>
-        <p>Le modèle base atteint 100% sur <em>within</em> en CoT. <em>crosses</em> et <em>overlaps</em> restent les prédicats les plus difficiles à prédire.</p>
+        <h4>within facile · overlaps difficile</h4>
+        <p><em>within</em> est le prédicat le mieux prédit (moy 55%). <em>overlaps</em> reste le plus difficile (moy 29%).</p>
       </div>
     </div>
   </div>
@@ -1143,7 +1130,7 @@ code{font-family:var(--mono);font-size:12px;background:var(--bg2);border:1px sol
 <!-- FOOTER -->
 <footer>
   <div class="f-logo">GPT-OSS 20B · Raisonnement Topologique</div>
-  <p>4 expérimentations GPU A100 · 96 exemples · 12 configurations · CoT · ToT · GoT · KG OSM</p>
+  <p>5 expérimentations GPU A100 · 96 exemples · 15 configurations · CoT · ToT · GoT · KG OSM</p>
   <p>DE-9IM · contains · within · touches · crosses · disjoint · overlaps · Université Laval</p>
 </footer>
 
@@ -1153,7 +1140,7 @@ code{font-family:var(--mono);font-size:12px;background:var(--bg2);border:1px sol
 var PIPES=[
 {num:'01',name:'GPTOSS Base',
  desc:'Modèle GPT-OSS-20B sans fine-tuning. Les preuves OSM sont récupérées dynamiquement à l\'inférence via Nominatim et injectées dans le prompt.',
- tag:'exp1_base_gpu · 512 tok · sans adaptateur',bestScore:'57.3%',bestStrat:'CoT',
+ tag:'exp1_base_gpu · 512 tok · sans adaptateur',bestScore:'57.3%',bestStrat:'COT',
  diffNote:'Configuration de référence : aucun fine-tuning. Le KG OSM enrichit uniquement le prompt à l\'inférence.',
  phases:[{label:'⚡ Phase d\'inférence',cls:'phase-infer',steps:[
   {icon:'&#128196;',label:'Texte\nrequête',type:'input',typeLabel:'Entrée',dTitle:'Texte requête',dSub:'Phrase vernaculaire décrivant la relation spatiale',dBody:'Ex. : <strong>« Baraboo is home to the Circus World Museum »</strong>. Le modèle doit inférer le prédicat DE-9IM (<code>contains</code>) sans coordonnées explicites.'},
@@ -1164,7 +1151,7 @@ var PIPES=[
 },
 {num:'02',name:'GPTOSS Fine-tuné',
  desc:'GPT-OSS-20B fine-tuné sur 234 exemples topologiques équilibrés (sans KG). L\'adaptateur LoRA r=8 spécialise le modèle sur la classification DE-9IM.',
- tag:'exp2_finetuned_topo_gpu · 512 tok · topo adapter',bestScore:'52.1%',bestStrat:'GoT',
+ tag:'exp2_finetuned_topo_gpu · 512 tok · topo adapter',bestScore:'61.5%',bestStrat:'GOT',
  diffNote:'Le fine-tuning dégrade CoT (49.0 % vs 57.3 %) et GoT (52.1 % vs 57.3 % base). GoT reste la meilleure stratégie au sein de l\'expérimentation. Pas de KG à l\'inférence.',
  phases:[
   {label:'🔧 Phase d\'entraînement',cls:'phase-train',steps:[
@@ -1182,7 +1169,7 @@ var PIPES=[
 },
 {num:'03',name:'FT + KG en entrée',
  desc:'Modèle fine-tuné (adaptateur topo) + preuves OSM injectées dans le prompt à l\'inférence. Double enrichissement : poids spécialisés + contexte géographique externe.',
- tag:'exp3_finetuned_kg_in_gpu · 1024 tok · topo + osm',bestScore:'47.9%',bestStrat:'CoT',
+ tag:'exp3_finetuned_kg_in_gpu · 1024 tok · topo + osm',bestScore:'47.9%',bestStrat:'COT',
  diffNote:'Combiner fine-tuning et KG en entrée ne cumule pas les avantages. Mismatch : modèle entraîné sans KG, inféré avec KG.',
  phases:[
   {label:'🔧 Phase d\'entraînement',cls:'phase-train',steps:[
@@ -1220,7 +1207,7 @@ var PIPES=[
 },
 {num:'05',name:'Topo-LoRA + raisonnement ancré (KG grounding)',
  desc:'Modèle fine-tuné (Topo-LoRA) avec raisonnement ancré sur le KG OSM à l\'inférence. Le KG ne figure pas dans le prompt : le modèle génère d\'abord ses étapes de raisonnement, puis chaque étape est alignée et vérifiée contre le graphe (reasoning path validation).',
- tag:'exp5_finetuned_enriched_gpu · 1024 tok · inference-time grounding',bestScore:'56.2%',bestStrat:'GoT',
+ tag:'exp5_finetuned_enriched_gpu · 1024 tok · inference-time grounding',bestScore:'56.2%',bestStrat:'GOT',
  diffNote:'GoT exploite pleinement le mécanisme d\'ancrage KG : 56.2 %. <code>within</code> atteint 81.2 %. 2e meilleure configuration globale. Le KG vérificateur améliore la robustesse et l\'interprétabilité des prédictions.',
  phases:[
   {label:'🔧 Phase d\'entraînement',cls:'phase-train',steps:[
