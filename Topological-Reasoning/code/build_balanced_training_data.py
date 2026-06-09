@@ -30,7 +30,7 @@ import collections
 PREDICATES_CSV  = ["contains", "within", "touches", "crosses", "disjoint", "overlaps", "equals"]
 PREDICATES_JSONL = ["contains", "within", "touches", "crosses", "disjoint", "overlaps"]
 
-EVAL_INDICES_FILE = "../dataset/eval_112_balanced_indices.json"
+EVAL_INDICES_FILE = "../dataset/eval_385_balanced_indices.json"
 
 JOBS = [
     {

@@ -100,7 +100,7 @@ fi
 # PHASE 2 — Evaluation
 # ─────────────────────────────────────────────────────────────────────────────
 echo ""
-header "PHASE 2 — Evaluating 5 configurations × 3 strategies on 112 balanced examples (7 predicates)"
+header "PHASE 2 — Evaluating 5 configurations × 3 strategies on 385 balanced examples (55/predicate × 7)"
 
 echo "  Config 1 · Base GPT-OSS-20B · CoT / ToT / GoT (512 tok)"
 line

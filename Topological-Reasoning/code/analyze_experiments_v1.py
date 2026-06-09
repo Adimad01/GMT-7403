@@ -30,7 +30,7 @@ import matplotlib.ticker as mtick
 VALID_PREDICATES = ["contains", "within", "touches", "crosses", "disjoint", "overlaps", "equals"]
 STRATEGIES       = ["cot", "tot", "got"]
 SUFFIX           = "neighborhood_details_spatial_relation_16_sample"
-N_EVAL           = 112
+N_EVAL           = 385
 
 # ---------------------------------------------------------------------------
 # Experiment registry — (label, model_tag, adapter_note)
