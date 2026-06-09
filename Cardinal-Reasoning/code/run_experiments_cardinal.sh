@@ -42,6 +42,22 @@ done
 line()   { echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"; }
 header() { line; printf "  %s\n" "$1"; line; echo ""; }
 
+# ─────────────────────────────────────────────────────────────────────────────
+# PREREQUISITE — Install Triton (required for MXFP4 model loading)
+# Without Triton, transformers tries to dequantize MXFP4 MoE expert layers on
+# GPU which triggers a CUDA CachingAllocator NVML assertion on this server.
+# With Triton, the model runs natively in MXFP4 format — no dequantization.
+# ─────────────────────────────────────────────────────────────────────────────
+echo ""
+header "PREREQUISITE — Triton for MXFP4 support"
+if $PYTHON -c "import triton; print('  [OK] Triton', triton.__version__, 'already installed')" 2>/dev/null; then
+    :
+else
+    echo "  Triton not found — installing..."
+    pip install "triton>=3.4.0" && echo "  [OK] Triton installed successfully" \
+        || { echo "  [ERROR] Triton install failed."; echo "  Run manually: pip install triton>=3.4.0"; exit 1; }
+fi
+
 # Wikidata-KG adapter path (cross-task, lives in Topological-Reasoning/)
 WIKIDATA_ADAPTER="../../Topological-Reasoning/code/finetuned_gptoss_wikidata_kg/final_adapter/adapter_model.safetensors"
 
