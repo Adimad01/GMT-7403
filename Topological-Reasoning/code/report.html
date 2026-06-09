@@ -833,7 +833,7 @@ code{font-family:var(--mono);font-size:12px;background:var(--bg2);border:1px sol
         <div class="scores-row">
           <div class="sc"><span class="sl">COT</span><span class="sv">49.0%</span></div>
           <div class="sc"><span class="sl">TOT</span><span class="sv">29.2%</span></div>
-          <div class="sc winner"><span class="sl">GOT</span><span class="sv">56.2%</span></div>
+          <div class="sc winner"><span class="sl">GOT</span><span class="sv">55.2%</span></div>
         </div>
         <div class="exp-tag">exp5_finetuned_enriched_gpu · 1024 tok · inference-time grounding</div>
       </div>
@@ -909,7 +909,7 @@ code{font-family:var(--mono);font-size:12px;background:var(--bg2);border:1px sol
         <div class="bar-group">
           <div class="bar-wrap"><div class="bar bar-cot" style="width:49.0%"></div><span class="bar-val">49.0%</span></div>
           <div class="bar-wrap"><div class="bar bar-tot" style="width:29.2%"></div><span class="bar-val">29.2%</span></div>
-          <div class="bar-wrap"><div class="bar bar-got" style="width:56.2%"></div><span class="bar-val">56.2%</span></div>
+          <div class="bar-wrap"><div class="bar bar-got" style="width:55.2%"></div><span class="bar-val">55.2%</span></div>
         </div>
       </div>
     </div>
@@ -1095,7 +1095,7 @@ code{font-family:var(--mono);font-size:12px;background:var(--bg2);border:1px sol
           <tr class="best-r"><td>★ GPTOSS Fine-tuné</td><td class="pct">61.5%</td><td>62.5%</td><td>62.5%</td><td class="pct-hi">75.0%</td><td>62.5%</td><td>62.5%</td><td>43.8%</td></tr>
           <tr><td>FT + KG en entrée</td><td class="pct">27.1%</td><td>31.2%</td><td>50.0%</td><td class="pct-lo">12.5%</td><td class="pct-lo">18.8%</td><td>37.5%</td><td class="pct-lo">12.5%</td></tr>
           <tr><td>Wikidata-KG LoRA</td><td class="pct">29.2%</td><td class="pct-lo">25.0%</td><td>43.8%</td><td class="pct-lo">18.8%</td><td class="pct-lo">12.5%</td><td>43.8%</td><td>31.2%</td></tr>
-          <tr><td>FT + Inférence enrichie</td><td class="pct">56.2%</td><td>50.0%</td><td class="pct-hi">81.2%</td><td>62.5%</td><td>56.2%</td><td>50.0%</td><td>37.5%</td></tr>
+          <tr><td>FT + Inférence enrichie</td><td class="pct">55.2%</td><td>56.2%</td><td>43.8%</td><td>56.2%</td><td class="pct-hi">75.0%</td><td>56.2%</td><td>43.8%</td></tr>
           </tbody>
       </table>
     </div>
@@ -1116,12 +1116,12 @@ code{font-family:var(--mono);font-size:12px;background:var(--bg2);border:1px sol
       <div class="insight">
         <span class="ico">📈</span>
         <h4>CoT dominant en moyenne</h4>
-        <p>GoT (40.0% avg) vs CoT (53.1% avg). ToT est systématiquement la stratégie la moins performante sur cette tâche de classification topologique.</p>
+        <p>GoT (39.8% avg) vs CoT (53.1% avg). ToT est systématiquement la stratégie la moins performante sur cette tâche de classification topologique.</p>
       </div>
       <div class="insight">
         <span class="ico">🗺️</span>
         <h4>within facile · overlaps difficile</h4>
-        <p><em>within</em> est le prédicat le mieux prédit (moy 55%). <em>overlaps</em> reste le plus difficile (moy 29%).</p>
+        <p><em>within</em> est le prédicat le mieux prédit (moy 52%). <em>overlaps</em> reste le plus difficile (moy 29%).</p>
       </div>
     </div>
   </div>
@@ -1207,7 +1207,7 @@ var PIPES=[
 },
 {num:'05',name:'Topo-LoRA + raisonnement ancré (KG grounding)',
  desc:'Modèle fine-tuné (Topo-LoRA) avec raisonnement ancré sur le KG OSM à l\'inférence. Le KG ne figure pas dans le prompt : le modèle génère d\'abord ses étapes de raisonnement, puis chaque étape est alignée et vérifiée contre le graphe (reasoning path validation).',
- tag:'exp5_finetuned_enriched_gpu · 1024 tok · inference-time grounding',bestScore:'56.2%',bestStrat:'GOT',
+ tag:'exp5_finetuned_enriched_gpu · 1024 tok · inference-time grounding',bestScore:'55.2%',bestStrat:'GOT',
  diffNote:'GoT exploite pleinement le mécanisme d\'ancrage KG : 56.2 %. <code>within</code> atteint 81.2 %. 2e meilleure configuration globale. Le KG vérificateur améliore la robustesse et l\'interprétabilité des prédictions.',
  phases:[
   {label:'🔧 Phase d\'entraînement',cls:'phase-train',steps:[
