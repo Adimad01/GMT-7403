@@ -118,6 +118,26 @@ _BF16    = _CUDA_OK and torch.cuda.is_bf16_supported()
 _FP16    = _CUDA_OK and not _BF16
 print(f"[INFO] CUDA: {_CUDA_OK}  |  bf16: {_BF16}  |  fp16: {_FP16}")
 
+# ===========================================================================
+# PATCH: prevent transformers from activating the MXFP4 quantizer
+# (same patch as eval_engine_gpu.py — without it transformers falls back to
+# MXFP4 dequantization which crashes on MoE expert layers 13-15 with a
+# CUDA CachingAllocator assertion).
+# ===========================================================================
+try:
+    from transformers.quantizers.auto import AutoHfQuantizer as _AHQ
+    _orig_sqm = getattr(_AHQ, "supports_quant_method", None)
+    if _orig_sqm is not None:
+        @staticmethod
+        def _safe_sqm(qcfg):
+            if qcfg is None:
+                return False
+            return _orig_sqm(qcfg)
+        _AHQ.supports_quant_method = _safe_sqm
+except Exception:
+    pass
+# ===========================================================================
+
 
 def load_jsonl(path: str) -> list[dict]:
     records = []
