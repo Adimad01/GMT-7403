@@ -153,6 +153,8 @@ def main():
     parser.add_argument("--dataset",    default="../dataset/triplet_update_v3_70.csv")
     parser.add_argument("--model-id",   default="openai/gpt-oss-20b")
     parser.add_argument("--output-dir", default="finetuned_gptoss_topological")
+    parser.add_argument("--bf16-cache", default="/home/jovyan/models/gpt-oss-20b-bf16",
+                        help="Pre-saved bf16 checkpoint — skips MXFP4 dequantize peak if it exists")
     args = parser.parse_args()
 
     # ------------------------------------------------------------------
@@ -184,17 +186,32 @@ def main():
     # ------------------------------------------------------------------
     cuda_ok = torch.cuda.is_available()
     if cuda_ok:
-        print(f"[GPU] CUDA available ✅  {torch.cuda.get_device_name(0)}")
+        free_gb = (torch.cuda.get_device_properties(0).total_memory
+                   - torch.cuda.memory_allocated(0)) / 1e9
+        print(f"[GPU] CUDA ✅  {torch.cuda.get_device_name(0)}  free≈{free_gb:.0f} GB")
     else:
         print("[GPU] ⚠️  CUDA not available — training will be very slow on CPU!")
     dtype = torch.bfloat16 if (cuda_ok and torch.cuda.is_bf16_supported()) else torch.float16
-    print(f"[3/5] Loading model {args.model_id} in {dtype} ...")
+
+    # Prefer the pre-saved bf16 checkpoint to avoid the ~60 GB MXFP4→bf16 conversion spike.
+    # If it doesn't exist yet, fall back to on-the-fly dequantization (needs ~60 GB free).
+    bf16_cache = args.bf16_cache
+    if os.path.isfile(os.path.join(bf16_cache, "config.json")):
+        load_from = bf16_cache
+        extra_kwargs = {}
+        print(f"[3/5] Loading pre-saved bf16 model from {load_from}  (no conversion spike)")
+    else:
+        load_from = args.model_id
+        extra_kwargs = {"quantization_config": Mxfp4Config(dequantize=True)}
+        print(f"[3/5] Loading model {load_from} with MXFP4→bf16 dequantize (~60 GB peak)")
+        print(f"      TIP: run save_bf16_model.py once to cache and avoid this spike.")
+
     model = AutoModelForCausalLM.from_pretrained(
-        args.model_id,
+        load_from,
         device_map="auto",
         trust_remote_code=True,
         dtype=dtype,
-        quantization_config=Mxfp4Config(dequantize=True),
+        **extra_kwargs,
     )
     print(f"      -> Model dtype: {next(model.parameters()).dtype}")
 

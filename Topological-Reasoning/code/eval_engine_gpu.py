@@ -331,6 +331,8 @@ def main():
     parser.add_argument("--model-tag",       default="dynamic_osm_finetuned_gpu")
     parser.add_argument("--no-kg",           action="store_true",
                         help="Disable OSM KG evidence at inference (Config 4: KG in training only)")
+    parser.add_argument("--bf16-cache",      default="/home/jovyan/models/gpt-oss-20b-bf16",
+                        help="Pre-saved bf16 checkpoint — skips MXFP4 dequantize peak if it exists")
     args = parser.parse_args()
 
     # ------------------------------------------------------------------
@@ -380,17 +382,8 @@ def main():
 
     dtype = torch.bfloat16 if (cuda_ok and torch.cuda.is_bf16_supported()) else torch.float16
 
-    # On an A100 80 GB, GPT-OSS-20B in bf16 needs ~40 GB — no quantization required.
-    # Quantization configs (Mxfp4, BitsAndBytes) interact poorly with some model
-    # configs in newer transformers versions.  Load plain bf16/fp16 on GPU; warn on CPU.
-    if cuda_ok:
-        print(f"[MODEL] Loading in {dtype} (no quantization — fits in {gpu_mem:.0f} GB GPU)")
-    else:
-        print("[MODEL] No GPU — loading without quantization (expect OOM or very slow)")
-
     # Patch transformers ≥5.9.0 bug: supports_quant_method crashes when model's
     # quantization_config is None instead of a dict.
-    # Use getattr (not __dict__) so the descriptor protocol binds correctly.
     try:
         from transformers.quantizers.auto import AutoHfQuantizer as _AHQ
         _orig_sqm = getattr(_AHQ, "supports_quant_method", None)
@@ -404,12 +397,33 @@ def main():
     except Exception:
         pass
 
-    print(f"[MODEL] Loading base model ...")
+    # Prefer pre-saved bf16 checkpoint (no MXFP4→bf16 spike, ~40 GB steady-state).
+    # Falls back to on-the-fly dequantization if the cache doesn't exist yet.
+    bf16_cache = args.bf16_cache
+    if os.path.isfile(os.path.join(bf16_cache, "config.json")):
+        load_from   = bf16_cache
+        extra_kw    = {}
+        free_gb     = (torch.cuda.get_device_properties(0).total_memory
+                       - torch.cuda.memory_allocated(0)) / 1e9 if cuda_ok else 0
+        print(f"[MODEL] Loading pre-saved bf16 from {load_from}  (free GPU≈{free_gb:.0f} GB, no spike)")
+    else:
+        load_from = args.model_id
+        extra_kw  = {"quantization_config": Mxfp4Config(dequantize=True)}
+        if cuda_ok:
+            free_gb = (torch.cuda.get_device_properties(0).total_memory
+                       - torch.cuda.memory_allocated(0)) / 1e9
+            print(f"[MODEL] Loading {load_from} with MXFP4→bf16 dequantize "
+                  f"(~60 GB peak, free≈{free_gb:.0f} GB)")
+            print("[MODEL] TIP: run save_bf16_model.py once to cache and avoid the spike.")
+        else:
+            print(f"[MODEL] No GPU — loading {load_from} (expect OOM or very slow)")
+
     model = AutoModelForCausalLM.from_pretrained(
-        args.model_id,
+        load_from,
         device_map="auto",
         trust_remote_code=True,
         dtype=dtype,
+        **extra_kw,
     )
 
     adapter_tag = "base"
