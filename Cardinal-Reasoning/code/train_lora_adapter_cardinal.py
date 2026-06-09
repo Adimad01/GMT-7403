@@ -119,11 +119,29 @@ _FP16    = _CUDA_OK and not _BF16
 print(f"[INFO] CUDA: {_CUDA_OK}  |  bf16: {_BF16}  |  fp16: {_FP16}")
 
 # ===========================================================================
-# PATCH: prevent transformers from activating the MXFP4 quantizer
-# (same patch as eval_engine_gpu.py — without it transformers falls back to
-# MXFP4 dequantization which crashes on MoE expert layers 13-15 with a
-# CUDA CachingAllocator assertion).
+# PATCH 1: Force MXFP4 MoE dequantization to run on CPU.
+# Without Triton, transformers tries to dequantize MXFP4 expert layers on GPU.
+# This triggers a CUDA CachingAllocator NVML assertion (PyTorch bug on this
+# server).  Patching _convert_moe_packed_tensors to move tensors to CPU first
+# avoids the CUDA path entirely; result is moved back to the original device.
 # ===========================================================================
+try:
+    import transformers.integrations.mxfp4 as _mxfp4_mod
+    _orig_convert_moe = _mxfp4_mod._convert_moe_packed_tensors
+
+    def _cpu_safe_convert_moe(blocks, scales, dtype=torch.float32, rows_per_chunk=256):
+        device = blocks.device
+        result = _orig_convert_moe(
+            blocks.cpu(), scales.cpu(), dtype=dtype, rows_per_chunk=rows_per_chunk
+        )
+        return result.to(device)
+
+    _mxfp4_mod._convert_moe_packed_tensors = _cpu_safe_convert_moe
+    print("[PATCH] _convert_moe_packed_tensors → CPU-safe dequantization enabled")
+except Exception as _e:
+    print(f"[WARN] Could not patch _convert_moe_packed_tensors: {_e}")
+
+# PATCH 2: suppress MXFP4 quantizer None-qcfg crash (same as eval_engine_gpu.py)
 try:
     from transformers.quantizers.auto import AutoHfQuantizer as _AHQ
     _orig_sqm = getattr(_AHQ, "supports_quant_method", None)
