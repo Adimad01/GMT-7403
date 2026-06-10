@@ -1,0 +1,166 @@
+================================================================================
+  OSM / Nominatim Evidence Reliability Report
+================================================================================
+  Cache  : results/osm_cache.json
+  Generated: 2026-06-07 02:37:01
+
+
+  ── 1. Retrieval Rate ─────────────────────────────────────────────────────────
+  Total cache entries                 1,107
+  Returned a result                   1,082  █████████████████████████████░
+  Returned None (failed)                 25
+  Retrieval rate                      97.74%  ← fraction of queries answered by Nominatim
+
+  ── 2. Data Completeness  (of returned results) ───────────────────────────────
+  All required fields present         1,082  ██████████████████████████████
+  Completeness rate                  100.00%  ← lat + lon + bbox + osm_type + class + type + hierarchy
+
+  All returned entries carry every required field.  ✅
+
+  ── 3. Semantic Adequacy ──────────────────────────────────────────────────────
+  OSM class distribution:
+    ✅ boundary                 873  ████████████████████████░░░░░░
+    ✅ highway                   44  █░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+    ⚠️  amenity                   30  █░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+    ✅ waterway                  26  █░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+    ✅ place                     23  █░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+    ✅ water                     18  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+    ✅ leisure                   16  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+    ⚠️  tourism                   14  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+    ✅ natural                   13  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+    ⚠️  aeroway                    7  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+    ⚠️  building                   5  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+    ✅ landuse                    4  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+    ⚠️  office                     3  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+    ⚠️  man_made                   2  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+    ⚠️  shop                       1  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+    ⚠️  historic                   1  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+    ⚠️  military                   1  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+    ⚠️  information                1  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+
+  Reliable-class entries              1,017  ████████████████████████████░░
+  Semantic adequacy rate              93.99%  ← boundary / waterway / natural / highway / place / …
+
+  OSM object type distribution:
+    relation       954   (polygon / multipolygon — ideal for topology)
+    way            104   (single closed way — acceptable)
+    node            24   (point — no polygon geometry ⚠️)
+
+  Point-like entries (bbox < 0.01 km²)    44  ← no usable polygon extent for bbox analysis
+
+  Administrative hierarchy depth (# of fields):
+    depth  2:     2  ░░░░░░░░░░░░░░░░░░░░  shallow ⚠️
+    depth  3:     5  ░░░░░░░░░░░░░░░░░░░░  shallow ⚠️
+    depth  4:     3  ░░░░░░░░░░░░░░░░░░░░  normal
+    depth  5:   183  ███░░░░░░░░░░░░░░░░░  normal
+    depth  6:   435  ████████░░░░░░░░░░░░  normal
+    depth  7:   328  ██████░░░░░░░░░░░░░░  normal
+    depth  8:    43  █░░░░░░░░░░░░░░░░░░░  normal
+    depth  9:    18  ░░░░░░░░░░░░░░░░░░░░  deep
+    depth 10:    37  █░░░░░░░░░░░░░░░░░░░  deep
+    depth 11:    15  ░░░░░░░░░░░░░░░░░░░░  deep
+    depth 12:    12  ░░░░░░░░░░░░░░░░░░░░  deep
+    depth 13:     1  ░░░░░░░░░░░░░░░░░░░░  deep
+
+  Entries with shallow hierarchy (depth < 4) — 7 total:
+    • United States
+    • lake michigan
+    • Pecos River,
+    • Mexico
+    • Lake Michigan
+    • Sabine River
+    •  Neches River 
+
+  Entries with non-standard OSM class — 65 total:
+    • circus world museum,wisconsin
+    • discovery world,wisconsin
+    • Valley State Prison.
+    • Stanford University, California
+    • exact sciences,wisconsin
+    • rockwell automation,wisconsin
+    • Texas Wesleyan
+    • University of Texas at Austin, Texas
+    • gateway technical college ,wisconsin
+    • msoe,wisconsin
+    … and 55 more
+
+  ── 4. Bounding Box Quality ───────────────────────────────────────────────────
+  Area percentiles (km²):
+    p  0:             0.0 km²
+    p  5:             0.0 km²
+    p 25:            13.5 km²
+    p 50:            69.5 km²
+    p 75:           433.2 km²
+    p 95:         5,501.0 km²
+    p100:   336,869,201.2 km²
+
+  Interpretation guide:
+    p0  – p5  : points / very small features (nodes, buildings)
+    p25 – p50 : city districts, small municipalities
+    p50 – p75 : cities, large parks, waterways
+    p75 – p95 : counties, regions, large rivers
+    p95 – p100: states, countries, national rivers
+
+  ── 5. Failure Analysis  (None entries) ───────────────────────────────────────
+  Total failures : 25 / 1107  (2.3%)
+
+  [multi_road]  (8 entries)
+    Severity : HIGH   — missing road geometry blocks crosses/touches decisions
+    Repair   : Conjunctive road names ('Hwy 35 and 16') are not searchable; query each road separately.
+    Entries  :
+      • Texas Highways 35, Texas
+      • U.S. Highways 281 and 380, and Texas State Highways 114 and 199
+      • Farm Road 2229 and Texas State Highway 6, Texas
+      • US Route 90, Texas
+      • State Highways 16, Texas
+      • State High 72, Texas
+      • US Highway 277 and State Highway 6, Texas
+      • US87 and FM108, Texas
+
+  [composite_msa]  (7 entries)
+    Severity : MEDIUM — MSAs rarely appear as subjects/objects; low impact
+    Repair   : MSA strings are not Nominatim-searchable; split into component counties.
+    Entries  :
+      • Green Bay Metropolitan Statistical Area(Brown, Kewaunee, Oconto)
+      • Madison Metropolitan Statistical Area(Columbia, Dane, Green, Iowa)
+      • Minneapolis-St. Paul metropolitan area(Wisconsin Counties: Pierce, St. Croix, Minnesota Counties: Anoka, Carver, Chisago, Dakota, Hennepin, Isanti, Le Sueur, Mille Lacs, Pierce, Ramsey, Scott, Sherburne, Sibley, Washington, Wright)
+      • Chicago metropolitan area(Wisconsin County: Kenosha, Illinois Counties: Cook, DeKalb, DuPage, Grundy, Kane, Kendall, Lake, McHenry, Will, Indiana Counties: Jasper, Lake, Newton, Porter)
+      • Appleton,Wisconsin Metropolitan Statistical Area(Calumet, Outagamie)
+      • green bay metropolitan area(Brown, Kewaunee, Oconto),wisconsin
+      • Appleton metropolitan area(Calumet, Outagamie)
+
+  [typo_or_not_found]  (6 entries)
+    Severity : HIGH   — entity completely missing from evidence
+    Repair   : Correct spelling or try a broader search term (city name without county).
+    Entries  :
+      • Port Arthury, Texas
+      • the Mississippi River,wisconsin
+      • headquarters of harley-davidson
+      • Rohnert Par, California
+      • Jones and Haskell Counties, Texas
+      • Culinary Institute of America at Greystone
+
+  [encoding_error]  (2 entries)
+    Severity : HIGH   — entity completely missing from evidence
+    Repair   : Fix Unicode corruption in source data (e.g. em-dash → '-').
+    Entries  :
+      • university of wisconsin‚Äìriver falls ,wisconsin
+      • university of wisconsin‚Äìstevens point,wisconsin
+
+  [composite_slash]  (2 entries)
+    Severity : HIGH   — compound locations are semantically ambiguous anyway
+    Repair   : Slash-joined city lists (A/B/C) are not valid queries; pick the primary entity.
+    Entries  :
+      • San Antonio/Austin/Houston, Texas
+      • Dallas/Houston/Shreveport, Texas
+
+
+  ── 6. Summary & Recommendations ──────────────────────────────────────────────
+  Overall OSM reliability score : 97.2%  [EXCELLENT]
+
+  [25 failed queries]  Consider pre-cleaning entity names before querying: fix encoding errors, strip parenthesised county lists from MSA names, split conjunctive road strings, and correct known typos.
+  [24 node-type results]  Point results carry no polygon geometry. For topological reasoning, prefer querying with 'featuretype=settlement' or restrict osm_type to 'relation'/'way' in the Nominatim search.
+  [44 point-like bboxes]  Entries with bbox < 0.01 km² cannot support meaningful bounding-box analysis. Flag these in prompts as 'No polygon geometry — treat bbox analysis as unreliable'.
+  [65 non-standard OSM classes]  Classes like 'amenity', 'tourism', 'building' describe point/area POIs rather than administrative/geographic regions. These are valid in context (e.g. park within city) but should not be used as containers for large-scale topological predicates.
+
+================================================================================
