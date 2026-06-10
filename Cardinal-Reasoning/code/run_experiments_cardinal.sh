@@ -5,9 +5,10 @@
 #
 # Pipeline
 # ─────────────────────────────────────────────────────────────────────────────
-#  PHASE 0  Build cardinal training datasets
-#             cardinal_train.jsonl     (5680 rows, plain)
-#             cardinal_kg_train.jsonl  (5680 rows, KG-enriched)
+#  PHASE 0  Build cardinal training datasets (eval-excluded, 130/direction)
+#             cardinal_balanced_train.csv  (1040 rows, balanced)
+#             cardinal_train.jsonl         (1040 rows, plain)
+#             cardinal_kg_train.jsonl      (1040 rows, KG-enriched)
 #
 #  PHASE 1  Fine-tune adapters from scratch (unless --skip-train)
 #             FT-1  Cardinal-LoRA    → finetuned_gptoss_cardinal/final_adapter
@@ -62,12 +63,12 @@ fi
 WIKIDATA_ADAPTER="../../Topological-Reasoning/code/finetuned_gptoss_wikidata_kg/final_adapter/adapter_model.safetensors"
 
 # ─────────────────────────────────────────────────────────────────────────────
-# PHASE 0 — Build training datasets
+# PHASE 0 — Build training datasets (eval-excluded, balanced 130/direction)
 # ─────────────────────────────────────────────────────────────────────────────
 echo ""
-header "PHASE 0 — Building cardinal training datasets (5680 rows, 8 directions)"
+header "PHASE 0 — Building cardinal training datasets (1040 rows, 130/direction × 8, eval-excluded)"
 
-$PYTHON build_cardinal_training_data.py
+$PYTHON build_cardinal_training_data.py --exclude-eval
 
 # ─────────────────────────────────────────────────────────────────────────────
 # PHASE 1 — Fine-tuning
@@ -83,12 +84,12 @@ if [[ $SKIP_TRAIN -eq 0 ]]; then
     echo "  Done. Starting fine-tuning."
     echo ""
 
-    echo "  FT-1 · Cardinal-LoRA  (cardinal_train.jsonl — 5680 rows, plain)"
+    echo "  FT-1 · Cardinal-LoRA  (cardinal_train.jsonl — 1040 rows, plain, eval-excluded)"
     line
     $PYTHON train_runner_cardinal.py
 
     echo ""
-    echo "  FT-2 · Cardinal-KG LoRA  (cardinal_kg_train.jsonl — 5680 rows, KG-enriched)"
+    echo "  FT-2 · Cardinal-KG LoRA  (cardinal_kg_train.jsonl — 1040 rows, KG-enriched, eval-excluded)"
     line
     $PYTHON train_runner_cardinal_kg.py
 
@@ -135,7 +136,7 @@ fi
 # PHASE 2 — Evaluation
 # ─────────────────────────────────────────────────────────────────────────────
 echo ""
-header "PHASE 2 — Evaluating 5 configurations × 3 strategies on 80 examples"
+header "PHASE 2 — Evaluating 5 configurations × 3 strategies on 440 examples"
 
 echo "  Config 1 · Base GPT-OSS-20B · CoT / ToT / GoT (512 tok)"
 line

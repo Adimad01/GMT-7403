@@ -1,20 +1,18 @@
 """
-Experiment 5 — Cardinal-LoRA + extended reasoning budget
+Experiment 2 — Relative-LoRA (fine-tuned on relative_train.jsonl)
 ================================================================================
-Same Cardinal-LoRA adapter as Config 2 but with 1024 max tokens and the
-compass-rule KG provided at inference.  Tests whether more reasoning tokens
-and KG evidence at inference can compensate for simpler training.
+GPT-OSS-20B fine-tuned on relative_train.jsonl (630 navigation examples).
+No extended token budget.
 
-Model     : openai/gpt-oss-20b + Cardinal-LoRA adapter
-KG        : CardinalKnowledgeGraph (compass rules at inference)
+Model     : openai/gpt-oss-20b + Relative-LoRA adapter
 Strategies: CoT, ToT, GoT
-Eval set  : 80 examples — 10 per direction × 8 directions
-Max tokens: 1024  (extended budget)
+Eval set  : 270 examples (ring / square / tree navigation)
+Max tokens: 512
 Outputs   :
-  results/voletc_exp5_card_enriched_gpu_{strategy}_cardinal_direction_80_sample_ckpt.json
+  results/voletc_exp2_rel_lora_gpu_{strategy}_relative_nav_270_sample_ckpt.json
 
 Run:
-    python exp05_extended_cardinal.py
+    python exp02_finetuned_relative.py
 """
 
 import os
@@ -22,17 +20,16 @@ import sys
 import json
 import argparse
 
-DATASET      = "../dataset/cardinal_direction_relations.csv"
-INDICES_FILE = "../dataset/eval_440_balanced_indices.json"
+DATASET      = "../dataset/relative_eval.jsonl"
 MODEL_ID     = "openai/gpt-oss-20b"
-ADAPTER_PATH = "finetuned_gptoss_cardinal/final_adapter"
-MODEL_TAG    = "exp5_card_enriched_gpu"
+ADAPTER_PATH = "finetuned_gptoss_relative/final_adapter"
+MODEL_TAG    = "exp2_rel_lora_gpu"
 OUTPUT_DIR   = "results"
 TEMPERATURE    = 0.1
-MAX_NEW_TOKENS = 1024
-N_EVAL     = 440
+MAX_NEW_TOKENS = 512
+N_EVAL     = 270
 STRATEGIES = ["cot", "tot", "got"]
-SUFFIX     = "cardinal_direction_440_sample"
+SUFFIX     = "relative_nav_270_sample"
 
 
 def preflight():
@@ -41,8 +38,8 @@ def preflight():
         print(f"[ERROR] Eval dataset not found: {DATASET}")
         ok = False
     if not os.path.exists(os.path.join(ADAPTER_PATH, "adapter_model.safetensors")):
-        print(f"[ERROR] Cardinal-LoRA adapter not found: {ADAPTER_PATH}")
-        print("        Train it first: python train_runner_cardinal.py")
+        print(f"[ERROR] Relative-LoRA adapter not found: {ADAPTER_PATH}")
+        print("        Train it first: python train_runner_relative.py")
         ok = False
     if not ok:
         sys.exit(1)
@@ -85,11 +82,10 @@ def run():
     preflight()
 
     print("\n" + "=" * 70)
-    print("  CARDINAL EXPERIMENT 5 — Cardinal-LoRA + extended budget + KG")
+    print("  RELATIVE EXPERIMENT 2 — Relative-LoRA · CoT/ToT/GoT")
     print("=" * 70)
     print(f"  Model      : {MODEL_ID}")
     print(f"  Adapter    : {ADAPTER_PATH}")
-    print(f"  KG         : CardinalKnowledgeGraph (compass rules at inference)")
     print(f"  Strategies : {', '.join(s.upper() for s in target)}")
     print(f"  Output tag : {MODEL_TAG}")
     print("=" * 70)
@@ -99,20 +95,18 @@ def run():
         sys.exit(0)
 
     sys.argv = [
-        "eval_engine_cardinal.py",
-        "--dataset",         DATASET,
-        "--filter-indices",  INDICES_FILE,
-        "--model-id",        MODEL_ID,
-        "--adapter-path",    ADAPTER_PATH,
-        "--use-kg",
-        "--strategy",        args.strategy,
-        "--output-dir",      OUTPUT_DIR,
-        "--model-tag",       MODEL_TAG,
-        "--temperature",     str(TEMPERATURE),
-        "--max-new-tokens",  str(MAX_NEW_TOKENS),
+        "eval_engine_relative.py",
+        "--dataset",        DATASET,
+        "--model-id",       MODEL_ID,
+        "--adapter-path",   ADAPTER_PATH,
+        "--strategy",       args.strategy,
+        "--output-dir",     OUTPUT_DIR,
+        "--model-tag",      MODEL_TAG,
+        "--temperature",    str(TEMPERATURE),
+        "--max-new-tokens", str(MAX_NEW_TOKENS),
     ]
 
-    from eval_engine_cardinal import main
+    from eval_engine_relative import main
     main()
 
 

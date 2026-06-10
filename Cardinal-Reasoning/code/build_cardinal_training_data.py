@@ -1,8 +1,12 @@
 """
 build_cardinal_training_data.py
 ================================================================================
-Converts cardinal_train.csv (5680 rows, 8 directions × 710) into two JSONL
-instruction-tuning datasets:
+Builds balanced training datasets from cardinal_direction_relations.csv
+(5760 rows, 8 directions × 720), excluding the 440-row balanced eval split.
+
+Outputs:
+  ../dataset/cardinal_balanced_train.csv
+      Balanced training CSV: 130 examples per direction × 8 = 1040 rows.
 
   ../dataset/cardinal_train.jsonl
       Plain question → direction pairs (used by Config 2 & 5).
@@ -15,6 +19,7 @@ JSONL record format:
 
 Usage:
     python build_cardinal_training_data.py
+    python build_cardinal_training_data.py --exclude-eval
     python build_cardinal_training_data.py --seed 42
 """
 
@@ -24,6 +29,7 @@ import random
 import argparse
 import os
 import sys
+from collections import defaultdict
 
 DIRECTIONS = [
     "north", "south", "east", "west",
@@ -100,32 +106,79 @@ def _write_jsonl(records: list[dict], path: str):
 
 
 def build(args):
-    input_path  = "../dataset/cardinal_train.csv"
+    full_path   = "../dataset/cardinal_direction_relations.csv"
+    eval_idx_path = "../dataset/eval_440_balanced_indices.json"
+    train_csv_path = "../dataset/cardinal_balanced_train.csv"
     plain_path  = "../dataset/cardinal_train.jsonl"
     kg_path     = "../dataset/cardinal_kg_train.jsonl"
 
-    if not os.path.exists(input_path):
-        print(f"[ERROR] Input not found: {input_path}")
+    if not os.path.exists(full_path):
+        print(f"[ERROR] Input not found: {full_path}")
         sys.exit(1)
 
-    rows = _read_csv(input_path)
-    print(f"[DATA] Loaded {len(rows)} rows from {input_path}")
+    rows = _read_csv(full_path)
+    fieldnames = list(rows[0].keys()) if rows else []
+    print(f"[DATA] Loaded {len(rows)} rows from {full_path}")
+
+    # Exclude eval indices
+    eval_indices: set = set()
+    if args.exclude_eval:
+        if not os.path.exists(eval_idx_path):
+            print(f"[ERROR] Eval indices not found: {eval_idx_path}")
+            sys.exit(1)
+        with open(eval_idx_path) as f:
+            eval_indices = set(json.load(f))
+        print(f"[DATA] Excluding {len(eval_indices)} eval indices")
+
+    # Partition by direction, excluding eval rows
+    by_dir: defaultdict = defaultdict(list)
+    for i, row in enumerate(rows):
+        if i in eval_indices:
+            continue
+        d = row["direction"].strip().lower()
+        if d in DIRECTIONS:
+            by_dir[d].append(row)
+
+    print("[DATA] Available training rows per direction (after eval exclusion):")
+    for d in DIRECTIONS:
+        print(f"         {d:15s}: {len(by_dir[d])}")
+
+    # Balance at 130 per direction
+    PER_DIR = 130
+    random.seed(args.seed)
+    train_rows = []
+    for d in DIRECTIONS:
+        pool = by_dir[d]
+        if len(pool) < PER_DIR:
+            print(f"[WARN] {d}: only {len(pool)} rows available (need {PER_DIR}), using all")
+            selected = pool
+        else:
+            selected = random.sample(pool, PER_DIR)
+        train_rows.extend(selected)
+
+    random.shuffle(train_rows)
+    print(f"[DATA] Total training rows: {len(train_rows)} ({PER_DIR}/direction × {len(DIRECTIONS)})")
+
+    # Write balanced train CSV
+    os.makedirs(os.path.dirname(os.path.abspath(train_csv_path)), exist_ok=True)
+    with open(train_csv_path, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(train_rows)
+    print(f"  → wrote {len(train_rows)} rows to {train_csv_path}")
 
     dist = {}
-    for row in rows:
+    for row in train_rows:
         d = row["direction"].strip().lower()
         dist[d] = dist.get(d, 0) + 1
-    print("[DATA] Direction distribution:")
+    print("[DATA] Training direction distribution:")
     for d in DIRECTIONS:
         print(f"         {d:15s}: {dist.get(d, 0)}")
-
-    random.seed(args.seed)
-    random.shuffle(rows)
 
     plain_records = []
     kg_records    = []
 
-    for row in rows:
+    for row in train_rows:
         question  = row["question"].strip()
         direction = row["direction"].strip().lower()
 
@@ -151,13 +204,16 @@ def build(args):
     _write_jsonl(kg_records, kg_path)
 
     print("\n[DONE] Cardinal training datasets ready.")
-    print(f"  Plain : {plain_path}  ({len(plain_records)} examples)")
-    print(f"  KG    : {kg_path}     ({len(kg_records)} examples)")
+    print(f"  Train CSV : {train_csv_path}  ({len(train_rows)} rows, balanced)")
+    print(f"  Plain     : {plain_path}  ({len(plain_records)} examples)")
+    print(f"  KG        : {kg_path}     ({len(kg_records)} examples)")
 
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--exclude-eval", action="store_true",
+                        help="Exclude the 440 eval indices from training data")
     args = parser.parse_args()
     build(args)
 

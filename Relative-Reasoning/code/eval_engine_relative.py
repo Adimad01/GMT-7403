@@ -1,28 +1,30 @@
 """
-eval_engine_cardinal.py
+eval_engine_relative.py
 ================================================================================
-GPU-based cardinal direction inference (CoT / ToT / GoT).
+GPU-based relative navigation inference (CoT / ToT / GoT).
 Supports an optional PEFT adapter for the fine-tuned model.
 
-Dataset:  ../dataset/cardinal_eval_80.csv   (80 rows, 10/direction × 8 directions)
-Fields:   id, question, direction
+Dataset:  ../dataset/relative_eval.jsonl  (270 rows)
+Fields:   question, answer, origin_file
+
+Evaluation: exact match after normalize() (strip trailing period, lowercase)
 
 Usage:
-    python eval_engine_cardinal.py \\
-        --dataset  ../dataset/cardinal_eval_80.csv \\
+    python eval_engine_relative.py \\
+        --dataset  ../dataset/relative_eval.jsonl \\
         --model-id openai/gpt-oss-20b \\
         --strategy all \\
         --output-dir results \\
-        --model-tag exp1_card_base_gpu
+        --model-tag exp1_rel_base_gpu
 
     # with adapter
-    python eval_engine_cardinal.py \\
-        --dataset  ../dataset/cardinal_eval_80.csv \\
+    python eval_engine_relative.py \\
+        --dataset  ../dataset/relative_eval.jsonl \\
         --model-id openai/gpt-oss-20b \\
-        --adapter-path finetuned_gptoss_cardinal/final_adapter \\
+        --adapter-path finetuned_gptoss_relative/final_adapter \\
         --strategy all \\
         --output-dir results \\
-        --model-tag exp2_card_topo_gpu
+        --model-tag exp2_rel_lora_gpu
 """
 
 import os
@@ -30,7 +32,6 @@ import sys
 import json
 import argparse
 import types
-import pandas as pd
 import torch
 from tqdm import tqdm
 from datetime import datetime
@@ -125,14 +126,13 @@ from peft import PeftModel
 
 sys.path.insert(0, os.path.dirname(__file__))
 
-from strategies_cardinal import (
+from strategies_relative import (
     get_strategy,
-    VALID_DIRECTIONS,
+    normalize,
     STRATEGY_MAP,
-    CardinalKnowledgeGraph,
 )
 
-EXPERIMENT_SUFFIX = "cardinal_direction_440_sample"
+EXPERIMENT_SUFFIX = "relative_nav_270_sample"
 
 
 # ---------------------------------------------------------------------------
@@ -164,10 +164,20 @@ def _load_checkpoint(ckpt_path: str) -> dict:
     return {"processed_indices": [], "results": []}
 
 
+def _load_jsonl(path: str) -> list:
+    rows = []
+    with open(path, "r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if line:
+                rows.append(json.loads(line))
+    return rows
+
+
 # ---------------------------------------------------------------------------
 # EVALUATION LOOP
 # ---------------------------------------------------------------------------
-def evaluate_strategy(strategy, df: pd.DataFrame, output_dir: str,
+def evaluate_strategy(strategy, rows: list, output_dir: str,
                       model_tag: str, adapter_tag: str = "none"):
 
     strategy_name = strategy.name.lower()
@@ -180,14 +190,14 @@ def evaluate_strategy(strategy, df: pd.DataFrame, output_dir: str,
     results = list(ckpt.get("results", []))
 
     if processed_indices:
-        print(f"♻️  Resuming — {len(processed_indices)} rows already done.")
+        print(f"Resuming -- {len(processed_indices)} rows already done.")
 
     log_f = open(log_path, "a", encoding="utf-8")
 
     if not processed_indices:
         log_f.write(
             f"{'=' * 90}\n"
-            f"  CARDINAL — {strategy_name.upper()} — {model_tag.upper()} [{EXPERIMENT_SUFFIX}]\n"
+            f"  RELATIVE NAV -- {strategy_name.upper()} -- {model_tag.upper()} [{EXPERIMENT_SUFFIX}]\n"
             f"  Inference: GPU  |  Adapter: {adapter_tag}\n"
             f"  Started: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
             f"{'=' * 90}\n\n"
@@ -195,21 +205,18 @@ def evaluate_strategy(strategy, df: pd.DataFrame, output_dir: str,
         log_f.flush()
 
     desc = f"[{model_tag}/{strategy_name}]"
-    total_expected = len(df)
 
     try:
-        for _, row in tqdm(df.iterrows(), total=len(df), desc=desc):
-            real_idx = row.name
-
+        for real_idx, row in tqdm(enumerate(rows), total=len(rows), desc=desc):
             if real_idx in processed_indices:
                 continue
 
             entity = {
-                "question":  str(row.get("question", "")).strip(),
-                "direction": str(row.get("direction", "")).strip().lower(),
+                "question": str(row.get("question", "")).strip(),
+                "answer":   str(row.get("answer",   "")).strip(),
             }
 
-            expected = entity["direction"]
+            expected = entity["answer"]
 
             def row_logger(msg: str):
                 log_f.write(msg + "\n")
@@ -220,19 +227,19 @@ def evaluate_strategy(strategy, df: pd.DataFrame, output_dir: str,
             row_logger(f"Expected: {expected}")
             row_logger(f"{'=' * 90}")
 
-            predicted = "invalid"
+            predicted = None
             for attempt in range(3):
                 try:
                     predicted, _ = strategy.reason(entity, log_fn=row_logger)
                 except Exception as exc:
                     row_logger(f"ERROR attempt {attempt + 1}: {exc}")
-                    predicted = "invalid"
-                if predicted in VALID_DIRECTIONS:
+                    predicted = None
+                if predicted is not None:
                     break
                 if attempt < 2:
-                    row_logger(f"  ↻ invalid — retrying (attempt {attempt + 2}/3)...")
+                    row_logger(f"  retrying (attempt {attempt + 2}/3)...")
 
-            is_match = (expected == predicted)
+            is_match = (normalize(predicted) == normalize(expected))
             correct_so_far = sum(1 for r in results if r.get("match")) + (1 if is_match else 0)
             total_so_far   = len(results) + 1
             running_acc    = correct_so_far / total_so_far * 100
@@ -241,7 +248,7 @@ def evaluate_strategy(strategy, df: pd.DataFrame, output_dir: str,
                 f"\nRESULT | Expected={expected} | Predicted={predicted} | "
                 f"{'CORRECT' if is_match else 'WRONG'} | Acc={running_acc:.2f}%\n"
             )
-            tqdm.write(f"{real_idx} {expected} → {predicted} | acc={running_acc:.1f}%")
+            tqdm.write(f"{real_idx} {expected[:40]} -> {predicted} | acc={running_acc:.1f}%")
 
             results.append({"index": real_idx, "expected": expected,
                             "predicted": predicted, "match": is_match})
@@ -256,15 +263,17 @@ def evaluate_strategy(strategy, df: pd.DataFrame, output_dir: str,
     finally:
         _save_json_atomic(ckpt_path, {"processed_indices": sorted(processed_indices), "results": results})
         if results:
+            import pandas as pd
             rdf = pd.DataFrame(results)
             acc = rdf["match"].mean() * 100
             log_f.write(f"\nFINAL ACCURACY: {acc:.2f}% ({rdf['match'].sum()}/{len(rdf)})\n")
         log_f.close()
 
     if results:
+        import pandas as pd
         rdf = pd.DataFrame(results)
         acc = rdf["match"].mean() * 100
-        print(f"\n✅ {desc} Finished — Accuracy: {acc:.2f}%")
+        print(f"\n{desc} Finished -- Accuracy: {acc:.2f}%")
         print(f"   Log : {log_path}")
         print(f"   CKPT: {ckpt_path}")
 
@@ -275,36 +284,32 @@ def evaluate_strategy(strategy, df: pd.DataFrame, output_dir: str,
 # MAIN
 # ---------------------------------------------------------------------------
 def main():
-    parser = argparse.ArgumentParser(description="GPU cardinal direction inference (CoT / ToT / GoT)")
+    parser = argparse.ArgumentParser(description="GPU relative navigation inference (CoT / ToT / GoT)")
     parser.add_argument("--dataset",        required=True,
-                        help="Path to cardinal eval CSV")
+                        help="Path to relative_eval.jsonl")
     parser.add_argument("--filter-indices", default=None,
-                        help="JSON file with row indices to evaluate (for balanced eval split)")
+                        help="JSON file with row indices to evaluate (optional)")
     parser.add_argument("--model-id",       default="openai/gpt-oss-20b")
     parser.add_argument("--adapter-path",   default=None)
-    parser.add_argument("--use-kg",         action="store_true",
-                        help="Pass rule-based CardinalKnowledgeGraph to strategy")
     parser.add_argument("--strategy",       required=True,
                         choices=list(STRATEGY_MAP.keys()) + ["all"])
     parser.add_argument("--output-dir",     default="./results")
     parser.add_argument("--temperature",    type=float, default=0.1)
     parser.add_argument("--max-new-tokens", type=int,   default=512)
-    parser.add_argument("--model-tag",      default="exp1_card_base_gpu")
+    parser.add_argument("--model-tag",      default="exp1_rel_base_gpu")
     args = parser.parse_args()
 
     # ------------------------------------------------------------------
     # 1. Load dataset
     # ------------------------------------------------------------------
-    df = pd.read_csv(args.dataset)
+    rows = _load_jsonl(args.dataset)
+    print(f"[DATA] {len(rows)} eval rows loaded from {args.dataset}")
+
     if args.filter_indices:
         with open(args.filter_indices) as f:
             keep = set(json.load(f))
-        df = df[df.index.isin(keep)]
-        print(f"[DATA] Filtered to {len(df)} eval rows from {args.filter_indices}")
-    print(f"[DATA] {len(df)} eval rows ready  ({args.dataset})")
-
-    dist = df["direction"].value_counts().to_dict()
-    print("[DATA] Direction distribution:", dist)
+        rows = [r for i, r in enumerate(rows) if i in keep]
+        print(f"[DATA] Filtered to {len(rows)} eval rows from {args.filter_indices}")
 
     # ------------------------------------------------------------------
     # 2. Load model on GPU
@@ -321,9 +326,9 @@ def main():
     if cuda_ok:
         gpu_name = torch.cuda.get_device_name(0)
         gpu_mem  = torch.cuda.get_device_properties(0).total_memory / 1e9
-        print(f"[GPU] CUDA available ✅  {gpu_name}  ({gpu_mem:.1f} GB)")
+        print(f"[GPU] CUDA available  {gpu_name}  ({gpu_mem:.1f} GB)")
     else:
-        print("[GPU] ⚠️  CUDA not available — will run on CPU")
+        print("[GPU] CUDA not available -- will run on CPU")
 
     dtype = torch.bfloat16 if (cuda_ok and torch.cuda.is_bf16_supported()) else torch.float16
 
@@ -340,13 +345,13 @@ def main():
     except Exception:
         pass
 
-    # Always dequantize MXFP4 → bf16.  save_pretrained breaks MoE expert key names
+    # Always dequantize MXFP4 -> bf16.  save_pretrained breaks MoE expert key names
     # for gpt-oss-20b so a cached bf16 model produces all-None predictions.
     if cuda_ok:
         free_gb = (torch.cuda.get_device_properties(0).total_memory
                    - torch.cuda.memory_allocated(0)) / 1e9
-        print(f"[MODEL] Loading {args.model_id} with MXFP4→bf16 dequantize "
-              f"(free GPU≈{free_gb:.0f} GB)")
+        print(f"[MODEL] Loading {args.model_id} with MXFP4->bf16 dequantize "
+              f"(free GPU~{free_gb:.0f} GB)")
     model = AutoModelForCausalLM.from_pretrained(
         args.model_id,
         device_map="auto",
@@ -431,22 +436,17 @@ def main():
         return tokenizer.decode(out[0][input_len:], skip_special_tokens=True).strip()
 
     # ------------------------------------------------------------------
-    # 4. Optionally build KG
-    # ------------------------------------------------------------------
-    kg = CardinalKnowledgeGraph() if args.use_kg else None
-
-    # ------------------------------------------------------------------
-    # 5. Run selected strategies
+    # 4. Run selected strategies
     # ------------------------------------------------------------------
     os.makedirs(args.output_dir, exist_ok=True)
     strategies = list(STRATEGY_MAP.keys()) if args.strategy == "all" else [args.strategy]
 
     for strat in strategies:
-        print(f"\n🚀 Running {strat.upper()} (adapter={adapter_tag}, kg={'yes' if kg else 'no'})")
-        strategy_obj = get_strategy(strat, kg=kg, model_fn=gpu_inference_fn,
+        print(f"\nRunning {strat.upper()} (adapter={adapter_tag})")
+        strategy_obj = get_strategy(strat, model_fn=gpu_inference_fn,
                                     max_new_tokens=_max_new_tokens,
                                     temperature=_temperature)
-        evaluate_strategy(strategy_obj, df, args.output_dir, args.model_tag, adapter_tag)
+        evaluate_strategy(strategy_obj, rows, args.output_dir, args.model_tag, adapter_tag)
 
 
 if __name__ == "__main__":

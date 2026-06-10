@@ -24,15 +24,17 @@ import sys
 import json
 import argparse
 
-DATASET      = "../dataset/cardinal_eval_80.csv"
+DATASET      = "../dataset/cardinal_direction_relations.csv"
+INDICES_FILE = "../dataset/eval_440_balanced_indices.json"
 MODEL_ID     = "openai/gpt-oss-20b"
 ADAPTER_PATH = "../../Topological-Reasoning/code/finetuned_gptoss_wikidata_kg/final_adapter"
 MODEL_TAG    = "exp4_card_wikidata_gpu"
 OUTPUT_DIR   = "results"
 TEMPERATURE    = 0.1
 MAX_NEW_TOKENS = 1024
+N_EVAL     = 440
 STRATEGIES = ["cot", "tot", "got"]
-SUFFIX     = "cardinal_direction_80_sample"
+SUFFIX     = "cardinal_direction_440_sample"
 
 
 def preflight():
@@ -61,11 +63,16 @@ def check_strategy_status(strategies: list) -> bool:
             data    = json.load(open(ckpt))
             results = data.get("results", [])
             done    = len(data.get("processed_indices", []))
-            if done >= 80 and results:
-                acc = sum(1 for r in results if r.get("match")) / len(results) * 100
-                print(f"  {strat.upper():3s} : COMPLETE  ({done}/80, acc={acc:.1f}%)  ✅")
+            hits = sum(1 for r in results if r.get("match"))
+            acc  = hits / len(results) * 100 if results else 0.0
+            if results and done <= 80 and hits == 0:
+                print(f"  {strat.upper():3s} : STALE ({done} rows, acc=0.0%) — auto-deleting ⚠️")
+                os.remove(ckpt)
+                all_done = False
+            elif done >= N_EVAL and results:
+                print(f"  {strat.upper():3s} : COMPLETE  ({done}/{N_EVAL}, acc={acc:.1f}%)  ✅")
             else:
-                print(f"  {strat.upper():3s} : PARTIAL   ({done}/80) — will resume")
+                print(f"  {strat.upper():3s} : PARTIAL   ({done}/{N_EVAL}) — will resume")
                 all_done = False
         else:
             print(f"  {strat.upper():3s} : NOT STARTED")
@@ -97,15 +104,16 @@ def run():
 
     sys.argv = [
         "eval_engine_cardinal.py",
-        "--dataset",        DATASET,
-        "--model-id",       MODEL_ID,
-        "--adapter-path",   ADAPTER_PATH,
+        "--dataset",         DATASET,
+        "--filter-indices",  INDICES_FILE,
+        "--model-id",        MODEL_ID,
+        "--adapter-path",    ADAPTER_PATH,
         "--use-kg",
-        "--strategy",       args.strategy,
-        "--output-dir",     OUTPUT_DIR,
-        "--model-tag",      MODEL_TAG,
-        "--temperature",    str(TEMPERATURE),
-        "--max-new-tokens", str(MAX_NEW_TOKENS),
+        "--strategy",        args.strategy,
+        "--output-dir",      OUTPUT_DIR,
+        "--model-tag",       MODEL_TAG,
+        "--temperature",     str(TEMPERATURE),
+        "--max-new-tokens",  str(MAX_NEW_TOKENS),
     ]
 
     from eval_engine_cardinal import main
