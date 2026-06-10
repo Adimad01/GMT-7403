@@ -1,17 +1,19 @@
 """
 eval_engine_relative.py
 ================================================================================
-GPU-based relative navigation inference (CoT / ToT / GoT).
+GPU-based relative direction inference (CoT / ToT / GoT).
 Supports an optional PEFT adapter for the fine-tuned model.
 
-Dataset:  ../dataset/relative_eval.jsonl  (270 rows)
-Fields:   question, answer, origin_file
+Dataset:  ../../Topological-Reasoning/dataset/relative_direction_relations.csv
+Fields:   source_entity, target_entity, corpus, relation_label
+Labels:   behind, in_front_of, left_of, next_to, right_of
 
-Evaluation: exact match after normalize() (strip trailing period, lowercase)
+Evaluation: exact match (predicted label == relation_label)
 
 Usage:
     python eval_engine_relative.py \\
-        --dataset  ../dataset/relative_eval.jsonl \\
+        --dataset  ../../Topological-Reasoning/dataset/relative_direction_relations.csv \\
+        --filter-indices ../dataset/eval_20_balanced_indices.json \\
         --model-id openai/gpt-oss-20b \\
         --strategy all \\
         --output-dir results \\
@@ -19,7 +21,8 @@ Usage:
 
     # with adapter
     python eval_engine_relative.py \\
-        --dataset  ../dataset/relative_eval.jsonl \\
+        --dataset  ../../Topological-Reasoning/dataset/relative_direction_relations.csv \\
+        --filter-indices ../dataset/eval_20_balanced_indices.json \\
         --model-id openai/gpt-oss-20b \\
         --adapter-path finetuned_gptoss_relative/final_adapter \\
         --strategy all \\
@@ -32,6 +35,7 @@ import sys
 import json
 import argparse
 import types
+import pandas as pd
 import torch
 from tqdm import tqdm
 from datetime import datetime
@@ -129,10 +133,11 @@ sys.path.insert(0, os.path.dirname(__file__))
 from strategies_relative import (
     get_strategy,
     normalize,
+    VALID_DIRECTIONS,
     STRATEGY_MAP,
 )
 
-EXPERIMENT_SUFFIX = "relative_nav_270_sample"
+EXPERIMENT_SUFFIX = "relative_dir_20_sample"
 
 
 # ---------------------------------------------------------------------------
@@ -164,20 +169,10 @@ def _load_checkpoint(ckpt_path: str) -> dict:
     return {"processed_indices": [], "results": []}
 
 
-def _load_jsonl(path: str) -> list:
-    rows = []
-    with open(path, "r", encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if line:
-                rows.append(json.loads(line))
-    return rows
-
-
 # ---------------------------------------------------------------------------
 # EVALUATION LOOP
 # ---------------------------------------------------------------------------
-def evaluate_strategy(strategy, rows: list, output_dir: str,
+def evaluate_strategy(strategy, df: pd.DataFrame, output_dir: str,
                       model_tag: str, adapter_tag: str = "none"):
 
     strategy_name = strategy.name.lower()
@@ -197,7 +192,7 @@ def evaluate_strategy(strategy, rows: list, output_dir: str,
     if not processed_indices:
         log_f.write(
             f"{'=' * 90}\n"
-            f"  RELATIVE NAV -- {strategy_name.upper()} -- {model_tag.upper()} [{EXPERIMENT_SUFFIX}]\n"
+            f"  RELATIVE DIR -- {strategy_name.upper()} -- {model_tag.upper()} [{EXPERIMENT_SUFFIX}]\n"
             f"  Inference: GPU  |  Adapter: {adapter_tag}\n"
             f"  Started: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
             f"{'=' * 90}\n\n"
@@ -207,23 +202,27 @@ def evaluate_strategy(strategy, rows: list, output_dir: str,
     desc = f"[{model_tag}/{strategy_name}]"
 
     try:
-        for real_idx, row in tqdm(enumerate(rows), total=len(rows), desc=desc):
+        for _, row in tqdm(df.iterrows(), total=len(df), desc=desc):
+            real_idx = row.name
+
             if real_idx in processed_indices:
                 continue
 
             entity = {
-                "question": str(row.get("question", "")).strip(),
-                "answer":   str(row.get("answer",   "")).strip(),
+                "source_entity":  str(row.get("source_entity",  "")).strip(),
+                "target_entity":  str(row.get("target_entity",  "")).strip(),
+                "corpus":         str(row.get("corpus",         "")).strip(),
+                "relation_label": str(row.get("relation_label", "")).strip().lower(),
             }
 
-            expected = entity["answer"]
+            expected = entity["relation_label"]
 
             def row_logger(msg: str):
                 log_f.write(msg + "\n")
                 log_f.flush()
 
             row_logger(f"\n{'=' * 90}")
-            row_logger(f"ROW {real_idx} | {entity['question'][:80]}")
+            row_logger(f"ROW {real_idx} | {entity['source_entity']} ? {entity['target_entity']}")
             row_logger(f"Expected: {expected}")
             row_logger(f"{'=' * 90}")
 
@@ -234,12 +233,12 @@ def evaluate_strategy(strategy, rows: list, output_dir: str,
                 except Exception as exc:
                     row_logger(f"ERROR attempt {attempt + 1}: {exc}")
                     predicted = None
-                if predicted is not None:
+                if predicted in VALID_DIRECTIONS:
                     break
                 if attempt < 2:
                     row_logger(f"  retrying (attempt {attempt + 2}/3)...")
 
-            is_match = (normalize(predicted) == normalize(expected))
+            is_match = (predicted == expected)
             correct_so_far = sum(1 for r in results if r.get("match")) + (1 if is_match else 0)
             total_so_far   = len(results) + 1
             running_acc    = correct_so_far / total_so_far * 100
@@ -284,11 +283,11 @@ def evaluate_strategy(strategy, rows: list, output_dir: str,
 # MAIN
 # ---------------------------------------------------------------------------
 def main():
-    parser = argparse.ArgumentParser(description="GPU relative navigation inference (CoT / ToT / GoT)")
+    parser = argparse.ArgumentParser(description="GPU relative direction inference (CoT / ToT / GoT)")
     parser.add_argument("--dataset",        required=True,
-                        help="Path to relative_eval.jsonl")
+                        help="Path to relative_direction_relations.csv")
     parser.add_argument("--filter-indices", default=None,
-                        help="JSON file with row indices to evaluate (optional)")
+                        help="JSON file with row indices to evaluate (balanced split)")
     parser.add_argument("--model-id",       default="openai/gpt-oss-20b")
     parser.add_argument("--adapter-path",   default=None)
     parser.add_argument("--strategy",       required=True,
@@ -302,14 +301,15 @@ def main():
     # ------------------------------------------------------------------
     # 1. Load dataset
     # ------------------------------------------------------------------
-    rows = _load_jsonl(args.dataset)
-    print(f"[DATA] {len(rows)} eval rows loaded from {args.dataset}")
-
+    df = pd.read_csv(args.dataset)
     if args.filter_indices:
         with open(args.filter_indices) as f:
             keep = set(json.load(f))
-        rows = [r for i, r in enumerate(rows) if i in keep]
-        print(f"[DATA] Filtered to {len(rows)} eval rows from {args.filter_indices}")
+        df = df[df.index.isin(keep)]
+        print(f"[DATA] Filtered to {len(df)} eval rows from {args.filter_indices}")
+    print(f"[DATA] {len(df)} eval rows ready  ({args.dataset})")
+    dist = df["relation_label"].value_counts().to_dict()
+    print("[DATA] Label distribution:", dist)
 
     # ------------------------------------------------------------------
     # 2. Load model on GPU
@@ -446,7 +446,7 @@ def main():
         strategy_obj = get_strategy(strat, model_fn=gpu_inference_fn,
                                     max_new_tokens=_max_new_tokens,
                                     temperature=_temperature)
-        evaluate_strategy(strategy_obj, rows, args.output_dir, args.model_tag, adapter_tag)
+        evaluate_strategy(strategy_obj, df, args.output_dir, args.model_tag, adapter_tag)
 
 
 if __name__ == "__main__":

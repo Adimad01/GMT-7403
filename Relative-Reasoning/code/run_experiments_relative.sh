@@ -58,26 +58,31 @@ fi
 # PHASE 0 — Dataset check (splits already exist)
 # ─────────────────────────────────────────────────────────────────────────────
 echo ""
-header "PHASE 0 — Dataset check (splits already exist)"
+header "PHASE 0 — Dataset check (source: Topological-Reasoning/dataset/)"
 
-TRAIN_FILE="../dataset/relative_train.jsonl"
-EVAL_FILE="../dataset/relative_eval.jsonl"
+SRC_DATA="../../Topological-Reasoning/dataset/relative_direction_relations.csv"
+TRAIN_FILE="../dataset/relative_balanced_train.csv"
+EVAL_IDX="../dataset/eval_20_balanced_indices.json"
+
+if [[ ! -f "$SRC_DATA" ]]; then
+    echo "  [ERROR] Source dataset not found: $SRC_DATA"
+    exit 1
+fi
+echo "  [OK] Source: $SRC_DATA  (75 rows)"
+
+if [[ ! -f "$EVAL_IDX" ]]; then
+    echo "  [ERROR] Eval indices not found: $EVAL_IDX"
+    exit 1
+fi
+echo "  [OK] Eval indices: $EVAL_IDX  (20 rows, 4/class × 5)"
 
 if [[ ! -f "$TRAIN_FILE" ]]; then
-    echo "  [ERROR] Training data not found: $TRAIN_FILE"
+    echo "  [ERROR] Training CSV not found: $TRAIN_FILE"
+    echo "         Expected relative_balanced_train.csv (55 rows) — regenerate splits."
     exit 1
-else
-    TRAIN_ROWS=$($PYTHON -c "print(sum(1 for _ in open('$TRAIN_FILE')))")
-    echo "  [OK] $TRAIN_FILE  ($TRAIN_ROWS rows)"
 fi
-
-if [[ ! -f "$EVAL_FILE" ]]; then
-    echo "  [ERROR] Eval data not found: $EVAL_FILE"
-    exit 1
-else
-    EVAL_ROWS=$($PYTHON -c "print(sum(1 for _ in open('$EVAL_FILE')))")
-    echo "  [OK] $EVAL_FILE  ($EVAL_ROWS rows)"
-fi
+TRAIN_ROWS=$($PYTHON -c "import csv; print(sum(1 for _ in csv.reader(open('$TRAIN_FILE'))) - 1)")
+echo "  [OK] $TRAIN_FILE  ($TRAIN_ROWS rows)"
 
 # ─────────────────────────────────────────────────────────────────────────────
 # PHASE 1 — Fine-tuning
@@ -113,7 +118,7 @@ fi
 # PHASE 2 — Evaluation
 # ─────────────────────────────────────────────────────────────────────────────
 echo ""
-header "PHASE 2 — Evaluating 5 configurations × 3 strategies on 270 examples"
+header "PHASE 2 — Evaluating 5 configurations × 3 strategies on 20 examples"
 
 echo "  Config 1 · Base GPT-OSS-20B · CoT / ToT / GoT (512 tok)"
 line

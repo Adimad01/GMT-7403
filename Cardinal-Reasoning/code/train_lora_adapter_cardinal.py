@@ -140,14 +140,35 @@ except Exception:
 # ===========================================================================
 
 
-def load_jsonl(path: str) -> list[dict]:
+_VALID_CARDINAL = (
+    "north_of, south_of, east_of, west_of, "
+    "northeast_of, northwest_of, southeast_of, southwest_of"
+)
+
+
+def load_csv_records(path: str) -> list[dict]:
+    import csv
     records = []
-    with open(path, "r", encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if line:
-                records.append(json.loads(line))
+    with open(path, newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            if row.get("relation_label"):
+                records.append(row)
     return records
+
+
+def build_cardinal_training_prompt(row: dict) -> str:
+    src    = row["source_entity"]
+    tgt    = row["target_entity"]
+    corpus = row["corpus"]
+    label  = row["relation_label"]
+    return (
+        f"You are an expert in spatial geography and cardinal directions.\n\n"
+        f"Given the following description, determine the cardinal direction of "
+        f"'{src}' relative to '{tgt}'.\n\n"
+        f"Corpus: \"{corpus}\"\n\n"
+        f"Possible directions: {_VALID_CARDINAL}\n\n"
+        f"Answer: [{label}]"
+    )
 
 
 def main():
@@ -163,14 +184,12 @@ def main():
     args = parser.parse_args()
 
     print(f"[1/5] Loading dataset: {args.dataset}")
-    raw_records = load_jsonl(args.dataset)
+    raw_records = load_csv_records(args.dataset)
     print(f"      -> {len(raw_records)} instruction examples loaded")
 
-    label_counts: dict[str, int] = {}
-    for rec in raw_records:
-        lbl = rec.get("label", "unknown")
-        label_counts[lbl] = label_counts.get(lbl, 0) + 1
-    print("      Label distribution:", label_counts)
+    from collections import Counter
+    label_counts = Counter(r.get("relation_label", "unknown") for r in raw_records)
+    print("      Label distribution:", dict(sorted(label_counts.items())))
 
     print(f"[2/5] Loading tokenizer from {args.model_id} ...")
     tokenizer = AutoTokenizer.from_pretrained(args.model_id, trust_remote_code=True)
@@ -179,8 +198,8 @@ def main():
     tokenizer.model_max_length = MAX_SEQ_LENGTH
 
     records_with_eos = [
-        {"text": rec["text"] + tokenizer.eos_token}
-        for rec in raw_records
+        {"text": build_cardinal_training_prompt(row) + tokenizer.eos_token}
+        for row in raw_records
     ]
     train_dataset = Dataset.from_list(records_with_eos)
     print(f"      -> {len(train_dataset)} training examples ready.")

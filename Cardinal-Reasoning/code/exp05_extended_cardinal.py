@@ -22,17 +22,17 @@ import sys
 import json
 import argparse
 
-DATASET      = "../dataset/cardinal_direction_relations.csv"
-INDICES_FILE = "../dataset/eval_440_balanced_indices.json"
+DATASET      = "../../Topological-Reasoning/dataset/cardinal_direction_relations.csv"
+INDICES_FILE = "../dataset/eval_32_balanced_indices.json"
 MODEL_ID     = "openai/gpt-oss-20b"
 ADAPTER_PATH = "finetuned_gptoss_cardinal/final_adapter"
 MODEL_TAG    = "exp5_card_enriched_gpu"
 OUTPUT_DIR   = "results"
 TEMPERATURE    = 0.1
 MAX_NEW_TOKENS = 1024
-N_EVAL     = 440
+N_EVAL     = 32
 STRATEGIES = ["cot", "tot", "got"]
-SUFFIX     = "cardinal_direction_440_sample"
+SUFFIX     = "cardinal_dir_32_sample"
 
 
 def preflight():
@@ -61,7 +61,7 @@ def check_strategy_status(strategies: list) -> bool:
             done    = len(data.get("processed_indices", []))
             hits = sum(1 for r in results if r.get("match"))
             acc  = hits / len(results) * 100 if results else 0.0
-            if results and done <= 80 and hits == 0:
+            if results and done <= 5 and hits == 0:
                 print(f"  {strat.upper():3s} : STALE ({done} rows, acc=0.0%) — auto-deleting ⚠️")
                 os.remove(ckpt)
                 all_done = False

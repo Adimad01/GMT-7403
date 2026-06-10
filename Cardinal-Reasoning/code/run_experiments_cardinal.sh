@@ -66,9 +66,31 @@ WIKIDATA_ADAPTER="../../Topological-Reasoning/code/finetuned_gptoss_wikidata_kg/
 # PHASE 0 — Build training datasets (eval-excluded, balanced 130/direction)
 # ─────────────────────────────────────────────────────────────────────────────
 echo ""
-header "PHASE 0 — Building cardinal training datasets (1040 rows, 130/direction × 8, eval-excluded)"
+header "PHASE 0 — Dataset check (source: Topological-Reasoning/dataset/)"
 
-$PYTHON build_cardinal_training_data.py --exclude-eval
+SRC_DATA="../../Topological-Reasoning/dataset/cardinal_direction_relations.csv"
+TRAIN_FILE="../dataset/cardinal_balanced_train.csv"
+EVAL_IDX="../dataset/eval_32_balanced_indices.json"
+
+if [[ ! -f "$SRC_DATA" ]]; then
+    echo "  [ERROR] Source dataset not found: $SRC_DATA"
+    exit 1
+fi
+echo "  [OK] Source: $SRC_DATA  (120 rows)"
+
+if [[ ! -f "$EVAL_IDX" ]]; then
+    echo "  [ERROR] Eval indices not found: $EVAL_IDX"
+    exit 1
+fi
+echo "  [OK] Eval indices: $EVAL_IDX  (32 rows, 4/direction × 8)"
+
+if [[ ! -f "$TRAIN_FILE" ]]; then
+    echo "  [WARN] Training CSV not found — rebuilding..."
+    $PYTHON build_cardinal_training_data.py --exclude-eval
+else
+    TRAIN_ROWS=$($PYTHON -c "import csv; print(sum(1 for _ in csv.reader(open('$TRAIN_FILE'))) - 1)")
+    echo "  [OK] $TRAIN_FILE  ($TRAIN_ROWS rows)"
+fi
 
 # ─────────────────────────────────────────────────────────────────────────────
 # PHASE 1 — Fine-tuning
@@ -136,7 +158,7 @@ fi
 # PHASE 2 — Evaluation
 # ─────────────────────────────────────────────────────────────────────────────
 echo ""
-header "PHASE 2 — Evaluating 5 configurations × 3 strategies on 440 examples"
+header "PHASE 2 — Evaluating 5 configurations × 3 strategies on 32 examples"
 
 echo "  Config 1 · Base GPT-OSS-20B · CoT / ToT / GoT (512 tok)"
 line

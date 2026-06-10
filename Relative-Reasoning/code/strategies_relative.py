@@ -1,48 +1,47 @@
 """
 strategies_relative.py
 ================================================================================
-CoT / ToT / GoT reasoning strategies for the SpatialEvalLLM relative reasoning
-task (ring / square / tree navigation).
+CoT / ToT / GoT reasoning strategies for relative direction inference.
 
-No external KG is used — the task is pure multi-step positional reasoning.
+Task: given (source_entity, target_entity, corpus), predict the relative
+direction label: behind, in_front_of, left_of, next_to, or right_of.
+
+Dataset: relative_direction_relations.csv from Topological-Reasoning/dataset/
+  Columns: source_entity, target_entity, corpus, relation_label, ...
 """
+
 import re
-from typing import Optional, Tuple, Dict, Any, List
-from dataclasses import dataclass, field
 from abc import ABC, abstractmethod
+from typing import Dict, Any, Optional, List, Tuple
+from dataclasses import dataclass, field
 
 
-# ---------------------------------------------------------------------------
-# ANSWER EXTRACTION
-# ---------------------------------------------------------------------------
-def extract_answer(text: str) -> Optional[str]:
-    """Extract the predicted object from model output."""
-    if not text:
-        return None
-    # Remove <think>...</think> blocks
-    text = re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL)
-    text = text.strip()
+# =====================================================================
+# CONSTANTS
+# =====================================================================
+VALID_DIRECTIONS = {
+    "behind", "in_front_of", "left_of", "next_to", "right_of",
+}
 
-    # Look for explicit answer markers (case-insensitive)
-    patterns = [
-        r"answer\s*[:=]\s*\[?([^\]\n]+)\]?",
-        r"final\s+(?:answer|position|item)\s*[:=]\s*\[?([^\]\n]+)\]?",
-        r"you\s+(?:will\s+)?find\s*[:=]?\s*(?:a\s+|an\s+)?([^\.\n,]+)",
-        r"(?:result|conclusion)\s*[:=]\s*\[?([^\]\n]+)\]?",
-    ]
-    for pat in patterns:
-        m = re.search(pat, text, re.IGNORECASE)
-        if m:
-            val = m.group(1).strip().rstrip(".").rstrip(",").strip()
-            if val:
-                return val.lower()
+VALID_LIST = "behind, in_front_of, left_of, next_to, right_of"
 
-    # Last non-empty line as fallback
-    lines = [l.strip() for l in text.splitlines() if l.strip()]
-    if lines:
-        last = lines[-1].rstrip(".").rstrip(",").strip()
-        return last.lower() if last else None
-    return None
+_LABEL_ALIASES = {
+    "in front of":  "in_front_of",
+    "in front":     "in_front_of",
+    "front":        "in_front_of",
+    "ahead":        "in_front_of",
+    "in_front":     "in_front_of",
+    "left":         "left_of",
+    "to the left":  "left_of",
+    "right":        "right_of",
+    "to the right": "right_of",
+    "next to":      "next_to",
+    "beside":       "next_to",
+    "adjacent":     "next_to",
+    "behind":       "behind",
+    "at the back":  "behind",
+    "in back":      "behind",
+}
 
 
 def normalize(s: Optional[str]) -> str:
@@ -51,9 +50,61 @@ def normalize(s: Optional[str]) -> str:
     return s.lower().strip().rstrip(".").rstrip(",").strip()
 
 
-# ---------------------------------------------------------------------------
-# BASE STRATEGY
-# ---------------------------------------------------------------------------
+# =====================================================================
+# HELPERS
+# =====================================================================
+def extract_direction(text: str) -> Optional[str]:
+    """Extract a valid relative direction label from model output."""
+    if not text:
+        return None
+    clean = re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL)
+    clean = re.sub(r"[*_`]", "", clean)
+    lower = clean.lower()
+
+    # Explicit answer patterns
+    patterns = [
+        r"answer\s*[:=]\s*\[?([a-z_\s]+?)\]?(?:\s|$|[.,;:])",
+        r"final\s+(?:answer|direction|relation)\s*[:=]\s*\[?([a-z_\s]+?)\]?(?:\s|$|[.,;:])",
+        r"direction\s*(?:is|:)\s*\[?([a-z_\s]+?)\]?(?:\s|$|[.,;:])",
+        r"relation\s*(?:is|:)\s*\[?([a-z_\s]+?)\]?(?:\s|$|[.,;:])",
+    ]
+    for pat in patterns:
+        for m in re.finditer(pat, lower):
+            raw = m.group(1).strip().rstrip(".,;:")
+            if raw in VALID_DIRECTIONS:
+                return raw
+            canon = _LABEL_ALIASES.get(raw)
+            if canon:
+                return canon
+
+    # Scan for valid labels (take last occurrence)
+    found = []
+    for lbl in VALID_DIRECTIONS:
+        idx = lower.rfind(lbl)
+        if idx != -1:
+            found.append((idx, lbl))
+    for alias, canonical in _LABEL_ALIASES.items():
+        idx = lower.rfind(alias)
+        if idx != -1:
+            found.append((idx, canonical))
+    if found:
+        found.sort(key=lambda x: x[0])
+        return found[-1][1]
+    return None
+
+
+def _spatial_weight(text: str) -> float:
+    keywords = [
+        "left", "right", "front", "behind", "beside", "next",
+        "perspective", "observer", "facing", "port", "starboard",
+    ]
+    hits = sum(1 for kw in keywords if kw in text.lower())
+    return 1.0 + 0.3 * min(hits, 5)
+
+
+# =====================================================================
+# BASE CLASS
+# =====================================================================
 class ReasoningStrategy(ABC):
     def __init__(self, model_fn, max_new_tokens: int = 512, temperature: float = 0.1):
         self._generate = model_fn
@@ -68,180 +119,236 @@ class ReasoningStrategy(ABC):
     def reason(self, entity: Dict[str, Any], log_fn=None) -> Tuple[Optional[str], Dict]: ...
 
 
-# ---------------------------------------------------------------------------
-# SYSTEM PROMPT
-# ---------------------------------------------------------------------------
-SYSTEM_PROMPT = """You are an expert at spatial navigation and positional reasoning.
-You will be given a question that describes a path (ring, square grid, or tree) with
-named objects at positions. You need to carefully track each move step by step and
-determine which object you find at the final position.
-
-Rules:
-- Track your position precisely after EACH movement.
-- For a ring/circle: moves wrap around.
-- For a square grid: moves follow the grid adjacency.
-- For a tree: moves follow parent-child edges.
-- Your final answer must be the EXACT object name from the question.
-- End your response with: Answer: [object name]
-"""
-
-
-# ---------------------------------------------------------------------------
+# =====================================================================
 # 1. CHAIN-OF-THOUGHT (CoT)
-# ---------------------------------------------------------------------------
+# =====================================================================
 class ChainOfThought(ReasoningStrategy):
     @property
-    def name(self) -> str: return "CoT"
+    def name(self) -> str:
+        return "CoT"
 
     def reason(self, entity: Dict[str, Any], log_fn=None) -> Tuple[Optional[str], Dict]:
-        question = entity["question"]
-        trace = {"strategy": "CoT"}
+        src    = entity["source_entity"]
+        tgt    = entity["target_entity"]
+        corpus = entity["corpus"]
+        trace  = {"strategy": "CoT"}
+
+        def _log(step, content):
+            if log_fn:
+                log_fn(f"\n  [CoT] -- {step} --\n{content}")
+
+        _log("INPUT", f"{src} ? {tgt} | corpus: {corpus[:120]}")
 
         prompt = (
-            f"{SYSTEM_PROMPT}\n\n"
-            f"Question: {question}\n\n"
-            "Work through this step by step, tracking your exact position after each move.\n"
-            "Answer: ["
+            "You are an expert in spatial and relative directions.\n\n"
+            f"Given the following description of the spatial relationship between "
+            f"'{src}' and '{tgt}', determine the relative direction of '{src}' "
+            f"relative to '{tgt}' from an observer's perspective.\n\n"
+            f"Corpus: \"{corpus}\"\n\n"
+            f"The possible relative directions are:\n  {VALID_LIST}\n\n"
+            "Think step by step:\n"
+            "1. Identify the observer's viewpoint and orientation described in the corpus.\n"
+            "2. Map the spatial language to a relative direction "
+            "(left, right, in front, behind, next to).\n"
+            f"3. State your conclusion: '{src}' is [direction] '{tgt}'.\n\n"
+            "End with: Answer: [direction]\n\n"
+            "Reasoning:"
         )
 
         response = self._generate(prompt)
-        if log_fn:
-            log_fn(f"\n  [CoT] Response:\n{response}")
+        _log("LLM_RESPONSE", response)
 
-        predicted = extract_answer("Answer: [" + response)
+        direction = extract_direction(response)
 
-        # Fallback: ask directly
-        if predicted is None:
-            fallback = f"{SYSTEM_PROMPT}\n\nQuestion: {question}\n\nThe object you will find is:\nAnswer: ["
+        if direction is None:
+            fallback = (
+                f"Corpus: \"{corpus}\"\n"
+                f"The relative direction of '{src}' relative to '{tgt}' is:\n"
+                "Answer: ["
+            )
             fb_resp = self._generate(fallback)
-            predicted = extract_answer("Answer: [" + fb_resp)
-            if log_fn:
-                log_fn(f"\n  [CoT] Fallback: {fb_resp[:200]} -> {predicted}")
+            direction = extract_direction("Answer: [" + fb_resp)
+            _log("FALLBACK", fb_resp[:200] + f" -> {direction}")
 
-        trace["prediction"] = predicted
-        return predicted, trace
+        trace["prediction"] = direction
+        if log_fn:
+            log_fn(f"\n  [CoT] FINAL: {direction}")
+        return direction, trace
 
 
-# ---------------------------------------------------------------------------
+# =====================================================================
 # 2. TREE-OF-THOUGHT (ToT)
-# ---------------------------------------------------------------------------
+# =====================================================================
 class TreeOfThought(ReasoningStrategy):
     @property
-    def name(self) -> str: return "ToT"
+    def name(self) -> str:
+        return "ToT"
 
     def reason(self, entity: Dict[str, Any], log_fn=None) -> Tuple[Optional[str], Dict]:
-        question = entity["question"]
-        trace = {"strategy": "ToT", "branches": []}
+        src    = entity["source_entity"]
+        tgt    = entity["target_entity"]
+        corpus = entity["corpus"]
+        trace  = {"strategy": "ToT", "branches": []}
 
-        branch_prompt = (
-            f"{SYSTEM_PROMPT}\n\n"
-            f"Question: {question}\n\n"
-            "Generate THREE independent step-by-step solutions. Each solution must track "
-            "every move carefully. Format:\n\n"
-            "SOLUTION 1:\n[step-by-step tracking]\nAnswer: [object]\n\n"
-            "SOLUTION 2:\n[step-by-step tracking]\nAnswer: [object]\n\n"
-            "SOLUTION 3:\n[step-by-step tracking]\nAnswer: [object]\n\n"
+        def _log(step, content):
+            if log_fn:
+                log_fn(f"\n  [ToT] -- {step} --\n{content}")
+
+        _log("INPUT", f"{src} ? {tgt} | corpus: {corpus[:120]}")
+
+        prompt = (
+            "You are an expert in spatial and relative directions.\n\n"
+            f"Given the corpus describing the spatial relationship between "
+            f"'{src}' and '{tgt}', explore THREE independent reasoning paths.\n\n"
+            f"Corpus: \"{corpus}\"\n\n"
+            f"Possible directions: {VALID_LIST}\n\n"
+            "BRANCH 1: Literal language analysis\n"
+            "  - Identify explicit relative direction words (left, right, front, behind, beside).\n"
+            "Answer: [direction]\n\n"
+            "BRANCH 2: Observer perspective reasoning\n"
+            "  - Determine the observer's viewpoint and apply the left/right/front/behind logic.\n"
+            "Answer: [direction]\n\n"
+            "BRANCH 3: Synthesis\n"
+            "  - Combine both approaches and state the most likely direction.\n"
+            "Answer: [direction]\n\n"
             "Begin:"
         )
 
-        branch_resp = self._generate(branch_prompt)
-        if log_fn:
-            log_fn(f"\n  [ToT] Branches:\n{branch_resp}")
+        branch_resp = self._generate(prompt)
+        _log("BRANCHES_RAW", branch_resp)
 
-        # Extract answers from each solution
-        solution_pattern = r"SOLUTION\s+\d+\s*:\s*(.*?)(?=SOLUTION\s+\d+|$)"
-        solutions = re.findall(solution_pattern, branch_resp, re.DOTALL | re.IGNORECASE)
-        if not solutions:
-            # Try splitting on "Answer:" occurrences
-            solutions = re.split(r"(?=Answer\s*:)", branch_resp, flags=re.IGNORECASE)
+        branch_pattern = r"BRANCH\s+\d+\s*:(.*?)(?=BRANCH\s+\d+|$)"
+        branches = re.findall(branch_pattern, branch_resp, re.DOTALL | re.IGNORECASE)
 
-        votes: Dict[str, int] = {}
-        for sol in solutions:
-            pred = extract_answer(sol)
+        weighted: Dict[str, float] = {}
+        for i, b_text in enumerate(branches):
+            pred = extract_direction(b_text)
+            trace["branches"].append({"index": i + 1, "direction": pred,
+                                      "content": b_text.strip()[:300]})
+            _log(f"BRANCH_{i+1}", f"-> {pred}")
             if pred:
-                norm = normalize(pred)
-                votes[norm] = votes.get(norm, 0) + 1
+                weighted[pred] = weighted.get(pred, 0.0) + _spatial_weight(b_text)
 
-        final_pred = max(votes, key=votes.get) if votes else None
+        final_dir = max(weighted, key=weighted.get) if weighted else None
 
-        # Fallback
-        if final_pred is None:
-            final_pred = extract_answer(branch_resp)
-        if final_pred is None:
-            synth = f"{SYSTEM_PROMPT}\n\nQuestion: {question}\n\nAnswer: ["
-            final_pred = extract_answer("Answer: [" + self._generate(synth))
+        if final_dir is None:
+            final_dir = extract_direction(branch_resp)
+        if final_dir is None:
+            fb = (
+                f"Corpus: \"{corpus}\"\n"
+                f"The relative direction of '{src}' relative to '{tgt}' is:\n"
+                "Answer: ["
+            )
+            final_dir = extract_direction("Answer: [" + self._generate(fb))
+            _log("FALLBACK", f"-> {final_dir}")
 
-        trace["votes"] = votes
-        trace["prediction"] = final_pred
+        trace["prediction"] = final_dir
         if log_fn:
-            log_fn(f"\n  [ToT] Votes: {votes}  -> {final_pred}")
+            log_fn(f"\n  [ToT] FINAL: {final_dir}")
+        return final_dir, trace
 
-        return final_pred, trace
 
-
-# ---------------------------------------------------------------------------
+# =====================================================================
 # 3. GRAPH-OF-THOUGHT (GoT)
-# ---------------------------------------------------------------------------
+# =====================================================================
+@dataclass
+class ThoughtNode:
+    id: int
+    content: str
+    direction: Optional[str] = None
+    confidence: float = 0.0
+
+
 class GraphOfThought(ReasoningStrategy):
     @property
-    def name(self) -> str: return "GoT"
+    def name(self) -> str:
+        return "GoT"
 
     def reason(self, entity: Dict[str, Any], log_fn=None) -> Tuple[Optional[str], Dict]:
-        question = entity["question"]
-        trace = {"strategy": "GoT", "nodes": []}
+        src    = entity["source_entity"]
+        tgt    = entity["target_entity"]
+        corpus = entity["corpus"]
+        trace  = {"strategy": "GoT", "nodes": []}
+
+        def _log(step, content):
+            if log_fn:
+                log_fn(f"\n  [GoT] -- {step} --\n{content}")
+
+        _log("INPUT", f"{src} ? {tgt} | corpus: {corpus[:120]}")
 
         phase1_prompt = (
-            f"{SYSTEM_PROMPT}\n\n"
-            f"Question: {question}\n\n"
-            "Build a position-tracking graph. For each move, create a NODE:\n\n"
-            "NODE 0: Starting position = [object]\n"
-            "NODE 1: After move 1 -- [direction/steps] -> [object]\n"
-            "NODE 2: After move 2 -- [direction/steps] -> [object]\n"
-            "...\n"
-            "NODE N: Final position = [object]\n\n"
-            "Begin building the graph:"
+            "You are an expert in spatial and relative directions.\n\n"
+            f"Analyze the spatial relationship between '{src}' and '{tgt}' "
+            f"using the corpus below. Build a reasoning graph with FOUR thought nodes.\n\n"
+            f"Corpus: \"{corpus}\"\n\n"
+            f"Possible directions: {VALID_LIST}\n\n"
+            "THOUGHT 1: Relative language extraction\n"
+            "  - List every relative directional word or phrase in the corpus.\n"
+            "Direction: [direction]\n\n"
+            "THOUGHT 2: Observer perspective\n"
+            "  - Establish the observer's viewpoint and apply relative direction logic.\n"
+            "Direction: [direction]\n\n"
+            "THOUGHT 3: Consistency check\n"
+            "  - Do the language cues and perspective reasoning agree?\n"
+            "Direction: [direction]\n\n"
+            "THOUGHT 4: Final aggregation\n"
+            "  - State the definitive relative direction.\n"
+            "Direction: [direction]\n\n"
+            "Begin:"
         )
 
         phase1_resp = self._generate(phase1_prompt)
+        _log("PHASE1_RAW", phase1_resp)
+
+        thought_pattern = r"THOUGHT\s+\d+\s*:(.*?)(?=THOUGHT\s+\d+|$)"
+        thoughts = re.findall(thought_pattern, phase1_resp, re.DOTALL | re.IGNORECASE)
+
+        nodes: List[ThoughtNode] = []
+        weighted: Dict[str, float] = {}
+        for i, t_text in enumerate(thoughts):
+            pred   = extract_direction(t_text)
+            weight = _spatial_weight(t_text)
+            nodes.append(ThoughtNode(id=i, content=t_text.strip()[:400],
+                                     direction=pred, confidence=weight))
+            if pred:
+                weighted[pred] = weighted.get(pred, 0.0) + weight
+
+        trace["nodes"] = [{"id": n.id, "direction": n.direction,
+                           "confidence": n.confidence} for n in nodes]
+        final_dir = max(weighted, key=weighted.get) if weighted else None
+
+        if final_dir is None:
+            final_dir = extract_direction(phase1_resp)
+            _log("FALLBACK1", f"scan full response -> {final_dir}")
+
+        if final_dir is None:
+            synth = (
+                f"Corpus: \"{corpus}\"\n"
+                f"The relative direction of '{src}' relative to '{tgt}' is:\nAnswer: ["
+            )
+            final_dir = extract_direction("Answer: [" + self._generate(synth))
+            _log("FALLBACK2", f"synthesis -> {final_dir}")
+
+        trace["prediction"] = final_dir
         if log_fn:
-            log_fn(f"\n  [GoT] Phase1:\n{phase1_resp}")
-
-        # Extract from the last NODE entry
-        node_pattern = r"NODE\s+\d+\s*:.*?(?:=|->|--)\s*\[?([^\]\n]+)\]?"
-        nodes = re.findall(node_pattern, phase1_resp, re.IGNORECASE | re.DOTALL)
-
-        final_pred = None
-        if nodes:
-            # Take the last node's value
-            final_pred = normalize(nodes[-1].strip().rstrip("."))
-            if log_fn:
-                log_fn(f"\n  [GoT] Nodes found: {nodes[-3:]}  -> {final_pred}")
-
-        # Fallback 1: extract from full response
-        if not final_pred:
-            final_pred = extract_answer(phase1_resp)
-            if log_fn:
-                log_fn(f"\n  [GoT] Fallback1 from full response: {final_pred}")
-
-        # Fallback 2: direct synthesis
-        if not final_pred:
-            synth = f"{SYSTEM_PROMPT}\n\nQuestion: {question}\n\nAnswer: ["
-            final_pred = extract_answer("Answer: [" + self._generate(synth))
-            if log_fn:
-                log_fn(f"\n  [GoT] Fallback2 synthesis: {final_pred}")
-
-        trace["prediction"] = final_pred
-        return final_pred, trace
+            log_fn(f"\n  [GoT] FINAL: {final_dir}")
+        return final_dir, trace
 
 
-# ---------------------------------------------------------------------------
+# =====================================================================
 # FACTORY
-# ---------------------------------------------------------------------------
-STRATEGY_MAP = {"cot": ChainOfThought, "tot": TreeOfThought, "got": GraphOfThought}
+# =====================================================================
+STRATEGY_MAP = {
+    "cot": ChainOfThought,
+    "tot": TreeOfThought,
+    "got": GraphOfThought,
+}
+
 
 def get_strategy(name: str, model_fn=None, max_new_tokens: int = 512,
                  temperature: float = 0.1, **kwargs) -> ReasoningStrategy:
     cls = STRATEGY_MAP.get(name.lower())
     if cls is None:
         raise ValueError(f"Unknown strategy: {name}. Choose from: {list(STRATEGY_MAP)}")
-    return cls(model_fn=model_fn, max_new_tokens=max_new_tokens, temperature=temperature)
+    return cls(model_fn=model_fn, max_new_tokens=max_new_tokens,
+               temperature=temperature)

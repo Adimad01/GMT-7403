@@ -57,7 +57,7 @@ for _k in [k for k in list(sys.modules) if k == "torchvision" or k.startswith("t
 sys.meta_path.insert(0, _TvStubFinder())
 # ---------------------------------------------------------------------------
 
-DATASET    = "../dataset/cardinal_train.jsonl"
+DATASET    = "../dataset/cardinal_balanced_train.csv"
 OUTPUT_DIR = "finetuned_gptoss_cardinal"
 MODEL_ID   = "openai/gpt-oss-20b"
 
@@ -76,8 +76,10 @@ def preflight():
         print(f"[ERROR] Training dataset not found: {DATASET}")
         print("        Build it first with: python build_cardinal_training_data.py")
         sys.exit(1)
-    n = sum(1 for _ in open(DATASET))
-    print(f"[OK] Dataset: {DATASET}  ({n} lines)")
+    import csv
+    with open(DATASET, newline="") as f:
+        n = sum(1 for _ in csv.DictReader(f))
+    print(f"[OK] Dataset: {DATASET}  ({n} rows)")
 
 
 def run():

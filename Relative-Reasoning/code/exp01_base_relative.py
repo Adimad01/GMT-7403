@@ -22,16 +22,17 @@ import sys
 import json
 import argparse
 
-DATASET      = "../dataset/relative_eval.jsonl"
+DATASET      = "../../Topological-Reasoning/dataset/relative_direction_relations.csv"
+INDICES_FILE = "../dataset/eval_20_balanced_indices.json"
 MODEL_ID     = "openai/gpt-oss-20b"
 ADAPTER_PATH = None
 MODEL_TAG    = "exp1_rel_base_gpu"
 OUTPUT_DIR   = "results"
 TEMPERATURE    = 0.1
 MAX_NEW_TOKENS = 512
-N_EVAL     = 270
+N_EVAL     = 20
 STRATEGIES = ["cot", "tot", "got"]
-SUFFIX     = "relative_nav_270_sample"
+SUFFIX     = "relative_dir_20_sample"
 
 
 def preflight():
@@ -52,7 +53,7 @@ def check_strategy_status(strategies: list) -> bool:
             done    = len(data.get("processed_indices", []))
             hits = sum(1 for r in results if r.get("match"))
             acc  = hits / len(results) * 100 if results else 0.0
-            if results and done <= 80 and hits == 0:
+            if results and done <= 3 and hits == 0:
                 print(f"  {strat.upper():3s} : STALE ({done} rows, acc=0.0%) — auto-deleting ⚠️")
                 os.remove(ckpt)
                 all_done = False
@@ -91,6 +92,7 @@ def run():
     sys.argv = [
         "eval_engine_relative.py",
         "--dataset",        DATASET,
+        "--filter-indices", INDICES_FILE,
         "--model-id",       MODEL_ID,
         "--strategy",       args.strategy,
         "--output-dir",     OUTPUT_DIR,

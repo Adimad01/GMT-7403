@@ -132,7 +132,7 @@ from strategies_cardinal import (
     CardinalKnowledgeGraph,
 )
 
-EXPERIMENT_SUFFIX = "cardinal_direction_440_sample"
+EXPERIMENT_SUFFIX = "cardinal_dir_32_sample"
 
 
 # ---------------------------------------------------------------------------
@@ -205,18 +205,20 @@ def evaluate_strategy(strategy, df: pd.DataFrame, output_dir: str,
                 continue
 
             entity = {
-                "question":  str(row.get("question", "")).strip(),
-                "direction": str(row.get("direction", "")).strip().lower(),
+                "source_entity": str(row.get("source_entity", "")).strip(),
+                "target_entity": str(row.get("target_entity", "")).strip(),
+                "corpus":        str(row.get("corpus", "")).strip(),
+                "relation_label": str(row.get("relation_label", "")).strip().lower(),
             }
 
-            expected = entity["direction"]
+            expected = entity["relation_label"]
 
             def row_logger(msg: str):
                 log_f.write(msg + "\n")
                 log_f.flush()
 
             row_logger(f"\n{'=' * 90}")
-            row_logger(f"ROW {real_idx} | {entity['question'][:80]}")
+            row_logger(f"ROW {real_idx} | {entity['source_entity']} ? {entity['target_entity']}")
             row_logger(f"Expected: {expected}")
             row_logger(f"{'=' * 90}")
 
@@ -303,8 +305,8 @@ def main():
         print(f"[DATA] Filtered to {len(df)} eval rows from {args.filter_indices}")
     print(f"[DATA] {len(df)} eval rows ready  ({args.dataset})")
 
-    dist = df["direction"].value_counts().to_dict()
-    print("[DATA] Direction distribution:", dist)
+    dist = df["relation_label"].value_counts().to_dict()
+    print("[DATA] Label distribution:", dist)
 
     # ------------------------------------------------------------------
     # 2. Load model on GPU

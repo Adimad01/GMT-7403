@@ -99,33 +99,26 @@ else:
 # ---------------------------------------------------------------------------
 # PROMPT BUILDER
 # ---------------------------------------------------------------------------
+_VALID_RELATIVE = "behind, in_front_of, left_of, next_to, right_of"
+
+
 def build_training_prompt(row, tokenizer):
-    """Build a complete navigation instruction-following training example string."""
-    question = str(row.get("question", "")).strip()
-    answer   = str(row.get("answer",   "")).strip()
+    """Build a relative direction instruction-following training example."""
+    src    = str(row.get("source_entity", "")).strip()
+    tgt    = str(row.get("target_entity", "")).strip()
+    corpus = str(row.get("corpus",        "")).strip()
+    label  = str(row.get("relation_label","")).strip()
 
-    prompt_text = (
-        "### SYSTEM PROMPT ###\n"
-        "You are an expert at spatial navigation and positional reasoning.\n\n"
-        "### TASK ###\n"
-        "You will be given a question describing a path (ring, square grid, or tree) "
-        "with named objects at positions. Carefully track each move step by step and "
-        "determine which object you find at the final position.\n\n"
-        "### RULES ###\n"
-        "1. Track your position precisely after EACH movement.\n"
-        "2. For a ring/circle: moves wrap around.\n"
-        "3. For a square grid: moves follow the grid adjacency.\n"
-        "4. For a tree: moves follow parent-child edges.\n"
-        "5. Your final answer must be the EXACT object name from the question.\n\n"
-        "### QUESTION ###\n"
-        f"{question}\n\n"
-        "### OUTPUT ###\n"
-        "[step-by-step tracking ending with Answer: "
+    text = (
+        f"You are an expert in spatial and relative directions.\n\n"
+        f"Given the following description, determine the relative direction of "
+        f"'{src}' relative to '{tgt}'.\n\n"
+        f"Corpus: \"{corpus}\"\n\n"
+        f"Possible directions: {_VALID_RELATIVE}\n\n"
+        f"Answer: [{label}]"
+        + tokenizer.eos_token
     )
-
-    target_output = f"{answer}]"
-
-    return prompt_text + target_output + tokenizer.eos_token
+    return text
 
 
 # ---------------------------------------------------------------------------
@@ -143,12 +136,12 @@ def main():
     # 1. Load Data & Tokenizer
     # ------------------------------------------------------------------
     print("[1/5] Loading dataset and tokenizer...")
+    import csv as _csv
     rows = []
-    with open(args.dataset, "r", encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if line:
-                rows.append(json.loads(line))
+    with open(args.dataset, newline="", encoding="utf-8") as f:
+        for row in _csv.DictReader(f):
+            if row.get("relation_label"):
+                rows.append(row)
     print(f"      -> {len(rows)} rows loaded from {args.dataset}")
 
     tokenizer = AutoTokenizer.from_pretrained(args.model_id, trust_remote_code=True)
@@ -161,7 +154,6 @@ def main():
     records = [
         {"text": build_training_prompt(row, tokenizer)}
         for row in rows
-        if row.get("question") and row.get("answer")
     ]
     train_dataset = Dataset.from_list(records)
     print(f"      -> {len(records)} training examples loaded.")
