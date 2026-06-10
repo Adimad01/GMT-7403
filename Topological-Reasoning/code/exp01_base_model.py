@@ -36,7 +36,7 @@ OUTPUT_DIR     = "results"
 TEMPERATURE    = 0.1
 MAX_NEW_TOKENS = 512
 
-SUFFIX     = "balanced_385"
+SUFFIX     = "neighborhood_details_spatial_relation_16_sample"
 N_EVAL     = 385
 STRATEGIES = ["cot", "tot", "got"]
 # ---------------------------------------------------------------------------
@@ -68,8 +68,14 @@ def check_strategy_status(strategies: list) -> bool:
             data   = json.load(open(ckpt))
             done    = len(data.get("processed_indices", []))
             results = data.get("results", [])
-            if done >= N_EVAL and results:
-                acc = sum(1 for r in results if r.get("match")) / len(results) * 100
+            hits = sum(1 for r in results if r.get("match"))
+            acc  = hits / len(results) * 100 if results else 0.0
+            # Auto-delete stale checkpoints from old broken run (≤96 rows, 0% acc)
+            if results and done <= 96 and hits == 0:
+                print(f"  {strat.upper():3s} : STALE ({done} rows, acc=0.0%) — auto-deleting & restarting ⚠️")
+                os.remove(ckpt)
+                all_done = False
+            elif done >= N_EVAL and results:
                 print(f"  {strat.upper():3s} : COMPLETE  ({done}/{N_EVAL}, acc={acc:.1f}%)  ✅")
             else:
                 print(f"  {strat.upper():3s} : PARTIAL   ({done}/{N_EVAL}) — will resume")
