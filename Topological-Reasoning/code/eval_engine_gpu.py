@@ -331,8 +331,6 @@ def main():
     parser.add_argument("--model-tag",       default="dynamic_osm_finetuned_gpu")
     parser.add_argument("--no-kg",           action="store_true",
                         help="Disable OSM KG evidence at inference (Config 4: KG in training only)")
-    parser.add_argument("--bf16-cache",      default="/home/jovyan/models/gpt-oss-20b-bf16",
-                        help="Pre-saved bf16 checkpoint — skips MXFP4 dequantize peak if it exists")
     args = parser.parse_args()
 
     # ------------------------------------------------------------------
@@ -397,33 +395,23 @@ def main():
     except Exception:
         pass
 
-    # Prefer pre-saved bf16 checkpoint (no MXFP4→bf16 spike, ~40 GB steady-state).
-    # Falls back to on-the-fly dequantization if the cache doesn't exist yet.
-    bf16_cache = args.bf16_cache
-    if os.path.isfile(os.path.join(bf16_cache, "config.json")):
-        load_from   = bf16_cache
-        extra_kw    = {}
-        free_gb     = (torch.cuda.get_device_properties(0).total_memory
-                       - torch.cuda.memory_allocated(0)) / 1e9 if cuda_ok else 0
-        print(f"[MODEL] Loading pre-saved bf16 from {load_from}  (free GPU≈{free_gb:.0f} GB, no spike)")
-    else:
-        load_from = args.model_id
-        extra_kw  = {"quantization_config": Mxfp4Config(dequantize=True)}
-        if cuda_ok:
-            free_gb = (torch.cuda.get_device_properties(0).total_memory
-                       - torch.cuda.memory_allocated(0)) / 1e9
-            print(f"[MODEL] Loading {load_from} with MXFP4→bf16 dequantize "
-                  f"(~60 GB peak, free≈{free_gb:.0f} GB)")
-            print("[MODEL] TIP: run save_bf16_model.py once to cache and avoid the spike.")
-        else:
-            print(f"[MODEL] No GPU — loading {load_from} (expect OOM or very slow)")
+    # Always dequantize MXFP4 → bf16 on load.  save_pretrained does NOT preserve
+    # MoE expert key names correctly for gpt-oss-20b (gate_up_proj saved at root
+    # level instead of mlp.experts.gate_up_proj), so a pre-saved bf16 cache would
+    # silently reinitialise the expert layers and produce all-None predictions.
+    # Dequantize needs ~60 GB peak; with ≥80 GB free this is always safe.
+    if cuda_ok:
+        free_gb = (torch.cuda.get_device_properties(0).total_memory
+                   - torch.cuda.memory_allocated(0)) / 1e9
+        print(f"[MODEL] Loading {args.model_id} with MXFP4→bf16 dequantize "
+              f"(free GPU≈{free_gb:.0f} GB)")
 
     model = AutoModelForCausalLM.from_pretrained(
-        load_from,
+        args.model_id,
         device_map="auto",
         trust_remote_code=True,
         dtype=dtype,
-        **extra_kw,
+        quantization_config=Mxfp4Config(dequantize=True),
     )
 
     adapter_tag = "base"

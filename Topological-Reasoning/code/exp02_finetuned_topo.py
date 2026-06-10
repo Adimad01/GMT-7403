@@ -11,7 +11,7 @@ evidence is provided to the CoT/ToT/GoT reasoning strategies.
 Model     : openai/gpt-oss-20b + finetuned_gptoss_topological/final_adapter
 KG        : OSM (Nominatim)
 Strategies: CoT, ToT, GoT
-Eval set  : 96 balanced examples — 16 per predicate
+Eval set  : 385 balanced examples — 55 per predicate × 7 predicates
 Outputs   :
   results/voletc_exp2_finetuned_topo_gpu_{cot|tot|got}_*_ckpt.json
 
@@ -38,7 +38,8 @@ OUTPUT_DIR     = "results"
 TEMPERATURE    = 0.1
 MAX_NEW_TOKENS = 512
 
-SUFFIX     = "neighborhood_details_spatial_relation_16_sample"
+SUFFIX     = "balanced_385"
+N_EVAL     = 385
 STRATEGIES = ["cot", "tot", "got"]
 # ---------------------------------------------------------------------------
 
@@ -69,11 +70,11 @@ def check_strategy_status(strategies: list) -> bool:
             data   = json.load(open(ckpt))
             done    = len(data.get("processed_indices", []))
             results = data.get("results", [])
-            if done >= 96 and results:
+            if done >= N_EVAL and results:
                 acc = sum(1 for r in results if r.get("match")) / len(results) * 100
-                print(f"  {strat.upper():3s} : COMPLETE  ({done}/96, acc={acc:.1f}%)  ✅")
+                print(f"  {strat.upper():3s} : COMPLETE  ({done}/{N_EVAL}, acc={acc:.1f}%)  ✅")
             else:
-                print(f"  {strat.upper():3s} : PARTIAL   ({done}/96) — will resume")
+                print(f"  {strat.upper():3s} : PARTIAL   ({done}/{N_EVAL}) — will resume")
                 all_done = False
         else:
             print(f"  {strat.upper():3s} : NOT STARTED")
