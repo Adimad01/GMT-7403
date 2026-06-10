@@ -771,6 +771,22 @@ Begin:"""
                 weighted_scores[node.predicate] = weighted_scores.get(node.predicate, 0.0) + node.confidence
         final_pred = max(weighted_scores, key=weighted_scores.get) if weighted_scores else None
 
+        # Fallback 1: model didn't emit THOUGHT N: headers — scan full phase1 response.
+        if final_pred is None:
+            final_pred = extract_predicate(phase1_resp)
+            _log("FALLBACK1", f"thought-scan failed, extracted from full response: {final_pred}")
+
+        # Fallback 2: still None — ask directly for the answer.
+        if final_pred is None:
+            synth_prompt = (
+                f"{context}\n{kg_evidence}\n"
+                "Based on the spatial evidence above, the DE-9IM topological predicate is:\n"
+                "Answer: ["
+            )
+            synth_resp = self._generate(synth_prompt)
+            final_pred = extract_predicate(synth_resp)
+            _log("FALLBACK2", f"synthesis response: {synth_resp[:200]} → {final_pred}")
+
         trace["prediction"] = final_pred
         if log_fn: log_fn(f"\n  [GoT] ✅ FINAL PREDICTION: {final_pred}")
 
