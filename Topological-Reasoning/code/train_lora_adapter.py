@@ -66,6 +66,29 @@ except Exception as _kp_err:
     print(f"[WARN] kernels patch skipped: {_kp_err}")
 # ===========================================================================
 
+import sys
+import importlib.machinery
+import importlib.abc
+
+# Stub torchaudio — transformers 5.x imports it in loss_rnnt.py but the
+# installed torchaudio was compiled for CUDA 11 while torch 2.5 uses CUDA 12.
+class _TorchaudioStubFinder(importlib.abc.MetaPathFinder, importlib.abc.Loader):
+    def find_spec(self, fullname, path, target=None):
+        if fullname == "torchaudio" or fullname.startswith("torchaudio."):
+            return importlib.machinery.ModuleSpec(fullname, self, is_package=True)
+        return None
+    def create_module(self, spec): return None
+    def exec_module(self, module):
+        module.__path__ = []; module.__file__ = "<torchaudio-stub>"
+        class _S:
+            def __getattr__(self, n): return _S()
+            def __call__(self, *a, **k): return _S()
+            def __iter__(self): return iter([])
+        module.__getattr__ = lambda n: _S() if not (n.startswith("__") and n.endswith("__")) else (_ for _ in ()).throw(AttributeError(n))
+for _k in [k for k in list(sys.modules) if k == "torchaudio" or k.startswith("torchaudio.")]:
+    del sys.modules[_k]
+sys.meta_path.insert(0, _TorchaudioStubFinder())
+
 import inspect
 import pandas as pd
 from datasets import Dataset

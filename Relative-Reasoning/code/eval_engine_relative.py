@@ -84,6 +84,36 @@ sys.meta_path.insert(0, _TorchvisionStubFinder())
 # ===========================================================================
 
 # ===========================================================================
+# TORCHAUDIO STUB — transformers 5.x imports torchaudio in loss_rnnt.py but
+# torchaudio 0.13 was compiled for CUDA 11 while torch 2.5 uses CUDA 12.
+# ===========================================================================
+class _TorchaudioStubFinder(importlib.abc.MetaPathFinder, importlib.abc.Loader):
+    def find_spec(self, fullname, path, target=None):
+        if fullname == "torchaudio" or fullname.startswith("torchaudio."):
+            return importlib.machinery.ModuleSpec(fullname, self, is_package=True)
+        return None
+    def create_module(self, spec):
+        return None
+    def exec_module(self, module):
+        module.__path__ = []
+        module.__file__ = "<torchaudio-stub>"
+        class _Stub:
+            def __init__(self, n=""): self._n = n
+            def __getattr__(self, n): return _Stub(n)
+            def __call__(self, *a, **k): return _Stub()
+            def __iter__(self): return iter([])
+        def _catchall(name):
+            if name.startswith("__") and name.endswith("__"):
+                raise AttributeError(name)
+            return _Stub(name)
+        module.__getattr__ = _catchall
+
+for _k in [k for k in list(sys.modules) if k == "torchaudio" or k.startswith("torchaudio.")]:
+    del sys.modules[_k]
+sys.meta_path.insert(0, _TorchaudioStubFinder())
+# ===========================================================================
+
+# ===========================================================================
 # DEPENDENCY MONKEY PATCHES
 # ===========================================================================
 if not hasattr(torch, "accelerator"):
