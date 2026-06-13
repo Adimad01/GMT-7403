@@ -1,15 +1,15 @@
 """
-Experiment 2 — Relative-LoRA (fine-tuned on relative_train.jsonl)
+Experiment 2 — Relative-LoRA (fine-tuned on relative_balanced_train.csv)
 ================================================================================
-GPT-OSS-20B fine-tuned on relative_train.jsonl (630 navigation examples).
+GPT-OSS-20B fine-tuned on 55 relative direction examples (11/class × 5 classes).
 No extended token budget.
 
 Model     : openai/gpt-oss-20b + Relative-LoRA adapter
 Strategies: CoT, ToT, GoT
-Eval set  : 270 examples (ring / square / tree navigation)
+Eval set  : 20 examples (4/class × 5 classes, balanced across ambiguity levels)
 Max tokens: 512
 Outputs   :
-  results/voletc_exp2_rel_lora_gpu_{strategy}_relative_nav_270_sample_ckpt.json
+  results/voletc_exp2_rel_lora_gpu_{strategy}_relative_dir_20_sample_ckpt.json
 
 Run:
     python exp02_finetuned_relative.py

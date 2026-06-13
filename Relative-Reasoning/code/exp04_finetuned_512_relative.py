@@ -6,10 +6,10 @@ for independent checkpoint tracking. Used as a clean replication / ablation run.
 
 Model     : openai/gpt-oss-20b + Relative-LoRA adapter
 Strategies: CoT, ToT, GoT
-Eval set  : 270 examples (ring / square / tree navigation)
+Eval set  : 20 examples (4/class × 5 classes, balanced across ambiguity levels)
 Max tokens: 512
 Outputs   :
-  results/voletc_exp4_rel_lora_b_gpu_{strategy}_relative_nav_270_sample_ckpt.json
+  results/voletc_exp4_rel_lora_b_gpu_{strategy}_relative_dir_20_sample_ckpt.json
 
 Run:
     python exp04_finetuned_512_relative.py

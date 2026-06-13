@@ -1,16 +1,16 @@
 """
-Experiment 1 — Base GPT-OSS-20B (Relative Navigation)
+Experiment 1 — Base GPT-OSS-20B (Relative Direction)
 ================================================================================
-Base GPT-OSS-20B (no fine-tuning, no adapter) evaluated on 270 relative
-navigation examples using CoT, ToT, and GoT reasoning strategies.
+Base GPT-OSS-20B (no fine-tuning, no adapter) evaluated on 20 relative
+direction examples using CoT, ToT, and GoT reasoning strategies.
 
 Model     : openai/gpt-oss-20b  (base, no adapter)
 Strategies: CoT, ToT, GoT
-Eval set  : 270 examples (ring / square / tree navigation)
+Eval set  : 20 examples (4/class × 5 classes, balanced across ambiguity levels)
 Outputs   :
-  results/voletc_exp1_rel_base_gpu_cot_relative_nav_270_sample_ckpt.json
-  results/voletc_exp1_rel_base_gpu_tot_relative_nav_270_sample_ckpt.json
-  results/voletc_exp1_rel_base_gpu_got_relative_nav_270_sample_ckpt.json
+  results/voletc_exp1_rel_base_gpu_cot_relative_dir_20_sample_ckpt.json
+  results/voletc_exp1_rel_base_gpu_tot_relative_dir_20_sample_ckpt.json
+  results/voletc_exp1_rel_base_gpu_got_relative_dir_20_sample_ckpt.json
 
 Run:
     python exp01_base_relative.py

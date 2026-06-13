@@ -2,14 +2,15 @@
 Experiment 5 — Base model + extended reasoning budget (ablation, no fine-tuning)
 ================================================================================
 Base GPT-OSS-20B (no adapter) with 1024 max tokens.
-Ablation: does more reasoning budget alone improve navigation without fine-tuning?
+Ablation: does more reasoning budget alone improve relative direction accuracy
+without fine-tuning?
 
 Model     : openai/gpt-oss-20b  (base, no adapter)
 Strategies: CoT, ToT, GoT
-Eval set  : 270 examples (ring / square / tree navigation)
+Eval set  : 20 examples (4/class × 5 classes, balanced across ambiguity levels)
 Max tokens: 1024  (extended budget)
 Outputs   :
-  results/voletc_exp5_rel_base_ext_gpu_{strategy}_relative_nav_270_sample_ckpt.json
+  results/voletc_exp5_rel_base_ext_gpu_{strategy}_relative_dir_20_sample_ckpt.json
 
 Run:
     python exp05_base_1024_relative.py
