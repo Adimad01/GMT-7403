@@ -445,7 +445,17 @@ def main():
             quantization_config=Mxfp4Config(dequantize=True),
         )
     except RuntimeError as _mig_err:
-        if "NVML_SUCCESS" not in str(_mig_err) and "CUDACachingAllocator" not in str(_mig_err):
+        # transformers wraps the raw NVML assert in its own RuntimeError, so walk
+        # the full __cause__/__context__ chain to find the real error.
+        _exc, _nvml = _mig_err, False
+        _seen: set = set()
+        while _exc is not None and id(_exc) not in _seen:
+            _seen.add(id(_exc))
+            if "NVML_SUCCESS" in str(_exc) or "CUDACachingAllocator" in str(_exc):
+                _nvml = True
+                break
+            _exc = _exc.__cause__ if _exc.__cause__ is not None else _exc.__context__
+        if not _nvml:
             raise
         print("[MODEL] NVML assert on MIG partition — retrying: dequantize on CPU then move to CUDA")
         model = AutoModelForCausalLM.from_pretrained(

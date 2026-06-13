@@ -101,7 +101,7 @@ if [[ $SKIP_TRAIN -eq 0 ]]; then
     echo "  Done. Starting fine-tuning."
     echo ""
 
-    echo "  FT-1 · Relative-LoRA  (relative_train.jsonl — 630 rows)"
+    echo "  FT-1 · Relative-LoRA  (relative_balanced_train.csv — 55 rows)"
     line
     $PYTHON train_runner_relative.py
 
