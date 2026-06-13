@@ -241,36 +241,14 @@ def main():
         print(f"[3/5] Loading {args.model_id} with MXFP4→bf16 dequantize "
               f"(free GPU≈{free_gb:.0f} GB)")
 
-    try:
-        model = AutoModelForCausalLM.from_pretrained(
-            args.model_id,
-            device_map="auto",
-            trust_remote_code=True,
-            dtype=dtype,
-            quantization_config=Mxfp4Config(dequantize=True),
-        )
-    except RuntimeError as _mig_err:
-        # transformers wraps the raw NVML assert in its own RuntimeError, so walk
-        # the full __cause__/__context__ chain to find the real error.
-        _exc, _nvml = _mig_err, False
-        _seen: set = set()
-        while _exc is not None and id(_exc) not in _seen:
-            _seen.add(id(_exc))
-            if "NVML_SUCCESS" in str(_exc) or "CUDACachingAllocator" in str(_exc):
-                _nvml = True
-                break
-            _exc = _exc.__cause__ if _exc.__cause__ is not None else _exc.__context__
-        if not _nvml:
-            raise
-        print("[MODEL] NVML assert on MIG partition — retrying: dequantize on CPU then move to CUDA")
-        model = AutoModelForCausalLM.from_pretrained(
-            args.model_id,
-            device_map="cpu",
-            trust_remote_code=True,
-            dtype=dtype,
-            quantization_config=Mxfp4Config(dequantize=True),
-        )
-        model = model.cuda()
+    model = AutoModelForCausalLM.from_pretrained(
+        args.model_id,
+        device_map={"": 0},
+        trust_remote_code=True,
+        torch_dtype=dtype,
+        quantization_config=Mxfp4Config(dequantize=True),
+        use_cache=False,
+    )
     print(f"      -> Model dtype: {next(model.parameters()).dtype}")
 
     # ------------------------------------------------------------------
