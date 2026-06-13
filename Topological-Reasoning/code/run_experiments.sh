@@ -32,6 +32,10 @@
 
 set -euo pipefail
 
+# Disable PyTorch CUDA CachingAllocator NVML queries — prevents NVML_SUCCESS assert
+# on MIG-partitioned A100 GPUs where NVML cannot enumerate the virtual GPU correctly.
+export PYTORCH_NO_CUDA_MEMORY_CACHING=1
+
 PYTHON="${PYTHON:-python}"
 SKIP_TRAIN=0
 

@@ -203,13 +203,26 @@ def main():
         print(f"[3/5] Loading {args.model_id} with MXFP4->bf16 dequantize "
               f"(free GPU~{free_gb:.0f} GB)")
 
-    model = AutoModelForCausalLM.from_pretrained(
-        args.model_id,
-        device_map="auto",
-        trust_remote_code=True,
-        dtype=dtype,
-        quantization_config=Mxfp4Config(dequantize=True),
-    )
+    try:
+        model = AutoModelForCausalLM.from_pretrained(
+            args.model_id,
+            device_map="auto",
+            trust_remote_code=True,
+            dtype=dtype,
+            quantization_config=Mxfp4Config(dequantize=True),
+        )
+    except RuntimeError as _mig_err:
+        if "NVML_SUCCESS" not in str(_mig_err) and "CUDACachingAllocator" not in str(_mig_err):
+            raise
+        print("[MODEL] NVML assert on MIG partition — retrying: dequantize on CPU then move to CUDA")
+        model = AutoModelForCausalLM.from_pretrained(
+            args.model_id,
+            device_map="cpu",
+            trust_remote_code=True,
+            dtype=dtype,
+            quantization_config=Mxfp4Config(dequantize=True),
+        )
+        model = model.cuda()
     print(f"      -> Model dtype: {next(model.parameters()).dtype}")
 
     # ------------------------------------------------------------------
