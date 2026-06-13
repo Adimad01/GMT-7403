@@ -64,9 +64,9 @@ fi
 # PHASE 0 — Dataset check (splits already exist)
 # ─────────────────────────────────────────────────────────────────────────────
 echo ""
-header "PHASE 0 — Dataset check (source: Topological-Reasoning/dataset/)"
+header "PHASE 0 — Dataset check"
 
-SRC_DATA="../../Topological-Reasoning/dataset/relative_direction_relations.csv"
+SRC_DATA="../dataset/relative_direction_relations.csv"
 TRAIN_FILE="../dataset/relative_balanced_train.csv"
 EVAL_IDX="../dataset/eval_20_balanced_indices.json"
 
@@ -76,17 +76,34 @@ if [[ ! -f "$SRC_DATA" ]]; then
 fi
 echo "  [OK] Source: $SRC_DATA  (75 rows)"
 
-if [[ ! -f "$EVAL_IDX" ]]; then
-    echo "  [ERROR] Eval indices not found: $EVAL_IDX"
-    exit 1
+# Auto-generate train/eval splits if missing
+if [[ ! -f "$TRAIN_FILE" ]] || [[ ! -f "$EVAL_IDX" ]]; then
+    echo "  Generating train/eval splits..."
+    $PYTHON - << 'PYEOF'
+import csv, json
+from collections import defaultdict
+rows = list(csv.DictReader(open("../dataset/relative_direction_relations.csv")))
+fieldnames = list(rows[0].keys())
+by_label_level = defaultdict(lambda: defaultdict(list))
+for i, row in enumerate(rows):
+    by_label_level[row["relation_label"]][row["ambiguity_level"]].append(i)
+eval_indices = set()
+for label in sorted(by_label_level):
+    for lvl in ["Level 1","Level 2","Level 3","Level 4"]:
+        idxs = by_label_level[label][lvl]
+        if idxs:
+            eval_indices.add(idxs[0])
+train_indices = [i for i in range(len(rows)) if i not in eval_indices]
+with open("../dataset/relative_balanced_train.csv","w",newline="",encoding="utf-8") as f:
+    w = csv.DictWriter(f, fieldnames=fieldnames)
+    w.writeheader()
+    for i in train_indices:
+        w.writerow(rows[i])
+json.dump(sorted(eval_indices), open("../dataset/eval_20_balanced_indices.json","w"))
+print(f"  [OK] relative_balanced_train.csv ({len(train_indices)} rows)  eval_20_balanced_indices.json ({len(eval_indices)} indices)")
+PYEOF
 fi
-echo "  [OK] Eval indices: $EVAL_IDX  (20 rows, 4/class × 5)"
-
-if [[ ! -f "$TRAIN_FILE" ]]; then
-    echo "  [ERROR] Training CSV not found: $TRAIN_FILE"
-    echo "         Expected relative_balanced_train.csv (55 rows) — regenerate splits."
-    exit 1
-fi
+echo "  [OK] $EVAL_IDX  (20 rows, 4/class × 5)"
 TRAIN_ROWS=$($PYTHON -c "import csv; print(sum(1 for _ in csv.reader(open('$TRAIN_FILE'))) - 1)")
 echo "  [OK] $TRAIN_FILE  ($TRAIN_ROWS rows)"
 

@@ -20,7 +20,7 @@ import sys
 import json
 import argparse
 
-DATASET      = "../../Topological-Reasoning/dataset/relative_direction_relations.csv"
+DATASET      = "../dataset/relative_direction_relations.csv"
 INDICES_FILE = "../dataset/eval_20_balanced_indices.json"
 MODEL_ID     = "openai/gpt-oss-20b"
 ADAPTER_PATH = "finetuned_gptoss_relative/final_adapter"

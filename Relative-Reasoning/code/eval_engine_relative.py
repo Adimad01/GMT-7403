@@ -4,7 +4,7 @@ eval_engine_relative.py
 GPU-based relative direction inference (CoT / ToT / GoT).
 Supports an optional PEFT adapter for the fine-tuned model.
 
-Dataset:  ../../Topological-Reasoning/dataset/relative_direction_relations.csv
+Dataset:  ../dataset/relative_direction_relations.csv
 Fields:   source_entity, target_entity, corpus, relation_label
 Labels:   behind, in_front_of, left_of, next_to, right_of
 
@@ -12,7 +12,7 @@ Evaluation: exact match (predicted label == relation_label)
 
 Usage:
     python eval_engine_relative.py \\
-        --dataset  ../../Topological-Reasoning/dataset/relative_direction_relations.csv \\
+        --dataset  ../dataset/relative_direction_relations.csv \\
         --filter-indices ../dataset/eval_20_balanced_indices.json \\
         --model-id openai/gpt-oss-20b \\
         --strategy all \\
@@ -21,7 +21,7 @@ Usage:
 
     # with adapter
     python eval_engine_relative.py \\
-        --dataset  ../../Topological-Reasoning/dataset/relative_direction_relations.csv \\
+        --dataset  ../dataset/relative_direction_relations.csv \\
         --filter-indices ../dataset/eval_20_balanced_indices.json \\
         --model-id openai/gpt-oss-20b \\
         --adapter-path finetuned_gptoss_relative/final_adapter \\

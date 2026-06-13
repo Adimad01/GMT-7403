@@ -21,7 +21,7 @@ import sys
 import json
 import argparse
 
-DATASET      = "../../Topological-Reasoning/dataset/cardinal_direction_relations.csv"
+DATASET      = "../dataset/cardinal_direction_relations.csv"
 INDICES_FILE = "../dataset/eval_32_balanced_indices.json"
 MODEL_ID     = "openai/gpt-oss-20b"
 ADAPTER_PATH = "finetuned_gptoss_cardinal_kg/final_adapter"

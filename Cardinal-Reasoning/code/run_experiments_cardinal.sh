@@ -72,23 +72,43 @@ WIKIDATA_ADAPTER="../../Topological-Reasoning/code/finetuned_gptoss_wikidata_kg/
 # PHASE 0 — Build training datasets (eval-excluded, balanced 130/direction)
 # ─────────────────────────────────────────────────────────────────────────────
 echo ""
-header "PHASE 0 — Dataset check (source: Topological-Reasoning/dataset/)"
+header "PHASE 0 — Dataset check"
 
-SRC_DATA="../../Topological-Reasoning/dataset/cardinal_direction_relations.csv"
+SRC_DATA="../dataset/cardinal_direction_relations.csv"
 TRAIN_FILE="../dataset/cardinal_balanced_train.csv"
 EVAL_IDX="../dataset/eval_32_balanced_indices.json"
+EVAL_IDX_440="../dataset/eval_440_balanced_indices.json"
 
 if [[ ! -f "$SRC_DATA" ]]; then
     echo "  [ERROR] Source dataset not found: $SRC_DATA"
     exit 1
 fi
-echo "  [OK] Source: $SRC_DATA  (120 rows)"
+echo "  [OK] Source: $SRC_DATA"
 
-if [[ ! -f "$EVAL_IDX" ]]; then
-    echo "  [ERROR] Eval indices not found: $EVAL_IDX"
-    exit 1
+# Auto-generate eval index files if missing
+if [[ ! -f "$EVAL_IDX" ]] || [[ ! -f "$EVAL_IDX_440" ]]; then
+    echo "  Generating eval index files..."
+    $PYTHON - << 'PYEOF'
+import csv, json
+from collections import defaultdict
+DIRECTIONS = ["north","south","east","west","north-east","north-west","south-east","south-west"]
+rows = list(csv.DictReader(open("../dataset/cardinal_direction_relations.csv")))
+by_dir = defaultdict(list)
+for i, row in enumerate(rows):
+    d = row.get("direction","").strip().lower()
+    if d in DIRECTIONS:
+        by_dir[d].append(i)
+eval_440, eval_32 = [], []
+for d in DIRECTIONS:
+    idxs = by_dir[d]
+    eval_440.extend(idxs[:55])
+    eval_32.extend(idxs[:4])
+json.dump(sorted(eval_440), open("../dataset/eval_440_balanced_indices.json","w"))
+json.dump(sorted(eval_32),  open("../dataset/eval_32_balanced_indices.json","w"))
+print(f"  [OK] eval_440 ({len(eval_440)} indices)  eval_32 ({len(eval_32)} indices)")
+PYEOF
 fi
-echo "  [OK] Eval indices: $EVAL_IDX  (32 rows, 4/direction × 8)"
+echo "  [OK] $EVAL_IDX  (32 rows, 4/direction × 8)"
 
 if [[ ! -f "$TRAIN_FILE" ]]; then
     echo "  [WARN] Training CSV not found — rebuilding..."
