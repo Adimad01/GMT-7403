@@ -114,6 +114,13 @@ try:
 except Exception as _mxfp4_e:
     print(f"[WARN] mxfp4 MoE patch skipped: {_mxfp4_e}")
 
+try:
+    import transformers.modeling_utils as _tmu
+    _tmu.caching_allocator_warmup = lambda *_a, **_k: None
+    print("[PATCH] caching_allocator_warmup → no-op  (MIG A100 OOM fix)")
+except Exception as _wpe:
+    print(f"[WARN] warmup patch skipped: {_wpe}")
+
 import trl
 from trl import SFTTrainer, SFTConfig
 

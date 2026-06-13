@@ -66,6 +66,7 @@ except Exception as _kp_err:
     print(f"[WARN] kernels patch skipped: {_kp_err}")
 # ===========================================================================
 
+import sys
 import inspect
 import importlib.machinery
 import importlib.abc
@@ -110,6 +111,17 @@ try:
     print("[PATCH] mxfp4 MoE dequantization → CPU  (MIG A100 NVML fix)")
 except Exception as _mxfp4_e:
     print(f"[WARN] mxfp4 MoE patch skipped: {_mxfp4_e}")
+
+# Disable caching_allocator_warmup — it pre-allocates a tensor the size of the
+# whole model (~40 GB) as a CUDA allocator warmup.  On MIG the model skeleton +
+# warmup tensor together exceed available VRAM even though the model fits.
+# The warmup is a performance optimisation only; skipping it has no effect on accuracy.
+try:
+    import transformers.modeling_utils as _tmu
+    _tmu.caching_allocator_warmup = lambda *_a, **_k: None
+    print("[PATCH] caching_allocator_warmup → no-op  (MIG A100 OOM fix)")
+except Exception as _wpe:
+    print(f"[WARN] warmup patch skipped: {_wpe}")
 
 import trl
 from trl import SFTTrainer, SFTConfig
