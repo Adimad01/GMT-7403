@@ -31,6 +31,7 @@ Usage:
 """
 
 import os
+os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "backend:native")
 import sys
 import json
 import argparse
@@ -156,6 +157,21 @@ except Exception as _kp_err:
 # ===========================================================================
 
 from transformers import AutoTokenizer, AutoModelForCausalLM, Mxfp4Config
+
+# Monkey-patch mxfp4 MoE dequantization to run on CPU — prevents
+# NVML_SUCCESS assert at CUDACachingAllocator.cpp:995 on MIG A100.
+try:
+    import transformers.integrations.mxfp4 as _mxfp4_m
+    _orig_moe_cvt = _mxfp4_m._convert_moe_packed_tensors
+    def _cpu_moe_cvt(blocks, scales, dtype=torch.bfloat16, rows_per_chunk=None):
+        b = blocks.cpu() if blocks.device.type != "cpu" else blocks
+        s = scales.cpu() if scales.device.type != "cpu" else scales
+        return _orig_moe_cvt(b, s, dtype=dtype, rows_per_chunk=rows_per_chunk)
+    _mxfp4_m._convert_moe_packed_tensors = _cpu_moe_cvt
+    print("[PATCH] mxfp4 MoE dequantization → CPU  (MIG A100 NVML fix)")
+except Exception as _mxfp4_e:
+    print(f"[WARN] mxfp4 MoE patch skipped: {_mxfp4_e}")
+
 from peft import PeftModel
 
 sys.path.insert(0, os.path.dirname(__file__))
