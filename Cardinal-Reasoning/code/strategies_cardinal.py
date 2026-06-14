@@ -201,19 +201,13 @@ class TreeOfThought(ReasoningStrategy):
 
         prompt = (
             "You are an expert in spatial geography and cardinal directions.\n\n"
-            f"Given the corpus describing the spatial relationship between "
-            f"'{src}' and '{tgt}', explore THREE independent reasoning paths.\n\n"
+            f"Determine the cardinal direction of '{src}' with respect to '{tgt}' "
+            f"using the corpus below. Explore THREE independent reasoning paths. "
+            f"For each branch, choose your own focus and reasoning approach.\n\n"
             f"Corpus: \"{corpus}\"\n\n"
             f"Possible directions: {VALID_LIST}\n\n"
-            "BRANCH 1: Literal language analysis\n"
-            "  - Identify explicit directional words (north, south, above, below, etc.).\n"
-            "Answer: [direction]\n\n"
-            "BRANCH 2: Geographic / contextual reasoning\n"
-            "  - Use known geographic relationships between these entities.\n"
-            "Answer: [direction]\n\n"
-            "BRANCH 3: Synthesis\n"
-            "  - Combine both approaches and state the most likely direction.\n"
-            "Answer: [direction]\n\n"
+            "Label each branch as 'BRANCH N: <your chosen focus>', reason through it, "
+            "then end it with 'Answer: [direction]'.\n\n"
             "Begin:"
         )
 
@@ -281,22 +275,13 @@ class GraphOfThought(ReasoningStrategy):
 
         phase1_prompt = (
             "You are an expert in spatial geography and cardinal directions.\n\n"
-            f"Analyze the spatial relationship between '{src}' and '{tgt}' "
-            f"using the corpus below. Build a reasoning graph with FOUR thought nodes.\n\n"
+            f"Determine the cardinal direction of '{src}' with respect to '{tgt}' "
+            f"using the corpus below. Build a reasoning graph with FOUR thought nodes. "
+            f"For each thought, choose your own focus and reasoning angle.\n\n"
             f"Corpus: \"{corpus}\"\n\n"
             f"Possible directions: {VALID_LIST}\n\n"
-            "THOUGHT 1: Directional language extraction\n"
-            "  - List every directional word or phrase in the corpus.\n"
-            "Direction: [direction]\n\n"
-            "THOUGHT 2: Geographic context\n"
-            "  - Apply known geographic knowledge about these entities.\n"
-            "Direction: [direction]\n\n"
-            "THOUGHT 3: Consistency check\n"
-            "  - Do the language cues and geographic context agree?\n"
-            "Direction: [direction]\n\n"
-            "THOUGHT 4: Final aggregation\n"
-            "  - State the definitive cardinal direction.\n"
-            "Direction: [direction]\n\n"
+            "Label each node as 'THOUGHT N: <your chosen focus>', reason through it, "
+            "then end it with 'Direction: [direction]'.\n\n"
             "Begin:"
         )
 
