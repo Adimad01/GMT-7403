@@ -486,7 +486,6 @@ def main():
                 do_sample=True,
                 temperature=_temperature,
                 pad_token_id=tokenizer.eos_token_id,
-                use_cache=False,  # MIG A100: avoid KV-cache allocator NVML assert
             )
         elapsed = _time.time() - t0
         decoded = tokenizer.decode(out[0][input_len:], skip_special_tokens=True).strip()
