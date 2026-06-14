@@ -198,19 +198,13 @@ class TreeOfThought(ReasoningStrategy):
 
         prompt = (
             "You are an expert in spatial and relative directions.\n\n"
-            f"Given the corpus describing the spatial relationship between "
-            f"'{src}' and '{tgt}', explore THREE independent reasoning paths.\n\n"
+            f"Determine the relative direction of '{src}' with respect to '{tgt}' "
+            f"using the corpus below. Explore THREE independent reasoning paths. "
+            f"For each branch, choose your own focus and reasoning approach.\n\n"
             f"Corpus: \"{corpus}\"\n\n"
             f"Possible directions: {VALID_LIST}\n\n"
-            "BRANCH 1: Literal language analysis\n"
-            "  - Identify explicit relative direction words (left, right, front, behind, beside).\n"
-            "Answer: [direction]\n\n"
-            "BRANCH 2: Observer perspective reasoning\n"
-            "  - Determine the observer's viewpoint and apply the left/right/front/behind logic.\n"
-            "Answer: [direction]\n\n"
-            "BRANCH 3: Synthesis\n"
-            "  - Combine both approaches and state the most likely direction.\n"
-            "Answer: [direction]\n\n"
+            "Label each branch as 'BRANCH N: <your chosen focus>', reason through it, "
+            "then end it with 'Answer: [direction]'.\n\n"
             "Begin:"
         )
 
@@ -278,22 +272,13 @@ class GraphOfThought(ReasoningStrategy):
 
         phase1_prompt = (
             "You are an expert in spatial and relative directions.\n\n"
-            f"Analyze the spatial relationship between '{src}' and '{tgt}' "
-            f"using the corpus below. Build a reasoning graph with FOUR thought nodes.\n\n"
+            f"Determine the relative direction of '{src}' with respect to '{tgt}' "
+            f"using the corpus below. Build a reasoning graph with FOUR thought nodes. "
+            f"For each thought, choose your own focus and reasoning angle.\n\n"
             f"Corpus: \"{corpus}\"\n\n"
             f"Possible directions: {VALID_LIST}\n\n"
-            "THOUGHT 1: Relative language extraction\n"
-            "  - List every relative directional word or phrase in the corpus.\n"
-            "Direction: [direction]\n\n"
-            "THOUGHT 2: Observer perspective\n"
-            "  - Establish the observer's viewpoint and apply relative direction logic.\n"
-            "Direction: [direction]\n\n"
-            "THOUGHT 3: Consistency check\n"
-            "  - Do the language cues and perspective reasoning agree?\n"
-            "Direction: [direction]\n\n"
-            "THOUGHT 4: Final aggregation\n"
-            "  - State the definitive relative direction.\n"
-            "Direction: [direction]\n\n"
+            "Label each node as 'THOUGHT N: <your chosen focus>', reason through it, "
+            "then end it with 'Direction: [direction]'.\n\n"
             "Begin:"
         )
 
