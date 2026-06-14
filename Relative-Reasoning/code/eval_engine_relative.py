@@ -284,7 +284,10 @@ def evaluate_strategy(strategy, df: pd.DataFrame, output_dir: str,
                 try:
                     predicted, _ = strategy.reason(entity, log_fn=row_logger)
                 except Exception as exc:
-                    row_logger(f"ERROR attempt {attempt + 1}: {exc}")
+                    import traceback as _tb
+                    tb_str = _tb.format_exc()
+                    row_logger(f"ERROR attempt {attempt + 1}: {exc}\n{tb_str}")
+                    tqdm.write(f"  [ERR] row {real_idx} attempt {attempt+1}: {type(exc).__name__}: {exc}")
                     predicted = None
                 if predicted in VALID_DIRECTIONS:
                     break
@@ -481,12 +484,15 @@ def main():
                 do_sample=True,
                 temperature=_temperature,
                 pad_token_id=tokenizer.eos_token_id,
+                use_cache=False,  # MIG A100: avoid KV-cache allocator NVML assert
             )
         elapsed = _time.time() - t0
+        decoded = tokenizer.decode(out[0][input_len:], skip_special_tokens=True).strip()
         if _t0_first[0] is None:
             _t0_first[0] = elapsed
             print(f"[TIMING] First sample: {elapsed:.1f}s  ({input_len} input tokens)")
-        return tokenizer.decode(out[0][input_len:], skip_special_tokens=True).strip()
+            print(f"[DEBUG]  First response: {decoded[:300]!r}")
+        return decoded
 
     # ------------------------------------------------------------------
     # 4. Run selected strategies

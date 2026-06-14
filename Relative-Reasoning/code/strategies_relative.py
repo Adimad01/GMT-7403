@@ -58,7 +58,7 @@ def extract_direction(text: str) -> Optional[str]:
     if not text:
         return None
     clean = re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL)
-    clean = re.sub(r"[*_`]", "", clean)
+    clean = re.sub(r"[*`]", "", clean)  # keep underscores — labels use them (left_of, next_to)
     lower = clean.lower()
 
     # Explicit answer patterns
