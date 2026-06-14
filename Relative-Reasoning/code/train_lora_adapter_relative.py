@@ -71,6 +71,40 @@ import inspect
 import importlib.machinery
 import importlib.abc
 
+class _TorchvisionStubFinder(importlib.abc.MetaPathFinder, importlib.abc.Loader):
+    def find_spec(self, fullname, path, target=None):
+        if fullname == "torchvision" or fullname.startswith("torchvision."):
+            return importlib.machinery.ModuleSpec(fullname, self, is_package=True)
+        return None
+    def create_module(self, spec): return None
+    def exec_module(self, module):
+        module.__path__ = []; module.__file__ = "<torchvision-stub>"
+        class _S:
+            def __init__(self, n=""): self._n = n
+            def __getattr__(self, n): return _S(n)
+            def __call__(self, *a, **k): return _S()
+            def __iter__(self): return iter([])
+        def _catchall(name):
+            if name.startswith("__") and name.endswith("__"):
+                raise AttributeError(name)
+            return _S(name)
+        module.__getattr__ = _catchall
+        if module.__name__ == "torchvision.transforms":
+            class _InterpolationMode:
+                NEAREST = "nearest"; NEAREST_EXACT = "nearest-exact"
+                BILINEAR = "bilinear"; BICUBIC = "bicubic"
+                BOX = "box"; HAMMING = "hamming"; LANCZOS = "lanczos"
+            module.InterpolationMode = _InterpolationMode
+        elif module.__name__ == "torchvision.io":
+            class _ImageReadMode:
+                RGB = 0; GRAY = 1; RGB_ALPHA = 2; GRAY_ALPHA = 3; UNCHANGED = 4
+            module.ImageReadMode = _ImageReadMode
+            module.decode_image = None
+
+for _k in [k for k in list(sys.modules) if k == "torchvision" or k.startswith("torchvision.")]:
+    del sys.modules[_k]
+sys.meta_path.insert(0, _TorchvisionStubFinder())
+
 class _TorchaudioStubFinder(importlib.abc.MetaPathFinder, importlib.abc.Loader):
     def find_spec(self, fullname, path, target=None):
         if fullname == "torchaudio" or fullname.startswith("torchaudio."):
