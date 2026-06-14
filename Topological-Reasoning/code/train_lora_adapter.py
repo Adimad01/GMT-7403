@@ -106,9 +106,11 @@ try:
     import transformers.integrations.mxfp4 as _mxfp4_m
     _orig_moe_cvt = _mxfp4_m._convert_moe_packed_tensors
     def _cpu_moe_cvt(blocks, scales, dtype=torch.bfloat16, rows_per_chunk=None):
+        target_device = blocks.device
         b = blocks.cpu() if blocks.device.type != "cpu" else blocks
         s = scales.cpu() if scales.device.type != "cpu" else scales
-        return _orig_moe_cvt(b, s, dtype=dtype, rows_per_chunk=rows_per_chunk)
+        result = _orig_moe_cvt(b, s, dtype=dtype, rows_per_chunk=rows_per_chunk)
+        return result.to(target_device)  # move back to GPU after CPU dequantization
     _mxfp4_m._convert_moe_packed_tensors = _cpu_moe_cvt
     print("[PATCH] mxfp4 MoE dequantization → CPU  (MIG A100 NVML fix)")
 except Exception as _mxfp4_e:
