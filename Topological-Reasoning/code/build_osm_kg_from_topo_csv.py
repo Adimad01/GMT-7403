@@ -94,10 +94,22 @@ def main():
         print("        Run build_dataset_topological_v2.py first.")
         raise SystemExit(1)
 
+    # topo_v2_train.csv uses remapped column names from build_dataset_topological_v2.py:
+    #   spatial_relation   (← relation_label)
+    #   place_name_subject (← source_entity)
+    #   place_name_object  (← target_entity)
+    #   relation_predicate (← corpus)
+    def _get(row, *keys):
+        for k in keys:
+            v = row.get(k, "")
+            if v:
+                return str(v).strip()
+        return ""
+
     rows = []
     with open(args.input, newline="", encoding="utf-8") as f:
         for row in csv.DictReader(f):
-            label = row.get("relation_label", "").strip().lower()
+            label = _get(row, "spatial_relation", "relation_label").lower()
             if label in VALID_PREDICATES:
                 rows.append(row)
 
@@ -105,17 +117,17 @@ def main():
 
     by_pred = collections.defaultdict(list)
     for r in rows:
-        by_pred[r["relation_label"].strip().lower()].append(r)
+        by_pred[_get(r, "spatial_relation", "relation_label").lower()].append(r)
 
     counts = {p: len(by_pred.get(p, [])) for p in VALID_PREDICATES}
     print("[INFO] Per-predicate counts:", counts)
 
     records = []
     for r in rows:
-        src    = str(r.get("source_entity", "")).strip()
-        tgt    = str(r.get("target_entity", "")).strip()
-        corpus = str(r.get("corpus", "")).strip()
-        label  = r["relation_label"].strip().lower()
+        src    = _get(r, "place_name_subject", "source_entity")
+        tgt    = _get(r, "place_name_object",  "target_entity")
+        corpus = _get(r, "relation_predicate",  "corpus")
+        label  = _get(r, "spatial_relation",    "relation_label").lower()
         text   = build_prompt(src, tgt, corpus, label)
         records.append({"text": text, "label": label})
 

@@ -79,6 +79,27 @@ if not any(isinstance(f, _TvStubFinder) for f in sys.meta_path):
     for _k in [k for k in list(sys.modules) if k == "torchvision" or k.startswith("torchvision.")]:
         del sys.modules[_k]
     sys.meta_path.insert(0, _TvStubFinder())
+
+# Torchaudio stub — libcudart.so.11.0 missing on this server causes torchaudio
+# to crash on import, which is triggered by transformers.loss.loss_rnnt → torchaudio.
+class _TaStubFinder(importlib.abc.MetaPathFinder, importlib.abc.Loader):
+    def find_spec(self, fullname, path, target=None):
+        if fullname == "torchaudio" or fullname.startswith("torchaudio."):
+            return importlib.machinery.ModuleSpec(fullname, self, is_package=True)
+        return None
+    def create_module(self, spec): return None
+    def exec_module(self, module):
+        module.__path__ = []; module.__file__ = "<torchaudio-stub>"
+        class _S:
+            def __getattr__(self, n): return _S()
+            def __call__(self, *a, **k): return _S()
+            def __iter__(self): return iter([])
+        module.__getattr__ = lambda n: _S() if not (n.startswith("__") and n.endswith("__")) else (_ for _ in ()).throw(AttributeError(n))
+
+if not any(isinstance(f, _TaStubFinder) for f in sys.meta_path):
+    for _k in [k for k in list(sys.modules) if k == "torchaudio" or k.startswith("torchaudio.")]:
+        del sys.modules[_k]
+    sys.meta_path.insert(0, _TaStubFinder())
 # ---------------------------------------------------------------------------
 
 import torch
