@@ -219,6 +219,11 @@ def main():
     raw_records = load_jsonl(args.dataset)
     print(f"      -> {len(raw_records)} instruction examples loaded (source: {args.run_name})")
 
+    if not raw_records:
+        print(f"[ERROR] Dataset is empty: {args.dataset}")
+        print("        Delete the file and rerun so it gets rebuilt from topo_v2_train.csv")
+        sys.exit(1)
+
     label_counts: dict[str, int] = {}
     for rec in raw_records:
         lbl = rec.get("label", "unknown")
