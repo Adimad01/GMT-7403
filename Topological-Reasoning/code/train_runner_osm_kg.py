@@ -88,9 +88,18 @@ def check_done() -> bool:
 
 def preflight():
     if not os.path.exists(DATASET):
-        print(f"[ERROR] Training dataset not found: {DATASET}")
-        print("        Build it first with: python build_kg_instruction_dataset_osm.py")
-        sys.exit(1)
+        print(f"[INFO] Training dataset not found: {DATASET}")
+        print("       Building from topo_v2_train.csv …")
+        import subprocess
+        result = subprocess.run(
+            [sys.executable, "build_osm_kg_from_topo_csv.py",
+             "--input",  "../dataset/topo_v2_train.csv",
+             "--output", DATASET],
+            check=True,
+        )
+        if not os.path.exists(DATASET):
+            print(f"[ERROR] Build failed — {DATASET} still missing")
+            sys.exit(1)
     print(f"[OK] Dataset: {DATASET}  ({sum(1 for _ in open(DATASET))} lines)")
 
 

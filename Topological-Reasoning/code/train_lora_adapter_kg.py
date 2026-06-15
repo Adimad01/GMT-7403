@@ -84,9 +84,7 @@ if not any(isinstance(f, _TvStubFinder) for f in sys.meta_path):
 import torch
 
 # ===========================================================================
-# DEPENDENCY MONKEY PATCH (same as train_lora_adapter.py)
-# Transformers' MXFP4 quantizer requires PyTorch >= 2.5.
-# Our server is locked at PyTorch 2.4.0 — spoof missing attributes before import.
+# DEPENDENCY MONKEY PATCHES (same as train_lora_adapter.py)
 # ===========================================================================
 if not hasattr(torch, "accelerator"):
     class _DummyAccelerator:
@@ -114,6 +112,29 @@ if not hasattr(torch.nn.Module, "set_submodule"):
 # Patch: transformers >=5.9.0 on torch <2.6 — float8_e8m0fnu added in torch 2.6
 if not hasattr(torch, "float8_e8m0fnu"):
     torch.float8_e8m0fnu = getattr(torch, "float8_e5m2", None)
+
+# Patch: mxfp4 MoE dequantization → CPU to avoid NVML_SUCCESS assert on MIG A100
+try:
+    import transformers.integrations.mxfp4 as _mxfp4_m
+    _orig_moe_cvt = _mxfp4_m._convert_moe_packed_tensors
+    def _cpu_moe_cvt(blocks, scales, dtype=torch.bfloat16, rows_per_chunk=None):
+        target_device = blocks.device
+        b = blocks.cpu() if blocks.device.type != "cpu" else blocks
+        s = scales.cpu() if scales.device.type != "cpu" else scales
+        result = _orig_moe_cvt(b, s, dtype=dtype, rows_per_chunk=rows_per_chunk)
+        return result.to(target_device)
+    _mxfp4_m._convert_moe_packed_tensors = _cpu_moe_cvt
+    print("[PATCH] mxfp4 MoE dequantization → CPU  (MIG A100 NVML fix)")
+except Exception as _e:
+    print(f"[WARN] mxfp4 MoE patch skipped: {_e}")
+
+# Patch: caching_allocator_warmup pre-allocates ~40 GB; skip on MIG to avoid OOM
+try:
+    import transformers.modeling_utils as _tmu
+    _tmu.caching_allocator_warmup = lambda *_a, **_k: None
+    print("[PATCH] caching_allocator_warmup → no-op  (MIG A100 OOM fix)")
+except Exception as _e:
+    print(f"[WARN] warmup patch skipped: {_e}")
 # ===========================================================================
 
 from datasets import Dataset
@@ -208,10 +229,11 @@ def main():
     print(f"[3/5] Loading {args.model_id} (dequantizing MXFP4 → bf16) ...")
     model = AutoModelForCausalLM.from_pretrained(
         args.model_id,
-        device_map="auto",
+        device_map={"": 0},
         trust_remote_code=True,
-        dtype=torch.bfloat16,
+        torch_dtype=torch.bfloat16,
         quantization_config=Mxfp4Config(dequantize=True),
+        use_cache=False,
     )
     print(f"      -> Model dtype: {next(model.parameters()).dtype}")
 
