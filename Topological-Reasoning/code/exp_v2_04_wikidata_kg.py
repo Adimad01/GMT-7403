@@ -1,19 +1,17 @@
 """
-Experiment v2-04 — GPT-OSS-20B + Wikidata-KG LoRA (topological_relations v2)
+Experiment v2-04 — OSM-KG LoRA, KG used in fine-tuning only (topological_relations v2)
 ================================================================================
-Wikidata-KG adapter (trained on Wikidata-based instruction data) evaluated on
-the v2 test set: 105 examples · 15/predicate · 3/level (L1–L5).
+OSM-KG LoRA adapter (fine-tuned WITH KG evidence in prompts) evaluated WITHOUT
+KG evidence at inference. Tests whether KG knowledge was absorbed into the
+adapter weights vs. requiring KG context at inference time.
 
-Key distinction from v2-03: the adapter was fine-tuned on Wikidata semantic
-evidence (entity-level, encyclopaedic) rather than OSM geometric evidence.
-At inference, OSM KG evidence (coordinates, bounding boxes, hierarchy) is
-provided via CoT/ToT/GoT — testing whether Wikidata-KG fine-tuning transfers
-to OSM-grounded topological inference.
+Mirrors: GPTOSS Fine-tuné + KG comme entrée de fine-tuning (inference phase only).
 
-Model    : openai/gpt-oss-20b + finetuned_gptoss_wikidata_kg/final_adapter
+Model    : openai/gpt-oss-20b + finetuned_gptoss_osm_kg/final_adapter
+KG       : --no-kg  (disabled at inference — KG was training input, not inference input)
 Dataset  : ../dataset/topo_v2_eval.csv
 Indices  : ../dataset/topo_v2_eval_indices.json
-Outputs  : results/voletc_v2_exp4_wikidata_kg_{cot|tot|got}_..._ckpt.json
+Outputs  : results/voletc_v2_exp4_osm_kg_noinf_{cot|tot|got}_..._ckpt.json
 
 Run:
     python exp_v2_04_wikidata_kg.py
@@ -29,12 +27,11 @@ import argparse
 DATASET        = "../dataset/topo_v2_eval.csv"
 INDICES_FILE   = "../dataset/topo_v2_eval_indices.json"
 MODEL_ID       = "openai/gpt-oss-20b"
-ADAPTER_PATH   = "finetuned_gptoss_wikidata_kg/final_adapter"
-OSM_CACHE      = "results/osm_cache.json"
-MODEL_TAG      = "v2_exp4_wikidata_kg"
+ADAPTER_PATH   = "finetuned_gptoss_osm_kg/final_adapter"
+MODEL_TAG      = "v2_exp4_osm_kg_noinf"
 OUTPUT_DIR     = "results"
 TEMPERATURE    = 0.1
-MAX_NEW_TOKENS = 1024
+MAX_NEW_TOKENS = 512
 N_EVAL         = 105
 
 SUFFIX     = "neighborhood_details_spatial_relation_16_sample"
@@ -52,11 +49,7 @@ def preflight():
         sys.exit(1)
     print(f"[OK] Dataset : {DATASET}")
     print(f"[OK] Indices : {INDICES_FILE}")
-    print(f"[OK] Adapter : {ADAPTER_PATH}  [trained WITH Wikidata KG evidence]")
-    if os.path.exists(OSM_CACHE):
-        print(f"[OK] OSM cache: {len(json.load(open(OSM_CACHE)))} entries")
-    else:
-        print(f"[WARN] OSM cache not found — will query Nominatim live")
+    print(f"[OK] Adapter : {ADAPTER_PATH}  [OSM-KG LoRA — KG in training only, NOT at inference]")
 
 
 def check_strategy_status(strategies: list) -> bool:
@@ -89,11 +82,12 @@ def run():
     preflight()
 
     print("\n" + "=" * 70)
-    print("  EXPERIMENT v2-04 — Wikidata-KG LoRA · topological_relations v2")
+    print("  EXPERIMENT v2-04 — OSM-KG LoRA (KG in fine-tuning only, no KG at inference)")
     print("=" * 70)
     print(f"  Model      : {MODEL_ID}")
     print(f"  Adapter    : {ADAPTER_PATH}")
-    print(f"  KG         : Wikidata in training / OSM at inference (1024 tok budget)")
+    print(f"  KG         : DISABLED at inference (--no-kg)")
+    print(f"  Budget     : {MAX_NEW_TOKENS} tokens")
     print(f"  Eval set   : {N_EVAL} examples · 15/predicate · 3/level")
     print(f"  Strategies : {', '.join(s.upper() for s in target)}")
     print(f"  Output tag : {MODEL_TAG}")
@@ -115,6 +109,7 @@ def run():
         "--model-tag",      MODEL_TAG,
         "--temperature",    str(TEMPERATURE),
         "--max-new-tokens", str(MAX_NEW_TOKENS),
+        "--no-kg",
     ]
 
     from eval_engine_gpu import main

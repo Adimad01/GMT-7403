@@ -111,12 +111,12 @@ line
 $PYTHON exp_v2_03_osm_kg.py
 
 echo ""
-echo "  v2-04 · Wikidata-KG LoRA + OSM evidence at inference · CoT / ToT / GoT (1024 tok)"
+echo "  v2-04 · OSM-KG LoRA (KG in fine-tuning only, no KG at inference) · CoT / ToT / GoT (512 tok)"
 line
 $PYTHON exp_v2_04_wikidata_kg.py
 
 echo ""
-echo "  v2-05 · Topo-LoRA v2 + extended budget · CoT / ToT / GoT (1024 tok)"
+echo "  v2-05 · Topo-LoRA v2 + enriched KG inference · CoT / ToT / GoT (1024 tok)"
 line
 $PYTHON exp_v2_05_extended.py
 
