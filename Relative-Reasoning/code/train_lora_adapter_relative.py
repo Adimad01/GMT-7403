@@ -222,12 +222,20 @@ def main():
     # 1. Load Data & Tokenizer
     # ------------------------------------------------------------------
     print("[1/5] Loading dataset and tokenizer...")
-    import csv as _csv
+    is_jsonl = args.dataset.endswith(".jsonl")
     rows = []
-    with open(args.dataset, newline="", encoding="utf-8") as f:
-        for row in _csv.DictReader(f):
-            if row.get("relation_label"):
-                rows.append(row)
+    if is_jsonl:
+        with open(args.dataset, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if line:
+                    rows.append(json.loads(line))
+    else:
+        import csv as _csv
+        with open(args.dataset, newline="", encoding="utf-8") as f:
+            for row in _csv.DictReader(f):
+                if row.get("relation_label"):
+                    rows.append(row)
     print(f"      -> {len(rows)} rows loaded from {args.dataset}")
 
     tokenizer = AutoTokenizer.from_pretrained(args.model_id, trust_remote_code=True)
@@ -235,12 +243,14 @@ def main():
 
     # ------------------------------------------------------------------
     # 2. Build Dataset
+    #    jsonl records already carry the full prompt in "text"; CSV rows are
+    #    formatted via build_training_prompt (corpus -> [label]).
     # ------------------------------------------------------------------
     print("[2/5] Building training dataset...")
-    records = [
-        {"text": build_training_prompt(row, tokenizer)}
-        for row in rows
-    ]
+    if is_jsonl:
+        records = [{"text": r["text"] + tokenizer.eos_token} for r in rows]
+    else:
+        records = [{"text": build_training_prompt(row, tokenizer)} for row in rows]
     train_dataset = Dataset.from_list(records)
     print(f"      -> {len(records)} training examples loaded.")
 

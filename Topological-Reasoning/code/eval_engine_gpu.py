@@ -215,9 +215,13 @@ sys.path.insert(0, os.path.dirname(__file__))
 from strategies_osm import (
     get_strategy,
     VALID_PREDICATES,
+    VALID_LIST,
     STRATEGY_MAP,
     GeographicKnowledgeGraph,
+    extract_predicate,
 )
+from osm_client import NullKG
+from rag_loop import RAGStrategy, DomainSpec
 
 EXPERIMENT_SUFFIX = "neighborhood_details_spatial_relation_16_sample"
 
@@ -382,11 +386,18 @@ def main():
                         choices=list(STRATEGY_MAP.keys()) + ["all"])
     parser.add_argument("--output-dir",      default="./results")
     parser.add_argument("--temperature",     type=float, default=0.1)
-    parser.add_argument("--max-new-tokens",  type=int,   default=512)
+    parser.add_argument("--max-new-tokens",  type=int,   default=1024)
     parser.add_argument("--model-tag",       default="dynamic_osm_finetuned_gpu")
+    parser.add_argument("--kg-mode",         default="none",
+                        choices=["none", "input", "rag"],
+                        help="none = no KG evidence (Exp 1/2/3); "
+                             "input = OSM evidence prepended once (Exp 4/5); "
+                             "rag = per-step OSM retrieval during reasoning (Exp 6)")
     parser.add_argument("--no-kg",           action="store_true",
-                        help="Disable OSM KG evidence at inference (Config 4: KG in training only)")
+                        help="(deprecated) alias for --kg-mode none")
     args = parser.parse_args()
+    if args.no_kg:
+        args.kg_mode = "none"
 
     # ------------------------------------------------------------------
     # 1. Load & filter dataset
@@ -562,17 +573,25 @@ def main():
         return tokenizer.decode(out[0][input_len:], skip_special_tokens=True).strip()
 
     # ------------------------------------------------------------------
-    # 4. Load OSM KG (uses existing cache — no extra API calls needed)
+    # 4. Build the KG for the selected inference mode
     # ------------------------------------------------------------------
-    if args.no_kg:
-        class _NullKG:
-            """Drop-in replacement that returns no evidence (Config 4: KG-trained, no KG at inference)."""
-            def gather_evidence(self, place_a, place_b, sentence="", entity=None, log_fn=None):
-                return ""
-        kg = _NullKG()
-        print("[KG] OSM KG disabled (--no-kg): adapter was trained with KG, inference runs without evidence")
+    if args.kg_mode == "none":
+        kg = NullKG()
+        print("[KG] kg-mode=none — no OSM evidence at inference (Exp 1/2/3)")
     else:
         kg = GeographicKnowledgeGraph("results/osm_cache.json")
+        print(f"[KG] kg-mode={args.kg_mode} — OSM evidence active "
+              f"({'static input' if args.kg_mode == 'input' else 'per-step RAG'})")
+
+    topo_spec = DomainSpec(
+        task_noun="DE-9IM topological predicate",
+        valid_list=VALID_LIST,
+        extract_fn=extract_predicate,
+        parse_entity=lambda e: (
+            e["place_name_subject"], e["place_name_object"],
+            e.get("sentence") or e.get("vernacular_relation", ""),
+        ),
+    )
 
     # ------------------------------------------------------------------
     # 5. Run selected strategies
@@ -581,8 +600,12 @@ def main():
     strategies = list(STRATEGY_MAP.keys()) if args.strategy == "all" else [args.strategy]
 
     for strat in strategies:
-        print(f"\n🚀 Running {strat.upper()} with GPU inference (adapter={adapter_tag})")
-        strategy_obj = get_strategy(strat, kg, model_fn=gpu_inference_fn)
+        print(f"\n🚀 Running {strat.upper()} with GPU inference "
+              f"(adapter={adapter_tag}, kg-mode={args.kg_mode})")
+        if args.kg_mode == "rag":
+            strategy_obj = RAGStrategy(strat, kg, gpu_inference_fn, topo_spec)
+        else:
+            strategy_obj = get_strategy(strat, kg, model_fn=gpu_inference_fn)
         evaluate_strategy(strategy_obj, df, args.output_dir, args.model_tag, adapter_tag)
 
 

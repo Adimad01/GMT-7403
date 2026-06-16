@@ -328,6 +328,10 @@ class GeographicKnowledgeGraph:
             print(f"⚠️ OSM API Error for '{place_name}': {e}")
             return None
 
+    def fetch(self, place_name: str) -> Optional[dict]:
+        """Single-place lookup used by the per-step RAG loop (rag_loop.py)."""
+        return self._fetch_osm_data(place_name)
+
     def gather_evidence(self, place_a: str, place_b: str, sentence: str = "", entity: dict = None, log_fn=None) -> str:
         evidence_lines = [f'Sentence: "{sentence}"\n']
         evidence_lines.append("--- OpenStreetMap (OSM) Evidence ---")

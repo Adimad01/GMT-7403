@@ -185,12 +185,10 @@ from peft import PeftModel
 
 sys.path.insert(0, os.path.dirname(__file__))
 
-from strategies_relative import (
-    get_strategy,
-    normalize,
-    VALID_DIRECTIONS,
-    STRATEGY_MAP,
-)
+from strategies_relative import normalize, VALID_DIRECTIONS, VALID_LIST, extract_direction
+from strategies_osm_relative import get_strategy, STRATEGY_MAP
+from osm_client import OSMEvidenceKG, NullKG
+from rag_loop import RAGStrategy, DomainSpec
 
 EXPERIMENT_SUFFIX = "relative_dir_20_sample"
 
@@ -348,11 +346,15 @@ def main():
                         help="JSON file with row indices to evaluate (balanced split)")
     parser.add_argument("--model-id",       default="openai/gpt-oss-20b")
     parser.add_argument("--adapter-path",   default=None)
+    parser.add_argument("--kg-mode",        default="none",
+                        choices=["none", "input", "rag"],
+                        help="none = no KG (Exp 1/2/3); input = OSM evidence prepended "
+                             "once (Exp 4/5); rag = per-step OSM retrieval (Exp 6)")
     parser.add_argument("--strategy",       required=True,
                         choices=list(STRATEGY_MAP.keys()) + ["all"])
     parser.add_argument("--output-dir",     default="./results")
     parser.add_argument("--temperature",    type=float, default=0.1)
-    parser.add_argument("--max-new-tokens", type=int,   default=512)
+    parser.add_argument("--max-new-tokens", type=int,   default=1024)
     parser.add_argument("--model-tag",      default="exp1_rel_base_gpu")
     args = parser.parse_args()
 
@@ -496,16 +498,37 @@ def main():
         return decoded
 
     # ------------------------------------------------------------------
-    # 4. Run selected strategies
+    # 4. Build the KG for the selected inference mode
+    # ------------------------------------------------------------------
+    if args.kg_mode == "none":
+        kg = NullKG()
+        print("[KG] kg-mode=none — no OSM evidence (Exp 1/2/3)")
+    else:
+        kg = OSMEvidenceKG("results/osm_cache.json")
+        print(f"[KG] kg-mode={args.kg_mode} — OSM evidence active "
+              f"({'static input' if args.kg_mode == 'input' else 'per-step RAG'})")
+
+    rel_spec = DomainSpec(
+        task_noun="relative direction",
+        valid_list=VALID_LIST,
+        extract_fn=extract_direction,
+        parse_entity=lambda e: (e["source_entity"], e["target_entity"], e["corpus"]),
+    )
+
+    # ------------------------------------------------------------------
+    # 5. Run selected strategies
     # ------------------------------------------------------------------
     os.makedirs(args.output_dir, exist_ok=True)
     strategies = list(STRATEGY_MAP.keys()) if args.strategy == "all" else [args.strategy]
 
     for strat in strategies:
-        print(f"\nRunning {strat.upper()} (adapter={adapter_tag})")
-        strategy_obj = get_strategy(strat, model_fn=gpu_inference_fn,
-                                    max_new_tokens=_max_new_tokens,
-                                    temperature=_temperature)
+        print(f"\nRunning {strat.upper()} (adapter={adapter_tag}, kg-mode={args.kg_mode})")
+        if args.kg_mode == "rag":
+            strategy_obj = RAGStrategy(strat, kg, gpu_inference_fn, rel_spec)
+        else:
+            strategy_obj = get_strategy(strat, kg=kg, model_fn=gpu_inference_fn,
+                                        max_new_tokens=_max_new_tokens,
+                                        temperature=_temperature)
         evaluate_strategy(strategy_obj, df, args.output_dir, args.model_tag, adapter_tag)
 
 

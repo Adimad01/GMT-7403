@@ -180,12 +180,10 @@ from peft import PeftModel
 
 sys.path.insert(0, os.path.dirname(__file__))
 
-from strategies_cardinal import (
-    get_strategy,
-    VALID_DIRECTIONS,
-    STRATEGY_MAP,
-    CardinalKnowledgeGraph,
-)
+from strategies_cardinal import VALID_DIRECTIONS, VALID_LIST, extract_direction
+from strategies_osm_cardinal import get_strategy, STRATEGY_MAP
+from osm_client import OSMEvidenceKG, NullKG
+from rag_loop import RAGStrategy, DomainSpec
 
 EXPERIMENT_SUFFIX = "cardinal_dir_32_sample"
 
@@ -342,13 +340,15 @@ def main():
                         help="JSON file with row indices to evaluate (for balanced eval split)")
     parser.add_argument("--model-id",       default="openai/gpt-oss-20b")
     parser.add_argument("--adapter-path",   default=None)
-    parser.add_argument("--use-kg",         action="store_true",
-                        help="Pass rule-based CardinalKnowledgeGraph to strategy")
+    parser.add_argument("--kg-mode",        default="none",
+                        choices=["none", "input", "rag"],
+                        help="none = no KG (Exp 1/2/3); input = OSM evidence prepended "
+                             "once (Exp 4/5); rag = per-step OSM retrieval (Exp 6)")
     parser.add_argument("--strategy",       required=True,
                         choices=list(STRATEGY_MAP.keys()) + ["all"])
     parser.add_argument("--output-dir",     default="./results")
     parser.add_argument("--temperature",    type=float, default=0.1)
-    parser.add_argument("--max-new-tokens", type=int,   default=512)
+    parser.add_argument("--max-new-tokens", type=int,   default=1024)
     parser.add_argument("--model-tag",      default="exp1_card_base_gpu")
     args = parser.parse_args()
 
@@ -493,9 +493,22 @@ def main():
         return decoded
 
     # ------------------------------------------------------------------
-    # 4. Optionally build KG
+    # 4. Build the KG for the selected inference mode
     # ------------------------------------------------------------------
-    kg = CardinalKnowledgeGraph() if args.use_kg else None
+    if args.kg_mode == "none":
+        kg = NullKG()
+        print("[KG] kg-mode=none — no OSM evidence (Exp 1/2/3)")
+    else:
+        kg = OSMEvidenceKG("results/osm_cache.json")
+        print(f"[KG] kg-mode={args.kg_mode} — OSM evidence active "
+              f"({'static input' if args.kg_mode == 'input' else 'per-step RAG'})")
+
+    card_spec = DomainSpec(
+        task_noun="cardinal direction",
+        valid_list=VALID_LIST,
+        extract_fn=extract_direction,
+        parse_entity=lambda e: (e["source_entity"], e["target_entity"], e["corpus"]),
+    )
 
     # ------------------------------------------------------------------
     # 5. Run selected strategies
@@ -504,10 +517,13 @@ def main():
     strategies = list(STRATEGY_MAP.keys()) if args.strategy == "all" else [args.strategy]
 
     for strat in strategies:
-        print(f"\n🚀 Running {strat.upper()} (adapter={adapter_tag}, kg={'yes' if kg else 'no'})")
-        strategy_obj = get_strategy(strat, kg=kg, model_fn=gpu_inference_fn,
-                                    max_new_tokens=_max_new_tokens,
-                                    temperature=_temperature)
+        print(f"\n🚀 Running {strat.upper()} (adapter={adapter_tag}, kg-mode={args.kg_mode})")
+        if args.kg_mode == "rag":
+            strategy_obj = RAGStrategy(strat, kg, gpu_inference_fn, card_spec)
+        else:
+            strategy_obj = get_strategy(strat, kg=kg, model_fn=gpu_inference_fn,
+                                        max_new_tokens=_max_new_tokens,
+                                        temperature=_temperature)
         evaluate_strategy(strategy_obj, df, args.output_dir, args.model_tag, adapter_tag)
 
 
