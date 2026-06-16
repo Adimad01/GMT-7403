@@ -57,10 +57,18 @@ done
 | Cardinal    | `finetuned_gptoss_cardinal` | `finetuned_gptoss_cardinal_osm_kg` |
 | Relative    | `finetuned_gptoss_relative` | `finetuned_gptoss_relative_osm_kg` |
 
+## Analysis
+After eval, print the 6×3 accuracy matrix per domain:
+```bash
+python analyze_results.py        # run inside each */code dir
+```
+
 ## Notes
 - Relative OSM evidence is **informational only** (no coordinates/observer
   heading in the data); the LLM still infers left/right/front/behind from the
   corpus. Expect smaller KG gains than Topological/Cardinal.
-- Legacy scripts (Topological `exp01–06`/`exp_v2_*`, Cardinal shore/compass
-  `train_runner_cardinal.py` + `*_kg_train.jsonl`) are **superseded but left in
-  place** — do not run them for this design.
+- The repo was pruned to this pipeline only: the legacy experiments
+  (Topological `exp01–06`/`exp_v2_*`, Wikidata + static-KG variants, Cardinal
+  shore/compass task), their datasets, old result files, and stale
+  analysis/visualization scripts were removed. They remain recoverable from git
+  history if ever needed.
