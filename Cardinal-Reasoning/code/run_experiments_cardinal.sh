@@ -128,7 +128,7 @@ if [[ $SKIP_TRAIN -eq 0 ]]; then
     echo "  Done. Starting fine-tuning."
     echo ""
 
-    echo "  FT-1 · Cardinal-LoRA  (cardinal_train.jsonl — 1040 rows, plain, eval-excluded)"
+    echo "  FT-1 · Cardinal-LoRA  (cardinal_train.jsonl — 1040 rows, plain, eval-excluded, pre-formatted)"
     line
     $PYTHON train_runner_cardinal.py
 
