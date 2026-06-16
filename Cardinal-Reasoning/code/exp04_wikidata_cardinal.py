@@ -1,22 +1,21 @@
 """
-Experiment 4 — Wikidata-KG LoRA (cross-task transfer)
+Experiment 4 — Cardinal-KG LoRA (KG used in fine-tuning only)
 ================================================================================
-Uses the Wikidata-KG adapter trained on topological data (DE-9IM) and evaluates
-it on cardinal direction questions.  Tests whether topological spatial reasoning
-knowledge transfers to directional reasoning.
+Cardinal-KG LoRA adapter (fine-tuned WITH compass-rule KG evidence in prompts)
+evaluated WITHOUT KG evidence at inference. Tests whether KG knowledge was
+absorbed into the adapter weights vs. requiring KG context at inference time.
 
-The adapter lives in: ../../Topological-Reasoning/code/finetuned_gptoss_wikidata_kg/final_adapter
+Mirrors: GPTOSS Fine-tuné + KG comme entrée de fine-tuning (inference phase only).
 
-Model     : openai/gpt-oss-20b + Wikidata-KG LoRA (cross-task)
-KG        : CardinalKnowledgeGraph (compass rules at inference)
-Strategies: CoT, ToT, GoT
-Eval set  : 80 examples — 10 per direction × 8 directions
-Max tokens: 1024
-Outputs   :
-  results/voletc_exp4_card_wikidata_gpu_{strategy}_cardinal_direction_80_sample_ckpt.json
+Model    : openai/gpt-oss-20b + finetuned_gptoss_cardinal_kg/final_adapter
+KG       : DISABLED at inference (no --use-kg; KG was training input, not inference input)
+Dataset  : ../dataset/cardinal_direction_relations.csv
+Indices  : ../dataset/eval_32_balanced_indices.json
+Outputs  : results/voletc_exp4_card_kg_noinf_gpu_{cot|tot|got}_cardinal_dir_32_sample_ckpt.json
 
 Run:
     python exp04_wikidata_cardinal.py
+    python exp04_wikidata_cardinal.py --strategy cot
 """
 
 import os
@@ -24,17 +23,19 @@ import sys
 import json
 import argparse
 
-DATASET      = "../dataset/cardinal_direction_relations.csv"
-INDICES_FILE = "../dataset/eval_32_balanced_indices.json"
-MODEL_ID     = "openai/gpt-oss-20b"
-ADAPTER_PATH = "../../Topological-Reasoning/code/finetuned_gptoss_wikidata_kg/final_adapter"
-MODEL_TAG    = "exp4_card_wikidata_gpu"
-OUTPUT_DIR   = "results"
+# ---------------------------------------------------------------------------
+DATASET        = "../dataset/cardinal_direction_relations.csv"
+INDICES_FILE   = "../dataset/eval_32_balanced_indices.json"
+MODEL_ID       = "openai/gpt-oss-20b"
+ADAPTER_PATH   = "finetuned_gptoss_cardinal_kg/final_adapter"
+MODEL_TAG      = "exp4_card_kg_noinf_gpu"
+OUTPUT_DIR     = "results"
 TEMPERATURE    = 0.1
-MAX_NEW_TOKENS = 1024
-N_EVAL     = 32
-STRATEGIES = ["cot", "tot", "got"]
-SUFFIX     = "cardinal_dir_32_sample"
+MAX_NEW_TOKENS = 512
+N_EVAL         = 32
+STRATEGIES     = ["cot", "tot", "got"]
+SUFFIX         = "cardinal_dir_32_sample"
+# ---------------------------------------------------------------------------
 
 
 def preflight():
@@ -44,14 +45,13 @@ def preflight():
         ok = False
     adapter_check = os.path.join(ADAPTER_PATH, "adapter_model.safetensors")
     if not os.path.exists(adapter_check):
-        print(f"[ERROR] Wikidata-KG adapter not found: {ADAPTER_PATH}")
-        print("        Train it in Topological-Reasoning/code/:")
-        print("          python train_runner_wikidata_kg.py")
+        print(f"[ERROR] Cardinal-KG adapter not found: {ADAPTER_PATH}")
+        print("        Train it first: python train_runner_cardinal_kg.py")
         ok = False
     if not ok:
         sys.exit(1)
     print(f"[OK] Dataset : {DATASET}")
-    print(f"[OK] Adapter : {ADAPTER_PATH}  (Wikidata-KG, cross-task)")
+    print(f"[OK] Adapter : {ADAPTER_PATH}  [Cardinal-KG LoRA — KG in training only, NOT at inference]")
 
 
 def check_strategy_status(strategies: list) -> bool:
@@ -89,11 +89,13 @@ def run():
     preflight()
 
     print("\n" + "=" * 70)
-    print("  CARDINAL EXPERIMENT 4 — Wikidata-KG LoRA (cross-task) + KG")
+    print("  CARDINAL EXPERIMENT 4 — Cardinal-KG LoRA (KG in fine-tuning only, no KG at inference)")
     print("=" * 70)
     print(f"  Model      : {MODEL_ID}")
-    print(f"  Adapter    : {ADAPTER_PATH}  (trained on DE-9IM Wikidata data)")
-    print(f"  KG         : CardinalKnowledgeGraph (compass rules at inference)")
+    print(f"  Adapter    : {ADAPTER_PATH}")
+    print(f"  KG         : DISABLED at inference (KG absorbed in training weights)")
+    print(f"  Budget     : {MAX_NEW_TOKENS} tokens")
+    print(f"  Eval set   : {N_EVAL} examples · 4/direction × 8 directions")
     print(f"  Strategies : {', '.join(s.upper() for s in target)}")
     print(f"  Output tag : {MODEL_TAG}")
     print("=" * 70)
@@ -102,18 +104,19 @@ def run():
         print("\n[DONE] All strategies complete. Delete checkpoints to re-run.")
         sys.exit(0)
 
+    print()
     sys.argv = [
         "eval_engine_cardinal.py",
-        "--dataset",         DATASET,
-        "--filter-indices",  INDICES_FILE,
-        "--model-id",        MODEL_ID,
-        "--adapter-path",    ADAPTER_PATH,
-        "--use-kg",
-        "--strategy",        args.strategy,
-        "--output-dir",      OUTPUT_DIR,
-        "--model-tag",       MODEL_TAG,
-        "--temperature",     str(TEMPERATURE),
-        "--max-new-tokens",  str(MAX_NEW_TOKENS),
+        "--dataset",        DATASET,
+        "--filter-indices", INDICES_FILE,
+        "--model-id",       MODEL_ID,
+        "--adapter-path",   ADAPTER_PATH,
+        "--strategy",       args.strategy,
+        "--output-dir",     OUTPUT_DIR,
+        "--model-tag",      MODEL_TAG,
+        "--temperature",    str(TEMPERATURE),
+        "--max-new-tokens", str(MAX_NEW_TOKENS),
+        # NOTE: no --use-kg here — KG was only used in training, not at inference
     ]
 
     from eval_engine_cardinal import main

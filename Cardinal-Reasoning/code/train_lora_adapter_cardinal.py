@@ -114,9 +114,32 @@ for _k in [k for k in list(sys.modules) if k == "torchaudio" or k.startswith("to
     del sys.modules[_k]
 sys.meta_path.insert(0, _TorchaudioStubFinder())
 
+# Patch: mxfp4 MoE dequantization → CPU to avoid NVML_SUCCESS assert on MIG A100
+try:
+    import transformers.integrations.mxfp4 as _mxfp4_m
+    _orig_moe_cvt = _mxfp4_m._convert_moe_packed_tensors
+    def _cpu_moe_cvt(blocks, scales, dtype=torch.bfloat16, rows_per_chunk=None):
+        target_device = blocks.device
+        b = blocks.cpu() if blocks.device.type != "cpu" else blocks
+        s = scales.cpu() if scales.device.type != "cpu" else scales
+        result = _orig_moe_cvt(b, s, dtype=dtype, rows_per_chunk=rows_per_chunk)
+        return result.to(target_device)
+    _mxfp4_m._convert_moe_packed_tensors = _cpu_moe_cvt
+    print("[PATCH] mxfp4 MoE dequantization → CPU  (MIG A100 NVML fix)")
+except Exception as _e:
+    print(f"[WARN] mxfp4 MoE patch skipped: {_e}")
+
+# Patch: caching_allocator_warmup pre-allocates ~40 GB; skip on MIG to avoid OOM
+try:
+    import transformers.modeling_utils as _tmu
+    _tmu.caching_allocator_warmup = lambda *_a, **_k: None
+    print("[PATCH] caching_allocator_warmup → no-op  (MIG A100 OOM fix)")
+except Exception as _e:
+    print(f"[WARN] warmup patch skipped: {_e}")
+
 from datasets import Dataset
 from peft import LoraConfig, get_peft_model, TaskType
-from transformers import AutoTokenizer, AutoModelForCausalLM
+from transformers import AutoTokenizer, AutoModelForCausalLM, Mxfp4Config
 import trl
 from trl import SFTTrainer, SFTConfig
 
@@ -176,6 +199,16 @@ def load_csv_records(path: str) -> list[dict]:
     return records
 
 
+def load_jsonl(path: str) -> list[dict]:
+    records = []
+    with open(path, "r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if line:
+                records.append(json.loads(line))
+    return records
+
+
 def build_cardinal_training_prompt(row: dict) -> str:
     src    = row["source_entity"]
     tgt    = row["target_entity"]
@@ -204,11 +237,22 @@ def main():
     args = parser.parse_args()
 
     print(f"[1/5] Loading dataset: {args.dataset}")
-    raw_records = load_csv_records(args.dataset)
+    is_jsonl = args.dataset.endswith(".jsonl")
+    if is_jsonl:
+        raw_records = load_jsonl(args.dataset)
+    else:
+        raw_records = load_csv_records(args.dataset)
     print(f"      -> {len(raw_records)} instruction examples loaded")
 
+    if not raw_records:
+        print(f"[ERROR] Dataset is empty: {args.dataset}")
+        sys.exit(1)
+
     from collections import Counter
-    label_counts = Counter(r.get("relation_label", "unknown") for r in raw_records)
+    if is_jsonl:
+        label_counts = Counter(r.get("label", "unknown") for r in raw_records)
+    else:
+        label_counts = Counter(r.get("relation_label", "unknown") for r in raw_records)
     print("      Label distribution:", dict(sorted(label_counts.items())))
 
     print(f"[2/5] Loading tokenizer from {args.model_id} ...")
@@ -217,20 +261,28 @@ def main():
         tokenizer.pad_token = tokenizer.eos_token
     tokenizer.model_max_length = MAX_SEQ_LENGTH
 
-    records_with_eos = [
-        {"text": build_cardinal_training_prompt(row) + tokenizer.eos_token}
-        for row in raw_records
-    ]
+    if is_jsonl:
+        records_with_eos = [
+            {"text": rec["text"] + tokenizer.eos_token}
+            for rec in raw_records
+        ]
+    else:
+        records_with_eos = [
+            {"text": build_cardinal_training_prompt(row) + tokenizer.eos_token}
+            for row in raw_records
+        ]
     train_dataset = Dataset.from_list(records_with_eos)
     print(f"      -> {len(train_dataset)} training examples ready.")
 
     dtype = torch.bfloat16 if _BF16 else torch.float16
-    print(f"[3/5] Loading {args.model_id} in {dtype} (no Mxfp4 dequantize — base weights frozen for LoRA) ...")
+    print(f"[3/5] Loading {args.model_id} (dequantizing MXFP4 → {dtype}) ...")
     model = AutoModelForCausalLM.from_pretrained(
         args.model_id,
-        device_map="auto",
+        device_map={"": 0},
         trust_remote_code=True,
-        dtype=dtype,
+        torch_dtype=dtype,
+        quantization_config=Mxfp4Config(dequantize=True),
+        use_cache=False,
     )
 
     print("[4/5] Attaching LoRA adapters ...")

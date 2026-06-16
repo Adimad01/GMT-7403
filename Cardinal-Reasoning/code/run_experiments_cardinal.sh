@@ -13,14 +13,13 @@
 #  PHASE 1  Fine-tune adapters from scratch (unless --skip-train)
 #             FT-1  Cardinal-LoRA    → finetuned_gptoss_cardinal/final_adapter
 #             FT-2  Cardinal-KG LoRA → finetuned_gptoss_cardinal_kg/final_adapter
-#             FT-3  Wikidata-KG LoRA → (from Topological-Reasoning, cross-task)
 #
 #  PHASE 2  Evaluate 5 configurations × 3 strategies (CoT / ToT / GoT)
-#             Config 1  Base model (no adapter)                      512 tok
-#             Config 2  Cardinal-LoRA                                512 tok
-#             Config 3  Cardinal-KG LoRA + compass KG at inference  1024 tok
-#             Config 4  Wikidata-KG LoRA + compass KG (cross-task)  1024 tok
-#             Config 5  Cardinal-LoRA + extended budget + KG        1024 tok
+#             Config 1  Base model (no adapter)                             512 tok
+#             Config 2  Cardinal-LoRA                                       512 tok
+#             Config 3  Cardinal-KG LoRA + compass KG at inference         1024 tok
+#             Config 4  Cardinal-KG LoRA (KG in fine-tuning only, no KG)   512 tok
+#             Config 5  Cardinal-LoRA + extended budget + KG               1024 tok
 #
 #  PHASE 3  Analyse and summarise results
 # ─────────────────────────────────────────────────────────────────────────────
@@ -64,9 +63,6 @@ else
     pip install "triton>=3.4.0" && echo "  [OK] Triton installed successfully" \
         || { echo "  [ERROR] Triton install failed."; echo "  Run manually: pip install triton>=3.4.0"; exit 1; }
 fi
-
-# Wikidata-KG adapter path (cross-task, lives in Topological-Reasoning/)
-WIKIDATA_ADAPTER="../../Topological-Reasoning/code/finetuned_gptoss_wikidata_kg/final_adapter/adapter_model.safetensors"
 
 # ─────────────────────────────────────────────────────────────────────────────
 # PHASE 0 — Build training datasets (eval-excluded, balanced 130/direction)
@@ -137,19 +133,9 @@ if [[ $SKIP_TRAIN -eq 0 ]]; then
     $PYTHON train_runner_cardinal.py
 
     echo ""
-    echo "  FT-2 · Cardinal-KG LoRA  (cardinal_kg_train.jsonl — 1040 rows, KG-enriched, eval-excluded)"
+    echo "  FT-2 · Cardinal-KG LoRA  (cardinal_kg_train.jsonl — KG-enriched, eval-excluded)"
     line
     $PYTHON train_runner_cardinal_kg.py
-
-    echo ""
-    echo "  FT-3 · Wikidata-KG LoRA  — cross-task adapter from Topological-Reasoning/"
-    if [[ ! -f "$WIKIDATA_ADAPTER" ]]; then
-        echo "  [WARN] Wikidata-KG adapter not found at:"
-        echo "         $WIKIDATA_ADAPTER"
-        echo "         Config 4 (cross-task) will be SKIPPED."
-    else
-        echo "  [OK] $WIKIDATA_ADAPTER  ✅"
-    fi
 else
     echo ""
     header "PHASE 1 — Skipping fine-tuning (--skip-train flag)"
@@ -171,13 +157,6 @@ else
         echo "  [OK] finetuned_gptoss_cardinal_kg/final_adapter  ✅"
     fi
 
-    echo "  Checking Wikidata-KG adapter (cross-task, required for Config 4) ..."
-    if [[ ! -f "$WIKIDATA_ADAPTER" ]]; then
-        echo "  [WARN] $WIKIDATA_ADAPTER not found"
-        echo "         Config 4 will be SKIPPED"
-    else
-        echo "  [OK] $WIKIDATA_ADAPTER  ✅"
-    fi
 fi
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -201,13 +180,9 @@ line
 $PYTHON exp03_cardinal_kg.py
 
 echo ""
-echo "  Config 4 · Wikidata-KG LoRA (cross-task) + compass KG · CoT / ToT / GoT (1024 tok)"
-if [[ -f "$WIKIDATA_ADAPTER" ]]; then
-    line
-    $PYTHON exp04_wikidata_cardinal.py
-else
-    echo "  [SKIP] Wikidata-KG adapter not available."
-fi
+echo "  Config 4 · Cardinal-KG LoRA (KG in fine-tuning only, no KG at inference) · CoT / ToT / GoT (512 tok)"
+line
+$PYTHON exp04_wikidata_cardinal.py
 
 echo ""
 echo "  Config 5 · Cardinal-LoRA + extended budget + KG · CoT / ToT / GoT (1024 tok)"
