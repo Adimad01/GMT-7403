@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spatial Relations Dataset</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f5f5f7;--card:#fff;--text:#1d1d1f;--dim:#6e6e73;
+  --blue:#0071e3;--green:#30d158;--orange:#ff9f0a;--gray:#f2f2f7;
+  --r:20px;--sh:0 2px 24px rgba(0,0,0,.06);--sh2:0 8px 40px rgba(0,0,0,.13)
+}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+
+/* ── LOADING / ERROR OVERLAY ── */
+#overlay{
+  position:fixed;inset:0;z-index:999;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:#000;color:#f5f5f7;text-align:center;padding:40px;
+  transition:opacity .5s ease;
+}
+#overlay.hidden{opacity:0;pointer-events:none}
+.spinner{
+  width:40px;height:40px;border:3px solid #2a2a2a;
+  border-top-color:#0071e3;border-radius:50%;
+  animation:spin .8s linear infinite;margin-bottom:20px
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ov-title{font-size:22px;font-weight:600;margin-bottom:12px}
+.ov-sub{font-size:15px;color:#86868b;line-height:1.6;max-width:460px}
+.ov-code{
+  display:inline-block;margin-top:20px;padding:12px 20px;
+  background:#111;border:1px solid #2a2a2a;border-radius:10px;
+  font-family:'SF Mono',Monaco,Menlo,monospace;font-size:13px;
+  color:#30d158;text-align:left;line-height:1.7
+}
+.ov-link{color:#0071e3;text-decoration:none;margin-top:16px;display:inline-block;font-size:14px}
+
+/* ── HERO ── */
+.hero{background:#000;color:#f5f5f7;text-align:center;padding:130px 40px 110px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 700px 280px at 25% 110%,rgba(0,113,227,.28) 0%,transparent 60%),radial-gradient(ellipse 700px 280px at 75% 110%,rgba(48,209,88,.2) 0%,transparent 60%);pointer-events:none}
+.eyebrow-pill{display:inline-block;font-size:12px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--blue);background:rgba(0,113,227,.12);border:1px solid rgba(0,113,227,.28);padding:5px 14px;border-radius:20px;margin-bottom:36px}
+.hero h1{font-size:clamp(50px,9vw,96px);font-weight:700;letter-spacing:-.035em;line-height:1.04;margin-bottom:20px}
+.grad{background:linear-gradient(90deg,#0071e3 0%,#34c759 52%,#ff9f0a 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{font-size:19px;color:#86868b;max-width:540px;margin:0 auto 72px;line-height:1.55}
+.hero-nums{display:flex;justify-content:center;gap:72px;flex-wrap:wrap}
+.hnum{display:block;font-size:74px;font-weight:700;letter-spacing:-.045em;line-height:1;color:#fff}
+.hlbl{display:block;font-size:13px;color:#6e6e73;margin-top:8px}
+
+/* ── LAYOUT ── */
+.sec{padding:96px 40px;max-width:1100px;margin:0 auto}
+.wrap{max-width:1100px;margin:0 auto;padding:0 40px}
+.dark-sec{background:#000;color:#f5f5f7;padding:100px 0}
+
+/* ── TYPE ── */
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:12px}
+.sec-title{font-size:clamp(30px,5vw,52px);font-weight:700;letter-spacing:-.025em;line-height:1.1;margin-bottom:16px}
+.sec-sub{font-size:17px;color:var(--dim);margin-bottom:52px;line-height:1.55;max-width:600px}
+
+/* ── GRID ── */
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.g2{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+@media(max-width:820px){.g4,.g3{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.g4,.g3,.g2{grid-template-columns:1fr}}
+
+/* ── CARDS ── */
+.card{background:var(--card);border-radius:var(--r);padding:32px;box-shadow:var(--sh);transition:box-shadow .3s,transform .3s}
+.card:hover{box-shadow:var(--sh2);transform:translateY(-2px)}
+.dcard{background:#111;border:1px solid #2a2a2a;border-radius:var(--r);padding:32px}
+.ccard{border-radius:var(--r);padding:36px;background:var(--card);box-shadow:var(--sh);border-top:3px solid var(--ac);transition:box-shadow .3s,transform .3s}
+.ccard:hover{box-shadow:var(--sh2);transform:translateY(-2px)}
+.cnum{font-size:50px;font-weight:700;letter-spacing:-.04em;color:var(--ac);line-height:1;margin-bottom:8px;display:block}
+.cname{font-size:16px;font-weight:600;margin-bottom:8px}
+.cdesc{font-size:13px;color:var(--dim);line-height:1.5}
+.pending{opacity:.5}
+
+/* ── BAR CHART ── */
+.bars{display:flex;flex-direction:column;gap:11px}
+.brow{display:flex;align-items:center;gap:11px}
+.blbl{font-size:12px;font-weight:500;color:var(--dim);width:90px;flex-shrink:0;text-align:right;white-space:nowrap}
+.btrack{flex:1;height:6px;background:#f0f0f3;border-radius:3px;overflow:hidden}
+.bfill{height:100%;border-radius:3px;width:0;transition:width 1.3s cubic-bezier(.16,1,.3,1)}
+.bval{font-size:12px;font-weight:700;width:28px;flex-shrink:0;text-align:right}
+.dcard .btrack{background:#2a2a2a}
+.dcard .blbl{color:#86868b}
+.dcard .bval{color:#f5f5f7}
+
+/* ── PILLS ── */
+.pills{display:flex;gap:8px;flex-wrap:wrap}
+.pill{flex:1;min-width:64px;background:var(--gray);border-radius:14px;padding:14px 12px;text-align:center}
+.dpill{flex:1;min-width:64px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:14px;padding:14px 12px;text-align:center}
+.pnum{font-size:24px;font-weight:700;letter-spacing:-.02em;display:block}
+.plbl{font-size:10px;color:var(--dim);margin-top:3px;display:block;font-weight:500;text-transform:uppercase;letter-spacing:.04em}
+.dpill .plbl{color:#6e6e73}
+
+/* ── CHIPS ── */
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:6px}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--gray);border-radius:10px;padding:7px 12px;font-size:12px;font-weight:500}
+.dchip{display:inline-flex;align-items:center;gap:6px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:7px 12px;font-size:12px;font-weight:500;color:#f5f5f7}
+.cn{background:var(--text);color:var(--bg);border-radius:5px;padding:2px 6px;font-size:10px;font-weight:700}
+.dcn{background:#f5f5f7;color:#000;border-radius:5px;padding:2px 6px;font-size:10px;font-weight:700}
+
+/* ── DONUT ── */
+.donut-wrap{display:flex;align-items:center;gap:52px;flex-wrap:wrap}
+.leg-item{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.ldot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.lname{font-size:14px;font-weight:500;flex:1}
+.lval{font-size:15px;font-weight:700}
+.lpct{font-size:12px;color:var(--dim);margin-left:3px}
+
+/* ── PROGRESS ── */
+.prow{display:flex;align-items:center;gap:20px;padding:22px 0;border-bottom:1px solid #ebebeb}
+.prow:last-child{border-bottom:none}
+.pinfo{flex:1}
+.pname{font-size:15px;font-weight:600;margin-bottom:3px}
+.pcount{font-size:13px;color:var(--dim)}
+.ptrack{width:200px;height:5px;background:#f0f0f3;border-radius:3px;overflow:hidden;flex-shrink:0}
+.pfill{height:100%;border-radius:3px;width:0;transition:width 1.4s cubic-bezier(.16,1,.3,1)}
+.ppct{font-size:13px;font-weight:700;width:52px;text-align:right;flex-shrink:0}
+
+/* ── STAT MINI ── */
+.scard{background:var(--card);border-radius:var(--r);padding:28px;box-shadow:var(--sh);text-align:center}
+.snum{font-size:38px;font-weight:700;letter-spacing:-.03em;display:block}
+.slbl{font-size:13px;color:var(--dim);margin-top:4px;display:block}
+
+/* ── MISC ── */
+.div{height:1px;background:linear-gradient(to right,transparent,#ddd,transparent);margin:0 40px}
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;background:#f0fff4;color:#1a7f37;border:1px solid #b6e9c3;border-radius:6px;padding:3px 8px;margin-left:10px;vertical-align:middle}
+footer{background:#000;color:#6e6e73;text-align:center;padding:48px 40px;font-size:13px}
+footer strong{color:#f5f5f7}
+
+/* ── ANIMATIONS ── */
+.fi{opacity:0;transform:translateY(22px);transition:opacity .7s ease,transform .7s ease}
+.fi.on{opacity:1;transform:none}
+.fi:nth-child(2){transition-delay:.07s}
+.fi:nth-child(3){transition-delay:.14s}
+.fi:nth-child(4){transition-delay:.21s}
+
+/* ── HERO ENHANCEMENTS ── */
+.hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent 0%,rgba(0,113,227,.9) 20%,rgba(48,209,88,.7) 50%,rgba(255,159,10,.9) 80%,transparent 100%);animation:shimmer 5s ease-in-out infinite}
+@keyframes shimmer{0%,100%{opacity:.4;transform:scaleX(.7)}50%{opacity:1;transform:scaleX(1)}}
+.hero-bg-grid{position:absolute;inset:0;background-image:radial-gradient(circle,rgba(255,255,255,.05) 1px,transparent 1px);background-size:36px 36px;pointer-events:none;animation:bgdrift 30s linear infinite}
+@keyframes bgdrift{0%{background-position:0 0}100%{background-position:36px 36px}}
+.hnum{text-shadow:0 0 60px rgba(255,255,255,.12)}
+
+/* ── MAP SECTION ── */
+#coverage-map{height:560px;width:100%;position:relative;z-index:1}
+.map-glass{background:rgba(0,0,0,.72);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);border:1px solid rgba(255,255,255,.1);border-radius:16px}
+.map-overlay-box{position:absolute;top:24px;left:24px;z-index:1000;padding:20px 24px;color:#f5f5f7;min-width:190px;pointer-events:none}
+.map-legend-box{position:absolute;bottom:40px;right:24px;z-index:1000;padding:16px 18px;color:#f5f5f7}
+.map-legend-item{display:flex;align-items:center;gap:8px;margin-bottom:7px;font-size:12px;color:#d1d5db}
+.map-legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* ── STATE CARDS ── */
+.stcard{background:var(--card);border-radius:var(--r);padding:32px;box-shadow:var(--sh);border-top:4px solid var(--sc);transition:box-shadow .3s,transform .3s}
+.stcard:hover{box-shadow:var(--sh2);transform:translateY(-2px)}
+.stnum{font-size:52px;font-weight:700;letter-spacing:-.04em;color:var(--sc);line-height:1;margin-bottom:4px;display:block}
+.stname{font-size:18px;font-weight:700;margin-bottom:4px}
+.stpct{font-size:13px;color:var(--dim);margin-bottom:14px}
+.stplaces{font-size:12px;color:var(--dim);line-height:1.85}
+
+/* ── EXPERIMENT RESULTS ── */
+.res-tab{border:none;background:var(--gray);border-radius:12px;padding:10px 20px;font-size:13px;font-weight:600;cursor:pointer;color:var(--dim);transition:background .2s,color .2s;font-family:inherit}
+.res-tab.active{background:var(--blue);color:#fff}
+.res-tab:hover:not(.active){background:#e5e5ea}
+.res-table{width:100%;border-collapse:collapse;font-size:13px}
+.res-table th{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);padding:10px 14px;text-align:left;border-bottom:2px solid #ebebeb}
+.res-table td{padding:13px 14px;border-bottom:1px solid #f5f5f7;vertical-align:middle}
+.res-table tr:last-child td{border-bottom:none}
+.acc-cell{display:inline-flex;align-items:center;justify-content:center;min-width:68px;height:34px;border-radius:10px;font-size:13px;font-weight:700;padding:0 10px}
+.acc-pending{display:inline-flex;align-items:center;justify-content:center;min-width:68px;height:34px;border-radius:10px;font-size:11px;color:var(--dim);background:var(--gray)}
+.res-exp-name{font-size:13px;font-weight:600;margin-bottom:2px}
+.res-exp-desc{font-size:11px;color:var(--dim)}
+.res-best-badge{display:inline-block;font-size:9px;font-weight:700;background:#f0fff4;color:#1a7f37;border:1px solid #b6e9c3;border-radius:5px;padding:1px 6px;margin-left:6px;vertical-align:middle;letter-spacing:.04em}
+.res-summary-row{display:flex;gap:16px;margin-bottom:24px;flex-wrap:wrap}
+.res-summary-pill{background:var(--gray);border-radius:14px;padding:16px 20px;text-align:center;flex:1;min-width:100px}
+.res-summary-pill .pnum{font-size:26px}
+
+/* ── GEO EXTENT STRIP ── */
+.extent-strip{display:flex;gap:0;flex-wrap:wrap;align-items:stretch;background:var(--card);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden}
+.extent-cell{flex:1;min-width:160px;padding:24px 28px;border-right:1px solid #ebebeb}
+.extent-cell:last-child{border-right:none}
+.extent-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:6px}
+.extent-val{font-size:20px;font-weight:700;letter-spacing:-.02em}
+.extent-sub{font-size:11px;color:var(--dim);margin-top:3px}
+</style>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+</head>
+<body>
+
+<!-- ── OVERLAY (loading / error) ── -->
+<div id="overlay">
+  <div id="ov-loading">
+    <div class="spinner"></div>
+    <div class="ov-title">Loading CSV files…</div>
+    <div class="ov-sub">Fetching topological, cardinal and relative relation datasets.</div>
+  </div>
+  <div id="ov-error" style="display:none">
+    <div class="ov-title">Local server required</div>
+    <div class="ov-sub">This report fetches live data from CSV files and cannot run directly from <strong>file://</strong>. Start a local server in the dataset folder:</div>
+    <div class="ov-code">
+      cd "/Users/imadeddinelassakeur/Documents/PhD Journey/Data Collection"<br>
+      python3 -m http.server 8080
+    </div>
+    <a class="ov-link" href="http://localhost:8080/dataset_report.html">→ Open at http://localhost:8080/dataset_report.html</a>
+  </div>
+</div>
+
+<!-- ── MAIN APP ── -->
+<div id="app" style="visibility:hidden">
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg-grid"></div>
+  <div class="eyebrow-pill">PhD Research · Spatial Intelligence · 2026</div>
+  <h1>Spatial Relations<br><span class="grad">Dataset</span></h1>
+  <p class="hero-sub">A structured, annotated corpus for spatial reasoning in large language models — from vernacular text to geometric predicates.</p>
+  <div class="hero-nums">
+    <div><span class="hnum" id="h-total">—</span><span class="hlbl">Total Examples</span></div>
+    <div><span class="hnum" id="h-cats">—</span><span class="hlbl">Categories Built</span></div>
+    <div><span class="hnum" id="h-levels">—</span><span class="hlbl">Ambiguity Levels</span></div>
+  </div>
+</section>
+
+<!-- OVERVIEW -->
+<div class="sec">
+  <p class="eyebrow">Dataset Overview</p>
+  <h2 class="sec-title">Built for breadth.<br>Annotated for depth.</h2>
+  <p class="sec-sub">Each example pairs a vernacular corpus sentence with source/target spatial entities, geometry types, a canonical relation label, and a structured explanation.</p>
+  <div class="g4">
+    <div class="ccard fi" style="--ac:#0071e3">
+      <span class="cnum" id="c-topo">—</span>
+      <div class="cname">Topological</div>
+      <div class="cdesc" id="cd-topo">—</div>
+    </div>
+    <div class="ccard fi" style="--ac:#30d158">
+      <span class="cnum" id="c-card">—</span>
+      <div class="cname">Cardinal Direction</div>
+      <div class="cdesc" id="cd-card">—</div>
+    </div>
+    <div class="ccard fi" style="--ac:#ff9f0a">
+      <span class="cnum" id="c-rel">—</span>
+      <div class="cname">Relative Direction</div>
+      <div class="cdesc" id="cd-rel">—</div>
+    </div>
+    <div class="ccard pending fi" style="--ac:#8e8e93">
+      <span class="cnum" id="c-metric" style="color:#8e8e93">—</span>
+      <div class="cname">Metric</div>
+      <div class="cdesc">near · far · within X km · adjacent · surrounded by</div>
+    </div>
+  </div>
+</div>
+
+<!-- GLOBAL DISTRIBUTION -->
+<div class="div"></div>
+<div class="sec">
+  <p class="eyebrow">Overall Distribution</p>
+  <h2 class="sec-title" id="dist-title">— annotated examples.<br>Active categories.</h2>
+
+  <div class="donut-wrap">
+    <svg width="220" height="220" viewBox="0 0 220 220" class="fi" id="donut-svg">
+      <g transform="rotate(-90,110,110)">
+        <circle cx="110" cy="110" r="80" fill="none" stroke="#2a2a2a" stroke-width="22" opacity=".3"/>
+        <circle id="ds-topo" cx="110" cy="110" r="80" fill="none" stroke="#0071e3" stroke-width="22" stroke-dasharray="0 503" class="dseg"/>
+        <circle id="ds-card" cx="110" cy="110" r="80" fill="none" stroke="#30d158" stroke-width="22" stroke-dasharray="0 503" class="dseg"/>
+        <circle id="ds-rel"  cx="110" cy="110" r="80" fill="none" stroke="#ff9f0a" stroke-width="22" stroke-dasharray="0 503" class="dseg"/>
+      </g>
+      <text id="donut-num" x="110" y="103" text-anchor="middle" font-size="32" font-weight="700" fill="#1d1d1f" font-family="-apple-system,sans-serif">—</text>
+      <text x="110" y="122" text-anchor="middle" font-size="12" fill="#86868b" font-family="-apple-system,sans-serif">examples</text>
+    </svg>
+
+    <div id="donut-legend" class="fi"></div>
+
+    <div class="g3 fi" style="flex:1;min-width:220px;gap:14px">
+      <div class="scard"><span class="snum" id="s-labels">—</span><span class="slbl">Relation labels</span></div>
+      <div class="scard"><span class="snum" id="s-levels">5</span><span class="slbl">Ambiguity levels</span></div>
+      <div class="scard"><span class="snum" id="s-geotypes">—</span><span class="slbl">Geometry types</span></div>
+      <div class="scard"><span class="snum" id="s-topo">—</span><span class="slbl">Topological</span></div>
+      <div class="scard"><span class="snum" id="s-card">—</span><span class="slbl">Cardinal</span></div>
+      <div class="scard"><span class="snum" id="s-rel">—</span><span class="slbl">Relative</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- GEOGRAPHIC COVERAGE MAP -->
+<div style="background:#000;position:relative;overflow:hidden">
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(88,86,214,.2) 0%,transparent 70%);pointer-events:none;z-index:0"></div>
+  <div class="wrap" style="padding-top:80px;padding-bottom:36px;position:relative;z-index:1">
+    <p class="eyebrow" style="color:#5856d6">Geographic Coverage</p>
+    <h2 class="sec-title" style="color:#f5f5f7">Three states.<br><span style="background:linear-gradient(90deg,#5856d6 0%,#0071e3 40%,#30d158 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">1,082 places.</span></h2>
+    <p class="sec-sub" style="color:#86868b">Every location queried across all experiments — municipal boundaries, rivers, highways, parks, and landmarks. Hover any dot to inspect. Scroll to zoom.</p>
+  </div>
+  <div style="position:relative">
+    <div id="coverage-map"></div>
+    <div class="map-glass map-overlay-box">
+      <div style="font-size:10px;color:#6e6e73;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px">Coverage</div>
+      <div style="font-size:44px;font-weight:700;letter-spacing:-.04em;line-height:1;color:#f5f5f7">1,082</div>
+      <div style="font-size:12px;color:#6e6e73;margin-top:4px;margin-bottom:20px">geocoded locations</div>
+      <div style="display:flex;flex-direction:column;gap:10px" id="map-state-pills"></div>
+    </div>
+    <div class="map-glass map-legend-box" id="map-legend-el"></div>
+  </div>
+</div>
+
+<!-- GEOGRAPHIC STATS -->
+<div class="sec">
+  <p class="eyebrow">Geographic Footprint</p>
+  <h2 class="sec-title">Dataset anchored<br>in the United States.</h2>
+  <p class="sec-sub">The corpus spans three primary states — reflecting CoT / ToT / GoT experiments on intra-state spatial reasoning — plus a set of cross-border and internationally named features.</p>
+
+  <div class="g3" style="margin-bottom:24px">
+    <div class="stcard fi" style="--sc:#0071e3">
+      <span class="stnum">375</span>
+      <div class="stname">California</div>
+      <div class="stpct">34.7% of geocoded corpus</div>
+      <div class="stplaces" id="ca-places"></div>
+    </div>
+    <div class="stcard fi" style="--sc:#30d158">
+      <span class="stnum">338</span>
+      <div class="stname">Wisconsin</div>
+      <div class="stpct">31.2% of geocoded corpus</div>
+      <div class="stplaces" id="wi-places"></div>
+    </div>
+    <div class="stcard fi" style="--sc:#ff9f0a">
+      <span class="stnum">298</span>
+      <div class="stname">Texas</div>
+      <div class="stpct">27.5% of geocoded corpus</div>
+      <div class="stplaces" id="tx-places"></div>
+    </div>
+  </div>
+
+  <div class="extent-strip fi">
+    <div class="extent-cell">
+      <div class="extent-label">Latitude span</div>
+      <div class="extent-val">16.2° N — 47.6° N</div>
+      <div class="extent-sub">Mexico border to US–Canada border</div>
+    </div>
+    <div class="extent-cell">
+      <div class="extent-label">Longitude span</div>
+      <div class="extent-val">124.2° W — 67.3° W</div>
+      <div class="extent-sub">Pacific coast to New England</div>
+    </div>
+    <div class="extent-cell">
+      <div class="extent-label">International entities</div>
+      <div class="extent-val">55 locations</div>
+      <div class="extent-sub">Cross-border & internationally named features</div>
+    </div>
+    <div class="extent-cell">
+      <div class="extent-label">Boundary-class</div>
+      <div class="extent-val">873 entities</div>
+      <div class="extent-sub">Cities, counties, states &amp; admin regions</div>
+    </div>
+  </div>
+</div>
+
+<div class="div"></div>
+
+<!-- TOPOLOGICAL -->
+<section class="dark-sec">
+  <div class="wrap">
+    <p class="eyebrow" style="color:#0071e3">Topological Relations</p>
+    <h2 class="sec-title" style="color:#f5f5f7" id="topo-title">— examples across — predicates.</h2>
+    <p class="sec-sub" style="color:#86868b">Based on DE-9IM topological predicates. Distributed across all 5 ambiguity levels, with diverse geometry combinations.</p>
+    <div class="g2" style="margin-bottom:20px">
+      <div class="dcard fi">
+        <h3 style="font-size:15px;font-weight:600;margin-bottom:18px;color:#f5f5f7">Label Distribution</h3>
+        <div class="bars" id="topo-bars"></div>
+      </div>
+      <div class="dcard fi">
+        <h3 style="font-size:15px;font-weight:600;margin-bottom:18px;color:#f5f5f7">Ambiguity Levels</h3>
+        <div class="pills" id="topo-pills"></div>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="dcard fi">
+        <h3 style="font-size:15px;font-weight:600;margin-bottom:14px;color:#f5f5f7">Source Geometry Types</h3>
+        <div class="chips" id="topo-src-geo"></div>
+      </div>
+      <div class="dcard fi">
+        <h3 style="font-size:15px;font-weight:600;margin-bottom:14px;color:#f5f5f7">Target Geometry Types</h3>
+        <div class="chips" id="topo-tgt-geo"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CARDINAL -->
+<div class="sec">
+  <p class="eyebrow" style="color:#30d158">Cardinal Direction Relations</p>
+  <h2 class="sec-title" id="card-title">— examples across — directions.</h2>
+  <p class="sec-sub">Each direction contributes equally, spanning all 5 ambiguity levels — from simple vernacular to counter-intuitive geographic paradoxes.</p>
+  <div class="g2">
+    <div class="card fi">
+      <h3 style="font-size:15px;font-weight:600;margin-bottom:18px">Direction Distribution</h3>
+      <div class="bars" id="card-bars"></div>
+    </div>
+    <div class="card fi">
+      <h3 style="font-size:15px;font-weight:600;margin-bottom:18px">Ambiguity Levels</h3>
+      <div class="pills" id="card-pills"></div>
+    </div>
+  </div>
+</div>
+
+<div class="div"></div>
+
+<!-- RELATIVE -->
+<div class="sec">
+  <p class="eyebrow" style="color:#ff9f0a">Relative Direction Relations</p>
+  <h2 class="sec-title" id="rel-title">— examples.<br>Observer-centric spatial language.</h2>
+  <p class="sec-sub">Captures relations dependent on the observer's viewpoint — nautical port/starboard, clock-face positions, anatomical references, and automotive perspectives.</p>
+  <div class="g2">
+    <div class="card fi">
+      <h3 style="font-size:15px;font-weight:600;margin-bottom:18px">Direction Distribution</h3>
+      <div class="bars" id="rel-bars"></div>
+    </div>
+    <div class="card fi">
+      <h3 style="font-size:15px;font-weight:600;margin-bottom:18px">Ambiguity Levels</h3>
+      <div class="pills" id="rel-pills"></div>
+    </div>
+  </div>
+</div>
+
+<div class="div"></div>
+
+<!-- OSM RELIABILITY -->
+<div class="sec" id="osm-sec">
+  <p class="eyebrow" style="color:#5856d6">OSM / Nominatim Evidence Audit</p>
+  <h2 class="sec-title">Geographic evidence.<br>Validated at scale.</h2>
+  <p class="sec-sub">Reliability audit of the Nominatim geocoding layer that grounds spatial entities across all experiments. 1,107 unique location queries evaluated across retrieval, completeness, and semantic adequacy.</p>
+
+  <div class="g4" style="margin-bottom:28px">
+    <div class="ccard fi" style="--ac:#5856d6">
+      <span class="cnum" style="font-size:38px">97.7%</span>
+      <div class="cname">Retrieval Rate</div>
+      <div class="cdesc">1,082 of 1,107 queries returned a result from Nominatim</div>
+    </div>
+    <div class="ccard fi" style="--ac:#34c759">
+      <span class="cnum" style="font-size:38px">100%</span>
+      <div class="cname">Data Completeness</div>
+      <div class="cdesc">Every returned result carries all required fields (lat, lon, bbox, class, type, hierarchy)</div>
+    </div>
+    <div class="ccard fi" style="--ac:#007aff">
+      <span class="cnum" style="font-size:38px">94.0%</span>
+      <div class="cname">Semantic Adequacy</div>
+      <div class="cdesc">1,017 entries belong to reliable geographic OSM classes</div>
+    </div>
+    <div class="ccard fi" style="--ac:#ff9f0a">
+      <span class="cnum" style="font-size:38px">97.2%</span>
+      <div class="cname">Overall Score</div>
+      <div class="cdesc"><span style="display:inline-block;margin-top:4px;background:#f0fff4;color:#1a7f37;border:1px solid #b6e9c3;border-radius:6px;padding:3px 10px;font-size:11px;font-weight:700;letter-spacing:.04em">EXCELLENT</span></div>
+    </div>
+  </div>
+
+  <div class="g2" style="margin-bottom:20px">
+    <div class="card fi">
+      <h3 style="font-size:15px;font-weight:600;margin-bottom:18px">OSM Class Distribution</h3>
+      <div class="bars" id="osm-class-bars"></div>
+    </div>
+    <div class="card fi">
+      <h3 style="font-size:15px;font-weight:600;margin-bottom:18px">Object Type Breakdown</h3>
+      <div class="bars" id="osm-type-bars"></div>
+      <div style="margin-top:10px;font-size:11px;color:var(--dim);line-height:1.6">
+        <span style="color:#30d158;font-weight:700">relation</span> — polygon / multipolygon, ideal for topology &nbsp;|&nbsp;
+        <span style="color:#ff9f0a;font-weight:700">way</span> — closed way, acceptable &nbsp;|&nbsp;
+        <span style="color:#ff3b30;font-weight:700">node</span> — point, no polygon ⚠
+      </div>
+      <h3 style="font-size:15px;font-weight:600;margin-bottom:12px;margin-top:24px">Hierarchy Depth Distribution</h3>
+      <div class="pills" id="osm-depth-pills" style="flex-wrap:wrap;gap:6px"></div>
+    </div>
+  </div>
+
+  <div class="g2">
+    <div class="card fi">
+      <h3 style="font-size:15px;font-weight:600;margin-bottom:6px">Failure Analysis</h3>
+      <p style="font-size:13px;color:var(--dim);margin-bottom:16px">25 of 1,107 queries (2.3%) returned no result</p>
+      <div id="osm-failures"></div>
+    </div>
+    <div class="card fi">
+      <h3 style="font-size:15px;font-weight:600;margin-bottom:14px">Bounding Box Quality</h3>
+      <p style="font-size:13px;color:var(--dim);margin-bottom:14px"><strong>44</strong> point-like entries (bbox &lt; 0.01 km²) — no usable polygon extent</p>
+      <table id="osm-bbox-table" style="width:100%;border-collapse:collapse;font-size:13px"></table>
+      <div style="margin-top:16px;font-size:11px;color:var(--dim);line-height:1.7">
+        p0–p5 : points / buildings &nbsp;·&nbsp; p25–p50 : city districts, municipalities<br>
+        p50–p75 : cities, large parks &nbsp;·&nbsp; p75–p95 : counties, regions<br>
+        p95–p100 : states, countries, national rivers
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="div"></div>
+
+<!-- EXPERIMENT RESULTS -->
+<div class="sec" id="results-sec">
+  <p class="eyebrow">Experiment Results</p>
+  <h2 class="sec-title">GPT-OSS-20B evaluated<br><span class="grad">across all relation types.</span></h2>
+  <p class="sec-sub">5 experiment configurations × 3 reasoning strategies (CoT / ToT / GoT) on held-out test sets. Topological: 105 examples · 7 predicates. Relative: 20 examples. Cardinal: experiments running.</p>
+
+  <div id="res-tabs" style="display:flex;gap:8px;margin-bottom:28px;flex-wrap:wrap">
+    <button class="res-tab active" data-tab="topological">Topological</button>
+    <button class="res-tab" data-tab="relative">Relative Direction</button>
+    <button class="res-tab" data-tab="cardinal">Cardinal Direction <span style="font-size:10px;opacity:.55">• running</span></button>
+  </div>
+
+  <div id="res-panel-topological" class="res-panel fi"></div>
+  <div id="res-panel-relative"    class="res-panel fi" style="display:none"></div>
+  <div id="res-panel-cardinal"    class="res-panel fi" style="display:none"></div>
+</div>
+
+<div class="div"></div>
+
+<!-- ROADMAP -->
+<div class="sec">
+  <p class="eyebrow">Roadmap Progress</p>
+  <h2 class="sec-title">Tracking toward<br>the 400-example target.</h2>
+  <p class="sec-sub">Original goal: 100 examples per category. Topological and Cardinal already exceed the target significantly.</p>
+  <div class="card fi" id="progress-card"></div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <strong>Spatial Relations Dataset</strong> — PhD Research · 2026<br>
+  <span id="footer-sub" style="margin-top:6px;display:block">Loading…</span>
+</footer>
+
+</div><!-- #app -->
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script>
+// ═══════════════════════════════════════════════════════════════
+// CSV PARSER  (RFC-4180 compliant, handles quoted fields)
+// ═══════════════════════════════════════════════════════════════
+function parseCSV(text) {
+  text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+  const rows = [];
+  let row = [], field = '', inQ = false;
+
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (inQ) {
+      if (c === '"' && text[i + 1] === '"') { field += '"'; i++; }
+      else if (c === '"') { inQ = false; }
+      else { field += c; }
+    } else {
+      if (c === '"') { inQ = true; }
+      else if (c === ',') { row.push(field); field = ''; }
+      else if (c === '\n') {
+        row.push(field); field = '';
+        if (row.some(f => f.trim())) rows.push(row);
+        row = [];
+      } else { field += c; }
+    }
+  }
+  if (field || row.length) { row.push(field); if (row.some(f => f.trim())) rows.push(row); }
+  if (!rows.length) return [];
+
+  const headers = rows[0].map(h => h.trim());
+  const headerKey = headers.join('|');
+
+  return rows.slice(1)
+    .filter(r => r.map(f => f.trim()).join('|') !== headerKey)          // skip dup headers
+    .map(r => Object.fromEntries(headers.map((h, i) => [h, (r[i] || '').trim()])))
+    .filter(r => r.relation_type && r.relation_type !== 'relation_type'); // extra safety
+}
+
+// ═══════════════════════════════════════════════════════════════
+// STATS COMPUTATION
+// ═══════════════════════════════════════════════════════════════
+function computeStats(rows) {
+  const tally = (obj, key) => { obj[key] = (obj[key] || 0) + 1; };
+  const labels = {}, levels = {}, srcGeo = {}, tgtGeo = {};
+  rows.forEach(r => {
+    tally(labels,  r.relation_label   || '?');
+    tally(levels,  r.ambiguity_level  || '?');
+    tally(srcGeo,  r.source_geometry  || '?');
+    tally(tgtGeo,  r.target_geometry  || '?');
+  });
+  return { total: rows.length, labels, levels, srcGeo, tgtGeo };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER HELPERS
+// ═══════════════════════════════════════════════════════════════
+function counter(el, target, dur = 1400) {
+  if (!el) return;
+  const ease = t => 1 - Math.pow(1 - t, 4);
+  const s = performance.now();
+  (function tick(now) {
+    const p = Math.min((now - s) / dur, 1);
+    el.textContent = Math.round(ease(p) * target).toLocaleString();
+    if (p < 1) requestAnimationFrame(tick);
+  })(s);
+}
+
+function renderBars(container, data, color, total) {
+  if (!container) return;
+  container.innerHTML = '';
+  Object.entries(data)
+    .sort((a, b) => b[1] - a[1])
+    .forEach(([label, val]) => {
+      const pct = ((val / total) * 100).toFixed(1);
+      const div = document.createElement('div');
+      div.className = 'brow';
+      div.innerHTML = `<span class="blbl">${label}</span>
+        <div class="btrack"><div class="bfill" style="background:${color}" data-pct="${pct}"></div></div>
+        <span class="bval">${val}</span>`;
+      container.appendChild(div);
+    });
+}
+
+function renderPills(container, levelData, color, dark) {
+  if (!container) return;
+  container.innerHTML = '';
+  Object.entries(levelData)
+    .sort((a, b) => a[0].localeCompare(b[0], undefined, { numeric: true }))
+    .forEach(([level, count]) => {
+      const pill = document.createElement('div');
+      pill.className = dark ? 'dpill' : 'pill';
+      pill.innerHTML = `<span class="pnum" style="color:${color}">${count}</span><span class="plbl">${level}</span>`;
+      container.appendChild(pill);
+    });
+}
+
+function renderChips(container, geoData, dark) {
+  if (!container) return;
+  container.innerHTML = '';
+  Object.entries(geoData)
+    .sort((a, b) => b[1] - a[1])
+    .forEach(([geo, count]) => {
+      const span = document.createElement('span');
+      span.className = dark ? 'dchip' : 'chip';
+      span.innerHTML = `${geo}<span class="${dark ? 'dcn' : 'cn'}">${count}</span>`;
+      container.appendChild(span);
+    });
+}
+
+function renderDonut(datasets, total) {
+  const r = 80, C = +(2 * Math.PI * r).toFixed(2);
+  const ids    = ['ds-topo', 'ds-card', 'ds-rel'];
+  const colors = ['#0071e3', '#30d158', '#ff9f0a'];
+  let offset = 0;
+
+  datasets.forEach((ds, i) => {
+    const seg = document.getElementById(ids[i]);
+    if (!seg) return;
+    const len = +((ds.stats.total / total) * C).toFixed(2);
+    seg.dataset.final  = `${len} ${C}`;
+    seg.dataset.offset = i === 0 ? '0' : `-${offset.toFixed(2)}`;
+    offset += len;
+  });
+}
+
+function renderLegend(container, datasets, total) {
+  if (!container) return;
+  const colors = ['#0071e3', '#30d158', '#ff9f0a', '#d1d1d6'];
+  const names  = ['Topological', 'Cardinal Direction', 'Relative Direction', 'Metric (pending)'];
+  container.innerHTML = '';
+  datasets.forEach((ds, i) => {
+    const pct = total > 0 ? ((ds.stats.total / total) * 100).toFixed(1) : '0.0';
+    const dim  = ds.stats.total === 0 ? ' style="color:var(--dim)"' : '';
+    const item = document.createElement('div');
+    item.className = 'leg-item';
+    item.innerHTML = `
+      <div class="ldot" style="background:${colors[i]}"></div>
+      <span class="lname"${dim}>${names[i]}</span>
+      <span class="lval"${dim}>${ds.stats.total > 0 ? ds.stats.total : 0}</span>
+      <span class="lpct">${ds.stats.total > 0 ? pct + '%' : '—'}</span>`;
+    container.appendChild(item);
+  });
+}
+
+function renderProgress(container, datasets) {
+  if (!container) return;
+  const TARGET = 100;
+  const colors  = ['#0071e3', '#30d158', '#ff9f0a', '#d1d1d6'];
+  const names   = ['Topological Relations', 'Cardinal Direction', 'Relative Direction', 'Metric Relations'];
+  const descs   = [
+    n => `${n} examples · ${7} labels · 5 levels`,
+    n => `${n} examples · ${8} labels · 5 levels`,
+    n => `${n} examples · ${5} labels · 5 levels`,
+    n => `${n} examples · not started`
+  ];
+  container.innerHTML = '';
+  datasets.forEach((ds, i) => {
+    const n    = ds.stats.total;
+    const pct  = Math.min((n / TARGET) * 100, 100);
+    const disp = Math.round((n / TARGET) * 100);
+    const dim  = n === 0 ? ' style="color:var(--dim)"' : '';
+    const row  = document.createElement('div');
+    row.className = 'prow';
+    row.innerHTML = `
+      <div class="pinfo">
+        <div class="pname"${dim}>${names[i]}</div>
+        <div class="pcount"${dim}>${descs[i](n)}</div>
+      </div>
+      <div class="ptrack"><div class="pfill" style="background:${colors[i]}" data-pct="${pct}"></div></div>
+      <div class="ppct" style="color:${colors[i]}">${n > 0 ? disp + '%' : '0%'}</div>`;
+    container.appendChild(row);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INTERSECTION OBSERVER  (triggers bar/donut animations)
+// ═══════════════════════════════════════════════════════════════
+function initObservers() {
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      const t = e.target;
+      t.classList.add('on');
+      t.querySelectorAll('.bfill, .pfill').forEach(b => b.style.width = b.dataset.pct + '%');
+      t.querySelectorAll('.dseg').forEach(seg => {
+        seg.style.transition = 'stroke-dasharray 1.3s cubic-bezier(.16,1,.3,1)';
+        seg.setAttribute('stroke-dasharray', seg.dataset.final || '0 503');
+        if (seg.dataset.offset) seg.setAttribute('stroke-dashoffset', seg.dataset.offset);
+      });
+      io.unobserve(t);
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('.fi').forEach(el => io.observe(el));
+}
+
+// ═══════════════════════════════════════════════════════════════
+// COVERAGE MAP  –  Leaflet map of all geocoded locations
+// ═══════════════════════════════════════════════════════════════
+const CLS_COLOR = {
+  boundary: '#a78bfa', waterway: '#38bdf8', highway:  '#fbbf24',
+  amenity:  '#f87171', place:    '#4ade80', water:    '#38bdf8',
+  leisure:  '#34d399', natural:  '#86efac', tourism:  '#fb923c',
+  aeroway:  '#94a3b8',
+};
+const CLS_DEF = '#64748b';
+
+async function initCoverageMap() {
+  if (!window.L) return;
+  let data;
+  try {
+    const r = await fetch('./locations.json');
+    if (!r.ok) throw new Error(r.status);
+    data = await r.json();
+  } catch(e) {
+    console.warn('locations.json unavailable', e);
+    document.getElementById('coverage-map').style.display = 'none';
+    return;
+  }
+
+  const locs   = data.locations;
+  const stats  = data.stats;
+
+  const map = L.map('coverage-map', {
+    center: [37.5, -100], zoom: 4,
+    zoomControl: false, attributionControl: false,
+    preferCanvas: true
+  });
+
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    subdomains: 'abcd', maxZoom: 19
+  }).addTo(map);
+
+  L.control.attribution({
+    prefix: '© <a href="https://carto.com" style="color:#6e6e73">CARTO</a> · © <a href="https://www.openstreetmap.org/copyright" style="color:#6e6e73">OpenStreetMap</a>',
+    position: 'bottomleft'
+  }).addTo(map);
+  L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+  const bounds = [];
+  locs.forEach(loc => {
+    const color = CLS_COLOR[loc.c] || CLS_DEF;
+    L.circleMarker([loc.la, loc.lo], {
+      radius: 4.5,
+      fillColor: color,
+      color: 'rgba(0,0,0,.25)',
+      weight: 1,
+      fillOpacity: 0.88
+    })
+    .bindPopup(
+      `<div style="font-family:-apple-system,sans-serif;padding:2px 0;min-width:150px">
+        <strong style="font-size:13px;color:#1d1d1f">${loc.n}</strong><br>
+        <span style="font-size:11px;color:#6e6e73">${loc.c}${loc.r ? ' · ' + loc.r : ''}</span>
+      </div>`,
+      { maxWidth: 240, className: 'map-popup' }
+    )
+    .addTo(map);
+    bounds.push([loc.la, loc.lo]);
+  });
+
+  if (bounds.length) map.fitBounds(L.latLngBounds(bounds), { padding: [50, 50] });
+
+  // State pills overlay
+  const pillsEl = document.getElementById('map-state-pills');
+  if (pillsEl && stats.top_states) {
+    const SC = ['#5856d6', '#30d158', '#ff9f0a'];
+    stats.top_states.slice(0, 3).forEach((s, i) => {
+      const div = document.createElement('div');
+      div.style.cssText = 'display:flex;align-items:center;gap:9px;font-size:12px';
+      div.innerHTML = `<span style="width:7px;height:7px;border-radius:50%;background:${SC[i]};flex-shrink:0;box-shadow:0 0 8px ${SC[i]}"></span>
+        <span style="text-transform:capitalize;color:#d1d5db">${s.s}</span>
+        <span style="margin-left:auto;font-weight:700;color:${SC[i]}">${s.n}</span>`;
+      pillsEl.appendChild(div);
+    });
+  }
+
+  // Class legend
+  const legendEl = document.getElementById('map-legend-el');
+  if (legendEl) {
+    legendEl.innerHTML = '<div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#6e6e73;margin-bottom:10px">OSM class</div>';
+    ['boundary','highway','waterway','amenity','place','natural','tourism','leisure'].forEach(cls => {
+      const cnt = stats.by_class[cls] || 0;
+      if (!cnt) return;
+      const col = CLS_COLOR[cls] || CLS_DEF;
+      const item = document.createElement('div');
+      item.className = 'map-legend-item';
+      item.innerHTML = `<div class="map-legend-dot" style="background:${col};box-shadow:0 0 6px ${col}"></div>
+        <span>${cls}</span>
+        <span style="margin-left:10px;font-weight:700;color:${col}">${cnt}</span>`;
+      legendEl.appendChild(item);
+    });
+  }
+
+  // State representative places
+  const SP = {
+    'ca-places': ['San Jose','Los Angeles','San Francisco','San Diego','Sacramento','Berkeley','Santa Barbara'],
+    'wi-places': ['Milwaukee','Madison','Green Bay','Baraboo','Buffalo River','Chippewa Falls','La Crosse'],
+    'tx-places': ['Dallas','Fort Worth','San Antonio','Austin','Houston','Odessa','Grapevine'],
+  };
+  Object.entries(SP).forEach(([id, places]) => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = places.map(p => `• ${p}`).join('<br>');
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// OSM RELIABILITY  –  static data + renderer
+// ═══════════════════════════════════════════════════════════════
+const OSM_DATA = {
+  total: 1107, valid_count: 1082, none_count: 25,
+  retrieval_rate: 97.74, completeness_rate: 100.0, semantic_rate: 93.99, overall: 97.24,
+  class_counts: {
+    boundary:873, highway:44, amenity:30, waterway:26,
+    place:23, water:18, tourism:14, leisure:16, natural:13,
+    aeroway:7, building:5, office:3, man_made:2,
+    shop:1, historic:1, military:1, information:1
+  },
+  reliable_classes: new Set(['boundary','waterway','natural','highway','place','water','leisure','landuse']),
+  osm_type_counts: { relation:954, way:104, node:24 },
+  osm_type_colors: { relation:'#30d158', way:'#ff9f0a', node:'#ff3b30' },
+  depths: { 2:2, 3:5, 4:3, 5:183, 6:435, 7:328, 8:43, 9:18, 10:37, 11:15, 12:12, 13:1 },
+  bbox_stats: [
+    { p:'p0',  v:0.00002,       label:'point / building' },
+    { p:'p5',  v:0.019,         label:'small feature' },
+    { p:'p25', v:13.5,          label:'neighborhood / district' },
+    { p:'p50', v:69.5,          label:'city / municipality' },
+    { p:'p75', v:433.2,         label:'county / region' },
+    { p:'p95', v:5501.0,        label:'state / large region' },
+    { p:'p100',v:336869201.2,   label:'country / major river' }
+  ],
+  failures: [
+    { cat:'multi_road', count:8, severity:'HIGH',
+      entries:['Texas Highways 35, Texas','U.S. Highways 281 and 380, and Texas State Highways 114 and 199',
+               'Farm Road 2229 and Texas State Highway 6, Texas','US Route 90, Texas',
+               'State Highways 16, Texas','State High 72, Texas',
+               'US Highway 277 and State Highway 6, Texas','US87 and FM108, Texas'],
+      repair:'Query each road separately rather than conjunctive names.' },
+    { cat:'composite_msa', count:7, severity:'MEDIUM',
+      entries:['Green Bay Metropolitan Statistical Area (Brown, Kewaunee, Oconto)',
+               'Madison Metropolitan Statistical Area (Columbia, Dane, Green, Iowa)',
+               'Minneapolis-St. Paul metropolitan area (multi-county)',
+               'Chicago metropolitan area (multi-county)',
+               'Appleton, Wisconsin Metropolitan Statistical Area (Calumet, Outagamie)',
+               'green bay metropolitan area (Brown, Kewaunee, Oconto), wisconsin',
+               'Appleton metropolitan area (Calumet, Outagamie)'],
+      repair:'MSA strings are not Nominatim-searchable; split into component counties.' },
+    { cat:'typo_or_not_found', count:6, severity:'HIGH',
+      entries:['Port Arthury, Texas','the Mississippi River, wisconsin',
+               'headquarters of harley-davidson','Rohnert Par, California',
+               'Jones and Haskell Counties, Texas','Culinary Institute of America at Greystone'],
+      repair:'Correct spelling or use the canonical place name.' },
+    { cat:'encoding_error', count:2, severity:'HIGH',
+      entries:['university of wisconsin–river falls, wisconsin (corrupted em-dash)',
+               'university of wisconsin–stevens point, wisconsin (corrupted em-dash)'],
+      repair:'Fix Unicode corruption in source data (em-dash → plain hyphen).' },
+    { cat:'composite_slash', count:2, severity:'HIGH',
+      entries:['San Antonio/Austin/Houston, Texas','Dallas/Houston/Shreveport, Texas'],
+      repair:'Slash-joined city lists are not valid queries; pick the primary entity.' }
+  ]
+};
+
+const SEV_COLOR = { HIGH:'#ff3b30', MEDIUM:'#ff9f0a', LOW:'#30d158' };
+const SEV_BG    = { HIGH:'#fff0f0', MEDIUM:'#fff8f0', LOW:'#f0fff4' };
+
+function fmtArea(v) {
+  if (v >= 1e6) return (v/1e6).toFixed(1) + ' M';
+  if (v >= 1e3) return (v/1e3).toFixed(1) + ' k';
+  if (v >= 1)   return v.toFixed(1);
+  return v.toFixed(4);
+}
+
+function renderOSMSection() {
+  const d = OSM_DATA;
+
+  // ── Class distribution bars ──────────────────────────────────
+  const classBars = document.getElementById('osm-class-bars');
+  if (classBars) {
+    classBars.innerHTML = '';
+    Object.entries(d.class_counts).sort((a,b)=>b[1]-a[1]).forEach(([cls,cnt]) => {
+      const pct = (cnt / d.valid_count * 100).toFixed(1);
+      const color = d.reliable_classes.has(cls) ? '#5856d6' : '#d1d1d6';
+      const tag = d.reliable_classes.has(cls) ? '' : ' <span style="font-size:9px;color:#ff9f0a;vertical-align:middle">⚠</span>';
+      const row = document.createElement('div');
+      row.className = 'brow';
+      row.innerHTML = `<span class="blbl" style="width:100px">${cls}${tag}</span>
+        <div class="btrack"><div class="bfill" style="background:${color}" data-pct="${pct}"></div></div>
+        <span class="bval">${cnt}</span>`;
+      classBars.appendChild(row);
+    });
+  }
+
+  // ── Object type bars ─────────────────────────────────────────
+  const typeBars = document.getElementById('osm-type-bars');
+  if (typeBars) {
+    typeBars.innerHTML = '';
+    Object.entries(d.osm_type_counts).sort((a,b)=>b[1]-a[1]).forEach(([t,cnt]) => {
+      const pct = (cnt / d.valid_count * 100).toFixed(1);
+      const color = d.osm_type_colors[t] || '#5856d6';
+      const row = document.createElement('div');
+      row.className = 'brow';
+      row.innerHTML = `<span class="blbl">${t}</span>
+        <div class="btrack"><div class="bfill" style="background:${color}" data-pct="${pct}"></div></div>
+        <span class="bval">${cnt}</span>`;
+      typeBars.appendChild(row);
+    });
+  }
+
+  // ── Hierarchy depth pills ─────────────────────────────────────
+  const depthPills = document.getElementById('osm-depth-pills');
+  if (depthPills) {
+    depthPills.innerHTML = '';
+    Object.entries(d.depths).sort((a,b)=>+a[0]-+b[0]).forEach(([depth,cnt]) => {
+      const color = +depth < 4 ? '#ff3b30' : (+depth < 9 ? '#5856d6' : '#ff9f0a');
+      const pill = document.createElement('div');
+      pill.className = 'pill';
+      pill.style.minWidth = '50px';
+      pill.innerHTML = `<span class="pnum" style="color:${color};font-size:18px">${cnt}</span><span class="plbl">d=${depth}</span>`;
+      depthPills.appendChild(pill);
+    });
+  }
+
+  // ── Failure analysis ─────────────────────────────────────────
+  const failureEl = document.getElementById('osm-failures');
+  if (failureEl) {
+    failureEl.innerHTML = '';
+    d.failures.forEach(f => {
+      const div = document.createElement('div');
+      div.style.cssText = 'margin-bottom:12px;padding:14px;background:var(--gray);border-radius:12px';
+      div.innerHTML = `
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
+          <span style="font-size:13px;font-weight:600">${f.cat.replace(/_/g,' ')}</span>
+          <span style="background:${SEV_BG[f.severity]};color:${SEV_COLOR[f.severity]};font-size:10px;font-weight:700;border-radius:5px;padding:2px 7px">${f.severity}</span>
+        </div>
+        <div style="font-size:12px;color:var(--dim);margin-bottom:5px">${f.count} entr${f.count===1?'y':'ies'} · <em>${f.repair}</em></div>
+        <div style="font-size:11px;color:var(--dim);line-height:1.6">${f.entries.slice(0,3).map(e=>`• ${e}`).join('<br>')}${f.entries.length>3?`<br><span style="color:#0071e3">… +${f.entries.length-3} more</span>`:''}</div>`;
+      failureEl.appendChild(div);
+    });
+  }
+
+  // ── Bbox percentile table ─────────────────────────────────────
+  const bboxTable = document.getElementById('osm-bbox-table');
+  if (bboxTable) {
+    bboxTable.innerHTML = `
+      <thead><tr style="color:var(--dim);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em">
+        <td style="padding:6px 0">Pct</td>
+        <td style="padding:6px 0;text-align:right">Area (km²)</td>
+        <td style="padding:6px 0;padding-left:14px">Typical feature</td>
+      </tr></thead>
+      <tbody>${d.bbox_stats.map(({p,v,label}) => `
+        <tr style="border-top:1px solid #f0f0f3">
+          <td style="padding:8px 0;font-weight:700;color:#5856d6">${p}</td>
+          <td style="padding:8px 0;text-align:right;font-variant-numeric:tabular-nums;font-size:12px">${fmtArea(v)}</td>
+          <td style="padding:8px 0;padding-left:14px;color:var(--dim);font-size:12px">${label}</td>
+        </tr>`).join('')}
+      </tbody>`;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MAIN  –  fetch → parse → render
+// ═══════════════════════════════════════════════════════════════
+const DATASETS = [
+  { id: 'topological', file: './topological_relations.csv' },
+  { id: 'cardinal',    file: './cardinal_direction_relations.csv' },
+  { id: 'relative',   file: './relative_direction_relations.csv' },
+  { id: 'metric',     file: './metric_relations.csv' }
+];
+
+async function init() {
+  // Show loading overlay
+  document.getElementById('ov-loading').style.display = '';
+  document.getElementById('ov-error').style.display = 'none';
+
+  // Detect file:// protocol early
+  if (window.location.protocol === 'file:') {
+    document.getElementById('ov-loading').style.display = 'none';
+    document.getElementById('ov-error').style.display = '';
+    return;
+  }
+
+  try {
+    // Fetch all CSVs (metric may not exist — graceful failure)
+    const datasets = await Promise.all(DATASETS.map(async ds => {
+      try {
+        const text = await fetch(ds.file).then(r => {
+          if (!r.ok) throw new Error(r.status);
+          return r.text();
+        });
+        const rows = parseCSV(text);
+        return { ...ds, rows, stats: computeStats(rows) };
+      } catch {
+        return { ...ds, rows: [], stats: { total: 0, labels: {}, levels: {}, srcGeo: {}, tgtGeo: {} } };
+      }
+    }));
+
+    const [topo, card, rel, metric] = datasets;
+    const activeSets = datasets.filter(d => d.stats.total > 0);
+    const total = datasets.reduce((s, d) => s + d.stats.total, 0);
+
+    // ── Hero ──
+    counter(document.getElementById('h-total'),  total);
+    counter(document.getElementById('h-cats'),   activeSets.length);
+    counter(document.getElementById('h-levels'), 5);
+
+    // ── Category cards ──
+    const setCard = (id, descId, ds, fallbackDesc) => {
+      const el = document.getElementById(id);
+      if (el) counter(el, ds.stats.total);
+      const desc = document.getElementById(descId);
+      if (desc) {
+        const labels = Object.keys(ds.stats.labels);
+        desc.textContent = labels.length > 0
+          ? labels.join(' · ')
+          : fallbackDesc;
+      }
+    };
+    setCard('c-topo', 'cd-topo', topo, 'touches · disjoint · crosses · overlaps · equals · contains · within');
+    setCard('c-card', 'cd-card', card, 'north · south · east · west · NE · NW · SE · SW');
+    setCard('c-rel',  'cd-rel',  rel,  'left · right · in front of · behind · next to');
+    const cm = document.getElementById('c-metric');
+    if (cm) cm.textContent = metric.stats.total > 0 ? metric.stats.total : '—';
+
+    // ── Distribution section ──
+    const distTitle = document.getElementById('dist-title');
+    if (distTitle) distTitle.innerHTML = `${total.toLocaleString()} annotated examples.<br>${activeSets.length} active categories.`;
+
+    const allLabels   = datasets.reduce((s, d) => s + Object.keys(d.stats.labels).length, 0);
+    const allGeoTypes = [...new Set(datasets.flatMap(d => [...Object.keys(d.stats.srcGeo), ...Object.keys(d.stats.tgtGeo)]))].filter(Boolean).length;
+
+    const setNum = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+    setNum('s-labels',   allLabels);
+    setNum('s-levels',   5);
+    setNum('s-geotypes', allGeoTypes);
+    setNum('s-topo',     topo.stats.total);
+    setNum('s-card',     card.stats.total);
+    setNum('s-rel',      rel.stats.total);
+
+    const donutNum = document.getElementById('donut-num');
+    if (donutNum) donutNum.textContent = total.toLocaleString();
+
+    // ── Donut ──
+    renderDonut([topo, card, rel], total);
+    renderLegend(document.getElementById('donut-legend'), [topo, card, rel, metric], total);
+
+    // ── Topological ──
+    const topoTitle = document.getElementById('topo-title');
+    if (topoTitle) topoTitle.textContent = `${topo.stats.total} examples — ${Object.keys(topo.stats.labels).length} predicates.`;
+    renderBars(document.getElementById('topo-bars'),    topo.stats.labels, '#0071e3', topo.stats.total);
+    renderPills(document.getElementById('topo-pills'),  topo.stats.levels, '#0071e3', true);
+    renderChips(document.getElementById('topo-src-geo'),topo.stats.srcGeo, true);
+    renderChips(document.getElementById('topo-tgt-geo'),topo.stats.tgtGeo, true);
+
+    // ── Cardinal ──
+    const cardTitle = document.getElementById('card-title');
+    if (cardTitle) cardTitle.textContent = `${card.stats.total} examples — ${Object.keys(card.stats.labels).length} directions.`;
+    renderBars(document.getElementById('card-bars'),  card.stats.labels, '#30d158', card.stats.total);
+    renderPills(document.getElementById('card-pills'),card.stats.levels, '#30d158', false);
+
+    // ── Relative ──
+    const relTitle = document.getElementById('rel-title');
+    if (relTitle) relTitle.innerHTML = `${rel.stats.total} examples.<br>Observer-centric spatial language.`;
+    renderBars(document.getElementById('rel-bars'),  rel.stats.labels, '#ff9f0a', rel.stats.total);
+    renderPills(document.getElementById('rel-pills'),rel.stats.levels, '#ff9f0a', false);
+
+    // ── Roadmap ──
+    renderProgress(document.getElementById('progress-card'), datasets);
+
+    // ── Coverage Map (non-blocking) ──
+    initCoverageMap().catch(e => console.warn('Map init:', e));
+
+    // ── OSM Reliability ──
+    renderOSMSection();
+
+    // ── Footer ──
+    const footerSub = document.getElementById('footer-sub');
+    if (footerSub) {
+      footerSub.textContent = `${total} annotated examples · topological · cardinal · relative · metric${metric.stats.total === 0 ? ' (pending)' : ''}`;
+    }
+
+    // ── Show app ──
+    document.getElementById('app').style.visibility = 'visible';
+    const overlay = document.getElementById('overlay');
+    overlay.classList.add('hidden');
+    setTimeout(() => overlay.remove(), 600);
+
+    initObservers();
+
+  } catch (err) {
+    console.error(err);
+    document.getElementById('ov-loading').style.display = 'none';
+    document.getElementById('ov-error').style.display   = '';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// EXPERIMENT RESULTS  –  static accuracy data from server checkpoints
+// ═══════════════════════════════════════════════════════════════
+const RESULTS_DATA = {
+  topological: {
+    label: 'Topological Relations',
+    color: '#0071e3',
+    n_eval: 105,
+    note: '7 DE-9IM predicates · 15 examples/predicate · 3 per ambiguity level',
+    exps: [
+      { id:'E1', name:'Base GPT-OSS-20B',      desc:'No adapter · 512 tok',              cot:78.1, tot:66.7, got:69.5 },
+      { id:'E2', name:'Topo-LoRA v2',           desc:'Fine-tuned on topo corpus · 512 tok', cot:61.0, tot:59.0, got:49.5 },
+      { id:'E3', name:'OSM-KG LoRA + KG inf.',  desc:'KG evidence at inference · 1024 tok', cot:33.3, tot:60.0, got:41.0 },
+      { id:'E4', name:'OSM-KG LoRA (no KG)',    desc:'KG in training only · 512 tok',       cot:48.6, tot:63.8, got:52.4 },
+      { id:'E5', name:'Topo-LoRA + enriched KG',desc:'Extended KG inference · 1024 tok',    cot:53.3, tot:30.5, got:63.8 },
+    ]
+  },
+  relative: {
+    label: 'Relative Direction',
+    color: '#ff9f0a',
+    n_eval: 20,
+    note: '5 relation labels · observer-centric spatial language',
+    exps: [
+      { id:'E1', name:'Base GPT-OSS-20B',    desc:'No adapter · 512 tok',           cot:90.0, tot:85.0, got:85.0 },
+      { id:'E2', name:'Relative-LoRA',        desc:'Fine-tuned · 512 tok',           cot:85.0, tot:65.0, got:90.0 },
+      { id:'E3', name:'LoRA + extended',      desc:'Fine-tuned · 1024 tok',          cot:90.0, tot:65.0, got:85.0 },
+      { id:'E4', name:'KG-LoRA (no KG inf.)',  desc:'KG in training only · 512 tok', cot:80.0, tot:75.0, got:80.0 },
+      { id:'E5', name:'Base + extended + KG', desc:'No adapter + KG · 1024 tok',     cot:90.0, tot:85.0, got:80.0 },
+    ]
+  },
+  cardinal: {
+    label: 'Cardinal Direction',
+    color: '#30d158',
+    n_eval: 32,
+    note: '8 directions · 4 examples/direction · experiments in progress',
+    exps: [
+      { id:'E1', name:'Base GPT-OSS-20B',       desc:'No adapter · 512 tok',              cot:null, tot:null, got:null },
+      { id:'E2', name:'Cardinal-LoRA',           desc:'Fine-tuned · 512 tok',              cot:null, tot:null, got:null },
+      { id:'E3', name:'Cardinal-KG LoRA + KG',  desc:'KG evidence at inference · 1024 tok', cot:null, tot:null, got:null },
+      { id:'E4', name:'Cardinal-KG LoRA (no KG)',desc:'KG in training only · 512 tok',     cot:null, tot:null, got:null },
+      { id:'E5', name:'Cardinal-LoRA + KG',     desc:'Extended KG inference · 1024 tok',   cot:null, tot:null, got:null },
+    ]
+  }
+};
+
+function accColor(v) {
+  if (v === null) return null;
+  if (v >= 80) return { bg:'#f0fff4', text:'#1a7f37', border:'#b6e9c3' };
+  if (v >= 65) return { bg:'#fffbeb', text:'#92400e', border:'#fde68a' };
+  if (v >= 50) return { bg:'#fff7ed', text:'#9a3412', border:'#fed7aa' };
+  return          { bg:'#fef2f2', text:'#991b1b', border:'#fecaca' };
+}
+
+function renderResultsPanel(panelId, data) {
+  const el = document.getElementById(panelId);
+  if (!el) return;
+
+  const allVals = data.exps.flatMap(e => [e.cot, e.tot, e.got]).filter(v => v !== null);
+  const globalMax = allVals.length ? Math.max(...allVals) : null;
+  const globalAvg = allVals.length ? (allVals.reduce((a,b)=>a+b,0)/allVals.length).toFixed(1) : null;
+  const strats = ['CoT','ToT','GoT'];
+
+  // Summary pills
+  const summaryHtml = allVals.length ? `
+    <div class="res-summary-row">
+      <div class="res-summary-pill"><span class="pnum" style="color:${data.color}">${globalMax.toFixed(1)}%</span><span class="plbl">Best accuracy</span></div>
+      <div class="res-summary-pill"><span class="pnum" style="color:${data.color}">${globalAvg}%</span><span class="plbl">Avg accuracy</span></div>
+      <div class="res-summary-pill"><span class="pnum" style="color:${data.color}">${data.n_eval}</span><span class="plbl">Eval examples</span></div>
+      <div class="res-summary-pill"><span class="pnum" style="color:${data.color}">${data.exps.length}×3</span><span class="plbl">Exp × Strategies</span></div>
+    </div>` : `<div style="padding:20px 0;font-size:14px;color:var(--dim)">Experiments in progress — results will appear here when the server completes the run.</div>`;
+
+  // Table rows
+  const rows = data.exps.map(exp => {
+    const vals = [exp.cot, exp.tot, exp.got];
+    const validVals = vals.filter(v => v !== null);
+    const expMax = validVals.length ? Math.max(...validVals) : null;
+    const expMaxIdx = vals.indexOf(expMax);
+    const isBestExp = expMax !== null && expMax === globalMax;
+
+    const cellHtml = (v, idx) => {
+      if (v === null) return `<td style="text-align:center"><span class="acc-pending">—</span></td>`;
+      const c = accColor(v);
+      const isGlobalMax = v === globalMax;
+      return `<td style="text-align:center"><span class="acc-cell" style="background:${c.bg};color:${c.text};${isGlobalMax?'outline:2px solid '+c.border+';outline-offset:1px':''}">${v.toFixed(1)}%</span></td>`;
+    };
+
+    return `<tr>
+      <td style="min-width:190px">
+        <div class="res-exp-name" style="color:${isBestExp?data.color:'inherit'}">${exp.id} · ${exp.name}${isBestExp?'<span class="res-best-badge">BEST</span>':''}</div>
+        <div class="res-exp-desc">${exp.desc}</div>
+      </td>
+      ${cellHtml(exp.cot,0)}${cellHtml(exp.tot,1)}${cellHtml(exp.got,2)}
+      <td style="text-align:center;min-width:80px">
+        ${expMax !== null
+          ? `<span style="font-size:14px;font-weight:700;color:${accColor(expMax).text}">${expMax.toFixed(1)}%</span><br><span style="font-size:10px;color:var(--dim)">${strats[expMaxIdx]}</span>`
+          : `<span style="font-size:11px;color:var(--dim)">—</span>`}
+      </td>
+    </tr>`;
+  }).join('');
+
+  el.innerHTML = `<div class="card" style="overflow-x:auto">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;gap:16px;flex-wrap:wrap">
+      <div>
+        <div style="font-size:14px;font-weight:700;color:${data.color};margin-bottom:4px">${data.label}</div>
+        <div style="font-size:12px;color:var(--dim)">${data.note}</div>
+      </div>
+    </div>
+    ${summaryHtml}
+    ${allVals.length ? `<table class="res-table">
+      <thead><tr>
+        <th>Experiment</th>
+        <th style="text-align:center">CoT</th>
+        <th style="text-align:center">ToT</th>
+        <th style="text-align:center">GoT</th>
+        <th style="text-align:center">Best</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div style="margin-top:14px;font-size:11px;color:var(--dim);line-height:1.7">
+      <span style="background:#f0fff4;color:#1a7f37;padding:2px 8px;border-radius:5px;font-weight:700;margin-right:6px">≥80%</span>high
+      &nbsp;·&nbsp;
+      <span style="background:#fffbeb;color:#92400e;padding:2px 8px;border-radius:5px;font-weight:700;margin-right:6px">65–79%</span>medium
+      &nbsp;·&nbsp;
+      <span style="background:#fff7ed;color:#9a3412;padding:2px 8px;border-radius:5px;font-weight:700;margin-right:6px">50–64%</span>low
+      &nbsp;·&nbsp;
+      <span style="background:#fef2f2;color:#991b1b;padding:2px 8px;border-radius:5px;font-weight:700;margin-right:6px">&lt;50%</span>very low
+      &nbsp;·&nbsp; outlined cell = global max
+    </div>` : ''}
+  </div>`;
+}
+
+function initResults() {
+  renderResultsPanel('res-panel-topological', RESULTS_DATA.topological);
+  renderResultsPanel('res-panel-relative',    RESULTS_DATA.relative);
+  renderResultsPanel('res-panel-cardinal',    RESULTS_DATA.cardinal);
+
+  document.querySelectorAll('.res-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.res-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      document.querySelectorAll('.res-panel').forEach(p => p.style.display = 'none');
+      const panel = document.getElementById('res-panel-' + tab.dataset.tab);
+      if (panel) panel.style.display = '';
+    });
+  });
+}
+
+init();
+initResults();
+</script>
+</body>
+</html>
