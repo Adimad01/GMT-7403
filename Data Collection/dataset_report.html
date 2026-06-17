@@ -425,74 +425,6 @@ footer strong{color:#f5f5f7}
 
 <div class="div"></div>
 
-<!-- OSM RELIABILITY -->
-<div class="sec" id="osm-sec">
-  <p class="eyebrow" style="color:#5856d6">OSM / Nominatim Evidence Audit</p>
-  <h2 class="sec-title">Geographic evidence.<br>Validated at scale.</h2>
-  <p class="sec-sub">Reliability audit of the Nominatim geocoding layer that grounds spatial entities across all experiments. 1,107 unique location queries evaluated across retrieval, completeness, and semantic adequacy.</p>
-
-  <div class="g4" style="margin-bottom:28px">
-    <div class="ccard fi" style="--ac:#5856d6">
-      <span class="cnum" style="font-size:38px">97.7%</span>
-      <div class="cname">Retrieval Rate</div>
-      <div class="cdesc">1,082 of 1,107 queries returned a result from Nominatim</div>
-    </div>
-    <div class="ccard fi" style="--ac:#34c759">
-      <span class="cnum" style="font-size:38px">100%</span>
-      <div class="cname">Data Completeness</div>
-      <div class="cdesc">Every returned result carries all required fields (lat, lon, bbox, class, type, hierarchy)</div>
-    </div>
-    <div class="ccard fi" style="--ac:#007aff">
-      <span class="cnum" style="font-size:38px">94.0%</span>
-      <div class="cname">Semantic Adequacy</div>
-      <div class="cdesc">1,017 entries belong to reliable geographic OSM classes</div>
-    </div>
-    <div class="ccard fi" style="--ac:#ff9f0a">
-      <span class="cnum" style="font-size:38px">97.2%</span>
-      <div class="cname">Overall Score</div>
-      <div class="cdesc"><span style="display:inline-block;margin-top:4px;background:#f0fff4;color:#1a7f37;border:1px solid #b6e9c3;border-radius:6px;padding:3px 10px;font-size:11px;font-weight:700;letter-spacing:.04em">EXCELLENT</span></div>
-    </div>
-  </div>
-
-  <div class="g2" style="margin-bottom:20px">
-    <div class="card fi">
-      <h3 style="font-size:15px;font-weight:600;margin-bottom:18px">OSM Class Distribution</h3>
-      <div class="bars" id="osm-class-bars"></div>
-    </div>
-    <div class="card fi">
-      <h3 style="font-size:15px;font-weight:600;margin-bottom:18px">Object Type Breakdown</h3>
-      <div class="bars" id="osm-type-bars"></div>
-      <div style="margin-top:10px;font-size:11px;color:var(--dim);line-height:1.6">
-        <span style="color:#30d158;font-weight:700">relation</span> — polygon / multipolygon, ideal for topology &nbsp;|&nbsp;
-        <span style="color:#ff9f0a;font-weight:700">way</span> — closed way, acceptable &nbsp;|&nbsp;
-        <span style="color:#ff3b30;font-weight:700">node</span> — point, no polygon ⚠
-      </div>
-      <h3 style="font-size:15px;font-weight:600;margin-bottom:12px;margin-top:24px">Hierarchy Depth Distribution</h3>
-      <div class="pills" id="osm-depth-pills" style="flex-wrap:wrap;gap:6px"></div>
-    </div>
-  </div>
-
-  <div class="g2">
-    <div class="card fi">
-      <h3 style="font-size:15px;font-weight:600;margin-bottom:6px">Failure Analysis</h3>
-      <p style="font-size:13px;color:var(--dim);margin-bottom:16px">25 of 1,107 queries (2.3%) returned no result</p>
-      <div id="osm-failures"></div>
-    </div>
-    <div class="card fi">
-      <h3 style="font-size:15px;font-weight:600;margin-bottom:14px">Bounding Box Quality</h3>
-      <p style="font-size:13px;color:var(--dim);margin-bottom:14px"><strong>44</strong> point-like entries (bbox &lt; 0.01 km²) — no usable polygon extent</p>
-      <table id="osm-bbox-table" style="width:100%;border-collapse:collapse;font-size:13px"></table>
-      <div style="margin-top:16px;font-size:11px;color:var(--dim);line-height:1.7">
-        p0–p5 : points / buildings &nbsp;·&nbsp; p25–p50 : city districts, municipalities<br>
-        p50–p75 : cities, large parks &nbsp;·&nbsp; p75–p95 : counties, regions<br>
-        p95–p100 : states, countries, national rivers
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="div"></div>
-
 <!-- EXPERIMENT RESULTS -->
 <div class="sec" id="results-sec">
   <p class="eyebrow">Experiment Results</p>
@@ -834,7 +766,7 @@ async function initCoverageMap() {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// OSM RELIABILITY  –  static data + renderer
+// OSM RELIABILITY  –  removed
 // ═══════════════════════════════════════════════════════════════
 const OSM_DATA = {
   total: 1107, valid_count: 1082, none_count: 25,
@@ -1098,8 +1030,6 @@ async function init() {
     // ── Coverage Map (non-blocking) ──
     initCoverageMap().catch(e => console.warn('Map init:', e));
 
-    // ── OSM Reliability ──
-    renderOSMSection();
 
     // ── Footer ──
     const footerSub = document.getElementById('footer-sub');
