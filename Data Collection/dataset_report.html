@@ -502,7 +502,7 @@ footer strong{color:#f5f5f7}
   <div id="res-tabs" style="display:flex;gap:8px;margin-bottom:28px;flex-wrap:wrap">
     <button class="res-tab active" data-tab="topological">Topological</button>
     <button class="res-tab" data-tab="relative">Relative Direction</button>
-    <button class="res-tab" data-tab="cardinal">Cardinal Direction <span style="font-size:10px;opacity:.55">• running</span></button>
+    <button class="res-tab" data-tab="cardinal">Cardinal Direction</button>
   </div>
 
   <div id="res-panel-topological" class="res-panel fi"></div>
@@ -1156,13 +1156,14 @@ const RESULTS_DATA = {
     label: 'Cardinal Direction',
     color: '#30d158',
     n_eval: 32,
-    note: '8 directions · 4 examples/direction · experiments in progress',
+    note: '8 directions · 4 examples/direction · 6 experiments',
     exps: [
-      { id:'E1', name:'Base GPT-OSS-20B',       desc:'No adapter · 512 tok',              cot:null, tot:null, got:null },
-      { id:'E2', name:'Cardinal-LoRA',           desc:'Fine-tuned · 512 tok',              cot:null, tot:null, got:null },
-      { id:'E3', name:'Cardinal-KG LoRA + KG',  desc:'KG evidence at inference · 1024 tok', cot:null, tot:null, got:null },
-      { id:'E4', name:'Cardinal-KG LoRA (no KG)',desc:'KG in training only · 512 tok',     cot:null, tot:null, got:null },
-      { id:'E5', name:'Cardinal-LoRA + KG',     desc:'Extended KG inference · 1024 tok',   cot:null, tot:null, got:null },
+      { id:'E1', name:'Base GPT-OSS-20B',         desc:'No adapter · no KG · 1024 tok',          cot:62.5, tot:65.6, got:59.4 },
+      { id:'E2', name:'Fine-tuned LoRA',           desc:'No-KG LoRA · no KG at inference · 1024 tok', cot:40.6, tot:56.2, got:43.8 },
+      { id:'E3', name:'OSM-KG LoRA',               desc:'KG in training only · no KG at inference · 1024 tok', cot:50.0, tot:31.2, got:25.0 },
+      { id:'E4', name:'Base + KG as input',        desc:'No adapter · OSM KG injected at inference · 1024 tok', cot:50.0, tot:50.0, got:53.1 },
+      { id:'E5', name:'Fine-tuned LoRA + KG input',desc:'LoRA + OSM KG at inference · 1024 tok',  cot:43.8, tot:37.5, got:37.5 },
+      { id:'E6', name:'Base + KG RAG',             desc:'No adapter · retrieval-augmented KG · 1024 tok', cot:53.1, tot:56.2, got:65.6 },
     ]
   }
 };
