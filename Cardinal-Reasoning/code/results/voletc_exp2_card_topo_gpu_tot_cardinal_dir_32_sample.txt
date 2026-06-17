@@ -1,0 +1,1385 @@
+==========================================================================================
+  CARDINAL — TOT — EXP2_CARD_TOPO_GPU [cardinal_dir_32_sample]
+  Inference: GPU  |  Adapter: final_adapter
+  Started: 2026-06-16 18:31:17
+==========================================================================================
+
+
+==========================================================================================
+ROW 0 | City of Seattle ? City of Portland
+Expected: north_of
+==========================================================================================
+
+  [ToT] -- INPUT --
+City of Seattle ? City of Portland | corpus: To get to Seattle from Portland, you have to drive straight up Interstate 5.
+
+  [ToT] -- BRANCHES_RAW --
+"
+
+Now produce answer.
+
+Let's do branch 1: north_of.
+
+Answer: north_of
+
+Yes.
+
+Let's produce final answer accordingly.assistantfinalnorth_of
+
+  [ToT] -- BRANCH_1 --
+-> north_of
+
+  [ToT] FINAL: north_of
+
+RESULT | Expected=north_of | Predicted=north_of | CORRECT | Acc=100.00%
+
+==========================================================================================
+ROW 1 | Canada ? United States
+Expected: north_of
+==========================================================================================
+
+  [ToT] -- INPUT --
+Canada ? United States | corpus: Canada is situated just above the United States, occupying the top portion of the continent.
+
+  [ToT] -- BRANCHES_RAW --
+"
+
+We need to decide which part of the United States is Canada located on. Canada is north of the United States, i.e., the United States is south of Canada. Therefore, Canada is north_of the United States.
+
+Thus the correct answer is north_of.
+
+We choose branch focusing on national position.
+
+Conclusion:"
+
+Answer: north_of
+
+  [ToT] FINAL: north_of
+
+RESULT | Expected=north_of | Predicted=north_of | CORRECT | Acc=100.00%
+
+==========================================================================================
+ROW 2 | Scotland ? England
+Expected: north_of
+==========================================================================================
+
+  [ToT] -- INPUT --
+Scotland ? England | corpus: Scotland is located at the top of the island, sitting directly up from England.
+
+  [ToT] -- BRANCHES_RAW --
+"
+
+Now produce answer.
+
+Let's do branch 1: north_of.
+
+"BRANCH 1: north_of
+England occupies the southern part of the island; Scotland lies on the northern side.
+Answer: north_of"
+
+Yes.
+
+Let's output that.assistantfinal']="BRANCH 1: north_of
+England occupies the southern part of the island; Scotland lies on the northern side.
+Answer: north_of"}
+
+  [ToT] -- BRANCH_1 --
+-> north_of
+
+  [ToT] -- BRANCH_2 --
+-> north_of
+
+  [ToT] -- BRANCH_3 --
+-> north_of
+
+  [ToT] FINAL: north_of
+
+RESULT | Expected=north_of | Predicted=north_of | CORRECT | Acc=100.00%
+
+==========================================================================================
+ROW 3 | Mexico ? United States
+Expected: south_of
+==========================================================================================
+
+  [ToT] -- INPUT --
+Mexico ? United States | corpus: Mexico lies directly below the United States, taking up the lower part of the North American landmass.
+
+  [ToT] -- BRANCHES_RAW --
+"
+
+Now produce answer.
+
+Let's do branch 1: north/south.
+
+"BRANCH 1: north/south axis
+The United States occupies the northern half of the North American continent, while Mexico occupies the southern half. Therefore, Mexico is south of the United States.
+Answer: south_of"
+
+Check.
+
+Yes.
+
+Return that as final.assistantfinal']="BRANCH 1: north/south axis
+The United States occupies the northern half of the North American continent, while Mexico occupies the southern half. Therefore, Mexico is south of the United States.
+Answer: south_of"}
+
+  [ToT] -- BRANCH_1 --
+-> south_of
+
+  [ToT] -- BRANCH_2 --
+-> south_of
+
+  [ToT] -- BRANCH_3 --
+-> south_of
+
+  [ToT] FINAL: south_of
+
+RESULT | Expected=south_of | Predicted=south_of | CORRECT | Acc=100.00%
+
+==========================================================================================
+ROW 4 | City of Miami ? City of Orlando
+Expected: south_of
+==========================================================================================
+
+  [ToT] -- INPUT --
+City of Miami ? City of Orlando | corpus: If you are in Orlando, you need to head straight down the Florida peninsula to reach Miami.
+
+  [ToT] -- BRANCHES_RAW --
+"
+
+Now produce answer.
+
+Let's do path 1: north-south line.
+
+"BRANCH 1: north-south line"
+
+We are on north-south line, south is south, so south.
+
+Answer: south_of
+
+Yes.
+
+Let's output that.
+
+assistantfinal-->
+
+BRANCH 1: north-south line  
+You are on the north-south line of the Florida peninsula; south lies along this line.  
+Answer: south_of
+
+  [ToT] -- BRANCH_1 --
+-> south_of
+
+  [ToT] -- BRANCH_2 --
+-> south_of
+
+  [ToT] FINAL: south_of
+
+RESULT | Expected=south_of | Predicted=south_of | CORRECT | Acc=100.00%
+
+==========================================================================================
+ROW 5 | Italy ? Switzerland
+Expected: south_of
+==========================================================================================
+
+  [ToT] -- INPUT --
+Italy ? Switzerland | corpus: Italy extends downwards from Switzerland, pointing toward the bottom of the European map.
+
+  [ToT] -- BRANCHES_RAW --
+"
+
+Now produce answer.
+
+Let's do branch 1: north/south.
+
+"BRANCH 1: north/south axis
+Switzerland lies north of Italy; therefore Italy is south of Switzerland.
+Answer: south_of"
+
+Branch 2: east/west axis.
+
+"BRANCH 2: east/west axis
+Both countries run east-west; no east/west relation can be inferred.
+Answer: south_of"
+
+Branch 3: diagonal.
+
+"BRANCH 3: south-east/south-west axis
+Italy is south of Switzerland and slightly east, but the south component dominates.
+Answer: south_of"
+
+All three agree on south_of. So final answer south_of.
+
+Let's output accordingly.assistantfinalsouth_of
+
+  [ToT] -- BRANCH_1 --
+-> south_of
+
+  [ToT] -- BRANCH_2 --
+-> south_of
+
+  [ToT] -- BRANCH_3 --
+-> west_of
+
+  [ToT] -- BRANCH_4 --
+-> south_of
+
+  [ToT] -- BRANCH_5 --
+-> None
+
+  [ToT] -- BRANCH_6 --
+-> south_of
+
+  [ToT] FINAL: south_of
+
+RESULT | Expected=south_of | Predicted=south_of | CORRECT | Acc=100.00%
+
+==========================================================================================
+ROW 6 | Atlantic Ocean ? United States
+Expected: east_of
+==========================================================================================
+
+  [ToT] -- INPUT --
+Atlantic Ocean ? United States | corpus: On a standard map, the Atlantic Ocean sits immediately to the right of the United States.
+
+  [ToT] -- BRANCHES_RAW --
+"
+
+Now produce answer.
+
+Let's do branch 1: focus on 'right' -> east.
+
+Answer: east_of.
+
+Let's produce final answer accordingly.assistantfinalBRANCH 1: Focus on the phrase 'to the right of' which unambiguously indicates east on a standard map orientation.  
+Answer: east_of
+
+  [ToT] -- BRANCH_1 --
+-> southwest_of
+
+  [ToT] -- BRANCH_2 --
+-> east_of
+
+  [ToT] FINAL: southwest_of
+
+RESULT | Expected=east_of | Predicted=southwest_of | WRONG | Acc=85.71%
+
+==========================================================================================
+ROW 7 | State of Nevada ? State of California
+Expected: east_of
+==========================================================================================
+
+  [ToT] -- INPUT --
+State of Nevada ? State of California | corpus: When leaving California, you travel straight towards the morning sun to reach Nevada.
+
+  [ToT] -- BRANCHES_RAW --
+"
+
+Now produce answer.
+
+Let's craft answer:
+
+"BRANCH 1: Focus on the direction of travel described in the sentence.
+
+The sentence says you travel "straight towards the morning sun." The sun rises in the east, so the travel is eastwards.
+
+Thus, Nevada is east of California.
+
+Answer: east_of
+
+BRANCH 2: Focus on the relative position of Nevada within the United States.
+
+Nevada lies to the east of California.
+
+Answer: east_of
+
+BRANCH 3: Focus on the coastline orientation.
+
+Both states share the Pacific coast on their western side; moving eastwards from the coast places Nevada to the east of California.
+
+Answer: east_of"
+
+Return that.assistantfinalBRANCH 1: Focus on the direction of travel described in the sentence.  
+The sentence says you travel "straight towards the morning sun," which is eastwards.  
+Therefore, Nevada is east of California.  
+
+Answer: east_of
+
+BRANCH 2: Focus on the relative position of Nevada within the United States.  
+Nevada lies to the east of California.  
+
+Answer: east_of
+
+BRANCH 3: Focus on the coastline orientation.  
+Both states share the Pacific coast on their western side; moving eastwards from the coast places Nevada to the east of California.  
+
+Answer: east_of
+
+  [ToT] -- BRANCH_1 --
+-> east_of
+
+  [ToT] -- BRANCH_2 --
+-> east_of
+
+  [ToT] -- BRANCH_3 --
+-> east_of
+
+  [ToT] -- BRANCH_4 --
+-> east_of
+
+  [ToT] -- BRANCH_5 --
+-> east_of
+
+  [ToT] -- BRANCH_6 --
+-> east_of
+
+  [ToT] FINAL: east_of
+
+RESULT | Expected=east_of | Predicted=east_of | CORRECT | Acc=87.50%
+
+==========================================================================================
+ROW 8 | Japan ? China
+Expected: east_of
+==========================================================================================
+
+  [ToT] -- INPUT --
+Japan ? China | corpus: Japan is positioned to the right of China, facing the direction of the sunrise.
+
+  [ToT] -- BRANCHES_RAW --
+"
+
+Now produce answer.
+
+Let's do branch 1: east_of.
+
+Answer: east_of
+
+Now produce final answer with only the label.
+
+Thus final answer: east_of
+
+Let's output that.assistantfinaleast_of
+
+  [ToT] -- BRANCH_1 --
+-> east_of
+
+  [ToT] FINAL: east_of
+
+RESULT | Expected=east_of | Predicted=east_of | CORRECT | Acc=88.89%
+
+==========================================================================================
+ROW 9 | Pacific Ocean ? United States
+Expected: west_of
+==========================================================================================
+
+  [ToT] -- INPUT --
+Pacific Ocean ? United States | corpus: The Pacific Ocean is located immediately to the left of the United States.
+
+  [ToT] -- BRANCHES_RAW --
+"
+
+Now produce answer.
+
+Let's do branch 1: left side => west_of.
+
+Branch 2: left side => west_of.
+
+Branch 3: left side => west_of.
+
+Thus answer: west_of.
+
+Return as per format.
+
+Let's produce final answer.
+
+assistantfinal>
+
+BRANCH 1: Focus on the phrase 'to the left of' and interpret it as the western side.
+
+The country lies on the left side of the country, so the ocean is on the west side.
+
+Answer: west_of
+
+  [ToT] -- BRANCH_1 --
+-> west_of
+
+  [ToT] -- BRANCH_2 --
+-> west_of
+
+  [ToT] -- BRANCH_3 --
+-> southwest_of
+
+  [ToT] -- BRANCH_4 --
+-> west_of
+
+  [ToT] FINAL: west_of
+
+RESULT | Expected=west_of | Predicted=west_of | CORRECT | Acc=90.00%
+
+==========================================================================================
+ROW 10 | Portugal ? Spain
+Expected: west_of
+==========================================================================================
+
+  [ToT] -- INPUT --
+Portugal ? Spain | corpus: Portugal occupies the left-hand side of the Iberian Peninsula, sitting right next to Spain.
+
+  [ToT] -- BRANCHES_RAW --
+"
+
+Now produce answer.
+
+Let's do branch 1: east/west.
+
+"BRANCH 1: east/west orientation
+
+Spain covers the eastern side of the Iberian Peninsula, while Portugal lies on the western side. Therefore Portugal is to the west of Spain.
+
+Answer: west_of"
+
+Yes.
+
+Let's output that.assistantfinal']="BRANCH 1: east/west orientation
+
+Spain covers the eastern side of the Iberian Peninsula, while Portugal lies on the western side. Therefore Portugal is to the west of Spain.
+
+Answer: west_of"}
+
+  [ToT] -- BRANCH_1 --
+-> west_of
+
+  [ToT] -- BRANCH_2 --
+-> west_of
+
+  [ToT] -- BRANCH_3 --
+-> west_of
+
+  [ToT] FINAL: west_of
+
+RESULT | Expected=west_of | Predicted=west_of | CORRECT | Acc=90.91%
+
+==========================================================================================
+ROW 11 | State of California ? State of Nevada
+Expected: west_of
+==========================================================================================
+
+  [ToT] -- INPUT --
+State of California ? State of Nevada | corpus: To get to California from Nevada, you just keep driving straight toward the sunset.
+
+  [ToT] -- BRANCHES_RAW --
+'
+
+Now produce answer: 'west_of'.
+
+Let's output accordingly.assistantfinal']='BRANCH 1: Focus on the phrase "toward the sunset" which indicates the direction of the sun in the northern hemisphere.
+
+Nevada is west of California; the sun rises in the east, so moving eastward is southward.
+
+Thus, California is west of Nevada.
+
+Answer: west_of
+
+  [ToT] -- BRANCH_1 --
+-> west_of
+
+  [ToT] FINAL: west_of
+
+RESULT | Expected=west_of | Predicted=west_of | CORRECT | Acc=91.67%
+
+==========================================================================================
+ROW 12 | State of Maine ? State of New York
+Expected: northeast_of
+==========================================================================================
+
+  [ToT] -- INPUT --
+State of Maine ? State of New York | corpus: The State of Maine is located in the upper right corner relative to New York.
+
+  [ToT] -- BRANCHES_RAW --
+'
+
+We reason: New York is east of Canada, so Maine is east of New York. It is also north, so northeast.
+
+Thus final answer: northeast_of
+
+Return result.assistantfinal='north_of'
+
+  [ToT] FINAL: north_of
+
+RESULT | Expected=northeast_of | Predicted=north_of | WRONG | Acc=84.62%
+
+==========================================================================================
+ROW 13 | City of Boston ? City of Philadelphia
+Expected: northeast_of
+==========================================================================================
+
+  [ToT] -- INPUT --
+City of Boston ? City of Philadelphia | corpus: From Philadelphia, traveling to Boston means moving up and to the right along the coast.
+
+  [ToT] -- BRANCHES_RAW --
+"
+
+Now produce answer.
+
+Let's do branch 1: focus on coast orientation.
+
+"BRANCH 1: coast orientation
+
+I am on the Atlantic coast, which lies to the east of Philadelphia. Moving north along the coast keeps me east of the city.
+
+Answer: east_of"
+
+Yes.
+
+Return that.assistantfinalBRANCH 1: coast orientation
+
+I am on the Atlantic coast, which lies to the east of Philadelphia. Moving north along the coast keeps me east of the city.
+
+Answer: east_of
+
+  [ToT] -- BRANCH_1 --
+-> None
+
+  [ToT] -- BRANCH_2 --
+-> east_of
+
+  [ToT] -- BRANCH_3 --
+-> east_of
+
+  [ToT] FINAL: east_of
+
+RESULT | Expected=northeast_of | Predicted=east_of | WRONG | Acc=78.57%
+
+==========================================================================================
+ROW 14 | Japan ? Taiwan
+Expected: northeast_of
+==========================================================================================
+
+  [ToT] -- INPUT --
+Japan ? Taiwan | corpus: Looking at the map, Japan is situated diagonally up and towards the sunrise from Taiwan.
+
+  [ToT] -- BRANCHES_RAW --
+"
+
+Now produce answer.
+
+Let's do branch 1: north_of.
+
+"BRANCH 1: north_of
+Taiwan lies on the eastern coast of China, with the sea to its east. Japan is east of Taiwan, so it must be north_of.
+
+Answer: north_of"
+
+Yes.
+
+Let's output that.assistantfinal']="BRANCH 1: north_of
+Taiwan lies on the eastern coast of China, with the sea to its east. Japan is east of Taiwan, so it must be north_of.
+
+Answer: north_of
+
+  [ToT] -- BRANCH_1 --
+-> north_of
+
+  [ToT] -- BRANCH_2 --
+-> north_of
+
+  [ToT] -- BRANCH_3 --
+-> north_of
+
+  [ToT] FINAL: north_of
+
+RESULT | Expected=northeast_of | Predicted=north_of | WRONG | Acc=73.33%
+
+==========================================================================================
+ROW 15 | State of Washington ? State of Colorado
+Expected: northwest_of
+==========================================================================================
+
+  [ToT] -- INPUT --
+State of Washington ? State of Colorado | corpus: The State of Washington sits in the extreme upper left quadrant of the country compared to Colorado.
+
+  [ToT] -- BRANCHES_RAW --
+"
+
+Now produce answer.
+
+Let's do reasoning path 1: focus on 'north/south'.
+
+"The State of Washington is in the northern half of the United States, while Colorado is in the central western half. Therefore Washington is north of Colorado.
+
+Answer: north_of"
+
+Yes.
+
+We can produce that as final.assistantfinal']="north_of
+
+  [ToT] FINAL: north_of
+
+RESULT | Expected=northwest_of | Predicted=north_of | WRONG | Acc=68.75%
+
+==========================================================================================
+ROW 16 | City of Seattle ? City of Las Vegas
+Expected: northwest_of
+==========================================================================================
+
+  [ToT] -- INPUT --
+City of Seattle ? City of Las Vegas | corpus: If you fly from Las Vegas to Seattle, your plane heads up and to the left.
+
+  [ToT] -- BRANCHES_RAW --
+"
+
+Now produce answer.
+
+Let's do branch 1: north_of.
+
+"BRANCH 1: north_of
+You are moving northwards from Las Vegas and must move westwards to reach Seattle, which is north-west.
+Answer: north-west_of"
+
+Branch 2: west_of.
+
+"BRANCH 2: west_of
+You are moving westwards from Las Vegas and must move northwards to reach Seattle, which is north-west.
+Answer: north-west_of"
+
+Branch 3: east_of.
+
+"BRANCH 3: east_of
+You are moving eastwards from Las Vegas and must turn around to head westwards to reach Seattle.
+Answer: north-west_of"
+
+All branches agree on north-west_of.
+
+Thus final answer: north-west_of.
+
+Let's output that.
+
+assistantfinal>
+
+north-west_of
+
+  [ToT] -- BRANCH_1 --
+-> north_of
+
+  [ToT] -- BRANCH_2 --
+-> west_of
+
+  [ToT] -- BRANCH_3 --
+-> west_of
+
+  [ToT] -- BRANCH_4 --
+-> west_of
+
+  [ToT] -- BRANCH_5 --
+-> east_of
+
+  [ToT] -- BRANCH_6 --
+-> west_of
+
+  [ToT] FINAL: west_of
+
+RESULT | Expected=northwest_of | Predicted=west_of | WRONG | Acc=64.71%
+
+==========================================================================================
+ROW 17 | Iceland ? United Kingdom
+Expected: northwest_of
+==========================================================================================
+
+  [ToT] -- INPUT --
+Iceland ? United Kingdom | corpus: Iceland is positioned diagonally up and towards the setting sun from the United Kingdom.
+
+  [ToT] -- BRANCHES_RAW --
+"
+
+Now produce answer.
+
+Let's do branch 1: focus on 'east_of' because of 'up and towards the setting sun'.
+
+Answer: east_of
+
+Let's produce final answer accordingly.assistantfinaleast_of
+
+  [ToT] -- BRANCH_1 --
+-> east_of
+
+  [ToT] FINAL: east_of
+
+RESULT | Expected=northwest_of | Predicted=east_of | WRONG | Acc=61.11%
+
+==========================================================================================
+ROW 18 | State of Florida ? State of Alabama
+Expected: southeast_of
+==========================================================================================
+
+  [ToT] -- INPUT --
+State of Florida ? State of Alabama | corpus: The State of Florida hangs down and to the right from the border of Alabama.
+
+  [ToT] -- BRANCHES_RAW --
+"
+
+Now produce answer.
+
+Let's do branch 1: north/south.
+
+"BRANCH 1: north/south axis
+Alabama lies along the north/south axis with its north side in the north and its south side in the south.
+The phrase 'to the right' does not inform north/south position.
+Thus the south/north position is unchanged.
+Answer: south_of"
+
+Branch 2: east/west.
+
+"BRANCH 2: east/west axis
+Along the east/west axis, Alabama's east side is east and its west side is west.
+'To the right' from this orientation points to the east side of Alabama.
+Answer: east_of"
+
+Branch 3: east/west orientation.
+
+"BRANCH 3: east/west orientation
+When facing the north side of Alabama, the right side is east.
+Therefore Florida is on the east side of Alabama.
+Answer: east_of"
+
+Now produce final answer as list.
+
+Let's do that.
+
+assistantfinal>
+
+south_of, east_of, east_of
+
+  [ToT] -- BRANCH_1 --
+-> south_of
+
+  [ToT] -- BRANCH_2 --
+-> south_of
+
+  [ToT] -- BRANCH_3 --
+-> west_of
+
+  [ToT] -- BRANCH_4 --
+-> east_of
+
+  [ToT] -- BRANCH_5 --
+-> west_of
+
+  [ToT] -- BRANCH_6 --
+-> east_of
+
+  [ToT] FINAL: east_of
+
+RESULT | Expected=southeast_of | Predicted=east_of | WRONG | Acc=57.89%
+
+==========================================================================================
+ROW 19 | City of Miami ? City of Atlanta
+Expected: southeast_of
+==========================================================================================
+
+  [ToT] -- INPUT --
+City of Miami ? City of Atlanta | corpus: To drive from Atlanta to Miami, you must travel diagonally down and towards the morning sun.
+
+  [ToT] -- BRANCHES_RAW --
+"
+
+Now produce answer.
+
+Let's do branch 1: focus on longitude (east/west).
+
+"Answer: east_of."
+
+Yes.
+
+Let's produce final answer with that branch.
+
+Ok.assistantfinal-->
+
+BRANCH 1: Focus on longitude (east/west) of the states.
+
+Both Georgia and Florida lie on the same meridian, so their north-south position is identical. The key is the east-west position: Georgia is west of Florida.
+
+Thus, Miami is east of Atlanta.
+
+Answer: east_of
+
+  [ToT] -- BRANCH_1 --
+-> southwest_of
+
+  [ToT] -- BRANCH_2 --
+-> east_of
+
+  [ToT] FINAL: east_of
+
+RESULT | Expected=southeast_of | Predicted=east_of | WRONG | Acc=55.00%
+
+==========================================================================================
+ROW 20 | Australia ? India
+Expected: southeast_of
+==========================================================================================
+
+  [ToT] -- INPUT --
+Australia ? India | corpus: On a world map, Australia is located in the lower right direction from India.
+
+  [ToT] -- BRANCHES_RAW --
+"
+
+Now produce answer.
+
+Let's do branch 1: focus on longitudinal position.
+
+"BRANCH 1: longitudinal position
+India spans roughly from 68°E to 98°E; Australia lies between 112°E and 154°E, which is east of India.
+Answer: east_of"
+
+Branch 2: focus on latitude.
+
+"BRANCH 2: latitude
+India lies between about 6°N and 38°N; Australia is south of this band, around 10°S to 44°S, so south.
+Answer: south_of"
+
+Branch 3: combine both.
+
+"BRANCH 3: combined east_and_south
+Australia is both east and south of India, the southeast corner of the world.
+Answer: southeast_of"
+
+Return all branches.
+
+Let's produce final answer accordingly.assistantfinalBRANCH 1: longitudinal position  
+India spans roughly from 68°E to 98°E; Australia lies between 112°E and 154°E, which is east of India.  
+Answer: east_of  
+
+BRANCH 2: latitude  
+India lies between about 6°N and 38°N; Australia is south of this band, around 10°S to 44°S.  
+Answer: south_of  
+
+BRANCH 3: combined east_and_south  
+Australia is both east and south of India, the southeast corner of the world.  
+Answer: southeast_of
+
+  [ToT] -- BRANCH_1 --
+-> None
+
+  [ToT] -- BRANCH_2 --
+-> east_of
+
+  [ToT] -- BRANCH_3 --
+-> None
+
+  [ToT] -- BRANCH_4 --
+-> south_of
+
+  [ToT] -- BRANCH_5 --
+-> northeast_of
+
+  [ToT] -- BRANCH_6 --
+-> southwest_of
+
+  [ToT] -- BRANCH_7 --
+-> east_of
+
+  [ToT] -- BRANCH_8 --
+-> south_of
+
+  [ToT] -- BRANCH_9 --
+-> east_of
+
+  [ToT] FINAL: east_of
+
+RESULT | Expected=southeast_of | Predicted=east_of | WRONG | Acc=52.38%
+
+==========================================================================================
+ROW 21 | State of Arizona ? State of Utah
+Expected: southwest_of
+==========================================================================================
+
+  [ToT] -- INPUT --
+State of Arizona ? State of Utah | corpus: The State of Arizona sits diagonally down and to the left from Utah.
+
+  [ToT] -- BRANCHES_RAW --
+"
+
+Now produce answer.
+
+Let's do branch 1: focus on 'down' indicates south.
+
+"BRANCH 1: focus on vertical 'down' direction.
+The phrase says 'down and to the left' from Utah.
+'Down' corresponds to south, 'to the left' corresponds to west.
+Combine them: south and to the left = south-west.
+Answer: south-west_of."
+
+Branch 2: focus on diagonal description.
+
+"BRANCH 2: focus on the phrase 'diagonally down and to the left'.
+A diagonal movement combining south and west yields south-west.
+Answer: south-west_of."
+
+Branch 3: focus on relative position.
+
+"BRANCH 3: consider that Utah is east of Arizona.
+Thus Arizona lies to the west of Utah.
+Answer: west_of."
+
+All branches agree on south-west_of, but the most precise is south-west_of.
+
+Final answer: south-west_of
+
+Let's output that.
+
+assistantfinal>
+
+BRANCH 1: focus on the vertical component 'down' → south.  
+BRANCH 2: focus on the horizontal component 'to the left' → west.  
+BRANCH 3: combine both to get a south‑west movement.
+
+Answer: south-west_of
+
+  [ToT] -- BRANCH_1 --
+-> south_of
+
+  [ToT] -- BRANCH_2 --
+-> west_of
+
+  [ToT] -- BRANCH_3 --
+-> None
+
+  [ToT] -- BRANCH_4 --
+-> west_of
+
+  [ToT] -- BRANCH_5 --
+-> None
+
+  [ToT] -- BRANCH_6 --
+-> west_of
+
+  [ToT] -- BRANCH_7 --
+-> south_of
+
+  [ToT] -- BRANCH_8 --
+-> west_of
+
+  [ToT] -- BRANCH_9 --
+-> west_of
+
+  [ToT] FINAL: west_of
+
+RESULT | Expected=southwest_of | Predicted=west_of | WRONG | Acc=50.00%
+
+==========================================================================================
+ROW 22 | City of San Diego ? City of Denver
+Expected: southwest_of
+==========================================================================================
+
+  [ToT] -- INPUT --
+City of San Diego ? City of Denver | corpus: When flying from Denver to San Diego, you head diagonally down towards the evening sun.
+
+  [ToT] -- BRANCHES_RAW --
+"
+
+Now produce answer.
+
+Let's do branch 1: north_of.
+
+"BRANCH 1: north_of
+You are asserting north_of.
+Answer: north_of"
+
+Yes.
+
+Let's output that.assistantfinal']="BRANCH 1: north_of
+You are asserting north_of.
+Answer: north_of"}
+
+  [ToT] -- BRANCH_1 --
+-> north_of
+
+  [ToT] -- BRANCH_2 --
+-> north_of
+
+  [ToT] -- BRANCH_3 --
+-> north_of
+
+  [ToT] FINAL: north_of
+
+RESULT | Expected=southwest_of | Predicted=north_of | WRONG | Acc=47.83%
+
+==========================================================================================
+ROW 23 | Spain ? France
+Expected: southwest_of
+==========================================================================================
+
+  [ToT] -- INPUT --
+Spain ? France | corpus: Spain occupies the lower left region when looking from the center of France.
+
+  [ToT] -- BRANCHES_RAW --
+"
+
+Now produce answer.
+
+Let's do branch 1: focus on 'south' because lower side.
+
+"Answer: south_of"
+
+Branch 2: focus on 'west' because left side.
+
+"Answer: west_of"
+
+Branch 3: focus on 'southwest' as it is both south and west.
+
+"Answer: southwest_of"
+
+Return all branches.
+
+Let's output accordingly.assistantfinalBRANCH 1: I consider the north–south axis. The phrase "lower left region" indicates the south side of France.  
+Answer: south_of
+
+BRANCH 2: I consider the east–west axis. The phrase "left region" indicates the west side of France.  
+Answer: west_of
+
+BRANCH 3: I combine both axes. The south side and the left side together form the south‑west quadrant of France.  
+Answer: southwest_of
+
+  [ToT] -- BRANCH_1 --
+-> south_of
+
+  [ToT] -- BRANCH_2 --
+-> west_of
+
+  [ToT] -- BRANCH_3 --
+-> west_of
+
+  [ToT] -- BRANCH_4 --
+-> south_of
+
+  [ToT] -- BRANCH_5 --
+-> west_of
+
+  [ToT] -- BRANCH_6 --
+-> west_of
+
+  [ToT] FINAL: west_of
+
+RESULT | Expected=southwest_of | Predicted=west_of | WRONG | Acc=45.83%
+
+==========================================================================================
+ROW 24 | City of Edmonton ? City of Calgary
+Expected: north_of
+==========================================================================================
+
+  [ToT] -- INPUT --
+City of Edmonton ? City of Calgary | corpus: To drive from Calgary to Edmonton, you have to head straight towards the 12 o'clock position on your map.
+
+  [ToT] -- BRANCHES_RAW --
+"
+
+Now produce answer.
+
+Let's do branch 1: north_of.
+
+"BRANCH 1: north_of
+Calgary lies to the west of the Rocky Mountains; Edmonton is east of those mountains, so north_of.
+Answer: north_of"
+
+Yes.
+
+Return that as final.assistantfinalBRANCH 1: north_of
+Calgary lies to the west of the Rocky Mountains, while Edmonton is to the east of those mountains, so Edmonton is north_of Calgary.
+Answer: north_of
+
+  [ToT] -- BRANCH_1 --
+-> north_of
+
+  [ToT] -- BRANCH_2 --
+-> north_of
+
+  [ToT] -- BRANCH_3 --
+-> north_of
+
+  [ToT] FINAL: north_of
+
+RESULT | Expected=north_of | Predicted=north_of | CORRECT | Acc=48.00%
+
+==========================================================================================
+ROW 25 | Norway ? Denmark
+Expected: north_of
+==========================================================================================
+
+  [ToT] -- INPUT --
+Norway ? Denmark | corpus: Norway is located directly upwards on the latitudinal grid from Denmark, pushing deeper into the colder climates.
+
+  [ToT] -- BRANCHES_RAW --
+"
+
+We choose branch: north_of
+
+Proceed: Norway lies to the north of Denmark.
+
+Answer: north_of
+
+  [ToT] FINAL: north_of
+
+RESULT | Expected=north_of | Predicted=north_of | CORRECT | Acc=50.00%
+
+==========================================================================================
+ROW 26 | State of Minnesota ? State of Iowa
+Expected: north_of
+==========================================================================================
+
+  [ToT] -- INPUT --
+State of Minnesota ? State of Iowa | corpus: If you leave Iowa, keep moving vertically toward the top of the map to cross the border into Minnesota.
+
+  [ToT] -- BRANCHES_RAW --
+"
+
+Now produce answer.
+
+Let's do branch 1: north_of.
+
+Answer: north_of
+
+Check.
+
+Yes.
+
+Now produce final answer.
+
+assistantfinal-->
+
+north_of
+
+  [ToT] -- BRANCH_1 --
+-> north_of
+
+  [ToT] FINAL: north_of
+
+RESULT | Expected=north_of | Predicted=north_of | CORRECT | Acc=51.85%
+
+==========================================================================================
+ROW 27 | State of Texas ? State of Oklahoma
+Expected: south_of
+==========================================================================================
+
+  [ToT] -- INPUT --
+State of Texas ? State of Oklahoma | corpus: Texas is situated directly underneath Oklahoma on the map, pointing straight toward the equator.
+
+  [ToT] -- BRANCHES_RAW --
+"
+
+We need to decide which direction Texas is relative to Oklahoma.
+
+Texas is south of Oklahoma. So answer south_of.
+
+We must produce three branches.
+
+Let's craft them.
+
+Branch 1: focus on north-south axis.
+
+"North-south axis: Oklahoma lies north of Texas; therefore Texas is south of Oklahoma."
+
+Answer: south_of
+
+Branch 2: focus on latitudinal position.
+
+"Latitudinal position: Both states are in the same latitude band; the only difference is north-south position, with Texas lower, so south_of."
+
+Answer: south_of
+
+Branch 3: focus on cardinal directions overall.
+
+"Cardinal directions: The east-west axis is unchanged; the north-south direction is south, so south_of."
+
+Answer: south_of
+
+Return with labels.
+
+Let's produce final answer.assistantfinalBRANCH 1: north-south axis  
+Oklahoma lies to the north of Texas.  
+Thus Texas is south of Oklahoma.  
+Answer: south_of  
+
+BRANCH 2: latitudinal position  
+Both states occupy the same latitude band; the only variation is in the north-south direction, with Texas lower.  
+Therefore south_of.  
+Answer: south_of  
+
+BRANCH 3: overall cardinal direction  
+The east-west orientation is unchanged; the north-south orientation is south.  
+So south_of.  
+Answer: south_of
+
+  [ToT] -- BRANCH_1 --
+-> south_of
+
+  [ToT] -- BRANCH_2 --
+-> south_of
+
+  [ToT] -- BRANCH_3 --
+-> south_of
+
+  [ToT] -- BRANCH_4 --
+-> south_of
+
+  [ToT] -- BRANCH_5 --
+-> south_of
+
+  [ToT] -- BRANCH_6 --
+-> south_of
+
+  [ToT] FINAL: south_of
+
+RESULT | Expected=south_of | Predicted=south_of | CORRECT | Acc=53.57%
+
+==========================================================================================
+ROW 28 | City of San Antonio ? City of Austin
+Expected: south_of
+==========================================================================================
+
+  [ToT] -- INPUT --
+City of San Antonio ? City of Austin | corpus: Leaving Austin, you just drop straight down the highway towards the 6 o'clock mark to get to San Antonio.
+
+  [ToT] -- BRANCHES_RAW --
+"
+
+Now produce answer.
+
+Let's do branch 1: focus on road orientation.
+
+"Answer: south_of"
+
+Let's produce final answer accordingly.
+
+assistantfinal-->
+
+south_of
+
+  [ToT] -- BRANCH_1 --
+-> south_of
+
+  [ToT] FINAL: south_of
+
+RESULT | Expected=south_of | Predicted=south_of | CORRECT | Acc=55.17%
+
+==========================================================================================
+ROW 29 | Cuba ? State of Florida
+Expected: south_of
+==========================================================================================
+
+  [ToT] -- INPUT --
+Cuba ? State of Florida | corpus: Cuba sits at a lower latitude, positioned exactly downwards from the tip of Florida.
+
+  [ToT] -- BRANCHES_RAW --
+"
+
+Now produce answer.
+
+Let's do branch 1: north-south axis.
+
+"BRANCH 1: north-south axis
+The tip of Florida lies at its northernmost point. Moving directly south along this axis takes you into the ocean and then southwards towards the equator. Cuba is located on the northern side of this axis, so it must be south of Florida.
+Answer: south_of"
+
+Yes.
+
+Let's output that.assistantfinal']="BRANCH 1: north-south axis
+The tip of Florida lies at its northernmost point. Moving directly south along this axis takes you into the ocean and then southwards towards the equator. Cuba is located on the northern side of this axis, so it must be south of Florida.
+Answer: south_of"}
+
+  [ToT] -- BRANCH_1 --
+-> south_of
+
+  [ToT] -- BRANCH_2 --
+-> south_of
+
+  [ToT] -- BRANCH_3 --
+-> south_of
+
+  [ToT] FINAL: south_of
+
+RESULT | Expected=south_of | Predicted=south_of | CORRECT | Acc=56.67%
+
+==========================================================================================
+ROW 30 | State of Ohio ? State of Indiana
+Expected: east_of
+==========================================================================================
+
+  [ToT] -- INPUT --
+State of Ohio ? State of Indiana | corpus: Ohio is positioned immediately rightward of Indiana, sliding along the exact same horizontal parallel.
+
+  [ToT] -- BRANCHES_RAW --
+"
+
+Now produce answer.
+
+Let's do branch 1: east_of.
+
+Answer: east_of
+
+Yes.
+
+Let's produce final answer accordingly.assistantfinal">east_of
+
+  [ToT] -- BRANCH_1 --
+-> east_of
+
+  [ToT] FINAL: east_of
+
+RESULT | Expected=east_of | Predicted=east_of | CORRECT | Acc=58.06%
+
+==========================================================================================
+ROW 31 | City of Tokyo ? City of Seoul
+Expected: east_of
+==========================================================================================
+
+  [ToT] -- INPUT --
+City of Tokyo ? City of Seoul | corpus: Flying from Seoul to Tokyo requires heading straight towards the 3 o'clock mark on your compass.
+
+  [ToT] -- BRANCHES_RAW --
+"
+
+Now produce answer.
+
+Let's do reasoning path 1: east.
+
+Answer: east_of.
+
+But we need to show reasoning path.
+
+Let's produce full answer with reasoning.
+
+Ok.
+
+Answer: east_of.
+
+But we need to show reasoning path.
+
+Let's produce:
+
+"BRANCH 1: Identify the eastward component of the journey.
+
+From Seoul, the Pacific Ocean lies to the east, and Tokyo is on that coast, so the journey is eastward.
+
+Answer: east_of."
+
+Yes.
+
+Let's output that.
+
+assistantfinal-->
+
+BRANCH 1: Identify the eastward component of the journey.  
+From Seoul, the Pacific Ocean lies to the east, and Tokyo is on that coast, so the journey is eastward.  
+
+Answer: east_of
+
+  [ToT] -- BRANCH_1 --
+-> east_of
+
+  [ToT] -- BRANCH_2 --
+-> east_of
+
+  [ToT] FINAL: east_of
+
+RESULT | Expected=east_of | Predicted=east_of | CORRECT | Acc=59.38%
+
+FINAL ACCURACY: 59.38% (19/32)

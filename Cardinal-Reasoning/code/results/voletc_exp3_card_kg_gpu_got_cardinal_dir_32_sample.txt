@@ -1,0 +1,1054 @@
+==========================================================================================
+  CARDINAL — GOT — EXP3_CARD_KG_GPU [cardinal_dir_32_sample]
+  Inference: GPU  |  Adapter: final_adapter
+  Started: 2026-06-16 19:18:18
+==========================================================================================
+
+
+==========================================================================================
+ROW 0 | City of Seattle ? City of Portland
+Expected: north_of
+==========================================================================================
+
+  [GoT] -- INPUT --
+City of Seattle ? City of Portland | corpus: To get to Seattle from Portland, you have to drive straight up Interstate 5.
+
+  [GoT] -- PHASE1_RAW --
+THOUGHT 1: <directional focus>
+End with Direction: [direction]
+
+Repeat for THOUGHT 2, 3, and 4, exploring different aspects of the route.
+
+Finally, combine the four directions into a consensus direction and state it clearly.
+
+Answer with the consensus direction in brackets.
+
+Compass directions are north, south, east, west, north-east, north-west, south-east, south-west. Use the forms north_of, south_of, east_of, west_of, north-east_of, north-west_of, south-east_of, south-west_of. ]"
+
+THOUGHT 1: directional focus - north-south axis
+I am considering the north-south component of the route.
+The road runs north-south along the I-5 corridor.
+Portland lies to the west of the I-5 axis, but the road takes you north along this axis.
+Direction: north_of
+
+THOUGHT 2: longitudinal focus - west-east axis
+I am examining the west-east axis of the route.
+The road runs north-south, so there is no west-east motion.
+However, the road's orientation is north-south, implying no east-west displacement.
+Direction: north_of
+
+THOUGHT 3: cardinal direction - north
+The route is described as "straight up" on I-5.
+"Straight up" unambiguously means north.
+Direction: north_of
+
+THOUGHT 4: route orientation - north-south axis
+I am confirming the north-south orientation of the road.
+Interstate 5 runs north-south through this region.
+A northbound trajectory on I-5 is the only direction possible.
+Direction: north_of
+
+Consensus direction: north_of }
+
+  [GoT] FINAL: north_of
+
+RESULT | Expected=north_of | Predicted=north_of | CORRECT | Acc=100.00%
+
+==========================================================================================
+ROW 1 | Canada ? United States
+Expected: north_of
+==========================================================================================
+
+  [GoT] -- INPUT --
+Canada ? United States | corpus: Canada is situated just above the United States, occupying the top portion of the continent.
+
+  [GoT] -- PHASE1_RAW --
+"
+
+THOUGHT 1: vertical axis focus
+  Reason: north-south orientation
+  The phrase "just above" indicates northward direction.
+  Direction: north_of
+
+THOUGHT 2: horizontal axis check
+  Reason: east-west extent is irrelevant for "above/below" descriptors.
+  No east-west component is specified.
+  Direction: (none)
+
+THOUGHT 3: qualifier consistency
+  Reason: "the top portion of the continent" reinforces northward position.
+  Direction: north_of
+
+THOUGHT 4: synthesis
+  Reason: combine vertical and horizontal analyses.
+  Vertical axis gives north_of; horizontal axis is unspecified.
+  Final direction: north_of
+
+Answer: north_of
+
+  [GoT] FINAL: north_of
+
+RESULT | Expected=north_of | Predicted=north_of | CORRECT | Acc=100.00%
+
+==========================================================================================
+ROW 2 | Scotland ? England
+Expected: north_of
+==========================================================================================
+
+  [GoT] -- INPUT --
+Scotland ? England | corpus: Scotland is located at the top of the island, sitting directly up from England.
+
+  [GoT] -- PHASE1_RAW --
+THOUGHT 1: cardinal direction axis
+  - Axis choice: north-south or east-west
+  - Here, the axis is north-south.
+  - Direction along axis: north_of England.
+
+End: Direction: north_of
+
+Next: THOUGHT 2: relative position phrase
+  - Phrase meaning: "directly up from"
+  - Interprets as "to the north of".
+  - Consistent with axis choice.
+
+End: Direction: north_of
+
+Next: THOUGHT 3: island orientation rule
+  - Islands run north-south; "up" means north.
+  - "down" would mean south.
+  - "up" = north_of the island.
+
+End: Direction: north_of
+
+Final: THOUGHT 4: consistency check
+  - All clues point north_of.
+  - No contradictions.
+
+End: Direction: north_of
+
+Answer: north_of
+
+  [GoT] FINAL: northeast_of
+
+RESULT | Expected=north_of | Predicted=northeast_of | WRONG | Acc=66.67%
+
+==========================================================================================
+ROW 3 | Mexico ? United States
+Expected: south_of
+==========================================================================================
+
+  [GoT] -- INPUT --
+Mexico ? United States | corpus: Mexico lies directly below the United States, taking up the lower part of the North American landmass.
+
+  [GoT] -- PHASE1_RAW --
+"
+
+THOUGHT 1: south_of
+  Reason: the phrase "below the United States" indicates a southward position.
+  Direction: south_of
+
+THOUGHT 2: south_of
+  Reason: "Mexico lies directly below the United States" specifies due south.
+  Direction: south_of
+
+THOUGHT 3: south_of
+  Reason: the landmass description places Mexico in the lower part of North America, i.e., south.
+  Direction: south_of
+
+THOUGHT 4: south_of
+  Reason: no east/west component is given; the relation is purely southward.
+  Direction: south_of
+
+Answer: south_of
+
+  [GoT] FINAL: south_of
+
+RESULT | Expected=south_of | Predicted=south_of | CORRECT | Acc=75.00%
+
+==========================================================================================
+ROW 4 | City of Miami ? City of Orlando
+Expected: south_of
+==========================================================================================
+
+  [GoT] -- INPUT --
+City of Miami ? City of Orlando | corpus: If you are in Orlando, you need to head straight down the Florida peninsula to reach Miami.
+
+  [GoT] -- PHASE1_RAW --
+THOUGHT 1: <direction along the peninsula>
+  Reason: the peninsula runs north-south.
+  Direction: south_of
+
+  THOUGHT 2: <orientation of the peninsula}
+  Reason: it extends north-south, south to north.
+  Direction: south_of
+
+  THOUGHT 3: <east-west extent}
+  Reason: the landmass is west of the Atlantic Ocean.
+  Direction: west_of
+
+  THOUGHT 4: <cross-relation}
+  Reason: combining north-south and east-west facts, the only consistent direction is south along the length of the peninsula.
+  Direction: south_of
+
+Answer: south_of
+
+  [GoT] FINAL: south_of
+
+RESULT | Expected=south_of | Predicted=south_of | CORRECT | Acc=80.00%
+
+==========================================================================================
+ROW 5 | Italy ? Switzerland
+Expected: south_of
+==========================================================================================
+
+  [GoT] -- INPUT --
+Italy ? Switzerland | corpus: Italy extends downwards from Switzerland, pointing toward the bottom of the European map.
+
+  [GoT] -- PHASE1_RAW --
+THOUGHT 1: directional axis – south–north band
+  Reason: south–north band runs east–west; south end is the direction of extension.
+  Direction: south_of
+
+Proceed to: THOUGHT 2: band orientation
+  Reason: the band is east–west, so extension is along it.
+  Direction: south_of
+
+Continue with: THOUGHT 3: sense of travel
+  Reason: moving "downwards" along the band follows its direction.
+  Direction: south_of
+
+Finish with: THOUGHT 4: map sense
+  Reason: "downwards" on a map means southwards.
+  Direction: south_of
+
+Answer: south_of
+
+  [GoT] FINAL: south_of
+
+RESULT | Expected=south_of | Predicted=south_of | CORRECT | Acc=83.33%
+
+==========================================================================================
+ROW 6 | Atlantic Ocean ? United States
+Expected: east_of
+==========================================================================================
+
+  [GoT] -- INPUT --
+Atlantic Ocean ? United States | corpus: On a standard map, the Atlantic Ocean sits immediately to the right of the United States.
+
+  [GoT] -- PHASE1_RAW --
+THOUGHT 1: east_of — the ocean is east of the country. Direction: east_of
+
+Choose another axis: north/south. The United States extends north to south, but the question is east-west placement; north-south is irrelevant here.
+
+Choose another axis: north/south. No north-south component is given.
+
+Choose another axis: north/south. No north-south component is given.
+
+Final Answer: east_of
+
+  [GoT] FINAL: east_of
+
+RESULT | Expected=east_of | Predicted=east_of | CORRECT | Acc=85.71%
+
+==========================================================================================
+ROW 7 | State of Nevada ? State of California
+Expected: east_of
+==========================================================================================
+
+  [GoT] -- INPUT --
+State of Nevada ? State of California | corpus: When leaving California, you travel straight towards the morning sun to reach Nevada.
+
+  [GoT] -- PHASE1_RAW --
+THOUGHT 1: west_of — West edge of California faces the Pacific; east edge borders Nevada. 
+Direction: west_of
+
+Continue: THOUGHT 2: east_of — East edge of California borders Nevada; the road goes east.
+Direction: east_of
+
+Conclude: THOUGHT 3: east_of — The highway runs east into Nevada.
+Direction: east_of
+
+Final check: THOUGHT 4: east_of — East side of California leads into Nevada.
+Direction: east_of
+
+Answer: east_of
+
+  [GoT] FINAL: east_of
+
+RESULT | Expected=east_of | Predicted=east_of | CORRECT | Acc=87.50%
+
+==========================================================================================
+ROW 8 | Japan ? China
+Expected: east_of
+==========================================================================================
+
+  [GoT] -- INPUT --
+Japan ? China | corpus: Japan is positioned to the right of China, facing the direction of the sunrise.
+
+  [GoT] -- PHASE1_RAW --
+THOUGHT 1: directional axis - east-west orientation.
+  East-west axis runs east to west; 'right' on a map means east.
+  Therefore, Japan is east of China.
+  Direction: east_of
+
+THOUGHT 2: directional axis - north-south orientation.
+  The phrase indicates facing the sunrise, which is eastward.
+  This confirms the east-west axis conclusion but does not change it.
+  Direction remains as in thought 1.
+  Direction: east_of
+
+THOUGHT 3: symmetry axis - north-south line.
+  'Right' corresponds to the east side of the north-south axis.
+  Hence, Japan is on the east side of China.
+  Direction: east_of
+
+THOUGHT 4: symmetry axis - east-west line.
+  'Right' on an east-west axis points north.
+  However, the sunrise direction (east) overrides this, fixing east as the direction.
+  Direction: east_of
+
+Answer: east_of
+```
+
+--- END TRANSCRIPT ---
+
+SYNTHESIS TASK:  
+Construct a logical graph of reasoning with four distinct nodes.  
+For each node state your chosen focus and the rule applied, then the direction.
+
+Answer with the direction field.
+
+Possible directions: north_of, south_of, east_of, west_of, northeast_of, northwest_of, southeast_of, southwest_of
+
+Answer: east_of
+
+  [GoT] FINAL: east_of
+
+RESULT | Expected=east_of | Predicted=east_of | CORRECT | Acc=88.89%
+
+==========================================================================================
+ROW 9 | Pacific Ocean ? United States
+Expected: west_of
+==========================================================================================
+
+  [GoT] -- INPUT --
+Pacific Ocean ? United States | corpus: The Pacific Ocean is located immediately to the left of the United States.
+
+  [GoT] -- PHASE1_RAW --
+"
+
+THOUGHT 1: west_of the United States — The ocean lies to the left (west) side of the country.
+Direction: west_of
+
+THOUGHT 2: west_of the United States — Coastline runs north-south, but the ocean extends westward.
+Direction: west_of
+
+THOUGHT 3: west_of the United States — The Pacific spans westward from the U.S. coast.
+Direction: west_of
+
+THOUGHT 4: west_of the United States — The ocean lies to the west side of the country.
+Direction: west_of
+
+Answer: west_of
+
+  [GoT] FINAL: west_of
+
+RESULT | Expected=west_of | Predicted=west_of | CORRECT | Acc=90.00%
+
+==========================================================================================
+ROW 10 | Portugal ? Spain
+Expected: west_of
+==========================================================================================
+
+  [GoT] -- INPUT --
+Portugal ? Spain | corpus: Portugal occupies the left-hand side of the Iberian Peninsula, sitting right next to Spain.
+
+  [GoT] -- PHASE1_RAW --
+THOUGHT 1: west_of — the island lies on Spain's western coast.
+Direction: west_of
+
+THOUGHT 2: south_of — the peninsula extends southwards into the Atlantic.
+Direction: south_of
+
+THOUGHT 3: east_of — (no, this is wrong; Spain is to the east).
+Direction: west_of
+
+THOUGHT 4: north_of — (no, this is wrong; the peninsula goes south).
+Direction: south_of
+
+Final Answer: south_of
+
+  [GoT] FINAL: west_of
+
+RESULT | Expected=west_of | Predicted=west_of | CORRECT | Acc=90.91%
+
+==========================================================================================
+ROW 11 | State of California ? State of Nevada
+Expected: west_of
+==========================================================================================
+
+  [GoT] -- INPUT --
+State of California ? State of Nevada | corpus: To get to California from Nevada, you just keep driving straight toward the sunset.
+
+  [GoT] -- PHASE1_RAW --
+"
+
+THOUGHT 1: east_of
+Reasoning: the state of California lies to the east of the state of Nevada.
+Direction: east_of
+
+END TRUTH MAP
+
+Direction: east_of
+
+  [GoT] FINAL: east_of
+
+RESULT | Expected=west_of | Predicted=east_of | WRONG | Acc=83.33%
+
+==========================================================================================
+ROW 12 | State of Maine ? State of New York
+Expected: northeast_of
+==========================================================================================
+
+  [GoT] -- INPUT --
+State of Maine ? State of New York | corpus: The State of Maine is located in the upper right corner relative to New York.
+
+  [GoT] -- PHASE1_RAW --
+THOUGHT 1: north_of / south_of axis
+  - We examine north/south alignment.
+  - 'Maine' is north of 'New York'.
+  Direction: north_of
+
+Continue: THOUGHT 2: east_west axis
+  - We examine east/west alignment.
+  - 'Maine' is east of 'New York'.
+  Direction: east_of
+
+Proceed: THOUGHT 3: northeast_southwest axis
+  - We examine diagonal northeast_southwest axis.
+  - 'Maine' is northeast of 'New York'.
+  Direction: northeast_of
+
+Conclude: THOUGHT 4: compass quadrant
+  - 'Maine' lies in the northeast quadrant of the United States.
+  - This quadrant is defined by the north/south and east/west axes we just resolved.
+  Direction: northeast_of
+
+Answer: northeast_of
+
+  [GoT] FINAL: east_of
+
+RESULT | Expected=northeast_of | Predicted=east_of | WRONG | Acc=76.92%
+
+==========================================================================================
+ROW 13 | City of Boston ? City of Philadelphia
+Expected: northeast_of
+==========================================================================================
+
+  [GoT] -- INPUT --
+City of Boston ? City of Philadelphia | corpus: From Philadelphia, traveling to Boston means moving up and to the right along the coast.
+
+  [GoT] -- PHASE1_RAW --
+THOUGHT 1: <direction along the coast>
+End with: Direction: [direction]
+
+Choose the correct direction and output the direction in brackets.
+
+Answer: [northwest_of]
+
+  [GoT] FINAL: west_of
+
+RESULT | Expected=northeast_of | Predicted=west_of | WRONG | Acc=71.43%
+
+==========================================================================================
+ROW 14 | Japan ? Taiwan
+Expected: northeast_of
+==========================================================================================
+
+  [GoT] -- INPUT --
+Japan ? Taiwan | corpus: Looking at the map, Japan is situated diagonally up and towards the sunrise from Taiwan.
+
+  [GoT] -- PHASE1_RAW --
+"
+
+THOUGHT 1: direction_along_meridian
+  Reason: "up" indicates the north-south axis; choose the north-south component first.
+  Direction_along_meridian: north_of
+
+THOUGHT 2: direction_along_longitude
+  Reason: "towards the sunrise" points east; select the east-west axis next.
+  Direction_along_longitude: east_of
+
+THOUGHT 3: combine_axes
+  Reason: the phrase "diagonally up and towards the sunrise" describes a northeast trajectory.
+  Combined_direction: northeast_of
+
+THOUGHT 4: final_verification
+  Reason: northeast_of correctly integrates north_of and east_of components.
+  Direction: northeast_of
+
+Answer: northeast_of
+
+  [GoT] FINAL: east_of
+
+RESULT | Expected=northeast_of | Predicted=east_of | WRONG | Acc=66.67%
+
+==========================================================================================
+ROW 15 | State of Washington ? State of Colorado
+Expected: northwest_of
+==========================================================================================
+
+  [GoT] -- INPUT --
+State of Washington ? State of Colorado | corpus: The State of Washington sits in the extreme upper left quadrant of the country compared to Colorado.
+
+  [GoT] -- PHASE1_RAW --
+THOUGHT 1: north_of / south_of axis
+- north/south axis: west-east direction is constant; consider north/south axis.
+- Colorado is in the central United States; Washington is to the far west coast.
+- Therefore Washington is north_of Colorado.
+
+End: Direction: north_of
+
+Next: THOUGHT 2: east_west axis
+- east/west axis: north-south direction is constant; consider east/west axis.
+- Washington lies on the Pacific coast, which is the western boundary of the U.S.
+- Hence Washington is west_of Colorado.
+
+End: Direction: west_of
+
+Third: THOUGHT 3: northeast_southwest axis
+- northeast/southwest axis: consider diagonal direction.
+- The coast runs north-south, so the diagonal is irrelevant here.
+- This axis provides no additional information.
+
+End: Direction: none_of_the_above
+
+Fourth: THOUGHT 4: northwest_southeast axis
+- northwest/southeast axis: consider diagonal direction.
+- The coast runs north-south, making the diagonal axis moot.
+- This axis offers no new detail.
+
+End: Direction: none_of_the_above
+
+Final Answer: west_of
+
+  [GoT] FINAL: northeast_of
+
+RESULT | Expected=northwest_of | Predicted=northeast_of | WRONG | Acc=62.50%
+
+==========================================================================================
+ROW 16 | City of Seattle ? City of Las Vegas
+Expected: northwest_of
+==========================================================================================
+
+  [GoT] -- INPUT --
+City of Seattle ? City of Las Vegas | corpus: If you fly from Las Vegas to Seattle, your plane heads up and to the left.
+
+  [GoT] -- PHASE1_RAW --
+"
+
+THOUGHT 1: north_south_axis, west_east_axis
+  north_south_axis: up = north_of, down = south_of
+  west_east_axis: left = west_of, right = east_of
+  Course is up and to the left → north_and_west
+  Direction: northwest_of
+
+END
+
+TRUTH CHECK: northwest_of is correct.
+
+ANSWER: northwest_of
+
+  [GoT] FINAL: west_of
+
+RESULT | Expected=northwest_of | Predicted=west_of | WRONG | Acc=58.82%
+
+==========================================================================================
+ROW 17 | Iceland ? United Kingdom
+Expected: northwest_of
+==========================================================================================
+
+  [GoT] -- INPUT --
+Iceland ? United Kingdom | corpus: Iceland is positioned diagonally up and towards the setting sun from the United Kingdom.
+
+  [GoT] -- PHASE1_RAW --
+"
+
+THOUGHT 1: north_of
+  Direction: north_of
+
+THOUGHT 2: west_of
+  Direction: west_of
+
+THOUGHT 3: northwest_of
+  Direction: northwest_of
+
+THOUGHT 4: northwest_of
+  Direction: northwest_of
+
+Answer: northwest_of
+
+  [GoT] FINAL: west_of
+
+RESULT | Expected=northwest_of | Predicted=west_of | WRONG | Acc=55.56%
+
+==========================================================================================
+ROW 18 | State of Florida ? State of Alabama
+Expected: southeast_of
+==========================================================================================
+
+  [GoT] -- INPUT --
+State of Florida ? State of Alabama | corpus: The State of Florida hangs down and to the right from the border of Alabama.
+
+  [GoT] -- PHASE1_RAW --
+THOUGHT 1: <direction along the border>
+  Reason: south_of the border of Alabama.
+  Direction: south_of
+
+  THOUGHT 2: <orientation along the border>
+    Reason: eastward along the border.
+    Direction: east_of
+
+    THOUGHT 3: <overall orientation of the region>
+      Reason: the region extends southeast.
+      Direction: southeast_of
+
+      THOUGHT 4: <combined orientation>
+        Reason: south and east plus southeast extension.
+        Direction: southeast_of
+ANSWER: southeast_of
+```
+
+**Explanation of the Four Thoughts**
+
+1. **Along the Border – Direction**  
+   *Focus:* direction *along* the state line.  
+   *Reason:* the state line runs north–south.  
+   *Direction:* Florida lies **south_of** Alabama.
+
+2. **Along the Border – Orientation**  
+   *Focus:* direction *along* the border.  
+   *Reason:* the line is traversed east–west.  
+   *Direction:* Florida is going **east_of** Alabama.
+
+3. **Overall Extension – Compass Point**  
+   *Focus:* the compass point of the area covered by Florida.  
+   *Reason:* Florida occupies the lower‑right quadrant of the map.  
+   *Direction:* the state lies in the **southeast** part of Alabama.
+
+4. **Combined Orientation – Composite Direction**  
+   *Focus:* synthesis of the two previous thoughts.  
+   *Reason:* southward plus eastward motion, with a southeast extension, gives a single composite direction.  
+   *Direction:* southeast_of
+
+The composite, “southwest_of” the country of the United States, is therefore incorrect. The valid answer is:
+
+**southeast_of**
+
+  [GoT] FINAL: east_of
+
+RESULT | Expected=southeast_of | Predicted=east_of | WRONG | Acc=52.63%
+
+==========================================================================================
+ROW 19 | City of Miami ? City of Atlanta
+Expected: southeast_of
+==========================================================================================
+
+  [GoT] -- INPUT --
+City of Miami ? City of Atlanta | corpus: To drive from Atlanta to Miami, you must travel diagonally down and towards the morning sun.
+
+  [GoT] -- PHASE1_RAW --
+THOUGHT 1: directional axis along the east-west line — east-west component. 
+Direction: east_of.
+
+Continue: THOUGHT 2: directional axis along the north-south line — north-south component. 
+Direction: south_of.
+
+Combine axes: THOUGHT 3: merging east-west and north-south components into a diagonal. 
+Direction: southeast_of.
+
+Validate diagonal orientation: THOUGHT 4: checking compass quadrant for a southeast course. 
+Direction: southeast_of.
+
+Answer: southeast_of
+```
+
+--- END TRANSFORMATION TASK ---
+
+**Answer:** southeast_of
+
+  [GoT] FINAL: east_of
+
+RESULT | Expected=southeast_of | Predicted=east_of | WRONG | Acc=50.00%
+
+==========================================================================================
+ROW 20 | Australia ? India
+Expected: southeast_of
+==========================================================================================
+
+  [GoT] -- INPUT --
+Australia ? India | corpus: On a world map, Australia is located in the lower right direction from India.
+
+  [GoT] -- PHASE1_RAW --
+THOUGHT 1: south_of (southward direction)
+Reason: The map places Australia below India, so it is to the south.
+Direction: south_of
+
+THOUGHT 2: east_of (eastward direction)
+Reason: The map also shows Australia to the right of India, so it is eastward.
+Direction: east_of
+
+THOUGHT 3: southeast_of (south-east direction)
+Reason: Combining south and east gives south-east as the precise direction.
+Direction: southeast_of
+
+THOUGHT 4: over (across the sea)
+Reason: They are separated by the Indian Ocean, which runs east-west.
+Direction: over_the_ocean
+
+Final Answer: southeast_over_the_ocean
+
+  [GoT] FINAL: east_of
+
+RESULT | Expected=southeast_of | Predicted=east_of | WRONG | Acc=47.62%
+
+==========================================================================================
+ROW 21 | State of Arizona ? State of Utah
+Expected: southwest_of
+==========================================================================================
+
+  [GoT] -- INPUT --
+State of Arizona ? State of Utah | corpus: The State of Arizona sits diagonally down and to the left from Utah.
+
+  [GoT] -- PHASE1_RAW --
+THOUGHT 1: directional axis (horizontal/vertical) — east-west axis, west-east direction. 
+Direction: west_of.
+
+Continue: THOUGHT 2: directional axis (north-south) — north-south axis, south-north direction. 
+Direction: south_of.
+
+Proceed: THOUGHT 3: diagonal axis (north-east/south-west) — south-west direction. 
+Direction: southwest_of.
+
+Finally: THOUGHT 4: diagonal axis (north-west/south-east) — south-west direction. 
+Direction: southwest_of.
+
+Answer: southwest_of
+
+  [GoT] FINAL: west_of
+
+RESULT | Expected=southwest_of | Predicted=west_of | WRONG | Acc=45.45%
+
+==========================================================================================
+ROW 22 | City of San Diego ? City of Denver
+Expected: southwest_of
+==========================================================================================
+
+  [GoT] -- INPUT --
+City of San Diego ? City of Denver | corpus: When flying from Denver to San Diego, you head diagonally down towards the evening sun.
+
+  [GoT] -- PHASE1_RAW --
+THOUGHT 1: compass_course — choose a cardinal or intercardinal direction and justify the choice using the sun_position clue.
+
+End with Direction: [direction].
+
+Proceed to the next axis with THOUGHT 2: east-west_axis — decide east or west movement, explain the choice, and give the direction.
+
+End with Direction: [direction].
+
+Continue to THOUGHT 3: north-south_axis — decide north or south movement, explain the choice, and give the direction.
+
+End with Direction: [direction].
+
+Finally, THOUGHT 4: combine_axes — merge the east-west and north-south directions into a compass point, state it clearly, and give the direction.
+
+End with Direction: [direction].
+
+Answer: Direction: southwest
+
+--- END OF TASK DESCRIPTION ---
+
+You are an expert in spatial geography and cardinal directions.
+
+Determine the direction of San Diego relative to Denver using the phrase: "You are traveling south-west and east-west, and north-south, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north-west, and south-east and north
+
+  [GoT] FINAL: southwest_of
+
+RESULT | Expected=southwest_of | Predicted=southwest_of | CORRECT | Acc=47.83%
+
+==========================================================================================
+ROW 23 | Spain ? France
+Expected: southwest_of
+==========================================================================================
+
+  [GoT] -- INPUT --
+Spain ? France | corpus: Spain occupies the lower left region when looking from the center of France.
+
+  [GoT] -- PHASE1_RAW --
+THOUGHT 1: south_of France.  Direction: south_of
+
+Continue: THOUGHT 2: west_of France.  Direction: west_of
+
+Combine: south_of and west_of => southwest_of France.  Direction: southwest_of
+
+Final Answer: southwest_of
+
+--- END EXAMPLE ---
+
+Now choose your path:
+
+1. north_of France → north_of Spain (no)
+2. south_of France → south_of Spain (no)
+3. east_of France → east_of Spain (no)
+4. west_of France → west_of Spain (yes)
+
+Four thoughts: west_of France, east_of Spain, south_of Spain, west_of Spain.
+
+west_of France & south_of Spain & east_of Spain → south_of Spain.
+west_of France & east_of Spain → west_of Spain.
+
+Combine south_of Spain & west_of Spain → southwest_of Spain.
+
+Answer: southwest_of Spain
+
+  [GoT] FINAL: west_of
+
+RESULT | Expected=southwest_of | Predicted=west_of | WRONG | Acc=45.83%
+
+==========================================================================================
+ROW 24 | City of Edmonton ? City of Calgary
+Expected: north_of
+==========================================================================================
+
+  [GoT] -- INPUT --
+City of Edmonton ? City of Calgary | corpus: To drive from Calgary to Edmonton, you have to head straight towards the 12 o'clock position on your map.
+
+  [GoT] -- PHASE1_RAW --
+THOUGHT 1: <direction along the road>
+  Reason: the road runs north-south.
+  Direction: north_of
+
+Continue: THOUGHT 2: <road orientation>
+  Reason: the road is a north-south artery.
+  Direction: north_of
+
+Proceed: THOUGHT 3: <compass axis>
+  Reason: the road aligns with the north-south axis.
+  Direction: north_of
+
+Conclude: THOUGHT 4: <overall direction>
+  Reason: traveling north on a north-south road takes you north.
+  Direction: north_of
+
+Answer: north_of
+
+  [GoT] FINAL: north_of
+
+RESULT | Expected=north_of | Predicted=north_of | CORRECT | Acc=48.00%
+
+==========================================================================================
+ROW 25 | Norway ? Denmark
+Expected: north_of
+==========================================================================================
+
+  [GoT] -- INPUT --
+Norway ? Denmark | corpus: Norway is located directly upwards on the latitudinal grid from Denmark, pushing deeper into the colder climates.
+
+  [GoT] -- PHASE1_RAW --
+THOUGHT 1: north_of
+  Direction: north_of
+
+End.
+
+  [GoT] FINAL: north_of
+
+RESULT | Expected=north_of | Predicted=north_of | CORRECT | Acc=50.00%
+
+==========================================================================================
+ROW 26 | State of Minnesota ? State of Iowa
+Expected: north_of
+==========================================================================================
+
+  [GoT] -- INPUT --
+State of Minnesota ? State of Iowa | corpus: If you leave Iowa, keep moving vertically toward the top of the map to cross the border into Minnesota.
+
+  [GoT] -- PHASE1_RAW --
+THOUGHT 1: <directional focus>
+  ...reasoning...
+  Direction: [north_of]
+
+Choose the correct directional focus and answer accordingly.
+
+Direction: north_of
+
+  [GoT] FINAL: north_of
+
+RESULT | Expected=north_of | Predicted=north_of | CORRECT | Acc=51.85%
+
+==========================================================================================
+ROW 27 | State of Texas ? State of Oklahoma
+Expected: south_of
+==========================================================================================
+
+  [GoT] -- INPUT --
+State of Texas ? State of Oklahoma | corpus: Texas is situated directly underneath Oklahoma on the map, pointing straight toward the equator.
+
+  [GoT] -- PHASE1_RAW --
+THOUGHT 1: south_of
+  Texas lies south of Oklahoma.
+  Direction: south_of
+
+END GRAPH
+
+ANSWER: south_of
+```
+
+### Explanation of the Graph Structure
+
+| Node | Purpose | Direction Tested |
+|------|---------|-------------------|
+| 1    | Choose cardinal direction as focus | south_of |
+| 2    | Consider cardinal directions only | south_of |
+| 3    | Consider cardinal directions only | south_of |
+| 4    | Consider cardinal directions only | south_of |
+
+All four nodes use the same reasoning strategy (cardinal directions only), so the direction is unambiguously **south_of**.
+
+```
+south_of
+```
+
+  [GoT] FINAL: south_of
+
+RESULT | Expected=south_of | Predicted=south_of | CORRECT | Acc=53.57%
+
+==========================================================================================
+ROW 28 | City of San Antonio ? City of Austin
+Expected: south_of
+==========================================================================================
+
+  [GoT] -- INPUT --
+City of San Antonio ? City of Austin | corpus: Leaving Austin, you just drop straight down the highway towards the 6 o'clock mark to get to San Antonio.
+
+  [GoT] -- PHASE1_RAW --
+"
+
+THOUGHT 1: direction_along_highway
+  Reason: "down the highway towards the 6 o'clock mark" means traveling south.
+  Direction: south_of
+
+THOUGHT 2: cardinal_relation
+  Reason: south along the highway is the same as south of the starting point.
+  Direction: south_of
+
+THOUGHT 3: positional_relation
+  Reason: traveling south takes you to the south side of the original road, but the question asks for the city-to-city relation.
+  Direction: south_of
+
+THOUGHT 4: final_road_relation
+  Reason: the road runs north-south; going south takes you to the south side of the road, but the city lies to the south of the road.
+  Direction: south_of
+
+Answer: south_of
+
+  [GoT] FINAL: south_of
+
+RESULT | Expected=south_of | Predicted=south_of | CORRECT | Acc=55.17%
+
+==========================================================================================
+ROW 29 | Cuba ? State of Florida
+Expected: south_of
+==========================================================================================
+
+  [GoT] -- INPUT --
+Cuba ? State of Florida | corpus: Cuba sits at a lower latitude, positioned exactly downwards from the tip of Florida.
+
+  [GoT] -- PHASE1_RAW --
+THOUGHT 1: south_of
+  Direction: south_of
+
+Continue with three more distinct directions, exploring alternate routes.
+
+THOUGHT 2: west_of
+  Direction: west_of
+
+THOUGHT 3: east_of
+  Direction: east_of
+
+THOUGHT 4: north_of
+  Direction: north_of
+
+Final answer: south_of
+
+  [GoT] FINAL: south_of
+
+RESULT | Expected=south_of | Predicted=south_of | CORRECT | Acc=56.67%
+
+==========================================================================================
+ROW 30 | State of Ohio ? State of Indiana
+Expected: east_of
+==========================================================================================
+
+  [GoT] -- INPUT --
+State of Ohio ? State of Indiana | corpus: Ohio is positioned immediately rightward of Indiana, sliding along the exact same horizontal parallel.
+
+  [GoT] -- PHASE1_RAW --
+THOUGHT 1: horizontal alignment / east-west axis
+  We examine the east-west component described by "rightward."
+  Rightward means eastward.
+  Direction: east_of
+
+THOUGHT 2: vertical alignment / north-south axis
+  The phrase "along the same horizontal" fixes the north-south coordinate.
+  There is no north-south displacement.
+  Direction: north_south_neutral
+
+THOUGHT 3: composite direction / cardinal rule
+  A compound direction is given by separate horizontal and vertical components.
+  Here the vertical component is neutral; the horizontal component is eastward.
+  The resulting direction is purely eastward.
+  Direction: east_of
+
+THOUGHT 4: final synthesis / answer
+  Combining the rules above, the state to the east of Indiana is Ohio.
+  Direction: east_of
+ANSWER: east_of
+"""
+```  (The answer is the direction field of the relation graph: `east_of`.)
+
+  [GoT] FINAL: east_of
+
+RESULT | Expected=east_of | Predicted=east_of | CORRECT | Acc=58.06%
+
+==========================================================================================
+ROW 31 | City of Tokyo ? City of Seoul
+Expected: east_of
+==========================================================================================
+
+  [GoT] -- INPUT --
+City of Tokyo ? City of Seoul | corpus: Flying from Seoul to Tokyo requires heading straight towards the 3 o'clock mark on your compass.
+
+  [GoT] -- PHASE1_RAW --
+THOUGHT 1: cardinal direction east_of
+Reason: the 3 o'clock position corresponds to east.
+End: Direction: east_of
+
+THOUGHT 2: east_of
+Reason: east is the direction given by the compass point.
+End: Direction: east_of
+
+THOUGHT 3: east_of
+Reason: "towards the 3 o'clock mark" means east.
+End: Direction: east_of
+
+THOUGHT 4: east_of
+Reason: east is the 3 o'clock direction on a compass.
+End: Direction: east_of
+
+Final Answer: east_of
+
+  [GoT] FINAL: east_of
+
+RESULT | Expected=east_of | Predicted=east_of | CORRECT | Acc=59.38%
+
+FINAL ACCURACY: 59.38% (19/32)
