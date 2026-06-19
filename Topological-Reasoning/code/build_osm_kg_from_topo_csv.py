@@ -21,8 +21,12 @@ import argparse
 import csv
 import json
 import os
+import sys
 import random
 import collections
+
+sys.path.insert(0, os.path.dirname(__file__))
+from osm_client import load_cache, is_geocodable
 
 VALID_PREDICATES = {
     "contains", "within", "touches", "crosses", "disjoint", "overlaps", "equals"
@@ -122,14 +126,26 @@ def main():
     counts = {p: len(by_pred.get(p, [])) for p in VALID_PREDICATES}
     print("[INFO] Per-predicate counts:", counts)
 
-    records = []
+    # Skip rows whose entities failed OSM retrieval (consult the warmed cache),
+    # so the OSM-KG adapter never trains on empty-evidence examples.
+    cache = load_cache("results/osm_cache.json")
+    if not cache:
+        print("[WARN] results/osm_cache.json empty/missing — keeping all rows "
+              "(warm it with warm_osm_cache.py to enable OSM-fail filtering)")
+
+    records, skipped = [], 0
     for r in rows:
         src    = _get(r, "place_name_subject", "source_entity")
         tgt    = _get(r, "place_name_object",  "target_entity")
         corpus = _get(r, "relation_predicate",  "corpus")
         label  = _get(r, "spatial_relation",    "relation_label").lower()
+        if cache and not is_geocodable(cache, src, tgt):
+            skipped += 1
+            continue
         text   = build_prompt(src, tgt, corpus, label)
         records.append({"text": text, "label": label})
+    if cache:
+        print(f"[INFO] skipped {skipped} rows for OSM-retrieval failure; kept {len(records)}")
 
     random.seed(args.seed)
     random.shuffle(records)

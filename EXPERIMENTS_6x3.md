@@ -57,8 +57,27 @@ done
 | Cardinal    | `finetuned_gptoss_cardinal` | `finetuned_gptoss_cardinal_osm_kg` |
 | Relative    | `finetuned_gptoss_relative` | `finetuned_gptoss_relative_osm_kg` |
 
+## Zero-shot vs few-shot
+Every experiment runs in two prompting modes via `--shots`:
+- **Zero-shot** (`--shots 0`, default) — the current pipeline.
+- **Few-shot** (`--shots 5`) — prepends **5 demonstrations from the train split, one per
+  ambiguity level (L1–L5), all sharing the target row's label**. Tagged `_fs5` in outputs.
+  ⚠ **Label-conditioned by design:** the demos reveal the answer class, so few-shot numbers
+  are a leakage-aware probe, *not* a clean baseline — compare them to zero-shot, not across labels.
+```bash
+python exp1_base.py              # zero-shot
+python exp1_base.py --shots 5    # few-shot (uses the domain's train CSV for demos)
+```
+
+## OSM-failure filtering
+Rows whose entities can't be geocoded (absent/`null` in `osm_cache.json`) are **dropped from
+eval automatically**, uniformly across all 6 experiments, so the comparison stays fair. The
+OSM-KG training builders likewise **skip ungeocodable rows**. Warm the cache first
+(`warm_osm_cache.py`); pass `--keep-ungeocodable` to the engine to disable. The standalone
+`drop_ungeocodable.py` can also post-filter already-produced checkpoints.
+
 ## Analysis
-After eval, print the 6×3 accuracy matrix per domain:
+After eval, print the accuracy matrices per domain (zero-shot and few-shot shown separately):
 ```bash
 python analyze_results.py        # run inside each */code dir
 ```

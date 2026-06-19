@@ -8,14 +8,19 @@ KG as static input on the no-KG fine-tuned model.
   Tokens        : 1024    Strategies : CoT, ToT, GoT
   Eval set      : cardinal_direction_relations.csv (32 balanced eval rows)
 
-Run:
-    python exp5_ft_kg_input.py                # all strategies
-    python exp5_ft_kg_input.py --strategy cot
+Zero-shot (default) vs few-shot:
+    python exp5_ft_kg_input.py                 # zero-shot, all strategies
+    python exp5_ft_kg_input.py --strategy cot  # single strategy
+    python exp5_ft_kg_input.py --shots 5       # few-shot (5 same-label demos, one per level L1-5)
+
+Note: rows whose entities fail OSM retrieval are dropped from eval automatically
+(uniform across all experiments). Pass --keep-ungeocodable via the engine to disable.
 """
 import os, sys, json, argparse
 
 DATASET        = "../dataset/cardinal_direction_relations.csv"
 INDICES_FILE   = "../dataset/eval_32_balanced_indices.json"
+TRAIN_DATA     = "../dataset/cardinal_nokg_train.csv"          # for --shots few-shot demo sampling
 MODEL_ID       = "openai/gpt-oss-20b"
 ADAPTER_PATH   = "finetuned_gptoss_cardinal/final_adapter"
 KG_MODE        = "input"
@@ -29,6 +34,8 @@ STRATEGIES     = ["cot", "tot", "got"]
 def run():
     parser = argparse.ArgumentParser()
     parser.add_argument("--strategy", choices=STRATEGIES + ["all"], default="all")
+    parser.add_argument("--shots", type=int, default=0,
+                        help="0 = zero-shot (default); 5 = few-shot (same-label demos, one per level)")
     args = parser.parse_args()
 
     if ADAPTER_PATH and not os.path.exists(
@@ -39,7 +46,7 @@ def run():
 
     print("=" * 70)
     print("  EXPERIMENT 5 — Fine-tuned LoRA + OSM KG @ input (static) · Cardinal")
-    print(f"  adapter={ADAPTER_PATH or 'none'}  kg-mode={KG_MODE}  tokens={MAX_NEW_TOKENS}")
+    print(f"  adapter={ADAPTER_PATH or 'none'}  kg-mode={KG_MODE}  shots={args.shots}  tokens={MAX_NEW_TOKENS}")
     print("=" * 70)
 
     argv = [
@@ -53,7 +60,10 @@ def run():
         "--temperature",    str(TEMPERATURE),
         "--max-new-tokens", str(MAX_NEW_TOKENS),
         "--kg-mode",        KG_MODE,
+        "--shots",          str(args.shots),
     ]
+    if args.shots > 0:
+        argv += ["--train-data", TRAIN_DATA]
     if ADAPTER_PATH:
         argv += ["--adapter-path", ADAPTER_PATH]
     sys.argv = argv

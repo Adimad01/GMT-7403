@@ -29,6 +29,7 @@ EXP_ORDER = [
     ("exp6_base_kg_rag",   "Exp6  base + KG@inference (RAG)"),
 ]
 _CKPT_RE = re.compile(r"voletc_(?P<tag>.+?)_(?P<strat>cot|tot|got)_.*_ckpt\.json$")
+_FS_RE = re.compile(r"_fs(\d+)$")
 
 
 def _accuracy(path: str):
@@ -43,31 +44,13 @@ def _accuracy(path: str):
     return (hits / len(results) * 100.0, len(results))
 
 
-def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--results-dir", default="results")
-    args = ap.parse_args()
-
-    table: dict = {}   # tag -> {strat: (acc, n)}
-    for path in glob.glob(os.path.join(args.results_dir, "voletc_*_ckpt.json")):
-        m = _CKPT_RE.search(os.path.basename(path))
-        if not m:
-            continue
-        acc = _accuracy(path)
-        if acc is None:
-            continue
-        table.setdefault(m.group("tag"), {})[m.group("strat")] = acc
-
-    if not table:
-        print(f"[INFO] No result checkpoints found in {args.results_dir}/")
-        return
-
+def _print_matrix(title, table):
     ordered = [(t, lbl) for t, lbl in EXP_ORDER if t in table]
     extras = [(t, t) for t in sorted(table) if t not in dict(EXP_ORDER)]
     rows = ordered + extras
-
-    width = max(len(lbl) for _, lbl in rows)
-    header = f"{'Experiment':<{width}} | " + " | ".join(f"{s.upper():>10}" for s in STRATS)
+    width = max([len(lbl) for _, lbl in rows] + [len("Experiment")])
+    print(f"\n### {title}")
+    header = f"{'Experiment':<{width}} | " + " | ".join(f"{s.upper():>11}" for s in STRATS)
     print(header)
     print("-" * len(header))
     for tag, lbl in rows:
@@ -77,8 +60,37 @@ def main():
                 acc, n = table[tag][s]
                 cells.append(f"{acc:6.1f}% ({n:>2})")
             else:
-                cells.append(f"{'—':>10}")
-        print(f"{lbl:<{width}} | " + " | ".join(f"{c:>10}" for c in cells))
+                cells.append(f"{'—':>11}")
+        print(f"{lbl:<{width}} | " + " | ".join(f"{c:>11}" for c in cells))
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--results-dir", default="results")
+    args = ap.parse_args()
+
+    # shots -> base_tag -> {strat: (acc, n)}
+    byshots: dict = {}
+    for path in glob.glob(os.path.join(args.results_dir, "voletc_*_ckpt.json")):
+        m = _CKPT_RE.search(os.path.basename(path))
+        if not m:
+            continue
+        acc = _accuracy(path)
+        if acc is None:
+            continue
+        tag = m.group("tag")
+        fs = _FS_RE.search(tag)
+        shots = int(fs.group(1)) if fs else 0
+        base = _FS_RE.sub("", tag)
+        byshots.setdefault(shots, {}).setdefault(base, {})[m.group("strat")] = acc
+
+    if not byshots:
+        print(f"[INFO] No result checkpoints found in {args.results_dir}/")
+        return
+
+    for shots in sorted(byshots):
+        label = "Zero-shot" if shots == 0 else f"Few-shot ({shots}-shot, label-conditioned ⚠)"
+        _print_matrix(label, byshots[shots])
     print("\n(accuracy %% with sample count; — = not yet run)")
 
 

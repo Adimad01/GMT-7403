@@ -82,23 +82,29 @@ def main():
     print(f"[OK] no-KG CSV → {OUT_CSV} ({len(train_rows)} rows)")
 
     # --- OSM-KG jsonl ------------------------------------------------------
+    # Skip rows whose entities fail OSM retrieval so the OSM-KG adapter never
+    # trains on empty-evidence examples.
     kg = OSMEvidenceKG("results/osm_cache.json", allow_network=not args.offline)
-    records = []
+    records, skipped = [], 0
     for i, r in enumerate(train_rows, 1):
         src = r["source_entity"].strip()
         tgt = r["target_entity"].strip()
         corpus = r["corpus"].strip()
         label = r["relation_label"].strip().lower()
+        if kg.fetch(src) is None or kg.fetch(tgt) is None:
+            skipped += 1
+            continue
         evidence = kg.gather_evidence(src, tgt, sentence=corpus)
         records.append({"text": build_osm_kg_prompt(src, tgt, corpus, label, evidence),
                         "label": label})
         if i % 10 == 0:
-            print(f"  ... {i}/{len(train_rows)} geocoded")
+            print(f"  ... {i}/{len(train_rows)} processed (kept {len(records)}, skipped {skipped})")
 
     with open(OUT_JSONL, "w", encoding="utf-8") as f:
         for rec in records:
             f.write(json.dumps(rec, ensure_ascii=False) + "\n")
-    print(f"[OK] OSM-KG jsonl → {OUT_JSONL} ({len(records)} records)")
+    print(f"[OK] OSM-KG jsonl → {OUT_JSONL} ({len(records)} records, "
+          f"{skipped} skipped for OSM-retrieval failure)")
     print("[DONE] Relative training data ready.")
 
 

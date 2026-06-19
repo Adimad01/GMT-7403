@@ -22,9 +22,12 @@ Exports:
 import os
 import json
 import time
-import requests
 from math import radians, degrees, sin, cos, sqrt, atan2
 from typing import Optional
+
+# NB: `requests` is imported lazily inside OSMClient.fetch() so the module
+# (geometry helpers, NullKG, cache filters, offline use) imports fine even
+# where requests isn't installed.
 
 
 # ---------------------------------------------------------------------------
@@ -148,6 +151,7 @@ class OSMClient:
         headers = {"User-Agent": "LavalUniversity-GeomaticsPhDEval/1.0"}
 
         try:
+            import requests  # lazy: only needed for a live cache-miss query
             time.sleep(1.1)  # Nominatim usage policy: ≤ 1 request/second
             response = requests.get(url, params=params, headers=headers, timeout=20)
             response.raise_for_status()
@@ -259,6 +263,29 @@ class OSMEvidenceKG:
         if log_fn:
             log_fn(text)
         return text
+
+
+# ---------------------------------------------------------------------------
+# GEOCODABILITY FILTER  (drop OSM-retrieval failures from eval / training)
+# ---------------------------------------------------------------------------
+def load_cache(path: str = "results/osm_cache.json") -> dict:
+    if os.path.exists(path):
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            return {}
+    return {}
+
+
+def is_geocodable(cache: dict, *names: str) -> bool:
+    """True only if every name resolved to non-null OSM data in the cache.
+    Treats missing-from-cache and cached-null both as a retrieval failure."""
+    for n in names:
+        n = (n or "").strip()
+        if not n or cache.get(n) is None:
+            return False
+    return True
 
 
 # ---------------------------------------------------------------------------

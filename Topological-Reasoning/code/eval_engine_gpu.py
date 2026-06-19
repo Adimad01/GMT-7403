@@ -220,8 +220,9 @@ from strategies_osm import (
     GeographicKnowledgeGraph,
     extract_predicate,
 )
-from osm_client import NullKG
+from osm_client import NullKG, load_cache, is_geocodable
 from rag_loop import RAGStrategy, DomainSpec
+from fewshot import FewShotSelector
 
 EXPERIMENT_SUFFIX = "neighborhood_details_spatial_relation_16_sample"
 
@@ -259,7 +260,8 @@ def _load_checkpoint(ckpt_path: str) -> dict:
 # EVALUATION LOOP
 # ---------------------------------------------------------------------------
 def evaluate_strategy(strategy, df: pd.DataFrame, output_dir: str,
-                      model_tag: str, adapter_tag: str = "none"):
+                      model_tag: str, adapter_tag: str = "none",
+                      fewshot=None, prefix_holder=None):
 
     strategy_name = strategy.name.lower()
 
@@ -308,6 +310,10 @@ def evaluate_strategy(strategy, df: pd.DataFrame, output_dir: str,
             }
 
             expected = str(row.get("relation_label", row.get("spatial_relation", ""))).lower().strip()
+
+            # few-shot: build the per-row demo prefix (label-conditioned)
+            if prefix_holder is not None:
+                prefix_holder["v"] = fewshot.build_block(expected) if fewshot else ""
 
             def row_logger(msg: str):
                 log_f.write(msg + "\n")
@@ -395,6 +401,14 @@ def main():
                              "rag = per-step OSM retrieval during reasoning (Exp 6)")
     parser.add_argument("--no-kg",           action="store_true",
                         help="(deprecated) alias for --kg-mode none")
+    parser.add_argument("--shots",            type=int, default=0,
+                        help="0 = zero-shot (default); 5 = few-shot, 5 same-label demos "
+                             "(one per ambiguity level) drawn from --train-data")
+    parser.add_argument("--train-data",       default=None,
+                        help="Train CSV for few-shot demo sampling (required when --shots > 0)")
+    parser.add_argument("--keep-ungeocodable", action="store_true",
+                        help="Keep rows whose entities failed OSM retrieval "
+                             "(default: drop them, uniformly across all experiments)")
     args = parser.parse_args()
     if args.no_kg:
         args.kg_mode = "none"
@@ -419,6 +433,23 @@ def main():
         ]
         df = pd.concat(sampled).drop(columns=["_sr_clean"])
         print(f"[DATA] Stratified sample: {len(df)} rows (16 per predicate)")
+
+    # Drop rows whose entities failed OSM retrieval — uniformly across ALL
+    # experiments so the eval subset stays identical (fair KG vs no-KG).
+    if not args.keep_ungeocodable:
+        cache = load_cache("results/osm_cache.json")
+        if cache:
+            src_c = "place_name_subject" if "place_name_subject" in df.columns else "source_entity"
+            tgt_c = "place_name_object" if "place_name_object" in df.columns else "target_entity"
+            before = len(df)
+            df = df[df.apply(lambda r: is_geocodable(cache, r.get(src_c), r.get(tgt_c)), axis=1)]
+            print(f"[OSM-FILTER] dropped {before - len(df)} ungeocodable rows; {len(df)} remain")
+            if len(df) == 0:
+                print("[ERROR] all rows dropped — warm the cache first: "
+                      "python warm_osm_cache.py --dataset <eval csv>")
+                sys.exit(1)
+        else:
+            print("[OSM-FILTER] no osm_cache.json — skipping geocodability filter")
 
     print(f"[DATA] {len(df)} test rows ready.")
 
@@ -548,8 +579,10 @@ def main():
 
     import time as _time
     _t0_first = [None]
+    prefix_holder = {"v": ""}   # few-shot demo prefix, set per row in evaluate_strategy
 
     def gpu_inference_fn(prompt: str) -> str:
+        prompt = prefix_holder["v"] + prompt
         inputs = tokenizer(
             prompt,
             return_tensors="pt",
@@ -594,19 +627,33 @@ def main():
     )
 
     # ------------------------------------------------------------------
-    # 5. Run selected strategies
+    # 5. Few-shot demo selector (optional, label-conditioned)
+    # ------------------------------------------------------------------
+    fewshot = None
+    if args.shots > 0:
+        if not args.train_data or not os.path.exists(args.train_data):
+            print(f"[ERROR] --shots {args.shots} requires --train-data <train csv>")
+            sys.exit(1)
+        fewshot = FewShotSelector(args.train_data)
+        args.model_tag = f"{args.model_tag}_fs{args.shots}"
+        print(f"[FEWSHOT] {args.shots}-shot label-conditioned demos from {args.train_data} "
+              f"(tag → {args.model_tag})")
+
+    # ------------------------------------------------------------------
+    # 6. Run selected strategies
     # ------------------------------------------------------------------
     os.makedirs(args.output_dir, exist_ok=True)
     strategies = list(STRATEGY_MAP.keys()) if args.strategy == "all" else [args.strategy]
 
     for strat in strategies:
         print(f"\n🚀 Running {strat.upper()} with GPU inference "
-              f"(adapter={adapter_tag}, kg-mode={args.kg_mode})")
+              f"(adapter={adapter_tag}, kg-mode={args.kg_mode}, shots={args.shots})")
         if args.kg_mode == "rag":
             strategy_obj = RAGStrategy(strat, kg, gpu_inference_fn, topo_spec)
         else:
             strategy_obj = get_strategy(strat, kg, model_fn=gpu_inference_fn)
-        evaluate_strategy(strategy_obj, df, args.output_dir, args.model_tag, adapter_tag)
+        evaluate_strategy(strategy_obj, df, args.output_dir, args.model_tag, adapter_tag,
+                          fewshot=fewshot, prefix_holder=prefix_holder)
 
 
 if __name__ == "__main__":

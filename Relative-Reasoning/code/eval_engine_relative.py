@@ -187,8 +187,9 @@ sys.path.insert(0, os.path.dirname(__file__))
 
 from strategies_relative import normalize, VALID_DIRECTIONS, VALID_LIST, extract_direction
 from strategies_osm_relative import get_strategy, STRATEGY_MAP
-from osm_client import OSMEvidenceKG, NullKG
+from osm_client import OSMEvidenceKG, NullKG, load_cache, is_geocodable
 from rag_loop import RAGStrategy, DomainSpec
+from fewshot import FewShotSelector
 
 EXPERIMENT_SUFFIX = "relative_dir_20_sample"
 
@@ -226,7 +227,8 @@ def _load_checkpoint(ckpt_path: str) -> dict:
 # EVALUATION LOOP
 # ---------------------------------------------------------------------------
 def evaluate_strategy(strategy, df: pd.DataFrame, output_dir: str,
-                      model_tag: str, adapter_tag: str = "none"):
+                      model_tag: str, adapter_tag: str = "none",
+                      fewshot=None, prefix_holder=None):
 
     strategy_name = strategy.name.lower()
 
@@ -269,6 +271,9 @@ def evaluate_strategy(strategy, df: pd.DataFrame, output_dir: str,
             }
 
             expected = entity["relation_label"]
+
+            if prefix_holder is not None:
+                prefix_holder["v"] = fewshot.build_block(expected) if fewshot else ""
 
             def row_logger(msg: str):
                 log_f.write(msg + "\n")
@@ -356,6 +361,12 @@ def main():
     parser.add_argument("--temperature",    type=float, default=0.1)
     parser.add_argument("--max-new-tokens", type=int,   default=1024)
     parser.add_argument("--model-tag",      default="exp1_rel_base_gpu")
+    parser.add_argument("--shots",          type=int, default=0,
+                        help="0 = zero-shot; 5 = few-shot (5 same-label demos, one per level)")
+    parser.add_argument("--train-data",     default=None,
+                        help="Train CSV for few-shot demo sampling (required when --shots > 0)")
+    parser.add_argument("--keep-ungeocodable", action="store_true",
+                        help="Keep rows whose entities failed OSM retrieval (default: drop)")
     args = parser.parse_args()
 
     # ------------------------------------------------------------------
@@ -368,6 +379,20 @@ def main():
         df = df[df.index.isin(keep)]
         print(f"[DATA] Filtered to {len(df)} eval rows from {args.filter_indices}")
     print(f"[DATA] {len(df)} eval rows ready  ({args.dataset})")
+
+    if not args.keep_ungeocodable:
+        cache = load_cache("results/osm_cache.json")
+        if cache:
+            before = len(df)
+            df = df[df.apply(lambda r: is_geocodable(cache, r.get("source_entity"),
+                                                     r.get("target_entity")), axis=1)]
+            print(f"[OSM-FILTER] dropped {before - len(df)} ungeocodable rows; {len(df)} remain")
+            if len(df) == 0:
+                print("[ERROR] all rows dropped — warm the cache first (warm_osm_cache.py)")
+                sys.exit(1)
+        else:
+            print("[OSM-FILTER] no osm_cache.json — skipping geocodability filter")
+
     dist = df["relation_label"].value_counts().to_dict()
     print("[DATA] Label distribution:", dist)
 
@@ -471,8 +496,10 @@ def main():
 
     import time as _time
     _t0_first = [None]
+    prefix_holder = {"v": ""}   # few-shot demo prefix, set per row
 
     def gpu_inference_fn(prompt: str) -> str:
+        prompt = prefix_holder["v"] + prompt
         inputs = tokenizer(
             prompt,
             return_tensors="pt",
@@ -516,20 +543,34 @@ def main():
     )
 
     # ------------------------------------------------------------------
-    # 5. Run selected strategies
+    # 5. Few-shot demo selector (optional, label-conditioned)
+    # ------------------------------------------------------------------
+    fewshot = None
+    if args.shots > 0:
+        if not args.train_data or not os.path.exists(args.train_data):
+            print(f"[ERROR] --shots {args.shots} requires --train-data <train csv>")
+            sys.exit(1)
+        fewshot = FewShotSelector(args.train_data)
+        args.model_tag = f"{args.model_tag}_fs{args.shots}"
+        print(f"[FEWSHOT] {args.shots}-shot label-conditioned demos from {args.train_data} "
+              f"(tag → {args.model_tag})")
+
+    # ------------------------------------------------------------------
+    # 6. Run selected strategies
     # ------------------------------------------------------------------
     os.makedirs(args.output_dir, exist_ok=True)
     strategies = list(STRATEGY_MAP.keys()) if args.strategy == "all" else [args.strategy]
 
     for strat in strategies:
-        print(f"\nRunning {strat.upper()} (adapter={adapter_tag}, kg-mode={args.kg_mode})")
+        print(f"\nRunning {strat.upper()} (adapter={adapter_tag}, kg-mode={args.kg_mode}, shots={args.shots})")
         if args.kg_mode == "rag":
             strategy_obj = RAGStrategy(strat, kg, gpu_inference_fn, rel_spec)
         else:
             strategy_obj = get_strategy(strat, kg=kg, model_fn=gpu_inference_fn,
                                         max_new_tokens=_max_new_tokens,
                                         temperature=_temperature)
-        evaluate_strategy(strategy_obj, df, args.output_dir, args.model_tag, adapter_tag)
+        evaluate_strategy(strategy_obj, df, args.output_dir, args.model_tag, adapter_tag,
+                          fewshot=fewshot, prefix_holder=prefix_holder)
 
 
 if __name__ == "__main__":
