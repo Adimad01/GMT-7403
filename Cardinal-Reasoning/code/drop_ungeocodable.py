@@ -20,7 +20,7 @@ Dry-run by default (reports only).  Pass --apply to rewrite the checkpoints
 Usage:
   # Cardinal
   python drop_ungeocodable.py --dataset ../dataset/cardinal_direction_relations.csv \\
-                              --eval-indices ../dataset/eval_32_balanced_indices.json
+                              --eval-indices ../dataset/eval_40_balanced_indices.json
   # Topological (eval CSV already IS the eval set; indices are 0..104)
   python drop_ungeocodable.py --dataset ../dataset/topo_v2_eval.csv \\
                               --eval-indices ../dataset/topo_v2_eval_indices.json --apply

@@ -87,10 +87,10 @@ else
 fi
 
 # ─────────────────────────────────────────────────────────────────────────────
-# PHASE 2 — Evaluation
+# PHASE 2a — Zero-shot evaluation
 # ─────────────────────────────────────────────────────────────────────────────
 echo ""
-header "PHASE 2 — Evaluating 6 experiments × 3 strategies on 20 examples"
+header "PHASE 2a — Zero-shot: 6 experiments × 3 strategies on 20 examples"
 
 echo "  Exp 1 · Base GPT-OSS-20B (no adapter, no KG) · CoT / ToT / GoT"
 line
@@ -120,6 +120,41 @@ echo ""
 echo "  Exp 6 · Base + KG RAG · CoT / ToT / GoT"
 line
 $PYTHON exp6_base_kg_rag.py
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PHASE 2b — Few-shot evaluation (5 same-label demos)
+# ─────────────────────────────────────────────────────────────────────────────
+echo ""
+header "PHASE 2b — Few-shot (5 shots): 6 experiments × 3 strategies on 20 examples"
+
+echo "  Exp 1 · Base GPT-OSS-20B (no adapter, no KG) · CoT / ToT / GoT · 5-shot"
+line
+$PYTHON exp1_base.py --shots 5
+
+echo ""
+echo "  Exp 2 · Fine-tuned LoRA (no KG) · CoT / ToT / GoT · 5-shot"
+line
+$PYTHON exp2_ft_nokg.py --shots 5
+
+echo ""
+echo "  Exp 3 · OSM-KG LoRA (KG in training only) · CoT / ToT / GoT · 5-shot"
+line
+$PYTHON exp3_ft_osmkg.py --shots 5
+
+echo ""
+echo "  Exp 4 · Base + OSM KG as input · CoT / ToT / GoT · 5-shot"
+line
+$PYTHON exp4_base_kg_input.py --shots 5
+
+echo ""
+echo "  Exp 5 · Fine-tuned LoRA + OSM KG as input · CoT / ToT / GoT · 5-shot"
+line
+$PYTHON exp5_ft_kg_input.py --shots 5
+
+echo ""
+echo "  Exp 6 · Base + KG RAG · CoT / ToT / GoT · 5-shot"
+line
+$PYTHON exp6_base_kg_rag.py --shots 5
 
 # ─────────────────────────────────────────────────────────────────────────────
 # PHASE 3 — Analysis

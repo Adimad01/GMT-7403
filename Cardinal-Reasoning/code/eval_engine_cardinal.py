@@ -186,7 +186,7 @@ from osm_client import OSMEvidenceKG, NullKG, load_cache, is_geocodable
 from rag_loop import RAGStrategy, DomainSpec
 from fewshot import FewShotSelector
 
-EXPERIMENT_SUFFIX = "cardinal_dir_32_sample"
+EXPERIMENT_SUFFIX = "cardinal_dir_40_sample"
 
 
 # ---------------------------------------------------------------------------

@@ -19,7 +19,7 @@ Note: rows whose entities fail OSM retrieval are dropped from eval automatically
 import os, sys, json, argparse
 
 DATASET        = "../dataset/cardinal_direction_relations.csv"
-INDICES_FILE   = "../dataset/eval_32_balanced_indices.json"
+INDICES_FILE   = "../dataset/eval_40_balanced_indices.json"
 TRAIN_DATA     = "../dataset/cardinal_nokg_train.csv"          # for --shots few-shot demo sampling
 MODEL_ID       = "openai/gpt-oss-20b"
 ADAPTER_PATH   = None

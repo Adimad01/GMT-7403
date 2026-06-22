@@ -31,7 +31,7 @@ from strategies_cardinal import VALID_DIRECTIONS, VALID_LIST
 from osm_client import OSMEvidenceKG
 
 DATASET   = "../dataset/cardinal_direction_relations.csv"
-EVAL_IDX  = "../dataset/eval_32_balanced_indices.json"
+EVAL_IDX  = "../dataset/eval_40_balanced_indices.json"
 OUT_CSV   = "../dataset/cardinal_nokg_train.csv"
 OUT_JSONL = "../dataset/cardinal_osm_kg_train.jsonl"
 
