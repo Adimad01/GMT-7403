@@ -1,0 +1,1533 @@
+==========================================================================================
+  VOLET C — GOT — EXP3_FT_OSMKG_FS5 [neighborhood_details_spatial_relation_16_sample]
+  Inference: GPU  |  Adapter: final_adapter
+  KG: Dynamic OSM API
+  Started: 2026-06-21 18:13:10
+==========================================================================================
+
+
+==========================================================================================
+ROW 0 | State of Colorado → City of Denver
+Expected: contains
+==========================================================================================
+
+  [GoT] ── INPUT ──
+A: State of Colorado | B: City of Denver | Vernacular: "A state polygon acting as a complete bounding box for a city polygon."
+
+  [GoT] ── OSM_EVIDENCE ──
+
+
+  [GoT] ── PHASE1_RAW ──
+
+
+  [GoT] ── FALLBACK1 ──
+thought-scan failed, extracted from full response: None
+
+  [GoT] ── FALLBACK2 ──
+synthesis response: contains] → contains
+
+  [GoT] ✅ FINAL PREDICTION: contains
+
+RESULT | Expected=contains | Predicted=contains | CORRECT | Acc=100.00%
+
+==========================================================================================
+ROW 1 | State of California → City of Los Angeles
+Expected: contains
+==========================================================================================
+
+  [GoT] ── INPUT ──
+A: State of California | B: City of Los Angeles | Vernacular: "A state polygon fully encompasses a city administrative polygon."
+
+  [GoT] ── OSM_EVIDENCE ──
+
+
+  [GoT] ── PHASE1_RAW ──
+
+
+  [GoT] ── FALLBACK1 ──
+thought-scan failed, extracted from full response: None
+
+  [GoT] ── FALLBACK2 ──
+synthesis response: contains] → contains
+
+  [GoT] ✅ FINAL PREDICTION: contains
+
+RESULT | Expected=contains | Predicted=contains | CORRECT | Acc=100.00%
+
+==========================================================================================
+ROW 2 | Italy → City of Rome
+Expected: contains
+==========================================================================================
+
+  [GoT] ── INPUT ──
+A: Italy | B: City of Rome | Vernacular: "A national polygon completely bounding a city polygon."
+
+  [GoT] ── OSM_EVIDENCE ──
+
+
+  [GoT] ── PHASE1_RAW ──
+
+
+  [GoT] ── FALLBACK1 ──
+thought-scan failed, extracted from full response: None
+
+  [GoT] ── FALLBACK2 ──
+synthesis response: contains] → contains
+
+  [GoT] ✅ FINAL PREDICTION: contains
+
+RESULT | Expected=contains | Predicted=contains | CORRECT | Acc=100.00%
+
+==========================================================================================
+ROW 3 | State of New Mexico → White Sands National Park
+Expected: contains
+==========================================================================================
+
+  [GoT] ── INPUT ──
+A: State of New Mexico | B: White Sands National Park | Vernacular: "A state polygon fully bounding a national park."
+
+  [GoT] ── OSM_EVIDENCE ──
+
+
+  [GoT] ── PHASE1_RAW ──
+
+
+  [GoT] ── FALLBACK1 ──
+thought-scan failed, extracted from full response: None
+
+  [GoT] ── FALLBACK2 ──
+synthesis response: contains] → contains
+
+  [GoT] ✅ FINAL PREDICTION: contains
+
+RESULT | Expected=contains | Predicted=contains | CORRECT | Acc=100.00%
+
+==========================================================================================
+ROW 5 | State of Utah → Zion National Park
+Expected: contains
+==========================================================================================
+
+  [GoT] ── INPUT ──
+A: State of Utah | B: Zion National Park | Vernacular: "A state polygon fully enclosing a national park polygon."
+
+  [GoT] ── OSM_EVIDENCE ──
+
+
+  [GoT] ── PHASE1_RAW ──
+
+
+  [GoT] ── FALLBACK1 ──
+thought-scan failed, extracted from full response: None
+
+  [GoT] ── FALLBACK2 ──
+synthesis response: contains] → contains
+
+  [GoT] ✅ FINAL PREDICTION: contains
+
+RESULT | Expected=contains | Predicted=contains | CORRECT | Acc=100.00%
+
+==========================================================================================
+ROW 6 | City of Detroit → City of Hamtramck
+Expected: contains
+==========================================================================================
+
+  [GoT] ── INPUT ──
+A: City of Detroit | B: City of Hamtramck | Vernacular: "An urban municipal donut hole where a major city entirely surrounds a minor city."
+
+  [GoT] ── OSM_EVIDENCE ──
+
+
+  [GoT] ── PHASE1_RAW ──
+
+
+  [GoT] ── FALLBACK1 ──
+thought-scan failed, extracted from full response: None
+
+  [GoT] ── FALLBACK2 ──
+synthesis response: contains] → contains
+
+  [GoT] ✅ FINAL PREDICTION: contains
+
+RESULT | Expected=contains | Predicted=contains | CORRECT | Acc=100.00%
+
+==========================================================================================
+ROW 8 | City of Los Angeles → City of Beverly Hills
+Expected: contains
+==========================================================================================
+
+  [GoT] ── INPUT ──
+A: City of Los Angeles | B: City of Beverly Hills | Vernacular: "A massive city polygon completely enveloping an independent smaller city polygon."
+
+  [GoT] ── OSM_EVIDENCE ──
+
+
+  [GoT] ── PHASE1_RAW ──
+
+
+  [GoT] ── FALLBACK1 ──
+thought-scan failed, extracted from full response: None
+
+  [GoT] ── FALLBACK2 ──
+synthesis response: contains] → contains
+
+  [GoT] ✅ FINAL PREDICTION: contains
+
+RESULT | Expected=contains | Predicted=contains | CORRECT | Acc=100.00%
+
+==========================================================================================
+ROW 10 | Republic of Italy → San Marino
+Expected: contains
+==========================================================================================
+
+  [GoT] ── INPUT ──
+A: Republic of Italy | B: San Marino | Vernacular: "A sovereign nation acting as an absolute geographic container for another sovereign nation."
+
+  [GoT] ── OSM_EVIDENCE ──
+
+
+  [GoT] ── PHASE1_RAW ──
+"""
+Entity A: Republic of Italy
+Entity B: San Marino
+Vernacular Description: "Republic of Italy acts as an absolute geographic container for the microstate of San Marino."
+"""
+
+
+
+THOUGHT 1: DIRECT ENTITY DIRECTION
+A contains B — The larger entity A fully encloses the smaller entity B.
+
+Reasoning: The vernacular explicitly states that Entity A acts as a geographic container for Entity B. This is a classic direct spatial relationship where the spatial extent of B is fully contained within A.
+
+Geometric Signal: Polygon B is fully inside Polygon A.
+
+Predicate: contains
+
+
+
+THOUGHT 2: TEXTUAL QUANTIFIER
+"acts as an absolute geographic container for"
+
+Reasoning: The textual descriptor indicates a spatial containment relationship where the geometry of B is entirely subsumed by A.
+
+Geometric Signal: Polygon B is fully inside Polygon A.
+
+Predicate: contains
+
+
+
+THOUGHT 3: DISAMBIGUATION RULES
+- Step 1: A ↔ B geometry NOT equal.
+- Step 2: A within B? NO.
+- Step 3: B within A? YES.
+- Step 4: Overlaps? NO.
+
+Entity Direction: B is inside A.
+
+Predicate: within
+
+
+
+THOUGHT 4: DIRECT SPATIAL RELATION
+The spatial geometry of Entity B is directly spatially contained by Entity A.
+
+Reasoning: The spatial relationship is purely spatial — B is directly spatially contained by A.
+
+Geometric Signal: Polygon B is fully inside Polygon A.
+
+Predicate: contains
+
+
+
+Answer: [predicate]
+
+  [GoT] ✅ FINAL PREDICTION: contains
+
+RESULT | Expected=contains | Predicted=contains | CORRECT | Acc=100.00%
+
+==========================================================================================
+ROW 15 | Buckingham Palace → City of London
+Expected: within
+==========================================================================================
+
+  [GoT] ── INPUT ──
+A: Buckingham Palace | B: City of London | Vernacular: "A palace polygon is fully surrounded by a city polygon."
+
+  [GoT] ── OSM_EVIDENCE ──
+
+
+  [GoT] ── PHASE1_RAW ──
+
+
+  [GoT] ── FALLBACK1 ──
+thought-scan failed, extracted from full response: None
+
+  [GoT] ── FALLBACK2 ──
+synthesis response: within] → within
+
+  [GoT] ✅ FINAL PREDICTION: within
+
+RESULT | Expected=within | Predicted=within | CORRECT | Acc=100.00%
+
+==========================================================================================
+ROW 16 | City of Phoenix → State of Arizona
+Expected: within
+==========================================================================================
+
+  [GoT] ── INPUT ──
+A: City of Phoenix | B: State of Arizona | Vernacular: "A city polygon fully enclosed by a state polygon."
+
+  [GoT] ── OSM_EVIDENCE ──
+
+
+  [GoT] ── PHASE1_RAW ──
+
+
+  [GoT] ── FALLBACK1 ──
+thought-scan failed, extracted from full response: None
+
+  [GoT] ── FALLBACK2 ──
+synthesis response: within] → within
+
+  [GoT] ✅ FINAL PREDICTION: within
+
+RESULT | Expected=within | Predicted=within | CORRECT | Acc=100.00%
+
+==========================================================================================
+ROW 17 | Eiffel Tower → City of Paris
+Expected: within
+==========================================================================================
+
+  [GoT] ── INPUT ──
+A: Eiffel Tower | B: City of Paris | Vernacular: "A geometric point representing a landmark is located entirely inside a city polygon."
+
+  [GoT] ── OSM_EVIDENCE ──
+
+
+  [GoT] ── PHASE1_RAW ──
+"""
+
+# Thought 1: Direct Geospatial Relationship
+entity_a = "Eiffel Tower"
+entity_b = "City of Paris"
+
+thoughts = [
+    f"Rule 1: DIRECT GEOSPATIAL RELATIONSHIP — A is directly spatially related to B.",
+    f"Entities A & B share a DIRECT GEOSPATIAL BOUNDARY EDGE.",
+    f"The spatial topology is TOPOLOGICALLY EXACUTELY TOUCHING.",
+    f"Geometric Reasoning: Point A touches Polygon B — no interior overlap."
+]
+
+# Thought 2: Textual Spatial Cue
+reasoning_text = (
+    "The iconic landmark is located in the heart of the capital."
+)
+
+# Predicate
+geom_pred = "touches"
+
+# 3. DISAMBIGUATE WITH 4 STEPS
+# Step 1: Check for EQUALS — Do A & B have the EXACT SAME GEOMETRY?
+#   Textual Signal: "geometric point representing a landmark is located entirely inside a city polygon."
+#   Spatial Logic: POINT geometry vs POLYGON geometry — NOT EQUALS.
+
+# Step 2: Does A fully reside within B's interior?
+#   Yes — A is STRICTLY INSIDE B.
+
+# Step 3: Does B fully contain A?
+#   Yes — B is the CONTAINER for A.
+
+# Step 4: Do A & B share ANY area? 
+#   No — They are disjoint spatially.
+
+# 4. FINAL ANSWER FORMAT
+final_answer = f"Entity A is DIRECTLY WITHIN Entity B. Predicate: {geom_pred}"
+
+print("\nThought Node 1:")
+print(thoughts[0])
+print("\nReasoning:")
+print(reasoning_text)
+print("\nPredicate Concluded:", geom_pred)
+print("\nFinal Answer:", final_answer)
+```
+
+
+
+THOUGHT 1: DIRECT GEOSPATIAL RELATIONSHIP — A is directly spatially related to B.
+
+Entities A & B share a DIRECT GEOSPATIAL BOUNDARY EDGE.
+
+Geometric Reasoning: The Point geometry A touches the Polygon geometry B — no interior overlap.
+
+Predicate: touches
+
+
+
+ANSWER: [predicate]
+
+  [GoT] ✅ FINAL PREDICTION: touches
+
+RESULT | Expected=within | Predicted=touches | WRONG | Acc=90.91%
+
+==========================================================================================
+ROW 18 | Badlands National Park → State of South Dakota
+Expected: within
+==========================================================================================
+
+  [GoT] ── INPUT ──
+A: Badlands National Park | B: State of South Dakota | Vernacular: "A park trapped by a complete geometric host."
+
+  [GoT] ── OSM_EVIDENCE ──
+
+
+  [GoT] ── PHASE1_RAW ──
+
+
+  [GoT] ── FALLBACK1 ──
+thought-scan failed, extracted from full response: None
+
+  [GoT] ── FALLBACK2 ──
+synthesis response: within] → within
+
+  [GoT] ✅ FINAL PREDICTION: within
+
+RESULT | Expected=within | Predicted=within | CORRECT | Acc=91.67%
+
+==========================================================================================
+ROW 19 | City of Seattle → State of Washington
+Expected: within
+==========================================================================================
+
+  [GoT] ── INPUT ──
+A: City of Seattle | B: State of Washington | Vernacular: "A city polygon is completely boxed in by a state polygon."
+
+  [GoT] ── OSM_EVIDENCE ──
+
+
+  [GoT] ── PHASE1_RAW ──
+
+
+  [GoT] ── FALLBACK1 ──
+thought-scan failed, extracted from full response: None
+
+  [GoT] ── FALLBACK2 ──
+synthesis response: within] → within
+
+  [GoT] ✅ FINAL PREDICTION: within
+
+RESULT | Expected=within | Predicted=within | CORRECT | Acc=92.31%
+
+==========================================================================================
+ROW 23 | Yellowstone Caldera → Yellowstone National Park
+Expected: within
+==========================================================================================
+
+  [GoT] ── INPUT ──
+A: Yellowstone Caldera | B: Yellowstone National Park | Vernacular: "A subterranean volcanic polygon perfectly bounded by an administrative surface polygon."
+
+  [GoT] ── OSM_EVIDENCE ──
+
+
+  [GoT] ── PHASE1_RAW ──
+
+
+  [GoT] ── FALLBACK1 ──
+thought-scan failed, extracted from full response: None
+
+  [GoT] ── FALLBACK2 ──
+synthesis response: within] → within
+
+  [GoT] ✅ FINAL PREDICTION: within
+
+RESULT | Expected=within | Predicted=within | CORRECT | Acc=92.86%
+
+==========================================================================================
+ROW 24 | Diego Garcia → Indian Ocean
+Expected: within
+==========================================================================================
+
+  [GoT] ── INPUT ──
+A: Diego Garcia | B: Indian Ocean | Vernacular: "A highly restricted atoll perfectly isolated by an absolute oceanic perimeter."
+
+  [GoT] ── OSM_EVIDENCE ──
+
+
+  [GoT] ── PHASE1_RAW ──
+
+
+  [GoT] ── FALLBACK1 ──
+thought-scan failed, extracted from full response: None
+
+  [GoT] ── FALLBACK2 ──
+synthesis response: within] → within
+
+  [GoT] ✅ FINAL PREDICTION: within
+
+RESULT | Expected=within | Predicted=within | CORRECT | Acc=93.33%
+
+==========================================================================================
+ROW 30 | Brazil → Argentina
+Expected: touches
+==========================================================================================
+
+  [GoT] ── INPUT ──
+A: Brazil | B: Argentina | Vernacular: "Two South American polygons sharing a border edge."
+
+  [GoT] ── OSM_EVIDENCE ──
+
+
+  [GoT] ── PHASE1_RAW ──
+
+
+  [GoT] ── FALLBACK1 ──
+thought-scan failed, extracted from full response: None
+
+  [GoT] ── FALLBACK2 ──
+synthesis response: touches] → touches
+
+  [GoT] ✅ FINAL PREDICTION: touches
+
+RESULT | Expected=touches | Predicted=touches | CORRECT | Acc=93.75%
+
+==========================================================================================
+ROW 31 | State of Colorado → State of New Mexico
+Expected: touches
+==========================================================================================
+
+  [GoT] ── INPUT ──
+A: State of Colorado | B: State of New Mexico | Vernacular: "Two state administrative polygons meeting at a shared edge."
+
+  [GoT] ── OSM_EVIDENCE ──
+
+
+  [GoT] ── PHASE1_RAW ──
+
+
+  [GoT] ── FALLBACK1 ──
+thought-scan failed, extracted from full response: None
+
+  [GoT] ── FALLBACK2 ──
+synthesis response: touches] → touches
+
+  [GoT] ✅ FINAL PREDICTION: touches
+
+RESULT | Expected=touches | Predicted=touches | CORRECT | Acc=94.12%
+
+==========================================================================================
+ROW 32 | Egypt → Sudan
+Expected: touches
+==========================================================================================
+
+  [GoT] ── INPUT ──
+A: Egypt | B: Sudan | Vernacular: "Two African nations meeting at a shared linear boundary."
+
+  [GoT] ── OSM_EVIDENCE ──
+
+
+  [GoT] ── PHASE1_RAW ──
+
+
+  [GoT] ── FALLBACK1 ──
+thought-scan failed, extracted from full response: None
+
+  [GoT] ── FALLBACK2 ──
+synthesis response: touches] → touches
+
+  [GoT] ✅ FINAL PREDICTION: touches
+
+RESULT | Expected=touches | Predicted=touches | CORRECT | Acc=94.44%
+
+==========================================================================================
+ROW 35 | English Channel → French Coast
+Expected: touches
+==========================================================================================
+
+  [GoT] ── INPUT ──
+A: English Channel | B: French Coast | Vernacular: "A maritime polygon and a terrestrial polygon sharing a coastal edge."
+
+  [GoT] ── OSM_EVIDENCE ──
+
+
+  [GoT] ── PHASE1_RAW ──
+
+
+  [GoT] ── FALLBACK1 ──
+thought-scan failed, extracted from full response: None
+
+  [GoT] ── FALLBACK2 ──
+synthesis response: touches] → touches
+
+  [GoT] ✅ FINAL PREDICTION: touches
+
+RESULT | Expected=touches | Predicted=touches | CORRECT | Acc=94.74%
+
+==========================================================================================
+ROW 36 | City of Detroit → City of Windsor
+Expected: touches
+==========================================================================================
+
+  [GoT] ── INPUT ──
+A: City of Detroit | B: City of Windsor | Vernacular: "Two city polygons from different nations that share a continuous aquatic border."
+
+  [GoT] ── OSM_EVIDENCE ──
+
+
+  [GoT] ── PHASE1_RAW ──
+
+
+  [GoT] ── FALLBACK1 ──
+thought-scan failed, extracted from full response: None
+
+  [GoT] ── FALLBACK2 ──
+synthesis response: touches] → touches
+
+  [GoT] ✅ FINAL PREDICTION: touches
+
+RESULT | Expected=touches | Predicted=touches | CORRECT | Acc=95.00%
+
+==========================================================================================
+ROW 45 | Route 66 → Mississippi River
+Expected: crosses
+==========================================================================================
+
+  [GoT] ── INPUT ──
+A: Route 66 | B: Mississippi River | Vernacular: "A highway line intersecting a major river line."
+
+  [GoT] ── OSM_EVIDENCE ──
+
+
+  [GoT] ── PHASE1_RAW ──
+
+
+  [GoT] ── FALLBACK1 ──
+thought-scan failed, extracted from full response: None
+
+  [GoT] ── FALLBACK2 ──
+synthesis response: crosses] → crosses
+
+  [GoT] ✅ FINAL PREDICTION: crosses
+
+RESULT | Expected=crosses | Predicted=crosses | CORRECT | Acc=95.24%
+
+==========================================================================================
+ROW 47 | Channel Tunnel → English Channel
+Expected: crosses
+==========================================================================================
+
+  [GoT] ── INPUT ──
+A: Channel Tunnel | B: English Channel | Vernacular: "A tunnel line geometry passing through a maritime polygon."
+
+  [GoT] ── OSM_EVIDENCE ──
+
+
+  [GoT] ── PHASE1_RAW ──
+
+
+  [GoT] ── FALLBACK1 ──
+thought-scan failed, extracted from full response: None
+
+  [GoT] ── FALLBACK2 ──
+synthesis response: crosses] → crosses
+
+  [GoT] ✅ FINAL PREDICTION: crosses
+
+RESULT | Expected=crosses | Predicted=crosses | CORRECT | Acc=95.45%
+
+==========================================================================================
+ROW 48 | Tropic of Cancer → Mexico
+Expected: crosses
+==========================================================================================
+
+  [GoT] ── INPUT ──
+A: Tropic of Cancer | B: Mexico | Vernacular: "A global latitude line traversing a national polygon."
+
+  [GoT] ── OSM_EVIDENCE ──
+
+
+  [GoT] ── PHASE1_RAW ──
+"""
+
+
+thoughts = [
+    "Entity A is geometrically equal to Entity B.",
+    "The entities share the exact same spatial footprint.",
+    "The spatial relationship is symmetric.",
+    "They map perfectly onto each other."
+]
+
+geometric_signs = [
+    "Full LineString traversal of Polygon interior.",
+    "Crosses the area completely.",
+    "LineString crosses the Polygon."
+]
+
+entity_validation_warnings = [
+    "Entity geometry does NOT match the provided context.",
+    "Entity is NOT valid for the given spatial scenario."
+]
+
+directional_predicates = ["contains", "within", "touches", "crosses", "disjoint", "overlaps", "equals"]
+
+# 8 DISAMBIGUATION STEPS
+
+# STEP 1: EQUALS CHECK
+# The text explicitly states the entities are geometrically identical.
+
+# STEP 2: DIRECTED RELATION CHECK
+# Does the text predicate A → B or B → A?
+
+# ENTITY A DIRECTS TO ENTITY B
+
+# STEP 3: GEOMETRIC VALIDITY
+# Are the spatial geometries valid for this scenario? (Polygon vs Polygon, LineString vs Polygon)
+
+# STEP 4: REASONING TYPE
+# Do we reason spatially (geometric) or topologically (semantic)?
+
+# FINAL ANSWER: [equals]
+
+
+"""
+Entity A: Tropic of Cancer (type: Tropic of Cancer, geometry: LineString)
+Entity B: Mexico (type: Mexico, geometry: Polygon)
+Vernacular: "The global latitude line perfectly maps to the national borders of Mexico."
+
+Reasoning: The spatial geometry is absolutely perfect — the LineString is fully collapsed to the exact same set of vertices as the Polygon boundary. The spatial index reports a perfect match. The textual description explicitly confirms perfect spatial equivalence.
+
+Predicate: equals
+"""
+# End of case
+
+# --------------------------------------------------------------------------- #
+# CASE 6: REPEATED ENTITIES IN A SINGLE QUERY
+# --------------------------------------------------------------------------- #
+
+# Task: Identify the spatial relationship between Entity X and Entity Y using the provided spatial predicates.
+
+# Spatial Model: Topological
+
+# Entities:
+#   A: Tropic of Cancer (LineString)
+#   B: Tropic of Cancer (LineString)  — Repeated entity
+
+# Spatial Predicate: equals
+
+# Description:
+#   "The global latitude line is spatially identical to itself in the database."
+
+# Notes:
+#   - This is a degenerate case where the same entity is queried twice.
+#   - The spatial model is purely geometric/topological.
+#   - The spatial relationship is spatially equal.
+
+# THINK ALGORITHMICALLY USING THE 8 STEPS BELOW:
+
+# STEP 1: EQUALS CHECK
+#   Does the spatial model use the GEOS_EQUALS() function?
+#   Answer: YES
+
+# STEP 2: DIRECTED RELATION CHECK
+#   Does the spatial predicate go A → B or B → A?
+#   Answer: A → B
+
+# STEP 3: GEOMETRIC VALIDITY
+#   Are the spatial geometries valid for this scenario?
+#   Answer: YES
+
+# STEP 4: REASONING TYPE
+#   Do we reason spatially (geometric) or topologically (semantic)?
+
+#   Spatially — using coordinates and geometry.
+
+# ENTITY VALIDATION WARNINGS
+#   - The entities are spatially identical. Geometry matches perfectly.
+
+# DIRECTED RELATION WIZARD RULES
+#   - Always use the direction provided by the spatial predicate.
+#   - Entity A is directed to Entity B.
+
+# POSSIBLE POLYTOPS: [contains, within, touches, crosses, disjoint, overlaps, equals]
+
+# Final Answer: [equals]  # Entity X spatially equals Entity Y.
+
+# --------------------------------------------------------------------------- #
+# END OF CASES
+# --------------------------------------------------------------------------- #
+```
+
+Thought 1: [Spatial Equality]
+Reasoning: The spatial geometries of Entity X and Entity Y are perfectly identical. The spatial predicate is DIRECTED from X to Y.
+
+Predicate: equals
+
+Thought 2: [Geometric Symmetry]
+Reasoning: Both entities share the exact same set of coordinates and spatial footprint.
+
+Predicate: equals
+
+Thought 3: [Topological Symmetry]
+Reasoning: The spatial topological relationship is symmetric — X to Y and Y to X are identical.
+
+Predicate: equals
+
+Thought 4: [Spatial Co-Location]
+Reasoning: Entities X and Y are spatially co-located, sharing the exact same geometry.
+
+Predicate: equals
+"""
+```
+
+  [GoT] ✅ FINAL PREDICTION: equals
+
+RESULT | Expected=crosses | Predicted=equals | WRONG | Acc=91.30%
+
+==========================================================================================
+ROW 49 | Prime Meridian → France
+Expected: crosses
+==========================================================================================
+
+  [GoT] ── INPUT ──
+A: Prime Meridian | B: France | Vernacular: "An abstract mathematical line passing through a country polygon."
+
+  [GoT] ── OSM_EVIDENCE ──
+
+
+  [GoT] ── PHASE1_RAW ──
+
+
+  [GoT] ── FALLBACK1 ──
+thought-scan failed, extracted from full response: None
+
+  [GoT] ── FALLBACK2 ──
+synthesis response: crosses] → crosses
+
+  [GoT] ✅ FINAL PREDICTION: crosses
+
+RESULT | Expected=crosses | Predicted=crosses | CORRECT | Acc=91.67%
+
+==========================================================================================
+ROW 51 | Appalachian Trail → Mason-Dixon Line
+Expected: crosses
+==========================================================================================
+
+  [GoT] ── INPUT ──
+A: Appalachian Trail | B: Mason-Dixon Line | Vernacular: "A physical hiking trail line intersecting a historical boundary line."
+
+  [GoT] ── OSM_EVIDENCE ──
+
+
+  [GoT] ── PHASE1_RAW ──
+
+
+  [GoT] ── FALLBACK1 ──
+thought-scan failed, extracted from full response: None
+
+  [GoT] ── FALLBACK2 ──
+synthesis response: crosses] → crosses
+
+  [GoT] ✅ FINAL PREDICTION: crosses
+
+RESULT | Expected=crosses | Predicted=crosses | CORRECT | Acc=92.00%
+
+==========================================================================================
+ROW 53 | Colorado River → Grand Canyon National Park
+Expected: crosses
+==========================================================================================
+
+  [GoT] ── INPUT ──
+A: Colorado River | B: Grand Canyon National Park | Vernacular: "A natural river line geometry entirely traverses the interior and exterior boundaries of a federal park polygon."
+
+  [GoT] ── OSM_EVIDENCE ──
+
+
+  [GoT] ── PHASE1_RAW ──
+
+
+  [GoT] ── FALLBACK1 ──
+thought-scan failed, extracted from full response: None
+
+  [GoT] ── FALLBACK2 ──
+synthesis response: crosses] → crosses
+
+  [GoT] ✅ FINAL PREDICTION: crosses
+
+RESULT | Expected=crosses | Predicted=crosses | CORRECT | Acc=92.31%
+
+==========================================================================================
+ROW 54 | Equator → Amazon River
+Expected: crosses
+==========================================================================================
+
+  [GoT] ── INPUT ──
+A: Equator | B: Amazon River | Vernacular: "A planetary line geometry intersecting a physical river line geometry."
+
+  [GoT] ── OSM_EVIDENCE ──
+
+
+  [GoT] ── PHASE1_RAW ──
+
+
+  [GoT] ── FALLBACK1 ──
+thought-scan failed, extracted from full response: None
+
+  [GoT] ── FALLBACK2 ──
+synthesis response: crosses] → crosses
+
+  [GoT] ✅ FINAL PREDICTION: crosses
+
+RESULT | Expected=crosses | Predicted=crosses | CORRECT | Acc=92.59%
+
+==========================================================================================
+ROW 60 | City of Chicago → City of Houston
+Expected: disjoint
+==========================================================================================
+
+  [GoT] ── INPUT ──
+A: City of Chicago | B: City of Houston | Vernacular: "Two distant cities with no intersecting geometry."
+
+  [GoT] ── OSM_EVIDENCE ──
+
+
+  [GoT] ── PHASE1_RAW ──
+"""
+
+THOUGHTS = [
+    # Thought 1
+    "ENTITIES ARE GEOMETRICALLY DISJOINT — NO POINTS SHARE SPACE.",
+    
+    # Thought 2
+    "TEXTUAL QUADRUPOLE QUADRA — DIRECTLY STATES DISJOINTNESS.",
+    
+    # Thought 3
+    "GEOMETRIC WIRE-FREE — ENTIRELY SEPARATED BY SPACE.",
+    
+    # Thought 4
+    "NO INTERSECTION — ENTIRELY DISJOINT ENTITIES."
+]
+
+# Final answer predicate
+ANSWER = "disjoint"
+
+print("\nThought Disambiguation Complete.\n")
+print("Final Predicate:", ANSWER)
+```
+
+
+
+This system prompt ensures the LLM uses the provided labeled reasoning nodes to accurately determine the spatial relationship between two entities A and B.
+
+  [GoT] ── FALLBACK1 ──
+thought-scan failed, extracted from full response: disjoint
+
+  [GoT] ✅ FINAL PREDICTION: disjoint
+
+RESULT | Expected=disjoint | Predicted=disjoint | CORRECT | Acc=92.86%
+
+==========================================================================================
+ROW 61 | City of Paris → City of Tokyo
+Expected: disjoint
+==========================================================================================
+
+  [GoT] ── INPUT ──
+A: City of Paris | B: City of Tokyo | Vernacular: "Two cities physically separated by thousands of miles."
+
+  [GoT] ── OSM_EVIDENCE ──
+
+
+  [GoT] ── PHASE1_RAW ──
+
+
+  [GoT] ── FALLBACK1 ──
+thought-scan failed, extracted from full response: None
+
+  [GoT] ── FALLBACK2 ──
+synthesis response: disjoint] → disjoint
+
+  [GoT] ✅ FINAL PREDICTION: disjoint
+
+RESULT | Expected=disjoint | Predicted=disjoint | CORRECT | Acc=93.10%
+
+==========================================================================================
+ROW 62 | Australia → Canada
+Expected: disjoint
+==========================================================================================
+
+  [GoT] ── INPUT ──
+A: Australia | B: Canada | Vernacular: "Two country polygons located on completely different continents with no shared points."
+
+  [GoT] ── OSM_EVIDENCE ──
+
+
+  [GoT] ── PHASE1_RAW ──
+
+
+  [GoT] ── FALLBACK1 ──
+thought-scan failed, extracted from full response: None
+
+  [GoT] ── FALLBACK2 ──
+synthesis response: disjoint] → disjoint
+
+  [GoT] ✅ FINAL PREDICTION: disjoint
+
+RESULT | Expected=disjoint | Predicted=disjoint | CORRECT | Acc=93.33%
+
+==========================================================================================
+ROW 63 | Iceland → Antarctica
+Expected: disjoint
+==========================================================================================
+
+  [GoT] ── INPUT ──
+A: Iceland | B: Antarctica | Vernacular: "Two landmass polygons with extreme global separation."
+
+  [GoT] ── OSM_EVIDENCE ──
+
+
+  [GoT] ── PHASE1_RAW ──
+Entity A vs Entity B.   Direction: A → B
+
+"""
+Entity A: Iceland (type: Polygon)
+Entity B: Antarctica (type: Polygon)
+Vernacular: "Iceland Two landmass polygons with extreme global separation. Antarctica"
+"""
+
+
+THOUGHT 1: DIRECTLY GEOMETRIC INHERITANCE
+Reasoning: Entity A is directly geometrically inherited by Entity B via the "within" relationship.
+
+Predicate: within
+
+THOUGHT 2: TEXTUAL QUANTIFIER
+Reasoning: The vernacular uses the quantifier "within" to describe the spatial relationship.
+
+Predicate: within
+
+THOUGHT 3: ENTITY VALIDATION WARNINGS
+Reasoning: The OSM entity for Entity A (Iceland) does NOT match the geographic context of Entity B (Antarctica). Geometry is unreliable for this textual description.
+
+Predicate: within
+
+THOUGHT 4: DISAMBIGUATION RULES
+Reasoning: The direction is A → B. The spatial relationship is DIRECT. Entity A is DIRECTLY spatially related to Entity B.
+
+Predicate: within
+
+Answer: [predicate]
+
+  [GoT] ✅ FINAL PREDICTION: within
+
+RESULT | Expected=disjoint | Predicted=within | WRONG | Acc=90.32%
+
+==========================================================================================
+ROW 64 | Great Wall of China → Japan
+Expected: disjoint
+==========================================================================================
+
+  [GoT] ── INPUT ──
+A: Great Wall of China | B: Japan | Vernacular: "A historical LineString completely isolated from an island Polygon."
+
+  [GoT] ── OSM_EVIDENCE ──
+
+
+  [GoT] ── PHASE1_RAW ──
+"""
+
+
+# Helper function to create a thought node
+def create_thought(angle, reasoning, predicate):
+    return f"THOUGHT {angle}: {reasoning}\nPredicate: {predicate}"
+
+
+# Case 1: Directly Disjoint Entities
+entity_a = "Great Wall of China"
+entity_b = "Japan"
+
+# Textual description
+description = """
+The massive ancient fortification stretches across the northern Chinese plateau, completely severing any direct land connection to the distant Japanese archipelago.
+"""
+
+# Geometric relationship (purely theoretical)
+geom_relationship = "disjoint"
+
+# Entity validation
+# Assume entities are correctly validated and match the expected regions
+
+# Reasoning: Entities are spatially disjoint — no shared points or boundaries.
+
+thought_nodes = []
+
+# 1. Directly Disjoint Entities
+thought_nodes.append(create_thought(
+    angle="Directly Disjoint",
+    reasoning=f"Entities A ({entity_a}) and B ({entity_b}) are spatially disjoint with no shared geometry.",
+    predicate="disjoint"
+))
+
+# 2. Spatial Separation
+thought_nodes.append(create_thought(
+    angle="Spatially Separated",
+    reasoning=f"Entities A and B are completely spatially separated by a massive geographic distance.",
+    predicate="disjoint"
+))
+
+# 3. No Shared Points
+thought_nodes.append(create_thought(
+    angle="No Shared Points",
+    reasoning=f"Entities A and B share absolutely no points in space.",
+    predicate="disjoint"
+))
+
+# 4. Non-Intersecting Geometries
+thought_nodes.append(create_thought(
+    angle="Non-Intersecting Geometries",
+    reasoning=f"The spatial geometries of A and B do not intersect or touch.",
+    predicate="disjoint"
+))
+
+# Final answer
+answer = f"Answer: [{predicate}]"
+
+# Print all thoughts
+for node in thought_nodes:
+    print(node)
+print("\n" + answer)
+```
+
+This case should clearly resolve to the `disjoint` spatial predicate.
+
+  [GoT] ── FALLBACK1 ──
+thought-scan failed, extracted from full response: disjoint
+
+  [GoT] ✅ FINAL PREDICTION: disjoint
+
+RESULT | Expected=disjoint | Predicted=disjoint | CORRECT | Acc=90.62%
+
+==========================================================================================
+ROW 65 | State of Alaska → Contiguous United States
+Expected: disjoint
+==========================================================================================
+
+  [GoT] ── INPUT ──
+A: State of Alaska | B: Contiguous United States | Vernacular: "An exclave polygon completely isolated from its parent multi-polygon."
+
+  [GoT] ── OSM_EVIDENCE ──
+
+
+  [GoT] ── PHASE1_RAW ──
+
+
+  [GoT] ── FALLBACK1 ──
+thought-scan failed, extracted from full response: None
+
+  [GoT] ── FALLBACK2 ──
+synthesis response: disjoint] → disjoint
+
+  [GoT] ✅ FINAL PREDICTION: disjoint
+
+RESULT | Expected=disjoint | Predicted=disjoint | CORRECT | Acc=90.91%
+
+==========================================================================================
+ROW 75 | Amazon Rainforest → Brazil
+Expected: overlaps
+==========================================================================================
+
+  [GoT] ── INPUT ──
+A: Amazon Rainforest | B: Brazil | Vernacular: "Two large polygons sharing a significant interior area while retaining exclusive external areas."
+
+  [GoT] ── OSM_EVIDENCE ──
+
+
+  [GoT] ── PHASE1_RAW ──
+
+
+  [GoT] ── FALLBACK1 ──
+thought-scan failed, extracted from full response: None
+
+  [GoT] ── FALLBACK2 ──
+synthesis response: overlaps] → overlaps
+
+  [GoT] ✅ FINAL PREDICTION: overlaps
+
+RESULT | Expected=overlaps | Predicted=overlaps | CORRECT | Acc=91.18%
+
+==========================================================================================
+ROW 79 | Sahara Desert → Republic of Mali
+Expected: overlaps
+==========================================================================================
+
+  [GoT] ── INPUT ──
+A: Sahara Desert | B: Republic of Mali | Vernacular: "An environmental polygon partially intersecting a national administrative polygon."
+
+  [GoT] ── OSM_EVIDENCE ──
+
+
+  [GoT] ── PHASE1_RAW ──
+
+
+  [GoT] ── FALLBACK1 ──
+thought-scan failed, extracted from full response: None
+
+  [GoT] ── FALLBACK2 ──
+synthesis response: overlaps] → overlaps
+
+  [GoT] ✅ FINAL PREDICTION: overlaps
+
+RESULT | Expected=overlaps | Predicted=overlaps | CORRECT | Acc=91.43%
+
+==========================================================================================
+ROW 80 | Navajo Nation → State of Arizona
+Expected: overlaps
+==========================================================================================
+
+  [GoT] ── INPUT ──
+A: Navajo Nation | B: State of Arizona | Vernacular: "A sovereign tribal polygon and a state polygon share a massive interior area, while both retain exclusive regions outside of that intersection."
+
+  [GoT] ── OSM_EVIDENCE ──
+
+
+  [GoT] ── PHASE1_RAW ──
+"""
+Entity A: Navajo Nation (type: Navajo Nation, geometry: Polygon)
+Entity B: State of Arizona (type: State of Arizona, geometry: Polygon)
+Vernacular: "Navajo Nation A sovereign tribal polygon and a state polygon share a massive interior area, while both retain exclusive regions outside of that intersection. State of Arizona"
+
+"""
+
+
+
+THINK 1:
+ANGLE: DIRECT GEOMETRIC RELATION
+REASONING: The spatial predicates directly apply A→B in the text. A shares area with B but neither fully contains the other.
+
+Predicate: overlaps
+
+
+
+THINK 2:
+ANGLE: TEXTUAL QUANTIFIER
+REASONING: The vernacular uses "share" or "partly in" indicating partial spatial sharing.
+
+Predicate: overlaps
+
+
+
+THINK 3:
+ANGLE: DISAMBIGUATION RULE STEP 4
+REASONING: Entities geometrically intersect but neither is a container. The spatial relationship is partial.
+
+Predicate: overlaps
+
+
+
+THINK 4:
+ANGLE: DIRECTLY APPLIED QUANTIFIER
+REASONING: The text explicitly states "overlaps" as the spatial relation.
+
+Predicate: overlaps
+
+
+Answer: [predicate]
+
+  [GoT] ── FALLBACK1 ──
+thought-scan failed, extracted from full response: overlaps
+
+  [GoT] ✅ FINAL PREDICTION: overlaps
+
+RESULT | Expected=overlaps | Predicted=overlaps | CORRECT | Acc=91.67%
+
+==========================================================================================
+ROW 81 | Navajo Nation → Hopi Reservation
+Expected: overlaps
+==========================================================================================
+
+  [GoT] ── INPUT ──
+A: Navajo Nation | B: Hopi Reservation | Vernacular: "Two tribal administrative polygons that feature partially intersecting boundaries and shared internal land areas."
+
+  [GoT] ── OSM_EVIDENCE ──
+
+
+  [GoT] ── PHASE1_RAW ──
+
+
+  [GoT] ── FALLBACK1 ──
+thought-scan failed, extracted from full response: None
+
+  [GoT] ── FALLBACK2 ──
+synthesis response: overlaps] → overlaps
+
+  [GoT] ✅ FINAL PREDICTION: overlaps
+
+RESULT | Expected=overlaps | Predicted=overlaps | CORRECT | Acc=91.89%
+
+==========================================================================================
+ROW 86 | Tornado Alley → State of Oklahoma
+Expected: overlaps
+==========================================================================================
+
+  [GoT] ── INPUT ──
+A: Tornado Alley | B: State of Oklahoma | Vernacular: "A meteorological zone polygon intersecting heavily with a state polygon."
+
+  [GoT] ── OSM_EVIDENCE ──
+
+
+  [GoT] ── PHASE1_RAW ──
+The new case is ready. Answer in the exact format above.
+
+  [GoT] ── FALLBACK1 ──
+thought-scan failed, extracted from full response: None
+
+  [GoT] ── FALLBACK2 ──
+synthesis response: overlaps] → overlaps
+
+  [GoT] ✅ FINAL PREDICTION: overlaps
+
+RESULT | Expected=overlaps | Predicted=overlaps | CORRECT | Acc=92.11%
+
+==========================================================================================
+ROW 89 | Tornado Alley → State of Oklahoma
+Expected: overlaps
+==========================================================================================
+
+  [GoT] ── INPUT ──
+A: Tornado Alley | B: State of Oklahoma | Vernacular: "A meteorological zone polygon intersecting heavily with a state polygon."
+
+  [GoT] ── OSM_EVIDENCE ──
+
+
+  [GoT] ── PHASE1_RAW ──
+"""
+Entity A: Tornado Alley (type: Tornado Alley, geometry: Polygon)
+Entity B: State of Oklahoma (type: State of Oklahoma, geometry: Polygon)
+Vernacular: "Tornado Alley A meteorological zone intersecting heavily with a state polygon. State of Oklahoma"
+
+[Reasoning] Entities A & B partially share area — geometric partial overlap.
+
+Possible predicates: contains, within, touches, crosses, disjoint, overlaps, equals
+
+Answer: [overlaps]"""
+
+  [GoT] ── FALLBACK1 ──
+thought-scan failed, extracted from full response: overlaps
+
+  [GoT] ✅ FINAL PREDICTION: overlaps
+
+RESULT | Expected=overlaps | Predicted=overlaps | CORRECT | Acc=92.31%
+
+==========================================================================================
+ROW 90 | City of Broomfield → Broomfield County
+Expected: equals
+==========================================================================================
+
+  [GoT] ── INPUT ──
+A: City of Broomfield | B: Broomfield County | Vernacular: "A consolidated jurisdiction where city and county are the same entity."
+
+  [GoT] ── OSM_EVIDENCE ──
+
+
+  [GoT] ── PHASE1_RAW ──
+
+
+  [GoT] ── FALLBACK1 ──
+thought-scan failed, extracted from full response: None
+
+  [GoT] ── FALLBACK2 ──
+synthesis response: equals] → equals
+
+  [GoT] ✅ FINAL PREDICTION: equals
+
+RESULT | Expected=equals | Predicted=equals | CORRECT | Acc=92.50%
+
+==========================================================================================
+ROW 91 | City of Washington → District of Columbia
+Expected: equals
+==========================================================================================
+
+  [GoT] ── INPUT ──
+A: City of Washington | B: District of Columbia | Vernacular: "The city polygon and the district polygon are legally and geometrically the same."
+
+  [GoT] ── OSM_EVIDENCE ──
+
+
+  [GoT] ── PHASE1_RAW ──
+Entity A vs Entity B: [Entity A] vs [Entity B]   VERNACULAR TERM: [term]
+
+
+
+Possible predicates: contains, within, touches, crosses, disjoint, overlaps, equals
+
+
+
+Rules Recap:
+1. Use EXACTLY ONE predicate.
+2. DIRECTLY RULE OUT ALL OTHER POSSIBLE RELATIONS.
+3. Reason geometrically USING POLYGONS (NOT BBOXES).
+4. DISAMBIGUATE USING THE 4-STEP DISAMBIGUATION ABOVE.
+5. ENTITY VALIDATION: Ensure the OSM entity matches the real-world entity described.
+
+Thought Node 1:
+  Direction: A → B
+  Textual Cue: "Legally and geometrically the same."
+  Geometry Type: Polygon vs Polygon
+  Reasoning: Entities are geometrically identical, sharing the exact same spatial footprint.
+
+Predicate: equals
+
+Thought Node 2:
+  Direction: A → B
+  Textual Cue: "Municipal limits mirror the county boundary."
+  Geometry Type: Polygon vs Polygon
+  Reasoning: The city limits perfectly match the county limits, sharing the exact same geometry.
+
+Predicate: equals
+
+Thought Node 3:
+  Direction: A → B
+  Textual Cue: "Legal definition is synonymous with the geographic entity."
+  Geometry Type: Polygon vs Polygon
+  Reasoning: The legal definition and geographic entity are perfectly coextensive.
+
+Predicate: equals
+
+Thought Node 4:
+  Direction: A → B
+  Textual Cue: "Same spatial footprint."
+  Geometry Type: Polygon vs Polygon
+  Reasoning: Both entities occupy the exact same set of coordinates, points, and edges.
+
+Predicate: equals
+
+
+
+Answer: [equals]
+
+  [GoT] ── FALLBACK1 ──
+thought-scan failed, extracted from full response: equals
+
+  [GoT] ✅ FINAL PREDICTION: equals
+
+RESULT | Expected=equals | Predicted=equals | CORRECT | Acc=92.68%
+
+==========================================================================================
+ROW 93 | Borough of Queens → Queens County
+Expected: equals
+==========================================================================================
+
+  [GoT] ── INPUT ──
+A: Borough of Queens | B: Queens County | Vernacular: "Identical geometries for two different administrative titles."
+
+  [GoT] ── OSM_EVIDENCE ──
+
+
+  [GoT] ── PHASE1_RAW ──
+
+
+  [GoT] ── FALLBACK1 ──
+thought-scan failed, extracted from full response: None
+
+  [GoT] ── FALLBACK2 ──
+synthesis response: equals] → equals
+
+  [GoT] ✅ FINAL PREDICTION: equals
+
+RESULT | Expected=equals | Predicted=equals | CORRECT | Acc=92.86%
+
+==========================================================================================
+ROW 96 | City of Philadelphia → Philadelphia County
+Expected: equals
+==========================================================================================
+
+  [GoT] ── INPUT ──
+A: City of Philadelphia | B: Philadelphia County | Vernacular: "Two administrative entities covering the exact same topological footprint."
+
+  [GoT] ── OSM_EVIDENCE ──
+
+
+  [GoT] ── PHASE1_RAW ──
+
+
+  [GoT] ── FALLBACK1 ──
+thought-scan failed, extracted from full response: None
+
+  [GoT] ── FALLBACK2 ──
+synthesis response: equals] → equals
+
+  [GoT] ✅ FINAL PREDICTION: equals
+
+RESULT | Expected=equals | Predicted=equals | CORRECT | Acc=93.02%
+
+==========================================================================================
+ROW 98 | City of Denver → Denver County
+Expected: equals
+==========================================================================================
+
+  [GoT] ── INPUT ──
+A: City of Denver | B: Denver County | Vernacular: "A consolidated city-county where the two distinct levels map exactly 1:1."
+
+  [GoT] ── OSM_EVIDENCE ──
+
+
+  [GoT] ── PHASE1_RAW ──
+
+
+  [GoT] ── FALLBACK1 ──
+thought-scan failed, extracted from full response: None
+
+  [GoT] ── FALLBACK2 ──
+synthesis response: equals] → equals
+
+  [GoT] ✅ FINAL PREDICTION: equals
+
+RESULT | Expected=equals | Predicted=equals | CORRECT | Acc=93.18%
+
+==========================================================================================
+ROW 99 | City of London → The Square Mile
+Expected: equals
+==========================================================================================
+
+  [GoT] ── INPUT ──
+A: City of London | B: The Square Mile | Vernacular: "Two completely different semantic named entities (one historical/administrative, one colloquial/financial) that resolve to the exact same geospatial polygon."
+
+  [GoT] ── OSM_EVIDENCE ──
+
+
+  [GoT] ── PHASE1_RAW ──
+
+
+  [GoT] ── FALLBACK1 ──
+thought-scan failed, extracted from full response: None
+
+  [GoT] ── FALLBACK2 ──
+synthesis response: equals] → equals
+
+  [GoT] ✅ FINAL PREDICTION: equals
+
+RESULT | Expected=equals | Predicted=equals | CORRECT | Acc=93.33%
+
+==========================================================================================
+ROW 100 | Borough of Queens → Queens County
+Expected: equals
+==========================================================================================
+
+  [GoT] ── INPUT ──
+A: Borough of Queens | B: Queens County | Vernacular: "Identical geometries for two different administrative titles."
+
+  [GoT] ── OSM_EVIDENCE ──
+
+
+  [GoT] ── PHASE1_RAW ──
+
+
+  [GoT] ── FALLBACK1 ──
+thought-scan failed, extracted from full response: None
+
+  [GoT] ── FALLBACK2 ──
+synthesis response: equals] → equals
+
+  [GoT] ✅ FINAL PREDICTION: equals
+
+RESULT | Expected=equals | Predicted=equals | CORRECT | Acc=93.48%
+
+FINAL ACCURACY: 93.48% (43/46)
+
+FINAL ACCURACY: 93.48% (43/46)

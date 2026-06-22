@@ -1,0 +1,2743 @@
+==========================================================================================
+  VOLET C — TOT — EXP2_FT_NOKG [neighborhood_details_spatial_relation_16_sample]
+  Inference: GPU  |  Adapter: final_adapter
+  KG: Dynamic OSM API
+  Started: 2026-06-20 01:35:47
+==========================================================================================
+
+
+==========================================================================================
+ROW 0 | State of Colorado → City of Denver
+Expected: contains
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: State of Colorado | B: City of Denver | Vernacular: "A state polygon acting as a complete bounding box for a city polygon."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: [EQUALS CHECK]
+[reasoning]
+Suggested predicate: equals
+
+
+BRANCH 2: [TOPLOGICAL REASONING USING POLYGON GEOMETRY]
+[reasoning]
+Suggested predicate: within
+
+
+BRANCH 3: [TOPLOGICAL REASONING USING POLYGON GEOMETRY]
+[reasoning]
+Suggested predicate: touches
+
+
+
+
+Final Answer: The correct topological reasoning for the relationship between the State of Colorado and the City of Denver is "within".
+
+  [ToT] ── BRANCH_1 ──
+Predicted: equals
+[EQUALS CHECK]
+[reasoning]
+Suggested predicate: equals
+
+  [ToT] ── BRANCH_2 ──
+Predicted: within
+[TOPLOGICAL REASONING USING POLYGON GEOMETRY]
+[reasoning]
+Suggested predicate: within
+
+  [ToT] ── BRANCH_3 ──
+Predicted: touches
+[TOPLOGICAL REASONING USING POLYGON GEOMETRY]
+[reasoning]
+Suggested predicate: touches
+
+
+
+
+Final Answer: The correct topological reasoning for the relationship between the State of Colorado and the City of Denver is "within".
+
+  [ToT] ✅ FINAL PREDICTION: touches
+
+RESULT | Expected=contains | Predicted=touches | WRONG | Acc=0.00%
+
+==========================================================================================
+ROW 1 | State of California → City of Los Angeles
+Expected: contains
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: State of California | B: City of Los Angeles | Vernacular: "A state polygon fully encompasses a city administrative polygon."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: EQUALS CHECK (Do the two entities have the IDENTICAL geometry?)
+[reasoning]
+Suggested predicate: equals
+
+
+BRANCH 2: CONTAINS/WITHIN (Which entity is the larger, enclosing one? A→B or B→A?)
+[reasoning]
+Suggested predicate: contains (or within)
+
+
+BRANCH 3: TOPOLOGICAL (Does the city share ANY area or boundary with the state? Completely inside? Completely outside? Completely sharing? Completely overlapping? )
+[reasoning]
+Suggested predicate: touches (or crosses or overlaps or disjoint)
+
+
+Answer: [predicate]
+
+  [ToT] ── BRANCH_1 ──
+Predicted: equals
+EQUALS CHECK (Do the two entities have the IDENTICAL geometry?)
+[reasoning]
+Suggested predicate: equals
+
+  [ToT] ── BRANCH_2 ──
+Predicted: contains
+CONTAINS/WITHIN (Which entity is the larger, enclosing one? A→B or B→A?)
+[reasoning]
+Suggested predicate: contains (or within)
+
+  [ToT] ── BRANCH_3 ──
+Predicted: touches
+TOPOLOGICAL (Does the city share ANY area or boundary with the state? Completely inside? Completely outside? Completely sharing? Completely overlapping? )
+[reasoning]
+Suggested predicate: touches (or crosses or overlaps or disjoint)
+
+
+Answer: [predicate]
+
+  [ToT] ✅ FINAL PREDICTION: equals
+
+RESULT | Expected=contains | Predicted=equals | WRONG | Acc=0.00%
+
+==========================================================================================
+ROW 2 | Italy → City of Rome
+Expected: contains
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Italy | B: City of Rome | Vernacular: "A national polygon completely bounding a city polygon."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: EQUALS CHECK (textual)
+[reasoning]
+Suggested predicate: equals
+
+
+BRANCH 2: TOPLOGICAL (geometry) VERDICT (A→B)
+[reasoning]
+Suggested predicate: within
+
+
+BRANCH 3: TOPLOGICAL (geometry) VERDICT (B→A)
+[reasoning]
+Suggested predicate: contains
+
+
+
+
+Answer: [predicate]
+
+  [ToT] ── BRANCH_1 ──
+Predicted: equals
+EQUALS CHECK (textual)
+[reasoning]
+Suggested predicate: equals
+
+  [ToT] ── BRANCH_2 ──
+Predicted: within
+TOPLOGICAL (geometry) VERDICT (A→B)
+[reasoning]
+Suggested predicate: within
+
+  [ToT] ── BRANCH_3 ──
+Predicted: contains
+TOPLOGICAL (geometry) VERDICT (B→A)
+[reasoning]
+Suggested predicate: contains
+
+
+
+
+Answer: [predicate]
+
+  [ToT] ✅ FINAL PREDICTION: within
+
+RESULT | Expected=contains | Predicted=within | WRONG | Acc=0.00%
+
+==========================================================================================
+ROW 3 | State of New Mexico → White Sands National Park
+Expected: contains
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: State of New Mexico | B: White Sands National Park | Vernacular: "A state polygon fully bounding a national park."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: [EQUALS CHECK]
+[reasoning]
+Suggested predicate: equals
+
+
+BRANCH 2: [TOPLOGICAL REASONING USING POLYGON GEOMETRY]
+[reasoning]
+Suggested predicate: within
+
+
+BRANCH 3: [TOPLOGICAL REASONING USING POLYGON GEOMETRY]
+[reasoning]
+Suggested predicate: touches
+
+
+
+
+Final Answer: The correct topological reasoning for the relationship between the State of New Mexico and the White Sands National Park is. 
+Reasoning: The State of New Mexico is the LARGER entity that SURROUNDS the national park. The geometry of the State of New Mexico fully encloses the geometry of the White Sands National Park. 
+Conclusion: The topological reasoning for the relationship between the State of New Mexico and the White Sands National Park is. 
+Answer: contains
+
+  [ToT] ── BRANCH_1 ──
+Predicted: equals
+[EQUALS CHECK]
+[reasoning]
+Suggested predicate: equals
+
+  [ToT] ── BRANCH_2 ──
+Predicted: within
+[TOPLOGICAL REASONING USING POLYGON GEOMETRY]
+[reasoning]
+Suggested predicate: within
+
+  [ToT] ── BRANCH_3 ──
+Predicted: contains
+[TOPLOGICAL REASONING USING POLYGON GEOMETRY]
+[reasoning]
+Suggested predicate: touches
+
+
+
+
+Final Answer: The correct topological reasoning for the relationship between the State of New Mexico and the White Sands National Park is. 
+Reasoning: The State of New Mexico is the LARGER entity that SURROUNDS the national park. The geometry of the State of New Mexico fully encloses the geometry of the White Sands National Park. 
+Conclusion: The topological reasoning for the relationship between the State of New Mexico and the White Sands National Park is. 
+Answer: contains
+
+  [ToT] ✅ FINAL PREDICTION: contains
+
+RESULT | Expected=contains | Predicted=contains | CORRECT | Acc=25.00%
+
+==========================================================================================
+ROW 5 | State of Utah → Zion National Park
+Expected: contains
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: State of Utah | B: Zion National Park | Vernacular: "A state polygon fully enclosing a national park polygon."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: [EQUALS CHECK]
+[reasoning]
+Suggested predicate: equals
+
+
+BRANCH 2: [TOPLOGICAL RULES (TOP-1)]
+[reasoning]
+Suggested predicate: within
+
+
+BRANCH 3: [TOPLOGICAL RULES (TOP-2)]
+[reasoning]
+Suggested predicate: contains
+
+
+Answer: [predicate]
+
+  [ToT] ── BRANCH_1 ──
+Predicted: equals
+[EQUALS CHECK]
+[reasoning]
+Suggested predicate: equals
+
+  [ToT] ── BRANCH_2 ──
+Predicted: within
+[TOPLOGICAL RULES (TOP-1)]
+[reasoning]
+Suggested predicate: within
+
+  [ToT] ── BRANCH_3 ──
+Predicted: contains
+[TOPLOGICAL RULES (TOP-2)]
+[reasoning]
+Suggested predicate: contains
+
+
+Answer: [predicate]
+
+  [ToT] ✅ FINAL PREDICTION: equals
+
+RESULT | Expected=contains | Predicted=equals | WRONG | Acc=20.00%
+
+==========================================================================================
+ROW 6 | City of Detroit → City of Hamtramck
+Expected: contains
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: City of Detroit | B: City of Hamtramck | Vernacular: "An urban municipal donut hole where a major city entirely surrounds a minor city."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: [TOPOLINIC REASONING using the OSM geometry data]
+[reasoning]
+Suggested predicate: [within]
+
+BRANCH 2: [TOPOLINIC REASONING using the OSM geometry data]
+[reasoning]
+Suggested predicate: [touches]
+
+BRANCH 3: [TOPOLINIC REASONING using the OSM geometry data]
+[reasoning]
+Suggested predicate: [equals]
+
+END ANALYSIS. The correct topological reasoning is: Answer: [within]
+
+  [ToT] ── BRANCH_1 ──
+Predicted: within
+[TOPOLINIC REASONING using the OSM geometry data]
+[reasoning]
+Suggested predicate: [within]
+
+  [ToT] ── BRANCH_2 ──
+Predicted: touches
+[TOPOLINIC REASONING using the OSM geometry data]
+[reasoning]
+Suggested predicate: [touches]
+
+  [ToT] ── BRANCH_3 ──
+Predicted: within
+[TOPOLINIC REASONING using the OSM geometry data]
+[reasoning]
+Suggested predicate: [equals]
+
+END ANALYSIS. The correct topological reasoning is: Answer: [within]
+
+  [ToT] ✅ FINAL PREDICTION: within
+
+RESULT | Expected=contains | Predicted=within | WRONG | Acc=16.67%
+
+==========================================================================================
+ROW 8 | City of Los Angeles → City of Beverly Hills
+Expected: contains
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: City of Los Angeles | B: City of Beverly Hills | Vernacular: "A massive city polygon completely enveloping an independent smaller city polygon."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: [approach: topological reasoning using the OSM geometry]
+[reasoning]
+Suggested predicate: within
+
+
+BRANCH 2: [approach: topological reasoning using the OSM geometry]
+[reasoning]
+Suggested predicate: touches
+
+
+BRANCH 3: [approach: topological reasoning using the OSM geometry]
+[reasoning]
+Suggested predicate: overlaps
+
+
+
+
+Final Answer: The correct topological reasoning for the relationship between the City of Los Angeles and the City of Beverly Hills is "within". 
+Answer: within
+
+  [ToT] ── BRANCH_1 ──
+Predicted: within
+[approach: topological reasoning using the OSM geometry]
+[reasoning]
+Suggested predicate: within
+
+  [ToT] ── BRANCH_2 ──
+Predicted: touches
+[approach: topological reasoning using the OSM geometry]
+[reasoning]
+Suggested predicate: touches
+
+  [ToT] ── BRANCH_3 ──
+Predicted: within
+[approach: topological reasoning using the OSM geometry]
+[reasoning]
+Suggested predicate: overlaps
+
+
+
+
+Final Answer: The correct topological reasoning for the relationship between the City of Los Angeles and the City of Beverly Hills is "within". 
+Answer: within
+
+  [ToT] ✅ FINAL PREDICTION: within
+
+RESULT | Expected=contains | Predicted=within | WRONG | Acc=14.29%
+
+==========================================================================================
+ROW 10 | Republic of Italy → San Marino
+Expected: contains
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Republic of Italy | B: San Marino | Vernacular: "A sovereign nation acting as an absolute geographic container for another sovereign nation."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: [approach: direct topological reasoning]
+[reasoning]
+Suggested predicate: within
+
+BRANCH 2: [approach: topological reasoning with geometry type checks]
+[reasoning]
+Suggested predicate: contains
+
+BRANCH 3: [approach: topological reasoning with geometry type checks]
+[reasoning]
+Suggested predicate: touches
+
+
+
+
+Answer: [predicate]
+
+  [ToT] ── BRANCH_1 ──
+Predicted: within
+[approach: direct topological reasoning]
+[reasoning]
+Suggested predicate: within
+
+  [ToT] ── BRANCH_2 ──
+Predicted: contains
+[approach: topological reasoning with geometry type checks]
+[reasoning]
+Suggested predicate: contains
+
+  [ToT] ── BRANCH_3 ──
+Predicted: touches
+[approach: topological reasoning with geometry type checks]
+[reasoning]
+Suggested predicate: touches
+
+
+
+
+Answer: [predicate]
+
+  [ToT] ✅ FINAL PREDICTION: contains
+
+RESULT | Expected=contains | Predicted=contains | CORRECT | Acc=25.00%
+
+==========================================================================================
+ROW 15 | Buckingham Palace → City of London
+Expected: within
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Buckingham Palace | B: City of London | Vernacular: "A palace polygon is fully surrounded by a city polygon."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: EQUALS CHECK
+[reasoning]
+Suggested predicate: equals
+
+
+BRANCH 2: TOPLOGICAL RULES (PUNCTUATION MATTERS)
+[reasoning]
+Suggested predicate: within
+
+
+BRANCH 3: TOPLOGICAL RULES (PUNCTUATION MATTERS)
+[reasoning]
+Suggested predicate: touches
+
+
+END ANALYSIS. The correct topological reasoning is: Answer: [Buckingham Palace A palace polygon is fully surrounded by a city polygon. City of London. The correct topological reasoning is: within]]
+
+  [ToT] ── BRANCH_1 ──
+Predicted: equals
+EQUALS CHECK
+[reasoning]
+Suggested predicate: equals
+
+  [ToT] ── BRANCH_2 ──
+Predicted: within
+TOPLOGICAL RULES (PUNCTUATION MATTERS)
+[reasoning]
+Suggested predicate: within
+
+  [ToT] ── BRANCH_3 ──
+Predicted: touches
+TOPLOGICAL RULES (PUNCTUATION MATTERS)
+[reasoning]
+Suggested predicate: touches
+
+
+END ANALYSIS. The correct topological reasoning is: Answer: [Buckingham Palace A palace polygon is fully surrounded by a city polygon. City of London. The correct topological reasoning is: within]]
+
+  [ToT] ✅ FINAL PREDICTION: touches
+
+RESULT | Expected=within | Predicted=touches | WRONG | Acc=22.22%
+
+==========================================================================================
+ROW 16 | City of Phoenix → State of Arizona
+Expected: within
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: City of Phoenix | B: State of Arizona | Vernacular: "A city polygon fully enclosed by a state polygon."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: EQUALS CHECK (textual)
+[reasoning]
+Suggested predicate: equals
+
+
+BRANCH 2: TOPLOGICAL (geometry) CHECK (directional)
+[reasoning]
+Suggested predicate: within
+
+
+BRANCH 3: TOPLOGICAL (geometry) CHECK (directional)
+[reasoning]
+Suggested predicate: touches
+
+
+
+
+Final Answer: The correct topological reasoning for the relationship "City of Phoenix A city polygon fully enclosed by a state polygon. State of Arizona" using the OSM evidence is }[ chosen predicate from the list: contains, within, touches, crosses, disjoint, overlaps, equals ]{. 
+Answer: [predicate]
+
+  [ToT] ── BRANCH_1 ──
+Predicted: equals
+EQUALS CHECK (textual)
+[reasoning]
+Suggested predicate: equals
+
+  [ToT] ── BRANCH_2 ──
+Predicted: within
+TOPLOGICAL (geometry) CHECK (directional)
+[reasoning]
+Suggested predicate: within
+
+  [ToT] ── BRANCH_3 ──
+Predicted: touches
+TOPLOGICAL (geometry) CHECK (directional)
+[reasoning]
+Suggested predicate: touches
+
+
+
+
+Final Answer: The correct topological reasoning for the relationship "City of Phoenix A city polygon fully enclosed by a state polygon. State of Arizona" using the OSM evidence is }[ chosen predicate from the list: contains, within, touches, crosses, disjoint, overlaps, equals ]{. 
+Answer: [predicate]
+
+  [ToT] ✅ FINAL PREDICTION: touches
+
+RESULT | Expected=within | Predicted=touches | WRONG | Acc=20.00%
+
+==========================================================================================
+ROW 17 | Eiffel Tower → City of Paris
+Expected: within
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Eiffel Tower | B: City of Paris | Vernacular: "A geometric point representing a landmark is located entirely inside a city polygon."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: [TOPOL-REASONING for 'within']
+[reasoning]
+Suggested predicate: within
+
+
+BRANCH 2: [TOPOL-REASONING for 'touches']
+[reasoning]
+Suggested predicate: touches
+
+
+BRANCH 3: [TOPOL-REASONING for 'overlaps']
+[reasoning]
+Suggested predicate: overlaps
+
+
+
+
+Final Decision: The correct topological reasoning for the relationship between the Eiffel Tower (Entity A) and the City of Paris (Entity B) is 'within'.
+
+  [ToT] ── BRANCH_1 ──
+Predicted: within
+[TOPOL-REASONING for 'within']
+[reasoning]
+Suggested predicate: within
+
+  [ToT] ── BRANCH_2 ──
+Predicted: touches
+[TOPOL-REASONING for 'touches']
+[reasoning]
+Suggested predicate: touches
+
+  [ToT] ── BRANCH_3 ──
+Predicted: overlaps
+[TOPOL-REASONING for 'overlaps']
+[reasoning]
+Suggested predicate: overlaps
+
+
+
+
+Final Decision: The correct topological reasoning for the relationship between the Eiffel Tower (Entity A) and the City of Paris (Entity B) is 'within'.
+
+  [ToT] ✅ FINAL PREDICTION: overlaps
+
+RESULT | Expected=within | Predicted=overlaps | WRONG | Acc=18.18%
+
+==========================================================================================
+ROW 18 | Badlands National Park → State of South Dakota
+Expected: within
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Badlands National Park | B: State of South Dakota | Vernacular: "A park trapped by a complete geometric host."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: EQUALS CHECK
+[reasoning]
+Suggested predicate: equals
+
+
+BRANCH 2: TOPLOGICAL RULES (WITNESS THE EXCLUSIVE ONE PREDICATE)
+[reasoning]
+Suggested predicate: touches
+
+
+BRANCH 3: TOPLOGICAL RULES (WITNESS THE EXCLUSIVE ONE PREDICATE)
+[reasoning]
+Suggested predicate: overlaps
+
+
+
+
+Answer: [predicate]
+
+  [ToT] ── BRANCH_1 ──
+Predicted: equals
+EQUALS CHECK
+[reasoning]
+Suggested predicate: equals
+
+  [ToT] ── BRANCH_2 ──
+Predicted: touches
+TOPLOGICAL RULES (WITNESS THE EXCLUSIVE ONE PREDICATE)
+[reasoning]
+Suggested predicate: touches
+
+  [ToT] ── BRANCH_3 ──
+Predicted: overlaps
+TOPLOGICAL RULES (WITNESS THE EXCLUSIVE ONE PREDICATE)
+[reasoning]
+Suggested predicate: overlaps
+
+
+
+
+Answer: [predicate]
+
+  [ToT] ✅ FINAL PREDICTION: equals
+
+RESULT | Expected=within | Predicted=equals | WRONG | Acc=16.67%
+
+==========================================================================================
+ROW 19 | City of Seattle → State of Washington
+Expected: within
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: City of Seattle | B: State of Washington | Vernacular: "A city polygon is completely boxed in by a state polygon."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: EQUALS CHECK
+[reasoning]
+Suggested predicate: equals
+
+
+BRANCH 2: TOPLOGICAL RULES (PRESCRIBE ONE)
+[reasoning]
+Suggested predicate: within
+
+
+BRANCH 3: TOPLOGICAL RULES (PRESCRIBE ONE)
+[reasoning]
+Suggested predicate: overlaps
+
+
+
+
+Answer: [predicate]
+
+  [ToT] ── BRANCH_1 ──
+Predicted: equals
+EQUALS CHECK
+[reasoning]
+Suggested predicate: equals
+
+  [ToT] ── BRANCH_2 ──
+Predicted: within
+TOPLOGICAL RULES (PRESCRIBE ONE)
+[reasoning]
+Suggested predicate: within
+
+  [ToT] ── BRANCH_3 ──
+Predicted: overlaps
+TOPLOGICAL RULES (PRESCRIBE ONE)
+[reasoning]
+Suggested predicate: overlaps
+
+
+
+
+Answer: [predicate]
+
+  [ToT] ✅ FINAL PREDICTION: equals
+
+RESULT | Expected=within | Predicted=equals | WRONG | Acc=15.38%
+
+==========================================================================================
+ROW 23 | Yellowstone Caldera → Yellowstone National Park
+Expected: within
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Yellowstone Caldera | B: Yellowstone National Park | Vernacular: "A subterranean volcanic polygon perfectly bounded by an administrative surface polygon."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: EQUALS CHECK
+[reasoning]
+Suggested predicate: equals
+
+
+BRANCH 2: TOPLOGICAL REASONING (WITNESS THE GEOMETRY)
+[reasoning]
+Suggested predicate: within
+
+
+BRANCH 3: TOPLOGICAL REASONING (WITNESS THE GEOMETRY)
+[reasoning]
+Suggested predicate: touches
+
+
+
+
+Answer: [predicate]
+
+  [ToT] ── BRANCH_1 ──
+Predicted: equals
+EQUALS CHECK
+[reasoning]
+Suggested predicate: equals
+
+  [ToT] ── BRANCH_2 ──
+Predicted: within
+TOPLOGICAL REASONING (WITNESS THE GEOMETRY)
+[reasoning]
+Suggested predicate: within
+
+  [ToT] ── BRANCH_3 ──
+Predicted: touches
+TOPLOGICAL REASONING (WITNESS THE GEOMETRY)
+[reasoning]
+Suggested predicate: touches
+
+
+
+
+Answer: [predicate]
+
+  [ToT] ✅ FINAL PREDICTION: within
+
+RESULT | Expected=within | Predicted=within | CORRECT | Acc=21.43%
+
+==========================================================================================
+ROW 24 | Diego Garcia → Indian Ocean
+Expected: within
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Diego Garcia | B: Indian Ocean | Vernacular: "A highly restricted atoll perfectly isolated by an absolute oceanic perimeter."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: [approach: direct topological reasoning]
+[reasoning]
+Suggested predicate: within
+
+BRANCH 2: [approach: topological reasoning with geometry validation]
+[reasoning]
+Suggested predicate: within
+
+BRANCH 3: [approach: topological reasoning with geometry validation]
+[reasoning]
+Suggested predicate: within
+
+
+
+
+Answer: within
+
+  [ToT] ── BRANCH_1 ──
+Predicted: within
+[approach: direct topological reasoning]
+[reasoning]
+Suggested predicate: within
+
+  [ToT] ── BRANCH_2 ──
+Predicted: within
+[approach: topological reasoning with geometry validation]
+[reasoning]
+Suggested predicate: within
+
+  [ToT] ── BRANCH_3 ──
+Predicted: within
+[approach: topological reasoning with geometry validation]
+[reasoning]
+Suggested predicate: within
+
+
+
+
+Answer: within
+
+  [ToT] ✅ FINAL PREDICTION: within
+
+RESULT | Expected=within | Predicted=within | CORRECT | Acc=26.67%
+
+==========================================================================================
+ROW 30 | Brazil → Argentina
+Expected: touches
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Brazil | B: Argentina | Vernacular: "Two South American polygons sharing a border edge."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: EQUALS CHECK
+[reasoning]
+Suggested predicate: equals
+
+
+BRANCH 2: TOPLOGICAL RULES (TOP-1)
+[reasoning]
+Suggested predicate: touches
+
+
+BRANCH 3: TOPLOGICAL RULES (TOP-2)
+[reasoning]
+Suggested predicate: overlaps
+
+
+
+
+Final Answer: The correct topological reasoning for the relationship between Brazil and Argentina is 'touches'.
+
+  [ToT] ── BRANCH_1 ──
+Predicted: equals
+EQUALS CHECK
+[reasoning]
+Suggested predicate: equals
+
+  [ToT] ── BRANCH_2 ──
+Predicted: touches
+TOPLOGICAL RULES (TOP-1)
+[reasoning]
+Suggested predicate: touches
+
+  [ToT] ── BRANCH_3 ──
+Predicted: overlaps
+TOPLOGICAL RULES (TOP-2)
+[reasoning]
+Suggested predicate: overlaps
+
+
+
+
+Final Answer: The correct topological reasoning for the relationship between Brazil and Argentina is 'touches'.
+
+  [ToT] ✅ FINAL PREDICTION: overlaps
+
+RESULT | Expected=touches | Predicted=overlaps | WRONG | Acc=25.00%
+
+==========================================================================================
+ROW 31 | State of Colorado → State of New Mexico
+Expected: touches
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: State of Colorado | B: State of New Mexico | Vernacular: "Two state administrative polygons meeting at a shared edge."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: EQUALS CHECK (Do the two states share the EXACT SAME geometry?)
+[reasoning]
+Suggested predicate: equals
+
+
+BRANCH 2: TOPLOGICAL REASONING (Which topological relation fits the two state polygons meeting at a shared edge?)
+[reasoning]
+Suggested predicate: touches
+
+
+BRANCH 3: TOPLOGICAL REASONING (Which topological relation fits the two state polygons meeting at a shared edge?)
+[reasoning]
+Suggested predicate: touches
+
+
+
+
+Conclusion: After evaluating all reasoning branches, the correct topological relation is
+Answer: touches
+
+
+
+
+Reasoning Trace: The correct topological relation is touches. The State of Colorado and the State of New Mexico meet precisely at the Four Corners Joint Management Area, sharing an identical boundary line with zero interior overlap. The OSM geometry for both State of Colorado (State of Colorado, geometry: Polygon) and State of New Mexico (State of New Mexico, geometry: Polygon) confirm a perfect edge-to-edge topological match. The textual qualifier "meeting at a shared edge" directly maps to the topological predicate "touches". Hence the relation is touches.
+
+  [ToT] ── BRANCH_1 ──
+Predicted: equals
+EQUALS CHECK (Do the two states share the EXACT SAME geometry?)
+[reasoning]
+Suggested predicate: equals
+
+  [ToT] ── BRANCH_2 ──
+Predicted: touches
+TOPLOGICAL REASONING (Which topological relation fits the two state polygons meeting at a shared edge?)
+[reasoning]
+Suggested predicate: touches
+
+  [ToT] ── BRANCH_3 ──
+Predicted: touches
+TOPLOGICAL REASONING (Which topological relation fits the two state polygons meeting at a shared edge?)
+[reasoning]
+Suggested predicate: touches
+
+
+
+
+Conclusion: After evaluating all reasoning branches, the correct topological relation is
+Answer: touches
+
+
+
+
+Reasoning Trace: The correct topological relation is touches. The State of Colorado and the State of New Mexico meet precisely at the Four Corners Joint Management Area, sharing an identical boundary line with zero interior overlap. The OSM geometry for both State of Colorado (State of Colorado, geometry: Polygon) and State of New Mexico (State of New Mexico, geometry: Polygon) confirm a perfect edge-to-edge topological match. The textual qualifier "meeting at a shared edge" directly maps to the topological predicate "touches". Hence the relation is touches.
+
+  [ToT] ✅ FINAL PREDICTION: touches
+
+RESULT | Expected=touches | Predicted=touches | CORRECT | Acc=29.41%
+
+==========================================================================================
+ROW 32 | Egypt → Sudan
+Expected: touches
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Egypt | B: Sudan | Vernacular: "Two African nations meeting at a shared linear boundary."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: EQUALS CHECK
+[reasoning]
+Suggested predicate: equals
+
+
+BRANCH 2: TOPLOGICAL REASONING (PRESERVE THE DIRECTION A→B)
+[reasoning]
+Suggested predicate: touches
+
+
+BRANCH 3: TOPLOGICAL REASONING (PRESERVE THE DIRECTION A→B)
+[reasoning]
+Suggested predicate: overlaps
+
+
+
+
+Answer: [predicate]
+
+  [ToT] ── BRANCH_1 ──
+Predicted: equals
+EQUALS CHECK
+[reasoning]
+Suggested predicate: equals
+
+  [ToT] ── BRANCH_2 ──
+Predicted: touches
+TOPLOGICAL REASONING (PRESERVE THE DIRECTION A→B)
+[reasoning]
+Suggested predicate: touches
+
+  [ToT] ── BRANCH_3 ──
+Predicted: overlaps
+TOPLOGICAL REASONING (PRESERVE THE DIRECTION A→B)
+[reasoning]
+Suggested predicate: overlaps
+
+
+
+
+Answer: [predicate]
+
+  [ToT] ✅ FINAL PREDICTION: equals
+
+RESULT | Expected=touches | Predicted=equals | WRONG | Acc=27.78%
+
+==========================================================================================
+ROW 35 | English Channel → French Coast
+Expected: touches
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: English Channel | B: French Coast | Vernacular: "A maritime polygon and a terrestrial polygon sharing a coastal edge."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: EQUALS CHECK
+[reasoning]
+Suggested predicate: equals
+
+
+BRANCH 2: TOPLOGICAL RULES (TOP-1)
+[reasoning]
+Suggested predicate: touches
+
+
+BRANCH 3: TOPLOGICAL RULES (TOP-2)
+[reasoning]
+Suggested predicate: overlaps
+
+
+
+
+Final Answer: The correct topological reasoning for 'English Channel A maritime polygon and a terrestrial polygon sharing a coastal edge. French Coast' using the OSM evidence is 'touches'.
+
+
+Answer: touches
+
+  [ToT] ── BRANCH_1 ──
+Predicted: equals
+EQUALS CHECK
+[reasoning]
+Suggested predicate: equals
+
+  [ToT] ── BRANCH_2 ──
+Predicted: touches
+TOPLOGICAL RULES (TOP-1)
+[reasoning]
+Suggested predicate: touches
+
+  [ToT] ── BRANCH_3 ──
+Predicted: touches
+TOPLOGICAL RULES (TOP-2)
+[reasoning]
+Suggested predicate: overlaps
+
+
+
+
+Final Answer: The correct topological reasoning for 'English Channel A maritime polygon and a terrestrial polygon sharing a coastal edge. French Coast' using the OSM evidence is 'touches'.
+
+
+Answer: touches
+
+  [ToT] ✅ FINAL PREDICTION: touches
+
+RESULT | Expected=touches | Predicted=touches | CORRECT | Acc=31.58%
+
+==========================================================================================
+ROW 36 | City of Detroit → City of Windsor
+Expected: touches
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: City of Detroit | B: City of Windsor | Vernacular: "Two city polygons from different nations that share a continuous aquatic border."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: EQUALS CHECK
+[reasoning]
+Suggested predicate: equals
+
+
+BRANCH 2: TOPLOGICAL RULES (WATER BOUNDARY)
+[reasoning]
+Suggested predicate: touches
+
+
+BRANCH 3: TOPLOGICAL RULES (CITY BOUNDARY)
+[reasoning]
+Suggested predicate: overlaps
+
+
+
+
+Final Answer: The correct topological reasoning is 'touches'. 
+
+
+Answer: touches
+
+  [ToT] ── BRANCH_1 ──
+Predicted: equals
+EQUALS CHECK
+[reasoning]
+Suggested predicate: equals
+
+  [ToT] ── BRANCH_2 ──
+Predicted: touches
+TOPLOGICAL RULES (WATER BOUNDARY)
+[reasoning]
+Suggested predicate: touches
+
+  [ToT] ── BRANCH_3 ──
+Predicted: touches
+TOPLOGICAL RULES (CITY BOUNDARY)
+[reasoning]
+Suggested predicate: overlaps
+
+
+
+
+Final Answer: The correct topological reasoning is 'touches'. 
+
+
+Answer: touches
+
+  [ToT] ✅ FINAL PREDICTION: touches
+
+RESULT | Expected=touches | Predicted=touches | CORRECT | Acc=35.00%
+
+==========================================================================================
+ROW 45 | Route 66 → Mississippi River
+Expected: crosses
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Route 66 | B: Mississippi River | Vernacular: "A highway line intersecting a major river line."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: [TOPLOGICAL REASONING USING GEOMETRY TYPES]
+[reasoning]
+Suggested predicate: crosses
+
+
+BRANCH 2: [PRESCRIBED VERNOUN RULE CHECK]
+[reasoning]
+Suggested predicate: crosses
+
+
+BRANCH 3: [EXCEPTION HANDLING USING ENTITY VALIDATION]
+[reasoning]
+Suggested predicate: crosses
+
+
+
+
+Answer: crosses
+
+  [ToT] ── BRANCH_1 ──
+Predicted: crosses
+[TOPLOGICAL REASONING USING GEOMETRY TYPES]
+[reasoning]
+Suggested predicate: crosses
+
+  [ToT] ── BRANCH_2 ──
+Predicted: crosses
+[PRESCRIBED VERNOUN RULE CHECK]
+[reasoning]
+Suggested predicate: crosses
+
+  [ToT] ── BRANCH_3 ──
+Predicted: crosses
+[EXCEPTION HANDLING USING ENTITY VALIDATION]
+[reasoning]
+Suggested predicate: crosses
+
+
+
+
+Answer: crosses
+
+  [ToT] ✅ FINAL PREDICTION: crosses
+
+RESULT | Expected=crosses | Predicted=crosses | CORRECT | Acc=38.10%
+
+==========================================================================================
+ROW 47 | Channel Tunnel → English Channel
+Expected: crosses
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Channel Tunnel | B: English Channel | Vernacular: "A tunnel line geometry passing through a maritime polygon."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: EQUALS CHECK
+[reasoning]
+Suggested predicate: equals
+
+
+BRANCH 2: TOPLOGICAL RULES (TOP-1)
+[reasoning]
+Suggested predicate: crosses
+
+
+BRANCH 3: TOPLOGICAL RULES (TOP-2)
+[reasoning]
+Suggested predicate: touches
+
+
+
+
+Answer: [predicate]
+
+  [ToT] ── BRANCH_1 ──
+Predicted: equals
+EQUALS CHECK
+[reasoning]
+Suggested predicate: equals
+
+  [ToT] ── BRANCH_2 ──
+Predicted: crosses
+TOPLOGICAL RULES (TOP-1)
+[reasoning]
+Suggested predicate: crosses
+
+  [ToT] ── BRANCH_3 ──
+Predicted: touches
+TOPLOGICAL RULES (TOP-2)
+[reasoning]
+Suggested predicate: touches
+
+
+
+
+Answer: [predicate]
+
+  [ToT] ✅ FINAL PREDICTION: equals
+
+RESULT | Expected=crosses | Predicted=equals | WRONG | Acc=36.36%
+
+==========================================================================================
+ROW 48 | Tropic of Cancer → Mexico
+Expected: crosses
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Tropic of Cancer | B: Mexico | Vernacular: "A global latitude line traversing a national polygon."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: EQUALS CHECK (textual)
+[reasoning]
+Suggested predicate: equals
+
+
+BRANCH 2: TOPOLOGICAL (geometry) USING THE ENTITY COORDINATES
+[reasoning]
+Suggested predicate: crosses
+
+
+BRANCH 3: TOPOLOGICAL (geometry) USING THE ENTITY COORDINATES
+[reasoning]
+Suggested predicate: touches
+
+
+
+
+Final Answer: The correct topological reasoning for the pair 'Tropic of Cancer (LineString) and Mexico (Polygon)' is 'crosses'.
+
+  [ToT] ── BRANCH_1 ──
+Predicted: equals
+EQUALS CHECK (textual)
+[reasoning]
+Suggested predicate: equals
+
+  [ToT] ── BRANCH_2 ──
+Predicted: crosses
+TOPOLOGICAL (geometry) USING THE ENTITY COORDINATES
+[reasoning]
+Suggested predicate: crosses
+
+  [ToT] ── BRANCH_3 ──
+Predicted: touches
+TOPOLOGICAL (geometry) USING THE ENTITY COORDINATES
+[reasoning]
+Suggested predicate: touches
+
+
+
+
+Final Answer: The correct topological reasoning for the pair 'Tropic of Cancer (LineString) and Mexico (Polygon)' is 'crosses'.
+
+  [ToT] ✅ FINAL PREDICTION: touches
+
+RESULT | Expected=crosses | Predicted=touches | WRONG | Acc=34.78%
+
+==========================================================================================
+ROW 49 | Prime Meridian → France
+Expected: crosses
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Prime Meridian | B: France | Vernacular: "An abstract mathematical line passing through a country polygon."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: EQUALS CHECK (entity geometry match)
+[reasoning]
+Suggested predicate: equals
+
+
+BRANCH 2: TOPLOGICAL REASONING (within, touches, crosses, overlaps)
+[reasoning]
+Suggested predicate: crosses
+
+
+BRANCH 3: TOPLOGICAL REASONING (within, touches, crosses, overlaps)
+[reasoning]
+Suggested predicate: within
+
+
+
+
+Answer: [predicate]
+
+  [ToT] ── BRANCH_1 ──
+Predicted: equals
+EQUALS CHECK (entity geometry match)
+[reasoning]
+Suggested predicate: equals
+
+  [ToT] ── BRANCH_2 ──
+Predicted: crosses
+TOPLOGICAL REASONING (within, touches, crosses, overlaps)
+[reasoning]
+Suggested predicate: crosses
+
+  [ToT] ── BRANCH_3 ──
+Predicted: within
+TOPLOGICAL REASONING (within, touches, crosses, overlaps)
+[reasoning]
+Suggested predicate: within
+
+
+
+
+Answer: [predicate]
+
+  [ToT] ✅ FINAL PREDICTION: equals
+
+RESULT | Expected=crosses | Predicted=equals | WRONG | Acc=33.33%
+
+==========================================================================================
+ROW 51 | Appalachian Trail → Mason-Dixon Line
+Expected: crosses
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Appalachian Trail | B: Mason-Dixon Line | Vernacular: "A physical hiking trail line intersecting a historical boundary line."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: [TOPOLINIC REASONING USING GEOMETRY TYPES]
+  — Entity A: Appalachian Trail (LineString)
+  — Entity B: Mason-Dixon Line (LineString)
+  — Reasoning: Two distinct LineString geometries representing separate linear features.
+  — Valid predicates: crosses, touches, disjoint, overlaps, equals
+  — Check for EQUALS: The text does NOT claim the trail and the historical boundary are the same line.
+  — Check for TOPOLINIC RULES: "physical hiking trail line intersecting a historical boundary line" → crosses (not just touches).
+  — Reasoning: The Appalachian Trail physically traverses the Mason-Dixon Line at exactly one point.
+  Suggested predicate: crosses
+
+
+BRANCH 2: [EXPLICIT DIRECTION VALIDATION]
+  — Entity A: Appalachian Trail (geometry: LineString)
+  — Entity B: Mason-Dixon Line (geometry: LineString)
+  — Reasoning: The vernacular clearly maps the relationship from A to B.
+  — Valid predicates: crosses, touches, disjoint, overlaps, equals
+  — Check for DIRECTION: "Appalachian Trail A physical hiking trail line intersecting a historical boundary line. Mason-Dixon Line" → A to B
+  — Reasoning: The Appalachian Trail physically traverses the Mason-Dixon Line at exactly one point.
+  Suggested predicate: crosses
+
+
+BRANCH 3: [BBOX CONFIRMATION (USE WITH CAUTION)] 
+  — Entity A: Appalachian Trail (bbox: 39.9995,-77.0000,40.0005,-76.9990)
+  — Entity B: Mason-Dixon Line (bbox: 39.9990,-77.0005,40.0010,-76.9995)
+  — Reasoning: Two separate bounding boxes representing distinct linear features.
+  — Valid predicates: crosses, touches, disjoint, overlaps, equals
+  — Check for EQUALS: The text does NOT claim the trail and the boundary are the same line.
+  — Check for TOPOLINIC RULES: "physical hiking trail line intersecting a historical boundary line" → crosses (not just touches).
+  — Reasoning: The Appalachian Trail physically traverses the Mason-Dixon Line at exactly one point.
+  Suggested predicate: crosses
+
+
+Answer: [crosses]
+
+  [ToT] ── BRANCH_1 ──
+Predicted: crosses
+[TOPOLINIC REASONING USING GEOMETRY TYPES]
+  — Entity A: Appalachian Trail (LineString)
+  — Entity B: Mason-Dixon Line (LineString)
+  — Reasoning: Two distinct LineString geometries representing separate linear features.
+  — Valid predicates: crosses, touches, disjoint, overlaps, equals
+  — Check for EQUALS: The text does NOT claim the trail and the historical boundary are the same line.
+  — Check for TOPOLINIC RULES: "physical hiking trail line intersecting a historical boundary line" → crosses (not just touches).
+  — Reasoning: The Appalachian Trail physically traverses the Mason-Dixon Line at exactly one point.
+  Suggested predicate: crosses
+
+  [ToT] ── BRANCH_2 ──
+Predicted: crosses
+[EXPLICIT DIRECTION VALIDATION]
+  — Entity A: Appalachian Trail (geometry: LineString)
+  — Entity B: Mason-Dixon Line (geometry: LineString)
+  — Reasoning: The vernacular clearly maps the relationship from A to B.
+  — Valid predicates: crosses, touches, disjoint, overlaps, equals
+  — Check for DIRECTION: "Appalachian Trail A physical hiking trail line intersecting a historical boundary line. Mason-Dixon Line" → A to B
+  — Reasoning: The Appalachian Trail physically traverses the Mason-Dixon Line at exactly one point.
+  Suggested predicate: crosses
+
+  [ToT] ── BRANCH_3 ──
+Predicted: crosses
+[BBOX CONFIRMATION (USE WITH CAUTION)] 
+  — Entity A: Appalachian Trail (bbox: 39.9995,-77.0000,40.0005,-76.9990)
+  — Entity B: Mason-Dixon Line (bbox: 39.9990,-77.0005,40.0010,-76.9995)
+  — Reasoning: Two separate bounding boxes representing distinct linear features.
+  — Valid predicates: crosses, touches, disjoint, overlaps, equals
+  — Check for EQUALS: The text does NOT claim the trail and the boundary are the same line.
+  — Check for TOPOLINIC RULES: "physical hiking trail line intersecting a historical boundary line" → crosses (not just touches).
+  — Reasoning: The Appalachian Trail physically traverses the Mason-Dixon Line at exactly one point.
+  Suggested predicate: crosses
+
+
+Answer: [crosses]
+
+  [ToT] ✅ FINAL PREDICTION: crosses
+
+RESULT | Expected=crosses | Predicted=crosses | CORRECT | Acc=36.00%
+
+==========================================================================================
+ROW 53 | Colorado River → Grand Canyon National Park
+Expected: crosses
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Colorado River | B: Grand Canyon National Park | Vernacular: "A natural river line geometry entirely traverses the interior and exterior boundaries of a federal park polygon."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: [TOPOLINIC REASONING]
+[reasoning]
+Suggested predicate: [predicate]
+
+
+BRANCH 2: [TOPOLINIC REASONING]
+[reasoning]
+Suggested predicate: [predicate]
+
+
+BRANCH 3: [TOPOLINIC REASONING]
+[reasoning]
+Suggested predicate: [predicate]
+
+  [ToT] ── BRANCH_1 ──
+Predicted: None
+[TOPOLINIC REASONING]
+[reasoning]
+Suggested predicate: [predicate]
+
+  [ToT] ── BRANCH_2 ──
+Predicted: None
+[TOPOLINIC REASONING]
+[reasoning]
+Suggested predicate: [predicate]
+
+  [ToT] ── BRANCH_3 ──
+Predicted: None
+[TOPOLINIC REASONING]
+[reasoning]
+Suggested predicate: [predicate]
+
+  [ToT] ✅ FINAL PREDICTION: contains
+
+RESULT | Expected=crosses | Predicted=contains | WRONG | Acc=34.62%
+
+==========================================================================================
+ROW 54 | Equator → Amazon River
+Expected: crosses
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Equator | B: Amazon River | Vernacular: "A planetary line geometry intersecting a physical river line geometry."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: [TOPOLINIC REASONING using the two geometries]
+[reasoning]
+Suggested predicate: touches
+
+
+BRANCH 2: [TOPOLINIC REASONING using the two geometries]
+[reasoning]
+Suggested predicate: crosses
+
+
+BRANCH 3: [TOPOLINIC REASONING using the two geometries]
+[reasoning]
+Suggested predicate: overlaps
+
+
+
+
+Answer: [touches]
+
+  [ToT] ── BRANCH_1 ──
+Predicted: touches
+[TOPOLINIC REASONING using the two geometries]
+[reasoning]
+Suggested predicate: touches
+
+  [ToT] ── BRANCH_2 ──
+Predicted: crosses
+[TOPOLINIC REASONING using the two geometries]
+[reasoning]
+Suggested predicate: crosses
+
+  [ToT] ── BRANCH_3 ──
+Predicted: touches
+[TOPOLINIC REASONING using the two geometries]
+[reasoning]
+Suggested predicate: overlaps
+
+
+
+
+Answer: [touches]
+
+  [ToT] ✅ FINAL PREDICTION: touches
+
+RESULT | Expected=crosses | Predicted=touches | WRONG | Acc=33.33%
+
+==========================================================================================
+ROW 60 | City of Chicago → City of Houston
+Expected: disjoint
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: City of Chicago | B: City of Houston | Vernacular: "Two distant cities with no intersecting geometry."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: EQUALS CHECK
+[reasoning]
+Suggested predicate: equals
+
+
+BRANCH 2: TOPLOGICAL RULES (within, touches, overlaps, crosses, contains, disjoint)
+[reasoning]
+Suggested predicate: within
+
+
+BRANCH 3: TOPLOGICAL RULES (within, touches, overlaps, crosses, contains, disjoint)
+[reasoning]
+Suggested predicate: touches
+
+
+Final Answer: The correct topological reasoning for "City of Chicago Two distant cities with no intersecting geometry. City of Houston" using the OSM evidence is "within".
+
+  [ToT] ── BRANCH_1 ──
+Predicted: equals
+EQUALS CHECK
+[reasoning]
+Suggested predicate: equals
+
+  [ToT] ── BRANCH_2 ──
+Predicted: within
+TOPLOGICAL RULES (within, touches, overlaps, crosses, contains, disjoint)
+[reasoning]
+Suggested predicate: within
+
+  [ToT] ── BRANCH_3 ──
+Predicted: touches
+TOPLOGICAL RULES (within, touches, overlaps, crosses, contains, disjoint)
+[reasoning]
+Suggested predicate: touches
+
+
+Final Answer: The correct topological reasoning for "City of Chicago Two distant cities with no intersecting geometry. City of Houston" using the OSM evidence is "within".
+
+  [ToT] ✅ FINAL PREDICTION: touches
+
+RESULT | Expected=disjoint | Predicted=touches | WRONG | Acc=32.14%
+
+==========================================================================================
+ROW 61 | City of Paris → City of Tokyo
+Expected: disjoint
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: City of Paris | B: City of Tokyo | Vernacular: "Two cities physically separated by thousands of miles."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: EQUALS CHECK
+[reasoning]
+Suggested predicate: equals
+
+
+BRANCH 2: TOPLOGICAL RULES (geometry-based)
+[reasoning]
+Suggested predicate: within
+
+
+BRANCH 3: TOPLOGICAL RULES (geometry-based)
+[reasoning]
+Suggested predicate: touches
+
+
+
+
+Final Answer: The correct topological reasoning for the pair City of Paris Two cities physically separated by thousands of miles. City of Tokyo is using Entity A: City of Paris (type: City of Paris, geometry: Polygon) and Entity B: City of Tokyo (type: City of Tokyo, geometry: Polygon) is [final predicate].
+
+  [ToT] ── BRANCH_1 ──
+Predicted: equals
+EQUALS CHECK
+[reasoning]
+Suggested predicate: equals
+
+  [ToT] ── BRANCH_2 ──
+Predicted: within
+TOPLOGICAL RULES (geometry-based)
+[reasoning]
+Suggested predicate: within
+
+  [ToT] ── BRANCH_3 ──
+Predicted: touches
+TOPLOGICAL RULES (geometry-based)
+[reasoning]
+Suggested predicate: touches
+
+
+
+
+Final Answer: The correct topological reasoning for the pair City of Paris Two cities physically separated by thousands of miles. City of Tokyo is using Entity A: City of Paris (type: City of Paris, geometry: Polygon) and Entity B: City of Tokyo (type: City of Tokyo, geometry: Polygon) is [final predicate].
+
+  [ToT] ✅ FINAL PREDICTION: touches
+
+RESULT | Expected=disjoint | Predicted=touches | WRONG | Acc=31.03%
+
+==========================================================================================
+ROW 62 | Australia → Canada
+Expected: disjoint
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Australia | B: Canada | Vernacular: "Two country polygons located on completely different continents with no shared points."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: EQUALS CHECK
+[reasoning]
+Suggested predicate: equals
+
+
+BRANCH 2: TOPLOGICAL RULES (WITNESS THE BIBLICAL CONUNDRUM)
+[reasoning]
+Suggested predicate: within
+
+
+BRANCH 3: TOPLOGICAL RULES (WITNESS THE BIBLICAL CONUNDRUM)
+[reasoning]
+Suggested predicate: touches
+
+
+Final Answer: The correct topological reasoning is that Australia and Canada are completely geographically isolated from each other, sharing absolutely no topological geometry. Therefore the reasoning leads to the precise topological predicate: 'within'. Answer: within.
+
+  [ToT] ── BRANCH_1 ──
+Predicted: equals
+EQUALS CHECK
+[reasoning]
+Suggested predicate: equals
+
+  [ToT] ── BRANCH_2 ──
+Predicted: within
+TOPLOGICAL RULES (WITNESS THE BIBLICAL CONUNDRUM)
+[reasoning]
+Suggested predicate: within
+
+  [ToT] ── BRANCH_3 ──
+Predicted: within
+TOPLOGICAL RULES (WITNESS THE BIBLICAL CONUNDRUM)
+[reasoning]
+Suggested predicate: touches
+
+
+Final Answer: The correct topological reasoning is that Australia and Canada are completely geographically isolated from each other, sharing absolutely no topological geometry. Therefore the reasoning leads to the precise topological predicate: 'within'. Answer: within.
+
+  [ToT] ✅ FINAL PREDICTION: within
+
+RESULT | Expected=disjoint | Predicted=within | WRONG | Acc=30.00%
+
+==========================================================================================
+ROW 63 | Iceland → Antarctica
+Expected: disjoint
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Iceland | B: Antarctica | Vernacular: "Two landmass polygons with extreme global separation."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: [EQUALS CHECK]
+[reasoning]
+Suggested predicate: equals
+
+
+BRANCH 2: [TOPLOGICAL REASONING USING POLYGON GEOMETRY]
+[reasoning]
+Suggested predicate: within
+
+
+BRANCH 3: [TOPLOGICAL REASONING USING POLYGON GEOMETRY]
+[reasoning]
+Suggested predicate: touches
+
+
+END ANALYSIS. Answer: [predicate]
+
+  [ToT] ── BRANCH_1 ──
+Predicted: equals
+[EQUALS CHECK]
+[reasoning]
+Suggested predicate: equals
+
+  [ToT] ── BRANCH_2 ──
+Predicted: within
+[TOPLOGICAL REASONING USING POLYGON GEOMETRY]
+[reasoning]
+Suggested predicate: within
+
+  [ToT] ── BRANCH_3 ──
+Predicted: touches
+[TOPLOGICAL REASONING USING POLYGON GEOMETRY]
+[reasoning]
+Suggested predicate: touches
+
+
+END ANALYSIS. Answer: [predicate]
+
+  [ToT] ✅ FINAL PREDICTION: within
+
+RESULT | Expected=disjoint | Predicted=within | WRONG | Acc=29.03%
+
+==========================================================================================
+ROW 64 | Great Wall of China → Japan
+Expected: disjoint
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Great Wall of China | B: Japan | Vernacular: "A historical LineString completely isolated from an island Polygon."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: [TOPOLINE reasoning using the OSM geometry types]
+[reasoning]
+Suggested predicate: [predicate]
+
+
+BRANCH 2: [TOPOLINE reasoning using the OSM geometry types]
+[reasoning]
+Suggested predicate: [predicate]
+
+
+BRANCH 3: [TOPOLINE reasoning using the OSM geometry types]
+[reasoning]
+Suggested predicate: [predicate]
+
+
+Conclusion: The correct topological reasoning for the pair is 'Great Wall of China A historical LineString completely isolated from an island Polygon. Japan' using the predicate [predicate]. Answer: [predicate]
+
+  [ToT] ── BRANCH_1 ──
+Predicted: None
+[TOPOLINE reasoning using the OSM geometry types]
+[reasoning]
+Suggested predicate: [predicate]
+
+  [ToT] ── BRANCH_2 ──
+Predicted: None
+[TOPOLINE reasoning using the OSM geometry types]
+[reasoning]
+Suggested predicate: [predicate]
+
+  [ToT] ── BRANCH_3 ──
+Predicted: None
+[TOPOLINE reasoning using the OSM geometry types]
+[reasoning]
+Suggested predicate: [predicate]
+
+
+Conclusion: The correct topological reasoning for the pair is 'Great Wall of China A historical LineString completely isolated from an island Polygon. Japan' using the predicate [predicate]. Answer: [predicate]
+
+  [ToT] ✅ FINAL PREDICTION: contains
+
+RESULT | Expected=disjoint | Predicted=contains | WRONG | Acc=28.12%
+
+==========================================================================================
+ROW 65 | State of Alaska → Contiguous United States
+Expected: disjoint
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: State of Alaska | B: Contiguous United States | Vernacular: "An exclave polygon completely isolated from its parent multi-polygon."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: [EQUALS CHECK]
+[reasoning]
+Suggested predicate: equals
+
+
+BRANCH 2: [TOPLOGICAL RULES (TOP 3) APPLY]
+[reasoning]
+Suggested predicate: within
+
+
+BRANCH 3: [TOPLOGICAL RULES (BOTTOM 3) APPLY]
+[reasoning]
+Suggested predicate: touches
+
+
+
+
+Answer: [predicate]
+
+  [ToT] ── BRANCH_1 ──
+Predicted: equals
+[EQUALS CHECK]
+[reasoning]
+Suggested predicate: equals
+
+  [ToT] ── BRANCH_2 ──
+Predicted: within
+[TOPLOGICAL RULES (TOP 3) APPLY]
+[reasoning]
+Suggested predicate: within
+
+  [ToT] ── BRANCH_3 ──
+Predicted: touches
+[TOPLOGICAL RULES (BOTTOM 3) APPLY]
+[reasoning]
+Suggested predicate: touches
+
+
+
+
+Answer: [predicate]
+
+  [ToT] ✅ FINAL PREDICTION: equals
+
+RESULT | Expected=disjoint | Predicted=equals | WRONG | Acc=27.27%
+
+==========================================================================================
+ROW 75 | Amazon Rainforest → Brazil
+Expected: overlaps
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Amazon Rainforest | B: Brazil | Vernacular: "Two large polygons sharing a significant interior area while retaining exclusive external areas."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: EQUALS DIRECT CHECK
+[reasoning]
+Suggested predicate: equals
+
+
+BRANCH 2: TOPLOGICAL RULES (WITNESS A & B)
+[reasoning]
+Suggested predicate: within
+
+
+BRANCH 3: TOPLOGICAL RULES (WITNESS A & B)
+[reasoning]
+Suggested predicate: overlaps
+
+
+
+
+Answer: [predicate]
+
+  [ToT] ── BRANCH_1 ──
+Predicted: equals
+EQUALS DIRECT CHECK
+[reasoning]
+Suggested predicate: equals
+
+  [ToT] ── BRANCH_2 ──
+Predicted: within
+TOPLOGICAL RULES (WITNESS A & B)
+[reasoning]
+Suggested predicate: within
+
+  [ToT] ── BRANCH_3 ──
+Predicted: overlaps
+TOPLOGICAL RULES (WITNESS A & B)
+[reasoning]
+Suggested predicate: overlaps
+
+
+
+
+Answer: [predicate]
+
+  [ToT] ✅ FINAL PREDICTION: equals
+
+RESULT | Expected=overlaps | Predicted=equals | WRONG | Acc=26.47%
+
+==========================================================================================
+ROW 79 | Sahara Desert → Republic of Mali
+Expected: overlaps
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Sahara Desert | B: Republic of Mali | Vernacular: "An environmental polygon partially intersecting a national administrative polygon."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: EQUALS CHECK
+[reasoning]
+Suggested predicate: equals
+
+
+BRANCH 2: TOPLOGICAL RULES (within/contains)
+[reasoning]
+Suggested predicate: within
+
+
+BRANCH 3: TOPLOGICAL RULES (overlaps/crosses/touches)
+[reasoning]
+Suggested predicate: overlaps
+
+
+
+
+Answer: [predicate]
+
+  [ToT] ── BRANCH_1 ──
+Predicted: equals
+EQUALS CHECK
+[reasoning]
+Suggested predicate: equals
+
+  [ToT] ── BRANCH_2 ──
+Predicted: within
+TOPLOGICAL RULES (within/contains)
+[reasoning]
+Suggested predicate: within
+
+  [ToT] ── BRANCH_3 ──
+Predicted: overlaps
+TOPLOGICAL RULES (overlaps/crosses/touches)
+[reasoning]
+Suggested predicate: overlaps
+
+
+
+
+Answer: [predicate]
+
+  [ToT] ✅ FINAL PREDICTION: equals
+
+RESULT | Expected=overlaps | Predicted=equals | WRONG | Acc=25.71%
+
+==========================================================================================
+ROW 80 | Navajo Nation → State of Arizona
+Expected: overlaps
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Navajo Nation | B: State of Arizona | Vernacular: "A sovereign tribal polygon and a state polygon share a massive interior area, while both retain exclusive regions outside of that intersection."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: EQUALS FIRST CHECK
+[reasoning]
+Suggested predicate: equals
+
+
+BRANCH 2: TOPLOGICAL RULES (PUNCTUATION MATTERS)
+[reasoning]
+Suggested predicate: overlaps
+
+
+BRANCH 3: DIRECT LOGICAL INFERENCE (A→B)
+[reasoning]
+Suggested predicate: within
+
+
+
+
+Final Answer: The correct topological reasoning is A 'Navajo Nation' 'Navajo Nation' 'State of Arizona' 'State of Arizona' => overlaps. Answer: overlaps.
+
+  [ToT] ── BRANCH_1 ──
+Predicted: equals
+EQUALS FIRST CHECK
+[reasoning]
+Suggested predicate: equals
+
+  [ToT] ── BRANCH_2 ──
+Predicted: overlaps
+TOPLOGICAL RULES (PUNCTUATION MATTERS)
+[reasoning]
+Suggested predicate: overlaps
+
+  [ToT] ── BRANCH_3 ──
+Predicted: overlaps
+DIRECT LOGICAL INFERENCE (A→B)
+[reasoning]
+Suggested predicate: within
+
+
+
+
+Final Answer: The correct topological reasoning is A 'Navajo Nation' 'Navajo Nation' 'State of Arizona' 'State of Arizona' => overlaps. Answer: overlaps.
+
+  [ToT] ✅ FINAL PREDICTION: overlaps
+
+RESULT | Expected=overlaps | Predicted=overlaps | CORRECT | Acc=27.78%
+
+==========================================================================================
+ROW 81 | Navajo Nation → Hopi Reservation
+Expected: overlaps
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Navajo Nation | B: Hopi Reservation | Vernacular: "Two tribal administrative polygons that feature partially intersecting boundaries and shared internal land areas."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: [approach: direct topological reasoning using the two OSM geometries]
+Entity A: Navajo Nation (geometry: Polygon)
+Entity B: Hopi Reservation (geometry: Polygon)
+Reasoning: The topological relationship between the Navajo Nation and the Hopi Reservation is a classic example of two sovereign geographies sharing a significant amount of land area. The OSM geometry for the Hopi Reservation is completely embedded within the massive footprint of the Navajo Nation. This scenario maps exactly to the topological predicate "overlaps".
+Suggested predicate: overlaps
+
+
+BRANCH 2: [approach: validate the topological direction using the OSM geometry types]
+Entity A: Navajo Nation (geometry: Polygon)
+Entity B: Hopi Reservation (geometry: Polygon)
+Reasoning: The topological reasoning is based on the two OSM geometry types (both Polygons). The relationship is fully symmetric: the Hopi Reservation is a massive enclave that sits entirely inside the larger Navajo Nation footprint. This scenario maps exactly to the topological predicate "overlaps".
+Suggested predicate: overlaps
+
+
+BRANCH 3: [approach: consider the extreme topological possibility of geometric identity]
+Entity A: Navajo Nation (geometry: Polygon)
+Entity B: Hopi Reservation (geometry: Polygon)
+Reasoning: The vernacular "Two tribal administrative polygons that feature partially intersecting boundaries and shared internal land areas" strongly indicates a complete geometric sharing of territory. The OSM geometry for the Hopi Reservation is fully nested within the massive footprint of the Navajo Nation. This scenario maps exactly to the topological predicate "overlaps".
+Suggested predicate: overlaps
+
+
+
+
+Final Answer: The topological relationship between the Navajo Nation and the Hopi Reservation is a classic example of two sovereign geographies sharing a significant amount of land area. The OSM geometry for the Hopi Reservation is completely embedded within the massive footprint of the Navajo Nation. This scenario maps exactly to the topological predicate "overlaps". 
+Answer: overlaps
+
+  [ToT] ── BRANCH_1 ──
+Predicted: overlaps
+[approach: direct topological reasoning using the two OSM geometries]
+Entity A: Navajo Nation (geometry: Polygon)
+Entity B: Hopi Reservation (geometry: Polygon)
+Reasoning: The topological relationship between the Navajo Nation and the Hopi Reservation is a classic example of two sovereign geographies sharing a significant amount of land area. The OSM geometry for the Hopi Reservation is completely embedded within the massive footprint of the Navajo Nation. This scenario maps exactly to the topological predicate "overlaps".
+Suggested predicate: overlaps
+
+  [ToT] ── BRANCH_2 ──
+Predicted: overlaps
+[approach: validate the topological direction using the OSM geometry types]
+Entity A: Navajo Nation (geometry: Polygon)
+Entity B: Hopi Reservation (geometry: Polygon)
+Reasoning: The topological reasoning is based on the two OSM geometry types (both Polygons). The relationship is fully symmetric: the Hopi Reservation is a massive enclave that sits entirely inside the larger Navajo Nation footprint. This scenario maps exactly to the topological predicate "overlaps".
+Suggested predicate: overlaps
+
+  [ToT] ── BRANCH_3 ──
+Predicted: overlaps
+[approach: consider the extreme topological possibility of geometric identity]
+Entity A: Navajo Nation (geometry: Polygon)
+Entity B: Hopi Reservation (geometry: Polygon)
+Reasoning: The vernacular "Two tribal administrative polygons that feature partially intersecting boundaries and shared internal land areas" strongly indicates a complete geometric sharing of territory. The OSM geometry for the Hopi Reservation is fully nested within the massive footprint of the Navajo Nation. This scenario maps exactly to the topological predicate "overlaps".
+Suggested predicate: overlaps
+
+
+
+
+Final Answer: The topological relationship between the Navajo Nation and the Hopi Reservation is a classic example of two sovereign geographies sharing a significant amount of land area. The OSM geometry for the Hopi Reservation is completely embedded within the massive footprint of the Navajo Nation. This scenario maps exactly to the topological predicate "overlaps". 
+Answer: overlaps
+
+  [ToT] ✅ FINAL PREDICTION: overlaps
+
+RESULT | Expected=overlaps | Predicted=overlaps | CORRECT | Acc=29.73%
+
+==========================================================================================
+ROW 86 | Tornado Alley → State of Oklahoma
+Expected: overlaps
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Tornado Alley | B: State of Oklahoma | Vernacular: "A meteorological zone polygon intersecting heavily with a state polygon."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: [EQUALS CHECK]
+[reasoning]
+Suggested predicate: equals
+
+
+BRANCH 2: [TOPLOGICAL REASONING USING POLYGON GEOMETRY]
+[reasoning]
+Suggested predicate: overlaps
+
+
+BRANCH 3: [TOPLOGICAL REASONING USING POLYGON GEOMETRY]
+[reasoning]
+Suggested predicate: within
+
+
+
+
+Answer: [predicate]
+
+  [ToT] ── BRANCH_1 ──
+Predicted: equals
+[EQUALS CHECK]
+[reasoning]
+Suggested predicate: equals
+
+  [ToT] ── BRANCH_2 ──
+Predicted: overlaps
+[TOPLOGICAL REASONING USING POLYGON GEOMETRY]
+[reasoning]
+Suggested predicate: overlaps
+
+  [ToT] ── BRANCH_3 ──
+Predicted: within
+[TOPLOGICAL REASONING USING POLYGON GEOMETRY]
+[reasoning]
+Suggested predicate: within
+
+
+
+
+Answer: [predicate]
+
+  [ToT] ✅ FINAL PREDICTION: overlaps
+
+RESULT | Expected=overlaps | Predicted=overlaps | CORRECT | Acc=31.58%
+
+==========================================================================================
+ROW 89 | Tornado Alley → State of Oklahoma
+Expected: overlaps
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Tornado Alley | B: State of Oklahoma | Vernacular: "A meteorological zone polygon intersecting heavily with a state polygon."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: [EQUALS CHECK]
+[reasoning]
+Suggested predicate: equals
+
+
+BRANCH 2: [TOPLOGICAL REASONING USING POLYGON GEOMETRY]
+[reasoning]
+Suggested predicate: overlaps
+
+
+BRANCH 3: [TOPLOGICAL REASONING USING POLYGON GEOMETRY]
+[reasoning]
+Suggested predicate: within
+
+
+
+
+Answer: [predicate]
+
+  [ToT] ── BRANCH_1 ──
+Predicted: equals
+[EQUALS CHECK]
+[reasoning]
+Suggested predicate: equals
+
+  [ToT] ── BRANCH_2 ──
+Predicted: overlaps
+[TOPLOGICAL REASONING USING POLYGON GEOMETRY]
+[reasoning]
+Suggested predicate: overlaps
+
+  [ToT] ── BRANCH_3 ──
+Predicted: within
+[TOPLOGICAL REASONING USING POLYGON GEOMETRY]
+[reasoning]
+Suggested predicate: within
+
+
+
+
+Answer: [predicate]
+
+  [ToT] ✅ FINAL PREDICTION: overlaps
+
+RESULT | Expected=overlaps | Predicted=overlaps | CORRECT | Acc=33.33%
+
+==========================================================================================
+ROW 90 | City of Broomfield → Broomfield County
+Expected: equals
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: City of Broomfield | B: Broomfield County | Vernacular: "A consolidated jurisdiction where city and county are the same entity."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: [EQUALS CHECK]
+[reasoning]
+Suggested predicate: equals
+
+
+BRANCH 2: [TOPOLINIC RULES: WITHIN vs OVERLAPS vs TOUCHES]
+[reasoning]
+Suggested predicate: within
+
+
+BRANCH 3: [TOPOLINIC RULES: WITHIN vs OVERLAPS vs TOUCHES]
+[reasoning]
+Suggested predicate: touches
+
+
+END ANALYSIS
+
+
+
+
+Answer: [equals]
+
+  [ToT] ── BRANCH_1 ──
+Predicted: equals
+[EQUALS CHECK]
+[reasoning]
+Suggested predicate: equals
+
+  [ToT] ── BRANCH_2 ──
+Predicted: within
+[TOPOLINIC RULES: WITHIN vs OVERLAPS vs TOUCHES]
+[reasoning]
+Suggested predicate: within
+
+  [ToT] ── BRANCH_3 ──
+Predicted: equals
+[TOPOLINIC RULES: WITHIN vs OVERLAPS vs TOUCHES]
+[reasoning]
+Suggested predicate: touches
+
+
+END ANALYSIS
+
+
+
+
+Answer: [equals]
+
+  [ToT] ✅ FINAL PREDICTION: equals
+
+RESULT | Expected=equals | Predicted=equals | CORRECT | Acc=35.00%
+
+==========================================================================================
+ROW 91 | City of Washington → District of Columbia
+Expected: equals
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: City of Washington | B: District of Columbia | Vernacular: "The city polygon and the district polygon are legally and geometrically the same."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: EQUALS DIRECT CHECK
+[approach]
+The vernacular explicitly states the two geometries are identical.
+[reasoning]
+Entity A: City of Washington (geometry: Polygon)
+Entity B: District of Columbia (geometry: Polygon)
+The OSM evidence confirms the two IDs share the exact same vertices and area.
+Suggested predicate: equals
+
+
+BRANCH 2: TOPOLINIC DIRECTION (within vs contains)
+[approach]
+The vernacular clearly indicates the direction of the topological reasoning.
+[reasoning]
+Entity A: City of Washington (geometry: Polygon)
+Entity B: District of Columbia (geometry: Polygon)
+The OSM evidence confirms the two IDs share the exact same vertices and area.
+Suggested predicate: equals
+
+
+BRANCH 3: TOPOLINIC DIRECTION (within vs contains)
+[approach]
+The vernacular explicitly states the two geometries are identical.
+[reasoning]
+Entity A: City of Washington (geometry: Polygon)
+Entity B: District of Columbia (geometry: Polygon)
+The OSM evidence confirms the two IDs share the exact same vertices and area.
+Suggested predicate: equals
+
+
+
+
+Answer: equals
+
+  [ToT] ── BRANCH_1 ──
+Predicted: equals
+EQUALS DIRECT CHECK
+[approach]
+The vernacular explicitly states the two geometries are identical.
+[reasoning]
+Entity A: City of Washington (geometry: Polygon)
+Entity B: District of Columbia (geometry: Polygon)
+The OSM evidence confirms the two IDs share the exact same vertices and area.
+Suggested predicate: equals
+
+  [ToT] ── BRANCH_2 ──
+Predicted: equals
+TOPOLINIC DIRECTION (within vs contains)
+[approach]
+The vernacular clearly indicates the direction of the topological reasoning.
+[reasoning]
+Entity A: City of Washington (geometry: Polygon)
+Entity B: District of Columbia (geometry: Polygon)
+The OSM evidence confirms the two IDs share the exact same vertices and area.
+Suggested predicate: equals
+
+  [ToT] ── BRANCH_3 ──
+Predicted: equals
+TOPOLINIC DIRECTION (within vs contains)
+[approach]
+The vernacular explicitly states the two geometries are identical.
+[reasoning]
+Entity A: City of Washington (geometry: Polygon)
+Entity B: District of Columbia (geometry: Polygon)
+The OSM evidence confirms the two IDs share the exact same vertices and area.
+Suggested predicate: equals
+
+
+
+
+Answer: equals
+
+  [ToT] ✅ FINAL PREDICTION: equals
+
+RESULT | Expected=equals | Predicted=equals | CORRECT | Acc=36.59%
+
+==========================================================================================
+ROW 93 | Borough of Queens → Queens County
+Expected: equals
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Borough of Queens | B: Queens County | Vernacular: "Identical geometries for two different administrative titles."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: EQUALS DIRECT CHECK
+[reasoning]
+Suggested predicate: equals
+
+
+BRANCH 2: TOPLOGICAL DIRECTION (Borough of Queens vs Queens County)
+[reasoning]
+Suggested predicate: within
+
+
+BRANCH 3: TOPLOGICAL DIRECTION (Queens County vs Borough of Queens)
+[reasoning]
+Suggested predicate: contains
+
+
+
+
+Answer: [predicate]
+
+  [ToT] ── BRANCH_1 ──
+Predicted: equals
+EQUALS DIRECT CHECK
+[reasoning]
+Suggested predicate: equals
+
+  [ToT] ── BRANCH_2 ──
+Predicted: within
+TOPLOGICAL DIRECTION (Borough of Queens vs Queens County)
+[reasoning]
+Suggested predicate: within
+
+  [ToT] ── BRANCH_3 ──
+Predicted: contains
+TOPLOGICAL DIRECTION (Queens County vs Borough of Queens)
+[reasoning]
+Suggested predicate: contains
+
+
+
+
+Answer: [predicate]
+
+  [ToT] ✅ FINAL PREDICTION: equals
+
+RESULT | Expected=equals | Predicted=equals | CORRECT | Acc=38.10%
+
+==========================================================================================
+ROW 96 | City of Philadelphia → Philadelphia County
+Expected: equals
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: City of Philadelphia | B: Philadelphia County | Vernacular: "Two administrative entities covering the exact same topological footprint."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: EQUALS FIRST CHECK
+[reasoning]
+Suggested predicate: equals
+
+
+BRANCH 2: TOPLOGICAL RULES (geometry-based) USING THE GEOMETRY TYPES
+[reasoning]
+Suggested predicate: equals
+
+
+BRANCH 3: TOPLOGICAL RULES (geometry-based) USING THE VALIDATED ENTITY METADATA
+[reasoning]
+Suggested predicate: equals
+
+
+
+
+Answer: [equals]
+
+  [ToT] ── BRANCH_1 ──
+Predicted: equals
+EQUALS FIRST CHECK
+[reasoning]
+Suggested predicate: equals
+
+  [ToT] ── BRANCH_2 ──
+Predicted: equals
+TOPLOGICAL RULES (geometry-based) USING THE GEOMETRY TYPES
+[reasoning]
+Suggested predicate: equals
+
+  [ToT] ── BRANCH_3 ──
+Predicted: equals
+TOPLOGICAL RULES (geometry-based) USING THE VALIDATED ENTITY METADATA
+[reasoning]
+Suggested predicate: equals
+
+
+
+
+Answer: [equals]
+
+  [ToT] ✅ FINAL PREDICTION: equals
+
+RESULT | Expected=equals | Predicted=equals | CORRECT | Acc=39.53%
+
+==========================================================================================
+ROW 98 | City of Denver → Denver County
+Expected: equals
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: City of Denver | B: Denver County | Vernacular: "A consolidated city-county where the two distinct levels map exactly 1:1."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: EQUALS reasoning (direct topological match)
+[reasoning]
+Suggested predicate: equals
+
+
+BRANCH 2: WITHIN reasoning (City of Denver is fully inside the larger Denver County)
+[reasoning]
+Suggested predicate: within
+
+
+BRANCH 3: OVERLAPS reasoning (City of Denver shares some area but does NOT fully sit inside the larger Denver County)
+[reasoning]
+Suggested predicate: overlaps
+
+
+
+
+Final Answer: The correct topological reasoning for the relationship "City of Denver A consolidated city-county where the two distinct levels map exactly 1:1. Denver County" between Entity A: City of Denver (geometry: Polygon) and Entity B: Denver County (geometry: Polygon) is **equals**. Answer: equals.
+
+  [ToT] ── BRANCH_1 ──
+Predicted: equals
+EQUALS reasoning (direct topological match)
+[reasoning]
+Suggested predicate: equals
+
+  [ToT] ── BRANCH_2 ──
+Predicted: within
+WITHIN reasoning (City of Denver is fully inside the larger Denver County)
+[reasoning]
+Suggested predicate: within
+
+  [ToT] ── BRANCH_3 ──
+Predicted: equals
+OVERLAPS reasoning (City of Denver shares some area but does NOT fully sit inside the larger Denver County)
+[reasoning]
+Suggested predicate: overlaps
+
+
+
+
+Final Answer: The correct topological reasoning for the relationship "City of Denver A consolidated city-county where the two distinct levels map exactly 1:1. Denver County" between Entity A: City of Denver (geometry: Polygon) and Entity B: Denver County (geometry: Polygon) is **equals**. Answer: equals.
+
+  [ToT] ✅ FINAL PREDICTION: equals
+
+RESULT | Expected=equals | Predicted=equals | CORRECT | Acc=40.91%
+
+==========================================================================================
+ROW 99 | City of London → The Square Mile
+Expected: equals
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: City of London | B: The Square Mile | Vernacular: "Two completely different semantic named entities (one historical/administrative, one colloquial/financial) that resolve to the exact same geospatial polygon."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: EQUALS reasoning (direct topological match)
+[reasoning]
+Suggested predicate: equals
+
+
+BRANCH 2: WITHIN reasoning (City of London fully encloses The Square Mile)
+[reasoning]
+Suggested predicate: within
+
+
+BRANCH 3: OVERLAPS reasoning (The Square Mile partially overlaps the City of London)
+[reasoning]
+Suggested predicate: overlaps
+
+
+Answer: [predicate]
+
+  [ToT] ── BRANCH_1 ──
+Predicted: equals
+EQUALS reasoning (direct topological match)
+[reasoning]
+Suggested predicate: equals
+
+  [ToT] ── BRANCH_2 ──
+Predicted: within
+WITHIN reasoning (City of London fully encloses The Square Mile)
+[reasoning]
+Suggested predicate: within
+
+  [ToT] ── BRANCH_3 ──
+Predicted: overlaps
+OVERLAPS reasoning (The Square Mile partially overlaps the City of London)
+[reasoning]
+Suggested predicate: overlaps
+
+
+Answer: [predicate]
+
+  [ToT] ✅ FINAL PREDICTION: within
+
+RESULT | Expected=equals | Predicted=within | WRONG | Acc=40.00%
+
+==========================================================================================
+ROW 100 | Borough of Queens → Queens County
+Expected: equals
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Borough of Queens | B: Queens County | Vernacular: "Identical geometries for two different administrative titles."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+BRANCH 1: EQUALS FIRST (direct topological reasoning)
+[reasoning]
+Suggested predicate: equals
+
+
+BRANCH 2: IN-BETWEEN (topological reasoning)
+[reasoning]
+Suggested predicate: overlaps
+
+
+BRANCH 3: OUTSIDE (topological reasoning)
+[reasoning]
+Suggested predicate: touches
+
+
+
+
+Final Answer: The correct topological reasoning is based on the Borough of Queens and Queens County having the EXACT SAME geometry. Therefore the predicate is 'equals'.
+Answer: equals
+
+  [ToT] ── BRANCH_1 ──
+Predicted: equals
+EQUALS FIRST (direct topological reasoning)
+[reasoning]
+Suggested predicate: equals
+
+  [ToT] ── BRANCH_2 ──
+Predicted: overlaps
+IN-BETWEEN (topological reasoning)
+[reasoning]
+Suggested predicate: overlaps
+
+  [ToT] ── BRANCH_3 ──
+Predicted: equals
+OUTSIDE (topological reasoning)
+[reasoning]
+Suggested predicate: touches
+
+
+
+
+Final Answer: The correct topological reasoning is based on the Borough of Queens and Queens County having the EXACT SAME geometry. Therefore the predicate is 'equals'.
+Answer: equals
+
+  [ToT] ✅ FINAL PREDICTION: equals
+
+RESULT | Expected=equals | Predicted=equals | CORRECT | Acc=41.30%
+
+FINAL ACCURACY: 41.30% (19/46)
+
+FINAL ACCURACY: 41.30% (19/46)
+
+FINAL ACCURACY: 41.30% (19/46)

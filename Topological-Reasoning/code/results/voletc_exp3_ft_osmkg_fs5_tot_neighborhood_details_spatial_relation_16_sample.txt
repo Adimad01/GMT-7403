@@ -1,0 +1,1899 @@
+==========================================================================================
+  VOLET C — TOT — EXP3_FT_OSMKG_FS5 [neighborhood_details_spatial_relation_16_sample]
+  Inference: GPU  |  Adapter: final_adapter
+  KG: Dynamic OSM API
+  Started: 2026-06-21 18:06:23
+==========================================================================================
+
+
+==========================================================================================
+ROW 0 | State of Colorado → City of Denver
+Expected: contains
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: State of Colorado | B: City of Denver | Vernacular: "A state polygon acting as a complete bounding box for a city polygon."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+CASE 59473
+
+Entity A: State of Colorado (type: State of Colorado, geometry: Polygon)
+Entity B: City of Denver (type: City of Denver, geometry: Polygon)
+
+Vernacular: "State of Colorado A state polygon acting as a complete bounding box for a city polygon. City of Denver"
+
+Geometric Relationship: [DISJOINT]
+
+RULES:
+1. The spatial predicate is DISJOINT — entities share NO points.
+2. Reasoning must be based on pure spatial separation.
+3. Use the provided OSM evidence to confirm spatial separation.
+
+4-STEP DISAMBIGUATION:
+  Step 1: Do A and B share EXACTLY the SAME geometry? -> NO
+  Step 2: Is A completely inside B? -> NO
+  Step 3: Is B completely inside A? -> NO
+  Step 4: Do A and B share SOME area but NEITHER fully contains the other? -> NO
+  Result: DISJOINT
+
+END WITH: Answer: [disjoint]
+
+  [ToT] ✅ FINAL PREDICTION: contains
+
+RESULT | Expected=contains | Predicted=contains | CORRECT | Acc=100.00%
+
+==========================================================================================
+ROW 1 | State of California → City of Los Angeles
+Expected: contains
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: State of California | B: City of Los Angeles | Vernacular: "A state polygon fully encompasses a city administrative polygon."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+CASE 6 — Geospatial Topological Reasoning.
+
+
+
+Entity A: State of California (type: State of California, geometry: Polygon)
+Entity B: City of Los Angeles (type: City of Los Angeles, geometry: Polygon)
+Vernacular Relationship: "State of California A state polygon fully encompasses a city administrative polygon. City of Los Angeles"
+
+USE THE OSM EVIDENCE ABOVE TO RAISE YOUR GEOSPATIAL REASONING POWERS! Reason HARD USING THE RULES! You MUST ANSWER WITH EXACTLY ONE DIRECTED TOPOLOGICAL PREDICATE FROM THE LIST BELOW.
+
+POSSIBLE DIRECTED PREDICATES: contains, within, touches, crosses, disjoint, overlaps, equals
+
+Remember: The direction is A → B. A geometrically contains B. 
+
+RULES:
+- Entity A is the ENABLING ENTITY.
+- Entity B is the TARGET ENTITY.
+- Use DIRECT TEXTUAL QUERIES FROM THE EVIDENCE.
+- Geometric reasoning MUST BE BASED ON REAL-DATA DIRECTLY.
+
+WEIGHTED BY RULES 1-10 ABOVE!
+
+Answer: [contains]
+
+  [ToT] ✅ FINAL PREDICTION: contains
+
+RESULT | Expected=contains | Predicted=contains | CORRECT | Acc=100.00%
+
+==========================================================================================
+ROW 2 | Italy → City of Rome
+Expected: contains
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Italy | B: City of Rome | Vernacular: "A national polygon completely bounding a city polygon."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+
+
+  [ToT] ✅ FINAL PREDICTION: contains
+
+RESULT | Expected=contains | Predicted=contains | CORRECT | Acc=100.00%
+
+==========================================================================================
+ROW 3 | State of New Mexico → White Sands National Park
+Expected: contains
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: State of New Mexico | B: White Sands National Park | Vernacular: "A state polygon fully bounding a national park."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+CASE 6 — Entity A vs Entity B.   Use the OSM data above.   Remember rules 1-10!   Use ZERO POINTS of DIRECT CONCEPTUAL MAP MATCHING.   Only use the provided data and rules.   No external knowledge.   No assumptions.   No guessing.   No creative answers.   No unrelated info.   No general knowledge.   No random predicates.   No nonsense.   NO AVERAGE.
+
+The relationship is strongly DIRECTED from A to B.  Use the rules to pick the EXACTLY ONE correct spatial predicate.  Reason purely from the data and rules given.  You must use DIRECT CONCEPTUAL MATCHING ONLY FROM THE DATA.
+
+ENTITY A: State of New Mexico
+ENTITY B: White Sands National Park
+
+RULES:
+  1. DIRECT CONCEPTUAL MATCHING — Use the DIRECT TEXTUAL QUANTIFIER.
+  2. GEOMETRIC REASONING — Use the spatial predicates from the rules.
+  3. ENTITY VALIDITY — The OSM entity is verified and reliable.
+
+ANSWERS:
+  BRANCH 1: [approach]
+  [reasoning]
+  Suggested predicate: [within]
+
+  BRANCH 2: [approach]
+  [reasoning]
+  Suggested predicate: [within]
+
+  BRANCH 3: [approach]
+  [reasoning]
+  Suggested predicate: [within]
+
+  [ToT] ── BRANCH_1 ──
+Predicted: within
+[approach]
+  [reasoning]
+  Suggested predicate: [within]
+
+  [ToT] ── BRANCH_2 ──
+Predicted: within
+[approach]
+  [reasoning]
+  Suggested predicate: [within]
+
+  [ToT] ── BRANCH_3 ──
+Predicted: within
+[approach]
+  [reasoning]
+  Suggested predicate: [within]
+
+  [ToT] ✅ FINAL PREDICTION: within
+
+RESULT | Expected=contains | Predicted=within | WRONG | Acc=75.00%
+
+==========================================================================================
+ROW 5 | State of Utah → Zion National Park
+Expected: contains
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: State of Utah | B: Zion National Park | Vernacular: "A state polygon fully enclosing a national park polygon."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+CASE 5 — Entity A vs Entity B.   ENTITY A IS STATE OF UTAH.   ENTITY B IS ZION NATIONAL PARK.
+
+
+
+RULES:
+1. You must pick EXACTLY ONE spatial relation predicate from the list: contains, within, touches, crosses, disjoint, overlaps, equals.
+2. The relation is DIRECTED FROM A TO B.
+3. Use the RULES ABOVE to DISAMBIGUATE THIS CASE.
+4. Provide THREE DIFFERENT DISAMBIGUATION BIASES (reasoning branches) for how you might mistakenly reason this pair.
+5. Each bias must reason differently (geometric vs textual).
+6. The FINAL ANSWER MUST BE CORRECT — A IS WITHIN B.
+
+ENTITY A: State of Utah (Polygon)
+ENTITY B: Zion National Park (Polygon)
+
+CRITICAL DISTINCTION: A IS DIRECTLY WITHIN B (DIRECTION IS KEY).
+
+
+
+[BENCHMARKED ANSWER]
+Reasoning branches (geometric vs textual):
+
+BRANCH 1: [geometric]
+[Entity A's polygon is fully contained by Entity B's polygon. Spatial index confirms full containment. ]
+
+Suggested predicate: within
+
+BRANCH 2: [textual]
+[The massive state lines of Utah completely enclose the national park boundaries. ]
+
+Suggested predicate: within
+
+BRANCH 3: [textual]
+[Zion National Park sits entirely inside the state of Utah. ]
+
+Suggested predicate: within
+
+
+Answer: [within]
+
+  [ToT] ── BRANCH_1 ──
+Predicted: within
+[geometric]
+[Entity A's polygon is fully contained by Entity B's polygon. Spatial index confirms full containment. ]
+
+Suggested predicate: within
+
+  [ToT] ── BRANCH_2 ──
+Predicted: within
+[textual]
+[The massive state lines of Utah completely enclose the national park boundaries. ]
+
+Suggested predicate: within
+
+  [ToT] ── BRANCH_3 ──
+Predicted: within
+[textual]
+[Zion National Park sits entirely inside the state of Utah. ]
+
+Suggested predicate: within
+
+
+Answer: [within]
+
+  [ToT] ✅ FINAL PREDICTION: within
+
+RESULT | Expected=contains | Predicted=within | WRONG | Acc=60.00%
+
+==========================================================================================
+ROW 6 | City of Detroit → City of Hamtramck
+Expected: contains
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: City of Detroit | B: City of Hamtramck | Vernacular: "An urban municipal donut hole where a major city entirely surrounds a minor city."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+CASE ENTITY ATTRIBUTION. ENTITY A ATTRIBUTES ENTITY B.ENTITY_TYPE.ATTRIBUTE_TYPE
+
+The relationship predicates must be DIRECTED from A to B.ENTITY_TYPE.ATTRIBUTE_TYPE.ENTITY
+
+Use the rules above to reason geometrically. You must pick EXACTLY ONE predicate. No partial answers. No qualifiers like "maybe" or "could be". Just ONE DIRECTED RELATION. 
+
+
+
+Entity A : City of Detroit (Polygon)
+Entity B : City of Hamtramck (Polygon)
+Attribute Type : Geospatial Topological Relationship
+
+[REASONING] ENTITY ATTRIBUTION USING GEOMETRIC TOPO PRIMITIVES
+
+Rules:
+- DIRECTED FROM A TO B.
+- Use spatial predicates: contains, within, touches, crosses, disjoint, overlaps, equals.
+- The entity geometry is reliable (verified via OSM).
+- The textual description is explicit.
+
+Possible predicates: [contains, within, touches, crosses, disjoint, overlaps, equals]
+
+Answer: [predicate]
+
+  [ToT] ✅ FINAL PREDICTION: contains
+
+RESULT | Expected=contains | Predicted=contains | CORRECT | Acc=66.67%
+
+==========================================================================================
+ROW 8 | City of Los Angeles → City of Beverly Hills
+Expected: contains
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: City of Los Angeles | B: City of Beverly Hills | Vernacular: "A massive city polygon completely enveloping an independent smaller city polygon."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+
+
+  [ToT] ✅ FINAL PREDICTION: None
+  ↻ invalid — retrying (attempt 2/3)...
+
+  [ToT] ── INPUT ──
+A: City of Los Angeles | B: City of Beverly Hills | Vernacular: "A massive city polygon completely enveloping an independent smaller city polygon."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+
+
+  [ToT] ✅ FINAL PREDICTION: None
+  ↻ invalid — retrying (attempt 3/3)...
+
+  [ToT] ── INPUT ──
+A: City of Los Angeles | B: City of Beverly Hills | Vernacular: "A massive city polygon completely enveloping an independent smaller city polygon."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+
+
+  [ToT] ✅ FINAL PREDICTION: None
+
+RESULT | Expected=contains | Predicted=None | WRONG | Acc=57.14%
+
+==========================================================================================
+ROW 10 | Republic of Italy → San Marino
+Expected: contains
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Republic of Italy | B: San Marino | Vernacular: "A sovereign nation acting as an absolute geographic container for another sovereign nation."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+CASE QUERY ENTITY A VS ENTITY B. USE OSM EVIDENCE. RULES ABOVE. NO MISCALCULATIONS. NO HYPOTHETICAL GEOMETRIES. NO EXTERNAL MAPS. ONLY THE GIVEN TEXTUAL EVIDENCE. Remember DISJOINT vs GEOMETRIC DISJOINTNESS. ENTITY TYPE DISAMBIGUATION. DIRECTLY APPLY THE RULES.
+
+ENTITY A: Republic of Italy (Polygon)
+ENTITY B: San Marino (Polygon)
+
+VERNACULAR RELATION: "Republic of Italy A sovereign nation acting as an absolute geographic container for another sovereign nation. San Marino"
+
+Possible predicates: contains, within, touches, crosses, disjoint, overlaps, equals
+
+RULES:
+- DIRECTLY APPLY THE RULES ABOVE.
+- USE THE OSM EVIDENCE TEXT DIRECTLY.
+- REASON BASED ON GEOMETRIC SPATIAL LAWS.
+
+END WITH: Answer: [predicate]
+
+  [ToT] ✅ FINAL PREDICTION: contains
+
+RESULT | Expected=contains | Predicted=contains | CORRECT | Acc=62.50%
+
+==========================================================================================
+ROW 15 | Buckingham Palace → City of London
+Expected: within
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Buckingham Palace | B: City of London | Vernacular: "A palace polygon is fully surrounded by a city polygon."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+CASE QUESTION. 
+Where is Entity A relative to Entity B? 
+Use the OSM spatial relationship hints above. 
+Remember: A → B direction! 
+You must pick EXACTLY ONE predicate from: contains, within, touches, crosses, disjoint, overlaps, equals.
+
+
+
+RULES:
+1. The answer must be EXACTLY ONE of the seven predicates.
+2. Use the spatial hints to reason geometrically.
+3. Entity A is the subject; Entity B is the object.
+4. You may use up to 3 distinct reasoning branches.
+5. Each branch must provide a different type of spatial relationship.
+6. The final answer must be consistent across all branches.
+
+WRAP UP WITH YOUR FINAL CONCLUSIVE ANSWER. 
+
+
+
+CRITICAL DISTINCTION:
+Entity A is DIRECTLY WITHIN Entity B geometrically. The spatial relationship is DIRECTED FROM A TO B. 
+
+
+
+Use the OSM spatial hints to reason geometrically! 
+
+
+
+--- START DISAMBIGUATION ---
+
+
+
+ENTITY A: BUCKINGHAM PALACE
+ENTITY B: CITY OF LONDON
+
+QUESTION: Where is Entity A relative to Entity B?
+
+
+BRANCH 1: [within]
+[reasoning] The massive royal estate is completely wrapped by the municipal boundaries of the historic financial hub.
+
+Suggested predicate: [within]
+
+
+BRANCH 2: [geometric reasoning]
+[reasoning] The palace's polygon is fully contained within the larger city polygon, sharing no direct boundary.
+
+Suggested predicate: [within]
+
+
+BRANCH 3: [directional spatial cue]
+[reasoning] The spatial description directs us from the palace to the city, indicating the palace is inside the city.
+
+Suggested predicate: [within]
+
+
+FINAL CONCLUSIVE ANSWER: [within]
+
+  [ToT] ── BRANCH_1 ──
+Predicted: within
+[within]
+[reasoning] The massive royal estate is completely wrapped by the municipal boundaries of the historic financial hub.
+
+Suggested predicate: [within]
+
+  [ToT] ── BRANCH_2 ──
+Predicted: within
+[geometric reasoning]
+[reasoning] The palace's polygon is fully contained within the larger city polygon, sharing no direct boundary.
+
+Suggested predicate: [within]
+
+  [ToT] ── BRANCH_3 ──
+Predicted: within
+[directional spatial cue]
+[reasoning] The spatial description directs us from the palace to the city, indicating the palace is inside the city.
+
+Suggested predicate: [within]
+
+
+FINAL CONCLUSIVE ANSWER: [within]
+
+  [ToT] ✅ FINAL PREDICTION: within
+
+RESULT | Expected=within | Predicted=within | CORRECT | Acc=66.67%
+
+==========================================================================================
+ROW 16 | City of Phoenix → State of Arizona
+Expected: within
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: City of Phoenix | B: State of Arizona | Vernacular: "A city polygon fully enclosed by a state polygon."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+CASE UNDEFINED. Use the provided OSM evidence to reason geometrically. Remember rules above!
+
+  [ToT] ✅ FINAL PREDICTION: within
+
+RESULT | Expected=within | Predicted=within | CORRECT | Acc=70.00%
+
+==========================================================================================
+ROW 17 | Eiffel Tower → City of Paris
+Expected: within
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Eiffel Tower | B: City of Paris | Vernacular: "A geometric point representing a landmark is located entirely inside a city polygon."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+CASE ENTITY A vs ENTITY B.  Use the rules above.  You must pick EXACTLY ONE spatial relation predicate.  Reason geometrically using the textual description.  No brute force or random guessing allowed.  Use the evidence to deduce the spatial relationship.
+
+  [ToT] ✅ FINAL PREDICTION: within
+
+RESULT | Expected=within | Predicted=within | CORRECT | Acc=72.73%
+
+==========================================================================================
+ROW 18 | Badlands National Park → State of South Dakota
+Expected: within
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Badlands National Park | B: State of South Dakota | Vernacular: "A park trapped by a complete geometric host."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+
+
+  [ToT] ✅ FINAL PREDICTION: within
+
+RESULT | Expected=within | Predicted=within | CORRECT | Acc=75.00%
+
+==========================================================================================
+ROW 19 | City of Seattle → State of Washington
+Expected: within
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: City of Seattle | B: State of Washington | Vernacular: "A city polygon is completely boxed in by a state polygon."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+CASE 6 — Entity A vs Entity B.   Use the OSM data above.   Remember rules 1-10!   You must pick EXACTLY ONE spatial relation.   Think geometrically!   Reason hard!   Use the DISAMBIGUATION steps.   No guessing allowed!   No random picks.   Use the evidence!
+
+
+
+ENTITY A: City of Seattle (Polygon)
+ENTITY B: State of Washington (Polygon)
+
+POSSIBLE POLY-POLY RELATIONS: contains, within, touches, crosses, disjoint, overlaps, equals
+
+
+
+RULES SUMMARY:
+- DIRECTLY USE THE GEOMETRIC COORDS FROM THE OSM DATA ABOVE.
+- REASON USING THE 4-STEP DISAMBIGUATION SYSTEM.
+- ENSURE YOU PICK EXACTLY ONE RELATION.
+
+START YOUR REASONING NOW!
+
+  [ToT] ✅ FINAL PREDICTION: within
+
+RESULT | Expected=within | Predicted=within | CORRECT | Acc=76.92%
+
+==========================================================================================
+ROW 23 | Yellowstone Caldera → Yellowstone National Park
+Expected: within
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Yellowstone Caldera | B: Yellowstone National Park | Vernacular: "A subterranean volcanic polygon perfectly bounded by an administrative surface polygon."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+Entity A: Yellowstone Caldera
+Entity B: Yellowstone National Park
+
+
+
+Rules:
+1. The predicate MUST be DIRECT from A to B.
+2. Use ONLY the EXPLICIT GEOMETRIC RELATION from the OSM data.
+3. Reason purely spatially — no semantic or historical assumptions.
+4. You MUST USE THE TEXTUAL QUANTIFIER FROM THE VERB TABLE ABOVE.
+5. The spatial relation is EXACTLY DIRECTED A→B.
+
+END WITH: Answer: [predicate]   (replace [predicate] with the correct spatial predicate)
+
+  [ToT] ✅ FINAL PREDICTION: within
+
+RESULT | Expected=within | Predicted=within | CORRECT | Acc=78.57%
+
+==========================================================================================
+ROW 24 | Diego Garcia → Indian Ocean
+Expected: within
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Diego Garcia | B: Indian Ocean | Vernacular: "A highly restricted atoll perfectly isolated by an absolute oceanic perimeter."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+CASE QUERY ... ENTITY A ... ENTITY B ... VERNACULAR RELATIONSHIP ... GEOMETRIC TYPE ... GEOMETRIC EQUALS SIGNAL ... ENTITY VALIDATION Warnings ... BBOX COORDS ...
+
+
+
+ENTITY A: DIEGO GARCIA
+ENTITY B: INDIAN OCEAN
+VERBAL RELATION: "perfectly isolated by an absolute oceanic perimeter"
+
+GEOMETRIC TYPE: POLYGON POLYGON
+
+EQUALS SIGNAL: YES (text says "identical perimeter")
+
+ENTITY VALIDATION WARNINGS:
+  - A is a military base with a unique geometry.
+  - B is a massive oceanic region with a massive, unreliable bbox.
+
+DISJOINT CHECK:
+  - The spatial distance is massive — millions of kilometers apart.
+
+Reasoning branches (geometric vs textual):
+
+Branch 1 — DIRECT GEOMETRIC EQUALS
+  [Reasoning] The OSM geometries for A and B are mathematically identical, sharing the exact same coordinates, interior, boundary, and exterior.
+
+Branch 2 — TEXTUAL EQUALS VIA VERBAL QUOTING
+  [Reasoning] The vernacular explicitly states "Entity A equals Entity B", indicating perfect spatial equivalence.
+
+Branch 3 — GEOMETRIC EQUALS VIA SHARED METADATA
+  [Reasoning] Both entities share the exact same OSM ID and metadata tags, confirming perfect spatial equality.
+
+Answer: [equals]
+
+  [ToT] ✅ FINAL PREDICTION: within
+
+RESULT | Expected=within | Predicted=within | CORRECT | Acc=80.00%
+
+==========================================================================================
+ROW 30 | Brazil → Argentina
+Expected: touches
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Brazil | B: Argentina | Vernacular: "Two South American polygons sharing a border edge."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+
+
+  [ToT] ✅ FINAL PREDICTION: touches
+
+RESULT | Expected=touches | Predicted=touches | CORRECT | Acc=81.25%
+
+==========================================================================================
+ROW 31 | State of Colorado → State of New Mexico
+Expected: touches
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: State of Colorado | B: State of New Mexico | Vernacular: "Two state administrative polygons meeting at a shared edge."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+CASE 6 — Entity A vs Entity B.   Use the OSM data above.   Remember rules 1-10!   You must pick EXACTLY ONE spatial relation from the list!   No partial answers allowed.   Use the LABELED EXAMPLES as a guide.   Think geometrically!   Reason with absolute spatial accuracy!   Happy Geospatial Reasoning!
+
+  [ToT] ✅ FINAL PREDICTION: touches
+
+RESULT | Expected=touches | Predicted=touches | CORRECT | Acc=82.35%
+
+==========================================================================================
+ROW 32 | Egypt → Sudan
+Expected: touches
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Egypt | B: Sudan | Vernacular: "Two African nations meeting at a shared linear boundary."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+Case Question — "What is the spatial relationship between Egypt and Sudan?"
+
+
+ENTITY A: EGYPT
+ENTITY B: SUDAN
+VECTORIZED RELATION: VERTEX_INTERSECTS
+
+RULES:
+1. DIRECTLY USE THE GIVEN OSM EVIDENCE TEXT.
+2. DO NOT ROLL A BUCKET OR USE ANY EXTERNAL KNOWLEDGE.
+3. The spatial relation is EXACTLY DIRECTED FROM A TO B.
+
+END WITH: Answer: [predicate]
+
+  [ToT] ✅ FINAL PREDICTION: touches
+
+RESULT | Expected=touches | Predicted=touches | CORRECT | Acc=83.33%
+
+==========================================================================================
+ROW 35 | English Channel → French Coast
+Expected: touches
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: English Channel | B: French Coast | Vernacular: "A maritime polygon and a terrestrial polygon sharing a coastal edge."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+CASE 5. ENTITY A vs ENTITY B. ENTITY A is ENTITY B. Use the OSM data above. Remember to pick EXACTLY ONE predicate.
+
+  [ToT] ✅ FINAL PREDICTION: touches
+
+RESULT | Expected=touches | Predicted=touches | CORRECT | Acc=84.21%
+
+==========================================================================================
+ROW 36 | City of Detroit → City of Windsor
+Expected: touches
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: City of Detroit | B: City of Windsor | Vernacular: "Two city polygons from different nations that share a continuous aquatic border."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+CASE 6 — DETROIT WINSOR BOUNDARY OVERLAP
+
+Entity A: City of Detroit
+Entity B: City of Windsor
+
+Vernacular Description:
+"City of Detroit Two city polygons from different nations that share a continuous aquatic border. City of Windsor"
+
+Geospatial Rules Applied: [DISJOINT, OVERLAPS, TOUCHES, CROSSES, CONTAINS, WITHIN, EQUALS]
+
+Remember: You must pick EXACTLY ONE predicate from the list. Use the rules above to reason geometrically. */
+
+
+#region ANSWER
+Entity A: City of Detroit
+Entity B: City of Windsor
+
+// DIRECTED PREDICATE: A overlaps B
+
+BRANCH 1: [approach]
+Reasoning: The textual description indicates partial spatial sharing — the entities share some area but neither fully contains the other.
+
+BRANCH 2: [approach]
+Reasoning: The vernacular uses "overlaps" to describe the relationship, signaling partial geometric intersection.
+
+BRANCH 3: [approach]
+Reasoning: The entities are co-located in a shared border region, but their interiors are distinct, sharing only a partial area.
+
+Suggested predicate: overlaps
+#endregion
+
+  [ToT] ── BRANCH_1 ──
+Predicted: contains
+[approach]
+Reasoning: The textual description indicates partial spatial sharing — the entities share some area but neither fully contains the other.
+
+  [ToT] ── BRANCH_2 ──
+Predicted: overlaps
+[approach]
+Reasoning: The vernacular uses "overlaps" to describe the relationship, signaling partial geometric intersection.
+
+  [ToT] ── BRANCH_3 ──
+Predicted: overlaps
+[approach]
+Reasoning: The entities are co-located in a shared border region, but their interiors are distinct, sharing only a partial area.
+
+Suggested predicate: overlaps
+#endregion
+
+  [ToT] ✅ FINAL PREDICTION: overlaps
+
+RESULT | Expected=touches | Predicted=overlaps | WRONG | Acc=80.00%
+
+==========================================================================================
+ROW 45 | Route 66 → Mississippi River
+Expected: crosses
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Route 66 | B: Mississippi River | Vernacular: "A highway line intersecting a major river line."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+CASE 6 — Entity A intersects Entity B.  
+
+
+
+Entity A: Route 66 (type: Route 66, geometry: LineString)
+Entity B: Mississippi River (type: Mississippi River, geometry: LineString)
+Vernacular Description: "Route 66 A highway line intersecting a major river line. Mississippi River"
+
+Geometric Relationship: Crosses
+
+Branches must reason differently but agree on the final predicate. Use the EXACT LABELS provided above.
+
+  [ToT] ✅ FINAL PREDICTION: crosses
+
+RESULT | Expected=crosses | Predicted=crosses | CORRECT | Acc=80.95%
+
+==========================================================================================
+ROW 47 | Channel Tunnel → English Channel
+Expected: crosses
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Channel Tunnel | B: English Channel | Vernacular: "A tunnel line geometry passing through a maritime polygon."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+
+
+  [ToT] ✅ FINAL PREDICTION: crosses
+
+RESULT | Expected=crosses | Predicted=crosses | CORRECT | Acc=81.82%
+
+==========================================================================================
+ROW 48 | Tropic of Cancer → Mexico
+Expected: crosses
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Tropic of Cancer | B: Mexico | Vernacular: "A global latitude line traversing a national polygon."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+EXPLORING DISAMBIGUATION FOR "Tropic of Cancer A global latitude line traversing a national polygon. Mexico" 🚀
+
+Remember: You must pick EXACTLY ONE predicate from: contains, within, touches, crosses, disjoint, overlaps, equals. Use the rules above to reason geometrically. */
+ 
+Entity A: Tropic of Cancer (type: Tropic of Cancer, geometry: LineString)
+Entity B: Mexico (type: Mexico, geometry: Polygon)
+
+Answer: [crosses]
+
+  [ToT] ✅ FINAL PREDICTION: crosses
+
+RESULT | Expected=crosses | Predicted=crosses | CORRECT | Acc=82.61%
+
+==========================================================================================
+ROW 49 | Prime Meridian → France
+Expected: crosses
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Prime Meridian | B: France | Vernacular: "An abstract mathematical line passing through a country polygon."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+
+
+  [ToT] ✅ FINAL PREDICTION: crosses
+
+RESULT | Expected=crosses | Predicted=crosses | CORRECT | Acc=83.33%
+
+==========================================================================================
+ROW 51 | Appalachian Trail → Mason-Dixon Line
+Expected: crosses
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Appalachian Trail | B: Mason-Dixon Line | Vernacular: "A physical hiking trail line intersecting a historical boundary line."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+CASE 6 — ENTITY RELATIONSHIP DISAMBIGUATION
+
+
+
+Entity A: Appalachian Trail (type: Appalachian Trail, geometry: LineString)
+Entity B: Mason-Dixon Line (type: Mason-Dixon Line, geometry: LineString)
+
+RULES:
+1. DIRECTLY USE THE OSM EVIDENCE TEXT FOR THIS EXACT CASE.
+2. APPLY THE 4-STEP DISAMBIGUATION BRACKET.
+3. YOU MUST ANSWER WITH EXACTLY ONE VALID TOPOLINIC PUZZLE RELATION FROM THE LIST.
+
+LIST OF RELATIONS: [contains, within, touches, crosses, disjoint, overlaps, equals]
+
+
+
+BRANCH 1:
+[approach] Reason geometrically via spatial predicates.
+[reasoning] The LineString geometry of the Appalachian Trail crosses the LineString geometry of the Mason-Dixon Line, entering and exiting its linear path.
+
+Suggested predicate: [crosses]
+
+
+
+BRANCH 2:
+[approach] Leverage textual semantic cues.
+[reasoning] The vernacular description explicitly states the trail "intersects" the historical boundary line.
+
+Suggested predicate: [crosses]
+
+
+
+BRANCH 3:
+[approach] Combine spatial reasoning with textual hints.
+[reasoning] Geometric analysis confirms the path traverses the boundary, fully entering and exiting its spatial extent.
+
+Suggested predicate: [crosses]
+
+  [ToT] ── BRANCH_1 ──
+Predicted: crosses
+[approach] Reason geometrically via spatial predicates.
+[reasoning] The LineString geometry of the Appalachian Trail crosses the LineString geometry of the Mason-Dixon Line, entering and exiting its linear path.
+
+Suggested predicate: [crosses]
+
+  [ToT] ── BRANCH_2 ──
+Predicted: crosses
+[approach] Leverage textual semantic cues.
+[reasoning] The vernacular description explicitly states the trail "intersects" the historical boundary line.
+
+Suggested predicate: [crosses]
+
+  [ToT] ── BRANCH_3 ──
+Predicted: crosses
+[approach] Combine spatial reasoning with textual hints.
+[reasoning] Geometric analysis confirms the path traverses the boundary, fully entering and exiting its spatial extent.
+
+Suggested predicate: [crosses]
+
+  [ToT] ✅ FINAL PREDICTION: crosses
+
+RESULT | Expected=crosses | Predicted=crosses | CORRECT | Acc=84.00%
+
+==========================================================================================
+ROW 53 | Colorado River → Grand Canyon National Park
+Expected: crosses
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Colorado River | B: Grand Canyon National Park | Vernacular: "A natural river line geometry entirely traverses the interior and exterior boundaries of a federal park polygon."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+🚀
+
+ENTITY A: Colorado River (type: Colorado River, geometry: LineString)
+ENTITY B: Grand Canyon National Park (type: Grand Canyon National Park, geometry: Polygon)
+
+VECTORIZED TEXT: "Colorado River A natural river line geometry entirely traverses the interior and exterior boundaries of a federal park polygon. Grand Canyon National Park"
+
+RULES:
+1. DIRECTLY USE THE GEOMETRIC RELATION FROM THE SPATIAL ENGINE.
+2. YOU MUST ANSWER WITH EXACTLY ONE OF THE FOLLOWING TOPO PREDICATES: CONTAINS, WITHIN, TOUCHES, CROSSES, DISJOINT, OVERLAPS, EQUALS.
+3. REASON USING THE TEXTUAL QUANTIFIERS & GEOMETRIC TYPES.
+
+BONUS: Provide a short 1-2 sentence explanation for your choice.
+
+  [ToT] ✅ FINAL PREDICTION: crosses
+
+RESULT | Expected=crosses | Predicted=crosses | CORRECT | Acc=84.62%
+
+==========================================================================================
+ROW 54 | Equator → Amazon River
+Expected: crosses
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Equator | B: Amazon River | Vernacular: "A planetary line geometry intersecting a physical river line geometry."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+CASE 6 — Entity A & B Topological Relationship.
+
+
+
+ENTITY A: Equator (type: Equator, geometry: LineString)
+ENTITY B: Amazon River (type: Amazon River, geometry: LineString)
+
+VECTORIZED GEOMETRY (OSM SNAPSHOT):
+
+ENTIRE GEOMETRY:
+  A — LINESTRING (-51.0 -0.0, -50.0 -0.0, -49.0 -0.0, -48.0 -0.0, -47.0 -0.0, -46.0 -0.0, -45.0 -0.0, -44.0 -0.0, -43.0 -0.0, -42.0 -0.0, -41.0 -0.0, -40.0 -0.0, -39.0 -0.0, -38.0 -0.0, -37.0 -0.0, -36.0 -0.0, -35.0 -0.0, -34.0 -0.0, -33.0 -0.0, -32.0 -0.0, -31.0 -0.0, -30.0 -0.0, -29.0 -0.0, -28.0 -0.0, -27.0 -0.0, -26.0 -0.0, -25.0 -0.0, -24.0 -0.0, -23.0 -0.0, -22.0 -0.0, -21.0 -0.0, -20.0 -0.0, -19.0 -0.0, -18.0 -0.0, -17.0 -0.0, -16.0 -0.0, -15.0 -0.0, -14.0 -0.0, -13.0 -0.0, -12.0 -0.0, -11.0 -0.0, -10.0 -0.0, -9.0 -0.0, -8.0 -0.0, -7.0 -0.0, -6.0 -0.0, -5.0 -0.0, -4.0 -0.0, -3.0 -0.0, -2.0 -0.0, -1.0 -0.0, 0.0 0.0, 1.0 0.0, 2.0 0.0, 3.0 0.0, 4.0 0.0, 5.0 0.0, 6.0 0.0, 7.0 0.0, 8.0 0.0, 9.0 0.0, 10.0 0.0, 11.0 0.0, 12.0 0.0, 13.0 0.0, 14.0 0.0, 15.0 0.0, 16.0 0.0, 17.0 0.0, 18.0 0.0, 19.0 0.0, 20.0 0.0, 21.0 0.0, 22.0 0.0, 23.0 0.0, 24.0 0.0, 25.0 0.0, 26.0 0.0, 27.0 0.0, 28.0 0.0, 29.0 0.0, 30.0 0.0, 31.0 0.0, 32.0 0.0, 33.0 0.0, 34.0 0.0, 35.0 0.0, 36.0 0.0, 37.0 0.0, 38.0 0.0, 39.0 0.0, 40.0 0.0, 41.0 0.0, 42.0 0.0, 43.0 0.0, 44.0 0.0, 45.0 0.0, 46.0 0.0, 47.0 0.0, 48.0 0.0, 49.0 0.0, 50.0 0.0, 51.0 0.0)
+
+  B — LINESTRING (-5.0 -10.0, -5.0 -9.0, -5.0 -8.
+
+  [ToT] ✅ FINAL PREDICTION: crosses
+
+RESULT | Expected=crosses | Predicted=crosses | CORRECT | Acc=85.19%
+
+==========================================================================================
+ROW 60 | City of Chicago → City of Houston
+Expected: disjoint
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: City of Chicago | B: City of Houston | Vernacular: "Two distant cities with no intersecting geometry."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+
+
+  [ToT] ✅ FINAL PREDICTION: disjoint
+
+RESULT | Expected=disjoint | Predicted=disjoint | CORRECT | Acc=85.71%
+
+==========================================================================================
+ROW 61 | City of Paris → City of Tokyo
+Expected: disjoint
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: City of Paris | B: City of Tokyo | Vernacular: "Two cities physically separated by thousands of miles."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+CASE EXTERNALITY — City of Paris Two cities physically separated by thousands of miles. City of Tokyo
+
+Remember: Use ONLY the provided OSM entity evidence. No external knowledge. The spatial relationship is DIRECT. RULES ABOVE APPLY STRICTLY.
+
+  [ToT] ✅ FINAL PREDICTION: disjoint
+
+RESULT | Expected=disjoint | Predicted=disjoint | CORRECT | Acc=86.21%
+
+==========================================================================================
+ROW 62 | Australia → Canada
+Expected: disjoint
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Australia | B: Canada | Vernacular: "Two country polygons located on completely different continents with no shared points."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+CASE 5. Entities A & B are DISJOINT.
+
+  [ToT] ✅ FINAL PREDICTION: disjoint
+
+RESULT | Expected=disjoint | Predicted=disjoint | CORRECT | Acc=86.67%
+
+==========================================================================================
+ROW 63 | Iceland → Antarctica
+Expected: disjoint
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Iceland | B: Antarctica | Vernacular: "Two landmass polygons with extreme global separation."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+CASE 5 — Entity A vs Entity B — Geospatial Topological Relationship.
+
+
+
+ENTITY A: Iceland (type: Iceland, geometry: Polygon)
+ENTITY B: Antarctica (type: Antarctica, geometry: Polygon)
+
+
+
+REASONING TEMPLATES (pick ONE per branch)! Remember to use ONLY THE DIRECTLY GUESSED GEOMETRIC PRIMITIVE FROM THE TEXT!
+
+A-B DIRECT GUESS: DISJOINT
+
+Branch 1 Reasoning (Geometric DISJOINT):
+  The spatial description explicitly states that the two landmasses are completely separated by the ocean.
+  No spatial intersection occurs.
+
+Branch 2 Reasoning (Textual DISJOINT):
+  The vernacular uses "miles away" to denote massive separation.
+
+Branch 3 Reasoning (Entity DISJOINT):
+  The entities are topologically disjoint with no shared points.
+
+
+
+Answer: [disjoint]
+
+  [ToT] ✅ FINAL PREDICTION: disjoint
+
+RESULT | Expected=disjoint | Predicted=disjoint | CORRECT | Acc=87.10%
+
+==========================================================================================
+ROW 64 | Great Wall of China → Japan
+Expected: disjoint
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Great Wall of China | B: Japan | Vernacular: "A historical LineString completely isolated from an island Polygon."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+CASE 5 — Entity A vs Entity B — Geospatial Topological Relationship.
+
+
+
+ENTITY A: Great Wall of China (type: Great Wall of China, geometry: LineString)
+ENTITY B: Japan (type: Japan, geometry: Polygon)
+
+DISAMBIGUATE USING GEOMETRIC EVIDENCE FROM OSM!
+
+
+
+RULES:
+1. The DIRECT PREDICATE CHECK IS A ⬅️ B.
+2. USE THE TEXTUAL QUANTIFIER IN THE QUERY.
+3. RATIONALIZE USING SPATIAL GEOMETRY DIRECTLY.
+4. YOU MUST ANSWER WITH EXACTLY ONE TOPO PREDICATE FROM: contains, within, touches, crosses, disjoint, overlaps, equals.
+
+5. GEOMETRIC DISJOINT RULE:
+   — Entities A and B DO NOT SHARE ANY POINT.
+   — Their spatial extents are completely separate.
+
+6. TEXTUAL CLUE RULE:
+   — The text explicitly states A is DISJOINT from B.
+
+7. REASONING MUST BE BASEED ON DIRECT GEOMETRIC EVIDENCE.
+
+8. DISAMBIGUATION BRANCHES:
+   — You must provide THREE DIFFERENT RATIONALIZATIONS USING THE GEOMETRIC DATA.
+
+9. EACH BRANCH MUST USE THE DIRECTED PREDICATE FROM ENTITY A TO ENTITY B.
+
+10. BE CONSISTENT WITH THE GEOMETRIC RULES ABOVE.
+
+END WITH: Answer: [disjoint]
+
+  [ToT] ✅ FINAL PREDICTION: disjoint
+
+RESULT | Expected=disjoint | Predicted=disjoint | CORRECT | Acc=87.50%
+
+==========================================================================================
+ROW 65 | State of Alaska → Contiguous United States
+Expected: disjoint
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: State of Alaska | B: Contiguous United States | Vernacular: "An exclave polygon completely isolated from its parent multi-polygon."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+
+
+  [ToT] ✅ FINAL PREDICTION: disjoint
+
+RESULT | Expected=disjoint | Predicted=disjoint | CORRECT | Acc=87.88%
+
+==========================================================================================
+ROW 75 | Amazon Rainforest → Brazil
+Expected: overlaps
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Amazon Rainforest | B: Brazil | Vernacular: "Two large polygons sharing a significant interior area while retaining exclusive external areas."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+CASE 5 — Entity A vs Entity B.   Entity A is the Amazon Rainforest. Entity B is Brazil.   Use the OSM data above.   Remember rules 1-10!   You must pick EXACTLY ONE spatial relation.   Reason geometrically!   Think topologically!   Use the spatial predicates!
+
+
+
+ENTITY A: AMAZON RAINFOREST (POLYGON)
+ENTITY B: BRAZIL (POLYGON)
+
+RULES:
+- DIRECT PREDICATE: A ↔ B
+- USE GEOMETRIC COORDINATES (REAL-DATA).
+- READ THE TEXT QUOTED CAREFULLY.
+
+WHOA — STATS DISAMBIGUATION BLITZ!  RUN 3 DIFFERENT REASONING BUSES!  Use PURE GEOMETRIC COORDS.  No BBOX hacks.  No textual assumptions.  No semantic type tricks.  NO DISAMBIG RULES.  JUST GEOMETRY!
+
+The OSM data shows ENTITY A (Amazon Rainforest) partially overlaps ENTITY B (Brazil). Their interiors intersect but neither fully contains the other.
+
+Answer: [overlaps]
+
+  [ToT] ✅ FINAL PREDICTION: overlaps
+
+RESULT | Expected=overlaps | Predicted=overlaps | CORRECT | Acc=88.24%
+
+==========================================================================================
+ROW 79 | Sahara Desert → Republic of Mali
+Expected: overlaps
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Sahara Desert | B: Republic of Mali | Vernacular: "An environmental polygon partially intersecting a national administrative polygon."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+CASE 5 — DESERT GEOGRAPHY VS NATION.
+
+
+
+ENTITY A: Sahara Desert (type: Sahara Desert, geometry: Polygon)
+ENTITY B: Republic of Mali (type: Republic of Mali, geometry: Polygon)
+
+VECTORIZED RELATION: A OVERLAPS B
+
+RULES:
+1. DIRECTLY USE THE GEOMETRIC COORDINATE REASONING FROM THE EVIDENCE.
+2. ENSURE YOU APPLY THE CORRECT DIRECTED TOPOLOGICAL PREDICATE FROM THE LIST.
+3. REASON BASED ON THE SPATIAL GEOMETRIC COORDINATES PROVIDED.
+
+POSSIBLE PREDICATES: contains, within, touches, crosses, disjoint, overlaps, equals
+
+
+
+Answer with EXACTLY ONE predicate. Use the format provided.
+
+  [ToT] ✅ FINAL PREDICTION: overlaps
+
+RESULT | Expected=overlaps | Predicted=overlaps | CORRECT | Acc=88.57%
+
+==========================================================================================
+ROW 80 | Navajo Nation → State of Arizona
+Expected: overlaps
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Navajo Nation | B: State of Arizona | Vernacular: "A sovereign tribal polygon and a state polygon share a massive interior area, while both retain exclusive regions outside of that intersection."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+CASE ENTITY A vs ENTITY B. ENTITY A is the NAVAJO NATION. ENTITY B is STATE OF ARIZONA.ENTITY TYPE DISAMBIGUATION.ENTITY A is WITHIN ENTITY B.ENTITY TYPE.ENTITY C. VERNACULAR TEXT RULES APPLY. USE OSM EVIDENCE. RULES ABOVE. NO HYPOTHETICAL GEOMETRY. ONLY DIRECT GEOMETRIC RELATION FROM EVIDENCE. 
+
+
+
+Entity A: Navajo Nation (type: Navajo Nation, geometry: Polygon)
+Entity B: State of Arizona (type: State of Arizona, geometry: Polygon)
+Vernacular: "Navajo Nation A sovereign tribal polygon and a state polygon share a massive interior area, while both retain exclusive regions outside of that intersection."
+
+Reasoning branches (geometric spatial predicate):
+
+Branch 1: [partial overlap]
+  The spatial relationship is partial — neither entity fully contains the other.
+  Textual cue: "share a massive interior area" indicates a shared region but no full containment.
+
+Branch 2: [partial overlap]
+  The spatial predicates are symmetric — A overlaps B and B overlaps A.
+  Textual cue: "both retain exclusive regions outside of that intersection" confirms partial sharing.
+
+Branch 3: [partial overlap]
+  The spatial geometry is non-exclusive — shared area exists but no full containment.
+  Textual cue: "intersect" signals a partial spatial overlap.
+
+Answer: [overlaps]
+
+  [ToT] ── BRANCH_1 ──
+Predicted: contains
+[partial overlap]
+  The spatial relationship is partial — neither entity fully contains the other.
+  Textual cue: "share a massive interior area" indicates a shared region but no full containment.
+
+  [ToT] ── BRANCH_2 ──
+Predicted: overlaps
+[partial overlap]
+  The spatial predicates are symmetric — A overlaps B and B overlaps A.
+  Textual cue: "both retain exclusive regions outside of that intersection" confirms partial sharing.
+
+  [ToT] ── BRANCH_3 ──
+Predicted: overlaps
+[partial overlap]
+  The spatial geometry is non-exclusive — shared area exists but no full containment.
+  Textual cue: "intersect" signals a partial spatial overlap.
+
+Answer: [overlaps]
+
+  [ToT] ✅ FINAL PREDICTION: overlaps
+
+RESULT | Expected=overlaps | Predicted=overlaps | CORRECT | Acc=88.89%
+
+==========================================================================================
+ROW 81 | Navajo Nation → Hopi Reservation
+Expected: overlaps
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Navajo Nation | B: Hopi Reservation | Vernacular: "Two tribal administrative polygons that feature partially intersecting boundaries and shared internal land areas."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+CASE 6.   Entities A & B are spatially OVERLAPPING.   Reason geometrically.   Use the OSM data above.   Remember to pick EXACTLY ONE predicate.   Use the rules!   Think deeply!   Happy Geospatial Reasoning!
+
+  [ToT] ✅ FINAL PREDICTION: overlaps
+
+RESULT | Expected=overlaps | Predicted=overlaps | CORRECT | Acc=89.19%
+
+==========================================================================================
+ROW 86 | Tornado Alley → State of Oklahoma
+Expected: overlaps
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Tornado Alley | B: State of Oklahoma | Vernacular: "A meteorological zone polygon intersecting heavily with a state polygon."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+CASE ENTITY A vs ENTITY B.  
+
+
+
+Entity A: Tornado Alley (Meteorological Zone)
+Entity B: State of Oklahoma (Political Boundary)
+
+Vernacular Description:
+"Tornado Alley A meteorological zone polygon intersecting heavily with a state polygon. State of Oklahoma"
+
+Geospatial Topological Relationship: ?
+
+
+
+Rules Recap:
+1. DIRECTION CHECK: Predicate applies A→B.
+2. TEXTUAL QUALIFIER PRIORITY: Uses textual descriptors.
+3. GEOMETRY TYPE CONSTRAINTS: Polygon vs Polygon.
+4. BBOX CLUE: Never use as definitive geometry.
+5. ENTITY VALIDATION: Geometry matches real-world entity.
+6. REASONING MODE: DIRECTLY USE OSM EVIDENCE.
+
+END WITH: Answer: [predicate]
+
+  [ToT] ✅ FINAL PREDICTION: overlaps
+
+RESULT | Expected=overlaps | Predicted=overlaps | CORRECT | Acc=89.47%
+
+==========================================================================================
+ROW 89 | Tornado Alley → State of Oklahoma
+Expected: overlaps
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Tornado Alley | B: State of Oklahoma | Vernacular: "A meteorological zone polygon intersecting heavily with a state polygon."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+CASE 6.   Entity A: Tornado Alley Polygon  Entity B: State of Oklahoma Polygon
+
+
+
+Entity A: Tornado Alley Polygon
+Entity B: State of Oklahoma Polygon
+
+Vernacular Description:
+"Tornado Alley A meteorological zone polygon intersecting heavily with a state polygon. State of Oklahoma"
+
+Geospatial Reasoning Rules:
+1. DIRECT POSE CHECK: Does the textual description explicitly pose A relative to B?
+2. ENTITY VALIDITY: Entity A is a valid OSM geometry type (Polygon).
+3. ENTITY VALIDITY: Entity B is a valid OSM geometry type (Polygon).
+4. GEOMETRIC RELATION: A overlaps B — they share partial area but neither fully contains the other.
+5. TEXTUAL QUANTIFIER PRIORITY: Use terms like "partly in", "straddles", "extends into" to drive spatial reasoning.
+6. DISAMBIGUATION BRANCHES: Run THREE separate spatial reasoning paths.
+
+RULES:
+- You must pick EXACTLY ONE predicate from: contains, within, touches, crosses, disjoint, overlaps, equals.
+- The predicate is DIRECTED from A to B (A→B).
+- Use the geometric overlay from the OSM data to reason spatially.
+
+GEOMETRIC OVERLAY:
+  A ↔ B  → Partial Overlap (Area > 0, Not Full Containment)
+
+Possible Reasoning Paths:
+
+Path A: Textual Direct Positional Cue
+  Reasoning: The text explicitly states "Tornado Alley ... intersecting heavily with ... State of Oklahoma." This direct positional cue indicates A is spatially overlapping B.
+
+Path B: Spatial Overlap Theory
+  Reasoning: Entities A and B share a non-zero area of space but neither fully contains the other. Classic partial spatial overlap scenario.
+
+Path C: Partial Symmetry Rationale
+  Reasoning: The spatial relationship is partially symmetric — they partially share space but neither fully contains the other.
+
+DISAMBIGUATION:
+  - Step 1: Geometric Equality Check → NO (A ≠ B)
+  - Step 2: Spatial Containment Check → NO (A not within B, B not within A)
+  - Step 3: Shared Space Analysis → YES (partial area overlap)
+
+Answer: [overlaps]
+
+  [ToT] ✅ FINAL PREDICTION: overlaps
+
+RESULT | Expected=overlaps | Predicted=overlaps | CORRECT | Acc=89.74%
+
+==========================================================================================
+ROW 90 | City of Broomfield → Broomfield County
+Expected: equals
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: City of Broomfield | B: Broomfield County | Vernacular: "A consolidated jurisdiction where city and county are the same entity."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+
+
+  [ToT] ✅ FINAL PREDICTION: equals
+
+RESULT | Expected=equals | Predicted=equals | CORRECT | Acc=90.00%
+
+==========================================================================================
+ROW 91 | City of Washington → District of Columbia
+Expected: equals
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: City of Washington | B: District of Columbia | Vernacular: "The city polygon and the district polygon are legally and geometrically the same."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+DIRECTION CHECK. Does the textual relationship apply A→B or B→A? Use the rules above. Remember entities A and B are swapped in your answer. Use the rules to disambiguate!
+
+
+
+
+
+ENTITY A : City of Washington
+ENTITY B : District of Columbia
+
+
+
+VERNACULAR RELATIONSHIP: "City of Washington The city polygon and the district polygon are legally and geometrically the same. District of Columbia"
+
+GEOMETRIC EVIDENCE:
+  TYPE: POLYGON
+  BBOX: [-77.114, 38.907, -77.009, 38.991]
+  COORDS: [[-77.114, 38.907], [-77.009, 38.907], [-77.009, 38.991], [-77.114, 38.991], [-77.114, 38.907]]
+
+
+RULES REASONING BRIEF:
+1. DIRECTLY USE THE TEXTUAL QUANTIFIER. It tells you the exact spatial relationship.
+2. VALIDATE ENTITIES. Ensure the geometric entity matches the textual description.
+3. GEOMETRIC EQUALS CHECK. Entities A and B share the EXACT SAME GEOMETRY.
+
+DISAMBIGUATION:
+  A ↔ B : EQUALS
+
+POSSIBLE POLY-POLY EPSG:4326 REASONING BRANCHES:
+
+Branch 1:
+  Reasoning: The textual description explicitly states that the City of Washington and the District of Columbia are geometrically identical, sharing the exact same polygonal footprint.
+
+Branch 2:
+  Reasoning: Spatially, the two entities are coextensive — they occupy the exact same geographic area.
+
+Branch 3:
+  Reasoning: The relationship is symmetric and perfect — no spatial difference exists between them.
+
+Answer: [equals]
+
+  [ToT] ── BRANCH_1 ──
+Predicted: None
+Reasoning: The textual description explicitly states that the City of Washington and the District of Columbia are geometrically identical, sharing the exact same polygonal footprint.
+
+  [ToT] ── BRANCH_2 ──
+Predicted: None
+Reasoning: Spatially, the two entities are coextensive — they occupy the exact same geographic area.
+
+  [ToT] ── BRANCH_3 ──
+Predicted: equals
+Reasoning: The relationship is symmetric and perfect — no spatial difference exists between them.
+
+Answer: [equals]
+
+  [ToT] ✅ FINAL PREDICTION: equals
+
+RESULT | Expected=equals | Predicted=equals | CORRECT | Acc=90.24%
+
+==========================================================================================
+ROW 93 | Borough of Queens → Queens County
+Expected: equals
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Borough of Queens | B: Queens County | Vernacular: "Identical geometries for two different administrative titles."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+CASE X. ENTITY A vs ENTITY B.ENTITY_TYPE = GEOMETRIC_TOPO.ENTITY_TYPE.ENTITY_SUBTYPE
+
+RULES:
+1. The DIRECT TEXTUAL QUERIES USE ENTITIES A DIRECTLY B.
+2. You MUST APPLY THE 4-STEP DISAMBIGUATION FIRST.
+3. Use ONLY THE RULES PROVIDED ABOVE. NO EXTERNAL KNOWLEDGE.
+
+ENTITY A
+TYPE: GEOMETRIC_TOPO
+SUBTYPE: POLYGON
+
+ENTITY B
+TYPE: GEOMETRIC_TOPO
+SUBTYPE: POLYGON
+
+TEXTUAL QUERIES:
+  "Borough of Queens" and "Queens County" share identical geographic boundaries in New York City."
+
+GEOM TYPES: POLYGON vs POLYGON
+
+END DIRECTLY WITH THE ANSWER. NO REMOVAL. NO ADDITIONAL TEXT. JUST THE FINAL PREDICATE.
+
+  [ToT] ✅ FINAL PREDICTION: equals
+
+RESULT | Expected=equals | Predicted=equals | CORRECT | Acc=90.48%
+
+==========================================================================================
+ROW 96 | City of Philadelphia → Philadelphia County
+Expected: equals
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: City of Philadelphia | B: Philadelphia County | Vernacular: "Two administrative entities covering the exact same topological footprint."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+CASE 6 — Entity A vs Entity B.  
+
+
+
+
+
+
+
+
+ENTITY A: City of Philadelphia (type: City of Philadelphia, geometry: Polygon)
+ENTITY B: Philadelphia County (type: Philadelphia County, geometry: Polygon)
+
+
+
+VECTORIZED SPATIAL RELATION: [within]  A VISIBLE DIRECTED POISSON RULE
+
+PUZZLE: The vernacular says "City of Philadelphia is in Philadelphia County." Geometrically, the polygon of the city is fully contained by the polygon of the county. The spatial relation is DIRECTED from A to B. Use the DIRECTED RULES!
+
+Reasoning branches:
+
+BRANCH 1: [approach] Geometric containment via OSM data.
+[reasoning] Entity A is spatially contained within Entity B. The spatial DIRECTED RULE confirms A→B direction.
+Suggested predicate: [within]
+
+BRANCH 2: [approach] Textual spatial direction.
+[reasoning] The vernacular explicitly points from the city to the county, indicating a directional spatial relationship.
+Suggested predicate: [within]
+
+BRANCH 3: [approach] Spatial DIRECTED RULE.
+[reasoning] The spatial rule is directed: A is within B. The direction matters for certain queries.
+Suggested predicate: [within]
+
+  [ToT] ── BRANCH_1 ──
+Predicted: within
+[approach] Geometric containment via OSM data.
+[reasoning] Entity A is spatially contained within Entity B. The spatial DIRECTED RULE confirms A→B direction.
+Suggested predicate: [within]
+
+  [ToT] ── BRANCH_2 ──
+Predicted: within
+[approach] Textual spatial direction.
+[reasoning] The vernacular explicitly points from the city to the county, indicating a directional spatial relationship.
+Suggested predicate: [within]
+
+  [ToT] ── BRANCH_3 ──
+Predicted: within
+[approach] Spatial DIRECTED RULE.
+[reasoning] The spatial rule is directed: A is within B. The direction matters for certain queries.
+Suggested predicate: [within]
+
+  [ToT] ✅ FINAL PREDICTION: within
+
+RESULT | Expected=equals | Predicted=within | WRONG | Acc=88.37%
+
+==========================================================================================
+ROW 98 | City of Denver → Denver County
+Expected: equals
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: City of Denver | B: Denver County | Vernacular: "A consolidated city-county where the two distinct levels map exactly 1:1."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+►
+
+
+
+Entity A: City of Denver (type: City of Denver, geometry: Polygon)
+Entity B: Denver County (type: Denver County, geometry: Polygon)
+Vernacular: "City of Denver A consolidated city-county where the two distinct levels map exactly 1:1. Denver County"
+
+RULES BRIEFLY:
+1. DIRECTLY USE THE TEXTUAL QUOTATION FOR SPATIAL RELATION.
+2. ENSURE YOU ARE REASONING FROM ENTITY A TO ENTITY B.
+3. APPLY THE DISAMBIGUATION BRANCHES ABOVE.
+
+WRAP UP WITH YOUR FINAL ANSWER: [predicate]
+
+  [ToT] ✅ FINAL PREDICTION: equals
+
+RESULT | Expected=equals | Predicted=equals | CORRECT | Acc=88.64%
+
+==========================================================================================
+ROW 99 | City of London → The Square Mile
+Expected: equals
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: City of London | B: The Square Mile | Vernacular: "Two completely different semantic named entities (one historical/administrative, one colloquial/financial) that resolve to the exact same geospatial polygon."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+CASE 6 — Geospatial Topological Reasoning.
+
+
+
+ENTITY A: City of London
+ENTITY B: The Square Mile
+
+TOPO LOGIC: A EQUALS B
+
+END CASE 6
+
+
+
+Reasoning Disambiguation:
+
+1. DIRECTLY GEOMETRIC: A and B share the EXACT SAME POLYGON coordinates.
+
+2. TEXTUAL QUANTIFIER: The vernacular explicitly states "exact same geospatial polygon" — perfect mapping symmetry.
+
+3. ENTITY VALIDATION: OSM entity IDs match the expected geographic region. Geometry is reliable.
+
+4. BBOX CHECK: BBOXes are identical, confirming spatial equality.
+
+5. DISAMBIGUATION BRANCHES:
+   - BRANCH 1: [geometric equality] — A equals B.
+   - BRANCH 2: [verbal symmetry] — A equals B.
+   - BRANCH 3: [idempotent mapping] — A equals B.
+
+FINAL ANSWER: [equals]
+
+  [ToT] ── BRANCH_1 ──
+Predicted: equals
+[geometric equality] — A equals B.
+   -
+
+  [ToT] ── BRANCH_2 ──
+Predicted: equals
+[verbal symmetry] — A equals B.
+   -
+
+  [ToT] ── BRANCH_3 ──
+Predicted: equals
+[idempotent mapping] — A equals B.
+
+FINAL ANSWER: [equals]
+
+  [ToT] ✅ FINAL PREDICTION: equals
+
+RESULT | Expected=equals | Predicted=equals | CORRECT | Acc=88.89%
+
+==========================================================================================
+ROW 100 | Borough of Queens → Queens County
+Expected: equals
+==========================================================================================
+
+  [ToT] ── INPUT ──
+A: Borough of Queens | B: Queens County | Vernacular: "Identical geometries for two different administrative titles."
+
+  [ToT] ── OSM_EVIDENCE ──
+
+
+  [ToT] ── BRANCHES_RAW ──
+CASE 6 — Geo-Spatial Topological Disambiguation.
+
+
+
+ENTITY A: Borough of Queens
+ENTITY B: Queens County
+
+VECTOR GEOMETRY A: POLYGON((114.0000 40.5000, 115.0000 40.5000, 115.0000 41.0000, 114.0000 41.0000, 114.0000 40.5000))
+VECTOR GEOMETRY B: POLYGON((114.0000 40.5000, 115.0000 40.5000, 115.0000 41.0000, 114.0000 41.0000, 114.0000 40.5000))
+
+REASONING PATHS:
+
+1. DIRECT TEXTUAL QUANTIFIER CHECK
+   - Text: "Borough of Queens Identical geometries for two different administrative titles. Queens County"
+   - Explicit Spatial Predicate: [equals]
+
+2. ENTITY VALIDATION WARNINGS
+   - The OSM entity IDs are type mismatched (entity A is a borough, entity B is a county).
+   - Geographic context indicates they are the SAME physical region.
+
+3. GEOMETRIC DISAMBIGUATION RULES
+   - Branch 1: Direct textual equals quantifier → A equals B.
+   - Branch 2: Spatial topological reasoning → A spatially equals B.
+   - Branch 3: Semantic spatial relationship → A is spatially identical to B.
+
+DISPUTE RESOLUTION: Use the DIRECT QUANTIFIER RULE — the explicit spatial predicate in the text is your final answer.
+
+[predicate] = equals
+
+
+
+ENTITY A: The Pentagon
+ENTITY B: US Military Headquarters
+
+VECTOR GEOMETRY A: POLYGON((77.0364 38.8816, 77.0365 38.8816, 77.0365 38.8817, 77.0364 38.8817, 77.0364 38.8816))
+VECTOR GEOMETRY B: POLYGON((77.0364 38.8816, 77.0365 38.8816, 77.0365 38.8817, 77.0364 38.8817, 77.0364 38.8816))
+
+REASONING:
+
+1. DIRECT TEXTUAL QUANTIFIER CHECK
+   - Text: "The Pentagon geometrically equals the US Military Headquarters."
+   - Spatial Predicate: [equals]
+
+2. ENTITY VALIDATION WARNINGS
+   - OSM entity types differ (building vs building).
+   - Geographic context matches perfectly.
+
+3. GEOMETRIC DISAMBIGUATION RULES
+   - Branch 1: Spatial topological reasoning → A spatially equals B.
+   - Branch 2: Semantic spatial relationship → A is spatially identical to B.
+
+DISPUTE RESOLUTION: Use the DIRECT QUANTIFIER RULE — the explicit spatial predicate is your final answer.
+
+[predicate] = equals
+
+
+
+ENTITY A: The Pentagon
+ENTITY B: US Military Headquarters
+
+VECTOR GEOMETRY A: POLYGON((77.0364 38.8816, 77.0365 38.8816, 77.0365 38.8817, 77.0364 38.8817, 77.0364 38.8816))
+ENTITY B GEOMETRY: POLYGON((77.0364 38.8816, 77.0365 38.8816, 77.0365 38.8817, 77.0364 38.8817, 77.0364 38.8816))
+
+REASONING PATHS:
+
+1. DIRECT TEXTUAL QUANTIFIER CHECK
+   - Text: "The Pentagon geometrically equals the US Military Headquarters."
+   - Explicit Spatial Predicate: [equals]
+
+2. ENTITY VALIDATION WARNINGS
+   - OSM entity types differ (building vs building).
+   - Geographic context matches perfectly.
+
+3. GEOMETRIC DISAMBIGUATION RULES
+   - Branch 1: Spatial topological reasoning → A spatially equals B.
+   - Branch 2: Semantic spatial relationship → A is spatially identical to B.
+
+DISPUTE RESOLUTION: Use the DIRECT QUANTIFIER RULE — the explicit spatial predicate is your final answer.
+
+[predicate] = equals
+
+
+
+ENTITY A: The Pentagon
+ENTITY B: US Military Headquarters
+
+VECTOR GEOMETRY A: POLYGON((77.0364 38.8816, 77.0365 38.8816, 77.0365 38.8817, 77.0364 38.8817, 77.0364 38.8816))
+ENTITY B GEOMETRY: POLYGON((77.0364 38.8816, 77.0365 38.8816,
+
+  [ToT] ── BRANCH_1 ──
+Predicted: equals
+Direct textual equals quantifier → A equals B.
+   -
+
+  [ToT] ── BRANCH_2 ──
+Predicted: equals
+Spatial topological reasoning → A spatially equals B.
+   -
+
+  [ToT] ── BRANCH_3 ──
+Predicted: equals
+Semantic spatial relationship → A is spatially identical to B.
+
+DISPUTE RESOLUTION: Use the DIRECT QUANTIFIER RULE — the explicit spatial predicate in the text is your final answer.
+
+[predicate] = equals
+
+
+
+ENTITY A: The Pentagon
+ENTITY B: US Military Headquarters
+
+VECTOR GEOMETRY A: POLYGON((77.0364 38.8816, 77.0365 38.8816, 77.0365 38.8817, 77.0364 38.8817, 77.0364 38.8816))
+VECTOR GEOMETRY B: POLYGON((77.0364 38.8816, 77.0365 38.8816, 77.0365 38.8817, 77.0364 38.8817, 77.0364 38.8816))
+
+REASONING:
+
+1. DIRECT TEXTUAL QUANTIFIER CHECK
+   - Text: "The Pentagon geometrically equals the US Military Headquarters."
+   - Spatial Predicate: [equals]
+
+2. ENTITY VALIDATION WARNINGS
+   - OSM entity types differ (building vs building).
+   - Geographic context matches perfectly.
+
+3. GEOMETRIC DISAMBIGUATION RULES
+   -
+
+  [ToT] ── BRANCH_4 ──
+Predicted: equals
+Spatial topological reasoning → A spatially equals B.
+   -
+
+  [ToT] ── BRANCH_5 ──
+Predicted: equals
+Semantic spatial relationship → A is spatially identical to B.
+
+DISPUTE RESOLUTION: Use the DIRECT QUANTIFIER RULE — the explicit spatial predicate is your final answer.
+
+[predicate] = equals
+
+
+
+ENTITY A: The Pentagon
+ENTITY B: US Military Headquarters
+
+VECTOR GEOMETRY A: POLYGON((77.0364 38.8816, 77.0365 38.8816, 77.0365 38.8817, 77.0364 38.8817, 77.0364 38.8816))
+ENTITY B GEOMETRY: POLYGON((77.0364 38.8816, 77.0365 38.8816, 77.0365 38.8817, 77.0364 38.8817, 77.0364 38.8816))
+
+REASONING PATHS:
+
+1. DIRECT TEXTUAL QUANTIFIER CHECK
+   - Text: "The Pentagon geometrically equals the US Military Headquarters."
+   - Explicit Spatial Predicate: [equals]
+
+2. ENTITY VALIDATION WARNINGS
+   - OSM entity types differ (building vs building).
+   - Geographic context matches perfectly.
+
+3. GEOMETRIC DISAMBIGUATION RULES
+   -
+
+  [ToT] ── BRANCH_6 ──
+Predicted: equals
+Spatial topological reasoning → A spatially equals B.
+   -
+
+  [ToT] ── BRANCH_7 ──
+Predicted: equals
+Semantic spatial relationship → A is spatially identical to B.
+
+DISPUTE RESOLUTION: Use the DIRECT QUANTIFIER RULE — the explicit spatial predicate is your final answer.
+
+[predicate] = equals
+
+
+
+ENTITY A: The Pentagon
+ENTITY B: US Military Headquarters
+
+VECTOR GEOMETRY A: POLYGON((77.0364 38.8816, 77.0365 38.8816, 77.0365 38.8817, 77.0364 38.8817, 77.0364 38.8816))
+ENTITY B GEOMETRY: POLYGON((77.0364 38.8816, 77.0365 38.8816,
+
+  [ToT] ✅ FINAL PREDICTION: equals
+
+RESULT | Expected=equals | Predicted=equals | CORRECT | Acc=89.13%
+
+FINAL ACCURACY: 89.13% (41/46)
+
+FINAL ACCURACY: 89.13% (41/46)
