@@ -23,11 +23,18 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "Topological-Reasonin
 import build_error_report as A
 import build_examples_report as E
 
-# (Display name, key, results dir, eval csv)
+# (Display name, key, results dir, eval csv, noun, label order)
 DOMAINS = [
-    ("Topological", "topo", "Topological-Reasoning/code/results", "Topological-Reasoning/dataset/topo_v2_eval.csv"),
-    ("Cardinal",    "card", "Cardinal-Reasoning/code/results",    "Cardinal-Reasoning/dataset/cardinal_direction_relations.csv"),
-    ("Relative",    "rel",  "Relative-Reasoning/code/results",    "Relative-Reasoning/dataset/relative_direction_relations.csv"),
+    ("Topological", "topo", "Topological-Reasoning/code/results",
+     "Topological-Reasoning/dataset/topo_v2_eval.csv", "predicate",
+     ["contains", "within", "touches", "crosses", "overlaps", "disjoint", "equals"]),
+    ("Cardinal", "card", "Cardinal-Reasoning/code/results",
+     "Cardinal-Reasoning/dataset/cardinal_direction_relations.csv", "direction",
+     ["north_of", "northeast_of", "east_of", "southeast_of",
+      "south_of", "southwest_of", "west_of", "northwest_of"]),
+    ("Relative", "rel", "Relative-Reasoning/code/results",
+     "Relative-Reasoning/dataset/relative_direction_relations.csv", "direction",
+     ["in_front_of", "behind", "left_of", "right_of", "next_to"]),
 ]
 
 
@@ -58,7 +65,7 @@ def examples_data(results_dir, eval_csv):
     return data, have_shots, n
 
 
-def analysis_html(cfg, meta):
+def analysis_html(cfg, meta, noun="predicate"):
     has_few = any(sh == 5 for (sh, _, _) in cfg)
     H = []
     # accuracy
@@ -72,8 +79,8 @@ def analysis_html(cfg, meta):
         H.append(f"<div class='card'>{A.matrix_html(cfg,0)}</div>")
     H.append("</div>")
     # difficulty
-    H.append("<div class='sec'><h2>Difficulty</h2><h3>Which relations are hard.</h3><div class='grid2'>")
-    H.append(f"<div class='card'><b>Accuracy by predicate</b><div style='height:14px'></div>"
+    H.append(f"<div class='sec'><h2>Difficulty</h2><h3>Which {noun}s are hard.</h3><div class='grid2'>")
+    H.append(f"<div class='card'><b>Accuracy by {noun}</b><div style='height:14px'></div>"
              f"{A.bars_html(A.per_predicate(cfg,0))}</div>")
     lvl = A.level_accuracy(cfg, 0, meta)
     if lvl:
@@ -101,7 +108,10 @@ def analysis_html(cfg, meta):
                  f"<p class='para'>{narrative or 'No data.'}</p>"
                  "<div class='grid2' style='align-items:start'>"
                  f"<div>{A.bars_html(sacc)}</div>"
-                 f"<div>{A.confusion_table_html(conf, labels, cap)}</div></div></div>")
+                 f"<div>{A.confusion_table_html(conf, labels, cap)}</div></div>"
+                 "<div style='height:18px'></div>"
+                 "<div class='cm-sub'>Confusion by strategy — zero-shot vs few-shot</div>"
+                 f"{A.per_strategy_confusion_grid(cfg, e)}</div>")
     H.append("</div>")
     # hardest cases
     H.append("<div class='sec'><h2>Hardest cases</h2><h3>Rows most configurations miss.</h3><div class='card'>")
@@ -179,14 +189,17 @@ def main():
     DATA = {}
     tabs, panels = [], []
     first = True
-    for name, key, rdir, ecsv in DOMAINS:
+    for name, key, rdir, ecsv, noun, order in DOMAINS:
         cfg = A.load_configs(rdir)
         if not cfg:
             continue
+        # make the analysis label-aware for this domain
+        A.PRED_ORDER = order
+        A.NOUN = noun
         meta = A.load_eval_meta(ecsv)
         data, have_shots, n_logs = examples_data(rdir, ecsv)
         DATA[key] = data
-        anal, _ = analysis_html(cfg, meta)
+        anal, _ = analysis_html(cfg, meta, noun=noun)
         expl = explorer_html(key, have_shots) if data["exps"] else ""
         tabs.append(f"<button class='domtabbtn{' active' if first else ''}' data-dom='{key}'>{name}</button>")
         disp = "block" if first else "none"
@@ -206,6 +219,7 @@ def main():
  background:#fff;color:var(--dim);border-radius:999px;cursor:pointer}
 .domtabbtn.active{background:#5856d6;color:#fff;border-color:#5856d6}
 .dom-h{font-size:13px;color:var(--dim);font-weight:600;margin:0 0 18px}
+.cm-sub{font-size:14px;font-weight:700;color:#1d1d1f;margin:0 0 10px;padding-top:6px;border-top:1px solid var(--line)}
 """
     page = (f"<!doctype html><html><head><meta charset='utf-8'>"
             f"<meta name='viewport' content='width=device-width,initial-scale=1'>"

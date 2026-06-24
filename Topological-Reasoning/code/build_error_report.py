@@ -28,7 +28,10 @@ import argparse
 import collections
 
 STRATS = ["cot", "tot", "got"]
+# PRED_ORDER = preferred label ordering; NOUN = what a label is called in this domain.
+# Both are overridable per domain (e.g. Cardinal/Relative set directions + "direction").
 PRED_ORDER = ["contains", "within", "touches", "crosses", "overlaps", "disjoint", "equals"]
+NOUN = "predicate"
 
 EXP_LABELS = {
     "exp1_base": "Exp 1 · base / no-KG",
@@ -135,12 +138,12 @@ def bars_html(pairs, unit="%"):
     return out + "</div>"
 
 
-def confusion_counts(cfg, shots, exp=None):
-    """expected→predicted counter over configs at `shots` (optionally one exp)."""
+def confusion_counts(cfg, shots, exp=None, strat=None):
+    """expected→predicted counter over configs at `shots` (optionally one exp/strategy)."""
     conf = collections.Counter()
     labels = set()
     for (sh, e, s), rows in cfg.items():
-        if sh != shots or (exp is not None and e != exp):
+        if sh != shots or (exp is not None and e != exp) or (strat is not None and s != strat):
             continue
         for r in rows:
             exp_l, pred = r["expected"], r.get("predicted") or "invalid"
@@ -151,12 +154,14 @@ def confusion_counts(cfg, shots, exp=None):
     return conf, labels
 
 
-def confusion_table_html(conf, labels, caption):
+def confusion_table_html(conf, labels, caption="", compact=False):
     order = [p for p in PRED_ORDER if p in labels]
     extra = sorted(l for l in labels if l not in PRED_ORDER)
     cols = order + extra + (["invalid"] if any(p == "invalid" for (_, p) in conf) else [])
     rows_l = order + extra
-    head = "".join(f"<th class='cm-c'>{c[:4]}</th>" for c in cols)
+    if not rows_l:
+        return "<p class='muted small'>no data</p>"
+    head = "".join(f"<th class='cm-c'>{c[:3]}</th>" for c in cols)
     body = ""
     for er in rows_l:
         row_total = sum(conf[(er, c)] for c in cols) or 1
@@ -170,9 +175,33 @@ def confusion_table_html(conf, labels, caption):
                 tds += f"<td class='cm' style='background:rgba(45,164,78,{0.15+0.85*frac:.2f});color:#06381a'>{v}</td>"
             else:
                 tds += f"<td class='cm' style='background:rgba(207,34,46,{0.12+0.7*frac:.2f});color:#5b0a12'>{v}</td>"
-        body += f"<tr><th class='cm-r'>{er}</th>{tds}</tr>"
-    return (f"<table class='cmtx'><thead><tr><th></th>{head}</tr></thead><tbody>{body}</tbody></table>"
-            f"<p class='muted small'>{caption}</p>")
+        body += f"<tr><th class='cm-r'>{er[:10]}</th>{tds}</tr>"
+    cls = "cmtx compact" if compact else "cmtx"
+    cap = f"<p class='muted small'>{caption}</p>" if caption else ""
+    return f"<table class='{cls}'><thead><tr><th></th>{head}</tr></thead><tbody>{body}</tbody></table>{cap}"
+
+
+def per_strategy_confusion_grid(cfg, exp):
+    """For one experiment: a row per strategy, each with its zero-shot + few-shot
+    confusion matrices side by side."""
+    blocks = []
+    for s in STRATS:
+        cells = []
+        for sh, lab in [(0, "zero-shot"), (5, "few-shot ⚠")]:
+            if (sh, exp, s) in cfg:
+                conf, labels = confusion_counts(cfg, sh, exp, s)
+                rows = cfg[(sh, exp, s)]
+                acc = sum(r["match"] for r in rows) / len(rows) * 100
+                cells.append(f"<div class='cm-block'><div class='cm-cap'>{lab} · {acc:.0f}%</div>"
+                             f"{confusion_table_html(conf, labels, compact=True)}</div>")
+        if cells:
+            blocks.append(f"<div class='cm-strat'><div class='cm-slabel'>{s.upper()}</div>"
+                          f"<div class='cm-pair'>{''.join(cells)}</div></div>")
+    if not blocks:
+        return ""
+    return ("<div class='cm-grid'>" + "".join(blocks) + "</div>"
+            "<p class='muted small'>rows = expected · cols = predicted · green = correct · red = error · "
+            "zero-shot vs few-shot side by side per strategy</p>")
 
 
 def confusion_html(cfg, shots):
@@ -196,11 +225,8 @@ def exp_narrative(cfg, exp, shots=0):
     conf, _ = confusion_counts(cfg, shots, exp)
     errors = {(a, b): n for (a, b), n in conf.items() if a != b}
     tot_err = sum(errors.values())
-    tot_all = sum(conf.values()) or 1
-    # error sinks / patterns
-    to_disjoint = sum(n for (a, b), n in errors.items() if b == "disjoint")
-    direction = errors.get(("contains", "within"), 0) + errors.get(("within", "contains"), 0)
-    invalid = sum(n for (a, b), n in conf.items() if b not in PRED_ORDER)
+    known = set(PRED_ORDER)
+    invalid = sum(n for (a, b), n in conf.items() if b == "invalid")
     top = sorted(errors.items(), key=lambda kv: -kv[1])[:3]
     best = max(sacc, key=sacc.get); worst = min(sacc, key=sacc.get)
 
@@ -216,15 +242,30 @@ def exp_narrative(cfg, exp, shots=0):
         if top:
             pair_txt = ", ".join(f"{a}→{b} ({n})" for (a, b), n in top)
             parts.append(f"Its most frequent confusions are {pair_txt}.")
-        if to_disjoint / tot_err >= 0.40:
-            parts.append(f"Strikingly, <b>{to_disjoint/tot_err*100:.0f}% of all its errors collapse to "
-                         f"<i>disjoint</i></b> — the model under-commits, defaulting to 'no relation' when unsure.")
-        elif to_disjoint / tot_err >= 0.20:
-            parts.append(f"About {to_disjoint/tot_err*100:.0f}% of errors fall into <i>disjoint</i>, "
-                         f"a moderate over-prediction of separateness.")
-        if direction >= 4:
-            parts.append(f"Directionality is a real weak spot: contains↔within is confused {direction} times "
-                         f"(it gets which entity encloses which backwards).")
+        # dominant error sink: the label most wrong answers collapse to
+        sink = collections.Counter()
+        for (a, b), n in errors.items():
+            sink[b] += n
+        sink_lbl, sink_n = sink.most_common(1)[0]
+        if sink_n / tot_err >= 0.40:
+            parts.append(f"Strikingly, <b>{sink_n/tot_err*100:.0f}% of all its errors collapse to "
+                         f"<i>{sink_lbl}</i></b> — the model over-predicts that {NOUN} when unsure.")
+        elif sink_n / tot_err >= 0.25:
+            parts.append(f"About {sink_n/tot_err*100:.0f}% of errors fall into <i>{sink_lbl}</i>, "
+                         f"a notable over-prediction of one {NOUN}.")
+        # biggest two-way (symmetric) confusion
+        seen, best_sym = set(), (None, 0)
+        for (a, b) in errors:
+            key = tuple(sorted((a, b)))
+            if key in seen:
+                continue
+            seen.add(key)
+            two = errors.get((a, b), 0) + errors.get((b, a), 0)
+            if two > best_sym[1]:
+                best_sym = (key, two)
+        if best_sym[0] and best_sym[1] >= 4:
+            a, b = best_sym[0]
+            parts.append(f"{a}↔{b} are mutually confused {best_sym[1]} times — a directional/symmetry weak spot.")
         if invalid >= 4:
             parts.append(f"It also emits {invalid} invalid/empty predictions, hinting at format or "
                          f"truncation issues.")
@@ -249,19 +290,17 @@ def exp_narrative(cfg, exp, shots=0):
 
 
 def per_predicate(cfg, shots):
-    acc = {}
-    for p in PRED_ORDER:
-        tot = hit = 0
-        for (sh, e, s), rows in cfg.items():
-            if sh != shots:
-                continue
-            for r in rows:
-                if r["expected"] == p:
-                    tot += 1
-                    hit += bool(r["match"])
-        if tot:
-            acc[p] = hit / tot * 100
-    return [(p, acc[p]) for p in PRED_ORDER if p in acc]
+    """Accuracy per expected label, derived from the data (any label set)."""
+    tot = collections.Counter()
+    hit = collections.Counter()
+    for (sh, e, s), rows in cfg.items():
+        if sh != shots:
+            continue
+        for r in rows:
+            tot[r["expected"]] += 1
+            hit[r["expected"]] += bool(r["match"])
+    labels = [p for p in PRED_ORDER if p in tot] + sorted(l for l in tot if l not in PRED_ORDER)
+    return [(p, hit[p] / tot[p] * 100) for p in labels if tot[p]]
 
 
 def hardest_rows(cfg, shots, meta, top=15):
@@ -354,6 +393,15 @@ table{border-collapse:collapse;width:100%}
 .exp-title{font-size:18px;font-weight:700;margin-bottom:8px}
 .para{font-size:15px;line-height:1.65;color:#333;margin:0 0 18px}
 .para i{color:#cf222e;font-style:normal;font-weight:600}
+.cm-grid{display:flex;flex-direction:column;gap:16px;margin-top:6px}
+.cm-strat{display:flex;align-items:flex-start;gap:14px}
+.cm-slabel{font-weight:700;font-size:13px;color:#5856d6;width:42px;padding-top:18px;flex:none}
+.cm-pair{display:flex;gap:22px;flex-wrap:wrap}
+.cm-block{}
+.cm-cap{font-size:12px;color:var(--dim);font-weight:600;margin-bottom:6px}
+.cmtx.compact .cm{width:30px;height:26px;font-size:11px;border-radius:5px}
+.cmtx.compact th{font-size:10px;padding:3px}
+.cmtx.compact .cm-r{padding-right:7px}
 """
 
 
