@@ -3,7 +3,7 @@ build_relative_train_data.py
 ================================================================================
 Builds the two relative-direction training sets for the unified 6-experiment
 design, from relative_direction_relations.csv (schema: source_entity,
-target_entity, corpus, relation_label, ...), excluding the 20 balanced eval
+target_entity, corpus, relation_label, ...), excluding the 25 balanced eval
 indices.
 
 Outputs:
@@ -32,7 +32,7 @@ from strategies_relative import VALID_DIRECTIONS, VALID_LIST
 from osm_client import OSMEvidenceKG
 
 DATASET   = "../dataset/relative_direction_relations.csv"
-EVAL_IDX  = "../dataset/eval_20_balanced_indices.json"
+EVAL_IDX  = "../dataset/eval_25_balanced_indices.json"
 OUT_CSV   = "../dataset/relative_balanced_train.csv"
 OUT_JSONL = "../dataset/relative_osm_kg_train.jsonl"
 

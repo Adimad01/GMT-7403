@@ -6,7 +6,7 @@ KG as static input on the no-KG fine-tuned model.
   Model         : openai/gpt-oss-20b  + finetuned_gptoss_relative/final_adapter
   KG @ training : —         KG @ input : OSM       KG @ inference : —   
   Tokens        : 1024    Strategies : CoT, ToT, GoT
-  Eval set      : relative_direction_relations.csv (20 balanced eval rows)
+  Eval set      : relative_direction_relations.csv (25 balanced eval rows: 5/label, one per level L1-5)
 
 Zero-shot (default) vs few-shot:
     python exp5_ft_kg_input.py                 # zero-shot, all strategies
@@ -19,7 +19,7 @@ Note: rows whose entities fail OSM retrieval are dropped from eval automatically
 import os, sys, json, argparse
 
 DATASET        = "../dataset/relative_direction_relations.csv"
-INDICES_FILE   = "../dataset/eval_20_balanced_indices.json"
+INDICES_FILE   = "../dataset/eval_25_balanced_indices.json"
 TRAIN_DATA     = "../dataset/relative_balanced_train.csv"          # for --shots few-shot demo sampling
 MODEL_ID       = "openai/gpt-oss-20b"
 ADAPTER_PATH   = "finetuned_gptoss_relative/final_adapter"

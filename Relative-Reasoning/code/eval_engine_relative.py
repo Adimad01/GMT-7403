@@ -13,7 +13,7 @@ Evaluation: exact match (predicted label == relation_label)
 Usage:
     python eval_engine_relative.py \\
         --dataset  ../dataset/relative_direction_relations.csv \\
-        --filter-indices ../dataset/eval_20_balanced_indices.json \\
+        --filter-indices ../dataset/eval_25_balanced_indices.json \\
         --model-id openai/gpt-oss-20b \\
         --strategy all \\
         --output-dir results \\
@@ -22,7 +22,7 @@ Usage:
     # with adapter
     python eval_engine_relative.py \\
         --dataset  ../dataset/relative_direction_relations.csv \\
-        --filter-indices ../dataset/eval_20_balanced_indices.json \\
+        --filter-indices ../dataset/eval_25_balanced_indices.json \\
         --model-id openai/gpt-oss-20b \\
         --adapter-path finetuned_gptoss_relative/final_adapter \\
         --strategy all \\
@@ -191,7 +191,7 @@ from osm_client import OSMEvidenceKG, NullKG, load_cache, is_geocodable
 from rag_loop import RAGStrategy, DomainSpec
 from fewshot import FewShotSelector
 
-EXPERIMENT_SUFFIX = "relative_dir_20_sample"
+EXPERIMENT_SUFFIX = "relative_dir_25_sample"
 
 
 # ---------------------------------------------------------------------------

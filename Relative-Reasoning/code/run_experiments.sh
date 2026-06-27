@@ -40,7 +40,7 @@ echo ""
 header "PHASE 0 — Dataset check"
 
 for f in "../dataset/relative_direction_relations.csv" \
-         "../dataset/eval_20_balanced_indices.json"; do
+         "../dataset/eval_25_balanced_indices.json"; do
     if [[ ! -f "$f" ]]; then
         echo "  [ERROR] $f not found"
         exit 1
@@ -90,7 +90,7 @@ fi
 # PHASE 2a — Zero-shot evaluation
 # ─────────────────────────────────────────────────────────────────────────────
 echo ""
-header "PHASE 2a — Zero-shot: 6 experiments × 3 strategies on 20 examples"
+header "PHASE 2a — Zero-shot: 6 experiments × 3 strategies on 25 examples"
 
 echo "  Exp 1 · Base GPT-OSS-20B (no adapter, no KG) · CoT / ToT / GoT"
 line
@@ -125,7 +125,7 @@ $PYTHON exp6_base_kg_rag.py
 # PHASE 2b — Few-shot evaluation (5 same-label demos)
 # ─────────────────────────────────────────────────────────────────────────────
 echo ""
-header "PHASE 2b — Few-shot (5 shots): 6 experiments × 3 strategies on 20 examples"
+header "PHASE 2b — Few-shot (5 shots): 6 experiments × 3 strategies on 25 examples"
 
 echo "  Exp 1 · Base GPT-OSS-20B (no adapter, no KG) · CoT / ToT / GoT · 5-shot"
 line
