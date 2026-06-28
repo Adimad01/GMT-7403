@@ -60,6 +60,7 @@ def run():
         "--temperature",    str(TEMPERATURE),
         "--max-new-tokens", str(MAX_NEW_TOKENS),
         "--kg-mode",        KG_MODE,
+        "--keep-ungeocodable",
         "--shots",          str(args.shots),
     ]
     if args.shots > 0:
