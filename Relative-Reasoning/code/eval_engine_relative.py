@@ -314,11 +314,12 @@ def evaluate_strategy(strategy, df: pd.DataFrame, output_dir: str,
                             "predicted": predicted, "match": is_match})
             processed_indices.add(real_idx)
 
-            if len(results) % 10 == 0:
-                _save_json_atomic(ckpt_path, {
-                    "processed_indices": sorted(processed_indices),
-                    "results": results,
-                })
+            # Checkpoint after every row so an interruption never loses
+            # completed work (each row is expensive; the file is tiny).
+            _save_json_atomic(ckpt_path, {
+                "processed_indices": sorted(processed_indices),
+                "results": results,
+            })
 
     finally:
         _save_json_atomic(ckpt_path, {"processed_indices": sorted(processed_indices), "results": results})
