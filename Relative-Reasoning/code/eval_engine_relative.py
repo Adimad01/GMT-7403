@@ -398,6 +398,26 @@ def main():
     print("[DATA] Label distribution:", dist)
 
     # ------------------------------------------------------------------
+    # 1b. Early-resume: if every selected strategy's checkpoint already
+    #     covers all eval rows, skip the expensive model load entirely.
+    # ------------------------------------------------------------------
+    _strats  = list(STRATEGY_MAP.keys()) if args.strategy == "all" else [args.strategy]
+    _eff_tag = f"{args.model_tag}_fs{args.shots}" if args.shots > 0 else args.model_tag
+    _expected = set(df.index.tolist())
+
+    def _strategy_done(sname: str) -> bool:
+        cp = os.path.join(args.output_dir,
+                          f"voletc_{_eff_tag}_{sname}_{EXPERIMENT_SUFFIX}_ckpt.json")
+        done = set(_load_checkpoint(cp).get("processed_indices", []))
+        return _expected.issubset(done)
+
+    if _expected and all(_strategy_done(s) for s in _strats):
+        print(f"[RESUME] All strategies ({', '.join(_strats)}) already complete for "
+              f"'{_eff_tag}' ({len(_expected)} rows) — skipping model load and this "
+              f"experiment.")
+        return
+
+    # ------------------------------------------------------------------
     # 2. Load model on GPU
     # ------------------------------------------------------------------
     tok_path = args.model_id
