@@ -37,6 +37,161 @@ DOMAINS = [
      ["in_front_of", "behind", "left_of", "right_of", "next_to"]),
 ]
 
+# Per-domain dataset locations for the "Dataset statistics" section.
+#   full         = the complete labelled dataset
+#   eval         = CSV the eval split is drawn from (row order = index space)
+#   eval_indices = JSON list of row indices held out for evaluation
+#   cache        = OSM geocode cache (both entities resolved ⇒ geocodable)
+DATASET_SPECS = {
+    "topo": {"full": "Topological-Reasoning/dataset/topological_relations.csv",
+             "eval": "Topological-Reasoning/dataset/topo_v2_eval.csv",
+             "eval_indices": "Topological-Reasoning/dataset/topo_v2_eval_indices.json",
+             "cache": "Topological-Reasoning/code/results/osm_cache.json"},
+    "card": {"full": "Cardinal-Reasoning/dataset/cardinal_direction_relations.csv",
+             "eval": "Cardinal-Reasoning/dataset/cardinal_direction_relations.csv",
+             "eval_indices": "Cardinal-Reasoning/dataset/eval_40_balanced_indices.json",
+             "cache": "Cardinal-Reasoning/code/results/osm_cache.json"},
+    "rel":  {"full": "Relative-Reasoning/dataset/relative_direction_relations.csv",
+             "eval": "Relative-Reasoning/dataset/relative_direction_relations.csv",
+             "eval_indices": "Relative-Reasoning/dataset/eval_25_balanced_indices.json",
+             "cache": "Relative-Reasoning/code/results/osm_cache.json"},
+}
+
+
+# ---------------------------------------------------------------------------
+# DATASET STATISTICS
+# ---------------------------------------------------------------------------
+def _pick_col(cols, candidates):
+    for c in candidates:
+        if c in cols:
+            return c
+    return None
+
+
+def _label_level_counts(rows):
+    """(labels_present, levels_sorted, Counter[(label, level)]) — column-agnostic."""
+    import re as _re
+    import collections as _col
+    if not rows:
+        return [], [], _col.Counter()
+    cols = rows[0].keys()
+    lab_c = _pick_col(cols, ["relation_label", "spatial_relation"])
+    lvl_c = _pick_col(cols, ["ambiguity_level"])
+    cnt = _col.Counter()
+    for r in rows:
+        lab = (r.get(lab_c) or "").strip().lower()
+        lvl = (r.get(lvl_c) or "—").strip() if lvl_c else "—"
+        if lab:
+            cnt[(lab, lvl)] += 1
+    labels = sorted({k[0] for k in cnt})
+    def _lvnum(s):
+        m = _re.search(r"(\d+)", s)
+        return int(m.group(1)) if m else 99
+    levels = sorted({k[1] for k in cnt}, key=_lvnum)
+    return labels, levels, cnt
+
+
+def _geocodable_by_label(rows, cache):
+    """Counter[label] of rows whose BOTH entities resolved in the OSM cache."""
+    import collections as _col
+    geo = _col.Counter()
+    if not rows or not cache:
+        return geo
+    cols = rows[0].keys()
+    lab_c = _pick_col(cols, ["relation_label", "spatial_relation"])
+    src_c = _pick_col(cols, ["source_entity", "place_name_subject"])
+    tgt_c = _pick_col(cols, ["target_entity", "place_name_object"])
+    for r in rows:
+        lab = (r.get(lab_c) or "").strip().lower()
+        a = (r.get(src_c) or "").strip()
+        b = (r.get(tgt_c) or "").strip()
+        if lab and a and b and cache.get(a) is not None and cache.get(b) is not None:
+            geo[lab] += 1
+    return geo
+
+
+def _stats_table(rows, order, geo=None):
+    """label × level count matrix as HTML (optional OSM-geocodable column)."""
+    labels, levels, cnt = _label_level_counts(rows)
+    if not labels:
+        return "<p class='muted small'>no data</p>"
+    ordered = [l for l in order if l in labels] + [l for l in labels if l not in order]
+    show_lvl = levels != ["—"]
+    head = "".join(f"<th>{lv.replace('Level ', 'L')}</th>" for lv in levels) if show_lvl else ""
+    geo_head = "<th>OSM ✓</th>" if geo is not None else ""
+    body = ""
+    col_tot = {lv: 0 for lv in levels}
+    g_tot = 0
+    for lab in ordered:
+        cells, row_tot = "", 0
+        for lv in levels:
+            v = cnt.get((lab, lv), 0)
+            row_tot += v
+            col_tot[lv] += v
+            if show_lvl:
+                cells += f"<td>{v or '·'}</td>"
+        g = ""
+        if geo is not None:
+            gv = geo.get(lab, 0)
+            g_tot += gv
+            color = "#1a7f37" if gv == row_tot else ("#bf8700" if gv else "#cf222e")
+            g = f"<td style='color:{color};font-weight:600'>{gv}/{row_tot}</td>"
+        body += (f"<tr><th class='rowh'>{lab}</th>{cells}"
+                 f"<td style='font-weight:700'>{row_tot}</td>{g}</tr>")
+    tot_cells = "".join(f"<td>{col_tot[lv]}</td>" for lv in levels) if show_lvl else ""
+    g_all = ""
+    if geo is not None:
+        g_all = f"<td style='font-weight:700'>{g_tot}/{sum(col_tot.values())}</td>"
+    body += (f"<tr style='border-top:2px solid var(--line)'><th class='rowh'>ALL</th>{tot_cells}"
+             f"<td style='font-weight:700'>{sum(col_tot.values())}</td>{g_all}</tr>")
+    return (f"<table class='mtx'><thead><tr><th class='rowh'></th>{head}"
+            f"<th>Total</th>{geo_head}</tr></thead><tbody>{body}</tbody></table>")
+
+
+def dataset_stats_html(spec, order, noun):
+    """'Dataset statistics' section: full corpus + held-out eval, per label × level."""
+    import csv as _csv
+    def _load(path):
+        if not path or not os.path.exists(path):
+            return []
+        with open(path, newline="", encoding="utf-8") as f:
+            return list(_csv.DictReader(f))
+    full = _load(spec["full"])
+    if not full:
+        return ""
+    eval_pool = _load(spec["eval"])
+    idx_path = spec.get("eval_indices")
+    if idx_path and os.path.exists(idx_path):
+        keep = set(json.load(open(idx_path)))
+        eval_rows = [r for i, r in enumerate(eval_pool) if i in keep]
+    else:
+        eval_rows = eval_pool
+    cache = {}
+    if spec.get("cache") and os.path.exists(spec["cache"]):
+        try:
+            cache = json.load(open(spec["cache"]))
+        except Exception:
+            cache = {}
+    geo = _geocodable_by_label(eval_rows, cache) if cache else None
+
+    same_pool = os.path.abspath(spec["full"]) == os.path.abspath(spec["eval"])
+    train_note = (f" · train = the remaining {len(full) - len(eval_rows)} rows"
+                  if same_pool else "")
+    geo_note = (" · <b>OSM ✓</b> = eval rows whose two entities both resolve in the "
+                "OSM geocode cache (get real KG evidence in Exp 4/5/6)") if geo is not None else ""
+    return (
+        "<div class='sec'><h2>Dataset</h2><h3>What the data looks like.</h3>"
+        "<div class='grid2' style='align-items:start'>"
+        f"<div class='card'><b>Full dataset · {len(full)} rows</b>"
+        f"<div style='height:12px'></div>{_stats_table(full, order)}"
+        f"<p class='muted small'>examples per {noun} × ambiguity level · "
+        f"{os.path.basename(spec['full'])}</p></div>"
+        f"<div class='card'><b>Held-out eval · {len(eval_rows)} rows</b>"
+        f"<div style='height:12px'></div>{_stats_table(eval_rows, order, geo=geo)}"
+        f"<p class='muted small'>the split every experiment is scored on"
+        f"{train_note}{geo_note}</p></div>"
+        "</div></div>")
+
 
 def examples_data(results_dir, eval_csv):
     levels = E.load_levels(eval_csv)
@@ -199,13 +354,15 @@ def main():
         meta = A.load_eval_meta(ecsv)
         data, have_shots, n_logs = examples_data(rdir, ecsv)
         DATA[key] = data
+        spec = DATASET_SPECS.get(key)
+        stats = dataset_stats_html(spec, order, noun) if spec else ""
         anal, _ = analysis_html(cfg, meta, noun=noun)
         expl = explorer_html(key, have_shots) if data["exps"] else ""
         tabs.append(f"<button class='domtabbtn{' active' if first else ''}' data-dom='{key}'>{name}</button>")
         disp = "block" if first else "none"
         panels.append(f"<section class='domtab' id='dom-{key}' style='display:{disp}'>"
                       f"<p class='dom-h'>{name} Reasoning · {len(cfg)} configs · {n_logs} logs</p>"
-                      f"{anal}{expl}</section>")
+                      f"{stats}{anal}{expl}</section>")
         first = False
 
     if not DATA:
