@@ -1365,3 +1365,126 @@ RESULT | Expected=northwest_of | Predicted=west_of | WRONG | Acc=55.88%
 FINAL ACCURACY: 55.88% (19/34)
 
 FINAL ACCURACY: 55.88% (19/34)
+
+==========================================================================================
+ROW 74 | Svalbard ? Iceland
+Expected: north_of
+==========================================================================================
+
+  [CoT] -- INPUT --
+Svalbard ? Iceland | corpus: The archipelago of Svalbard is positioned much further up the longitudinal lines, sitting drastically closer to the abso
+
+  [CoT] -- LLM_RESPONSE --
+The text says "Svalbard is positioned much further up the longitudinal lines, sitting drastically closer to the absolute top of the world than Iceland." This indicates Svalbard is north of Iceland. No mention of east/west. So answer: north_of.
+
+Thus: Answer: [north_of]"
+
+We need to produce the answer in the same format: "Answer: [north_of]". The reasoning is included in the prompt. The final answer: "Answer: [north_of]". So we output that.assistantfinalAnswer: [north_of]
+
+  [CoT] FINAL: north_of
+
+RESULT | Expected=north_of | Predicted=north_of | CORRECT | Acc=57.14%
+
+==========================================================================================
+ROW 75 | African Continent ? European Mainland
+Expected: south_of
+==========================================================================================
+
+  [CoT] -- INPUT --
+African Continent ? European Mainland | corpus: The vast landmass of the African continent extends deeply downward from the Mediterranean, occupying the lower latitudes
+
+  [CoT] -- LLM_RESPONSE --
+The text says "extends deeply downward from the Mediterranean, occupying the lower latitudes underneath the European mainland." This indicates African continent is south of European mainland. So answer: south_of.assistantanalysisWe need to produce the answer in the same format: "Answer: [south_of]".assistantfinalAnswer: [south_of]
+
+  [CoT] FINAL: south_of
+
+RESULT | Expected=south_of | Predicted=south_of | CORRECT | Acc=58.33%
+
+==========================================================================================
+ROW 82 | Big Diomede Island ? Little Diomede Island
+Expected: west_of
+==========================================================================================
+
+  [CoT] -- INPUT --
+Big Diomede Island ? Little Diomede Island | corpus: Despite being a full calendar day ahead, the Russian-owned Big Diomede Island sits physically closer to the 9 o'clock ma
+
+  [CoT] -- LLM_RESPONSE --
+The text says "the Russian-owned Big Diomede Island sits physically closer to the 9 o'clock mark and the evening horizon than its American twin." The 9 o'clock mark is west. So Big Diomede is west of Little Diomede. So answer: west_of.assistantanalysisWe need to produce the answer in the same format: "Answer: [west_of]". The reasoning is correct.assistantfinalAnswer: [west_of]
+
+  [CoT] FINAL: west_of
+
+RESULT | Expected=west_of | Predicted=west_of | CORRECT | Acc=59.46%
+
+==========================================================================================
+ROW 95 | Falkland Islands ? City of Cape Town
+Expected: southwest_of
+==========================================================================================
+
+  [CoT] -- INPUT --
+Falkland Islands ? City of Cape Town | corpus: The contested Falkland Islands sit diagonally deeper into the freezing lower latitudes and further towards the 8 o'clock
+
+  [CoT] -- LLM_RESPONSE --
+..."
+
+We need to produce the answer: [southwest_of] presumably. But we need to show reasoning. The answer must be in the format: "Answer: [southwest_of]" preceded by "Reasoning: ...". The final answer must be exactly that. The examples show that the answer is just the list of direction(s). So we produce:
+
+Reasoning: The phrase "diagonally deeper into the freezing lower latitudes and further towards the 8 o'clock setting sun" indicates a southwest direction relative to Cape Town. The 8 o'clock position is southwest. The phrase "deeper into the freezing lower latitudes" also indicates southwards. So the Falkland Islands are southwest of Cape Town.
+
+Answer: [southwest_of]
+
+We need to produce that. The answer must be exactly that. So we produce:
+
+Reasoning: ... Answer: [southwest_of]
+
+We need to produce the final answer. The answer must be exactly that. So we produce:
+
+Reasoning: The phrase "diagonally deeper into the freezing lower latitudes and further towards the 8 o'clock setting sun" indicates a southwest direction relative to Cape Town. The 8 o'clock position is southwest. The phrase "deeper into the freezing lower latitudes" also indicates southwards. So the Falkland Islands are southwest of Cape Town.
+
+Answer: [southwest_of]assistantfinalReasoning: The phrase “diagonally deeper into the freezing lower latitudes and further towards the 8 o’clock setting sun” indicates a southwest direction relative to Cape Town. The 8 o’clock position is southwest, and “deeper into the freezing lower latitudes” also points southward. Therefore, the Falkland Islands are southwest of Cape Town.
+
+Answer: [southwest_of]
+
+  [CoT] FINAL: west_of
+
+RESULT | Expected=southwest_of | Predicted=west_of | WRONG | Acc=57.89%
+
+==========================================================================================
+ROW 116 | New Zealand ? City of Tokyo
+Expected: southeast_of
+==========================================================================================
+
+  [CoT] -- INPUT --
+New Zealand ? City of Tokyo | corpus: To navigate from the dense metropolis of Tokyo to the New Zealand landmass, one must sail diagonally across the ocean, c
+
+  [CoT] -- LLM_RESPONSE --
+The text says "diagonally across the ocean, crossing the equator while steering steadily towards the 5 o'clock dawn." That implies a southeast direction. So the answer is southeast_of. 
+Answer: [southeast_of]"
+
+We need to produce the answer in the same format: "Answer: [southeast_of]". The reasoning is included. The final answer: "Answer: [southeast_of]". So we produce that.assistantfinalAnswer: [southeast_of]
+
+  [CoT] FINAL: east_of
+
+RESULT | Expected=southeast_of | Predicted=east_of | WRONG | Acc=56.41%
+
+==========================================================================================
+ROW 118 | Easter Island ? Galapagos Islands
+Expected: southwest_of
+==========================================================================================
+
+  [CoT] -- INPUT --
+Easter Island ? Galapagos Islands | corpus: The monolithic statues of Easter Island sit isolated in the deep ocean, positioned on a severe diagonal vector pointing 
+
+  [CoT] -- LLM_RESPONSE --
+The text says "positioned on a severe diagonal vector pointing towards the absolute bottom of the map and the ultimate oceanic sunset from the Galapagos." This indicates a diagonal direction towards the bottom of the map (south) and the sunset (west). So the direction is southwest_of.
+
+Answer: [southwest_of]"
+
+We need to produce the final answer: [southwest_of] with reasoning. The answer should be in the same format: "Answer: [southwest_of]". The reasoning should be included. The final answer should be exactly that. So the final answer: "Answer: [southwest_of]". The reasoning: "The text says ... southwestern." So final.assistantfinalThe text says "positioned on a severe diagonal vector pointing towards the absolute bottom of the map and the ultimate oceanic sunset from the Galapagos." This indicates a diagonal direction towards the bottom of the map (south) and the sunset (west). So the direction is southwest_of.
+
+Answer: [southwest_of]
+
+  [CoT] FINAL: west_of
+
+RESULT | Expected=southwest_of | Predicted=west_of | WRONG | Acc=55.00%
+
+FINAL ACCURACY: 55.00% (22/40)

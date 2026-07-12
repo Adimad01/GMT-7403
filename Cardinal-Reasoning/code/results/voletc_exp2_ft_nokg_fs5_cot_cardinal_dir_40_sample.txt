@@ -617,3 +617,110 @@ FINAL ACCURACY: 50.00% (17/34)
 FINAL ACCURACY: 50.00% (17/34)
 
 FINAL ACCURACY: 50.00% (17/34)
+
+==========================================================================================
+ROW 74 | Svalbard ? Iceland
+Expected: north_of
+==========================================================================================
+
+  [CoT] -- INPUT --
+Svalbard ? Iceland | corpus: The archipelago of Svalbard is positioned much further up the longitudinal lines, sitting drastically closer to the abso
+
+  [CoT] -- LLM_RESPONSE --
+The sentence says "Svalbard is positioned much further up the longitudinal lines, sitting drastically closer to the absolute top of the world than Iceland." This indicates Svalbard is north of Iceland. So the answer is north_of. 
+Answer: [north_of]"
+
+We need to produce answer in same format: "Answer: [north_of]". So final answer: "Answer: [north_of]".assistantfinalAnswer: [north_of]
+
+  [CoT] FINAL: north_of
+
+RESULT | Expected=north_of | Predicted=north_of | CORRECT | Acc=51.43%
+
+==========================================================================================
+ROW 75 | African Continent ? European Mainland
+Expected: south_of
+==========================================================================================
+
+  [CoT] -- INPUT --
+African Continent ? European Mainland | corpus: The vast landmass of the African continent extends deeply downward from the Mediterranean, occupying the lower latitudes
+
+  [CoT] -- LLM_RESPONSE --
+The phrase "extends deeply downward from the Mediterranean, occupying the lower latitudes underneath the European mainland" indicates that the African continent is below the European mainland. The direction is south_of. The final answer is: Answer: [south_of]"
+
+We need to produce the answer in the same format as examples: "Answer: [south_of]". The new case is the same as example 3. So answer: [south_of]. The final answer: "Answer: [south_of]".assistantfinalAnswer: [south_of]
+
+  [CoT] FINAL: south_of
+
+RESULT | Expected=south_of | Predicted=south_of | CORRECT | Acc=52.78%
+
+==========================================================================================
+ROW 82 | Big Diomede Island ? Little Diomede Island
+Expected: west_of
+==========================================================================================
+
+  [CoT] -- INPUT --
+Big Diomede Island ? Little Diomede Island | corpus: Despite being a full calendar day ahead, the Russian-owned Big Diomede Island sits physically closer to the 9 o'clock ma
+
+  [CoT] -- LLM_RESPONSE --
+The text says "closer to the 9 o'clock mark and the evening horizon" which is west. So answer west_of. 
+Answer: [west_of]"
+
+We need to produce the answer in the same format: "Answer: [west_of]". The reasoning is already given. So final answer: "Answer: [west_of]".assistantfinalAnswer: [west_of]
+
+  [CoT] FINAL: west_of
+
+RESULT | Expected=west_of | Predicted=west_of | CORRECT | Acc=54.05%
+
+==========================================================================================
+ROW 95 | Falkland Islands ? City of Cape Town
+Expected: southwest_of
+==========================================================================================
+
+  [CoT] -- INPUT --
+Falkland Islands ? City of Cape Town | corpus: The contested Falkland Islands sit diagonally deeper into the freezing lower latitudes and further towards the 8 o'clock
+
+  [CoT] -- LLM_RESPONSE --
+The sentence says "diagonally deeper into the freezing lower latitudes and further towards the 8 o'clock setting sun" relative to Cape Town. 8 o'clock is southwest. So Falkland Islands are southwest of Cape Town. Answer: [southwest_of]"
+
+We need to produce the answer in the same format as examples: "Answer: [southwest_of]". The new case: "The contested Falkland Islands sit diagonally deeper into the freezing lower latitudes and further towards the 8 o'clock setting sun than the African city of Cape Town." So direction: southwest_of. So answer: [southwest_of]. The answer should be exactly that. So final answer: "Answer: [southwest_of]".assistantfinalAnswer: [southwest_of]
+
+  [CoT] FINAL: west_of
+
+RESULT | Expected=southwest_of | Predicted=west_of | WRONG | Acc=52.63%
+
+==========================================================================================
+ROW 116 | New Zealand ? City of Tokyo
+Expected: southeast_of
+==========================================================================================
+
+  [CoT] -- INPUT --
+New Zealand ? City of Tokyo | corpus: To navigate from the dense metropolis of Tokyo to the New Zealand landmass, one must sail diagonally across the ocean, c
+
+  [CoT] -- LLM_RESPONSE --
+The phrase "diagonally across the ocean, crossing the equator while steering steadily towards the 5 o'clock dawn" indicates a southeast direction. The cardinal direction is southeast_of. The answer is: Answer: [southeast_of]"
+
+We need to produce the answer in the same format: "Answer: [southeast_of]". The reasoning is already given. So we just output that.assistantfinalAnswer: [southeast_of]
+
+  [CoT] FINAL: east_of
+
+RESULT | Expected=southeast_of | Predicted=east_of | WRONG | Acc=51.28%
+
+==========================================================================================
+ROW 118 | Easter Island ? Galapagos Islands
+Expected: southwest_of
+==========================================================================================
+
+  [CoT] -- INPUT --
+Easter Island ? Galapagos Islands | corpus: The monolithic statues of Easter Island sit isolated in the deep ocean, positioned on a severe diagonal vector pointing 
+
+  [CoT] -- LLM_RESPONSE --
+The text says "positioned on a severe diagonal vector pointing towards the absolute bottom of the map and the ultimate oceanic sunset from the Galapagos." That indicates a diagonal direction towards the bottom of the map, which is south. The ultimate oceanic sunset is also at the bottom of the map, which is south. So the direction is south. But we need a diagonal direction: southeast or southwest. The phrase "ultimate oceanic sunset" might refer to the west side of the map. The phrase "absolute bottom of the map" refers to the south side. So the direction is southwest. The text also says "severe diagonal vector pointing towards the absolute bottom of the map and the ultimate oceanic sunset from the Galapagos." That indicates a diagonal direction towards the bottom of the map and the west side. So the direction is southwest_of. 
+Answer: [southwest_of]"
+
+We need to produce the answer in the same format as examples: [southwest_of]. So final answer: [southwest_of]. But we need to ensure we follow the instructions: "Answer: [southwest_of]". The examples show just the answer list. So we should output: [southwest_of]. Let's do that.assistantfinal[southwest_of]
+
+  [CoT] FINAL: south_of
+
+RESULT | Expected=southwest_of | Predicted=south_of | WRONG | Acc=50.00%
+
+FINAL ACCURACY: 50.00% (20/40)

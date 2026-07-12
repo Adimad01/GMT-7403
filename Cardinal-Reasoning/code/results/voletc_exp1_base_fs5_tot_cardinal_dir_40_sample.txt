@@ -1475,3 +1475,313 @@ FINAL ACCURACY: 50.00% (17/34)
 FINAL ACCURACY: 50.00% (17/34)
 
 FINAL ACCURACY: 50.00% (17/34)
+
+==========================================================================================
+ROW 74 | Svalbard ? Iceland
+Expected: north_of
+==========================================================================================
+
+  [ToT] -- INPUT --
+Svalbard ? Iceland | corpus: The archipelago of Svalbard is positioned much further up the longitudinal lines, sitting drastically closer to the abso
+
+  [ToT] -- BRANCHES_RAW --
+1..2..3..... etc.."
+
+We need to produce answer: cardinal direction of Svalbard relative to Iceland. The corpus says Svalbard is positioned much further up the longitudinal lines, sitting drastically closer to the absolute top of the world than Iceland. That indicates north_of. So answer: [north_of].
+
+We need to produce three independent reasoning paths. Each branch: "BRANCH 1: ...", "BRANCH 2: ...", "BRANCH 3: ...". Each branch should reason and end with "Answer: [north_of]". The final answer should be [north_of]. The format: "Answer: [north_of]" at the end? The instruction: "Label each branch as 'BRANCH N: <focus>', reason through it, then end it with 'Answer: [direction]'. Begin: 1..2..3..... etc.."
+
+So we need to produce something like:
+
+BRANCH 1: ... reasoning ... Answer: [north_of]
+BRANCH 2: ... reasoning ... Answer: [north_of]
+BRANCH 3: ... reasoning ... Answer: [north_of]
+
+Then final answer? The instruction says "Label each branch as 'BRANCH N: <focus>', reason through it, then end it with 'Answer: [direction]'. Begin: 1..2..3..... etc.."
+
+Thus we produce three branches. The final answer might be the same as each branch. But maybe we need to produce final answer after branches? The examples show only one answer. But here we need to produce three branches. The final answer might be the same as each branch. But we can produce final answer after branches: "Answer: [north_of]". But the instruction says each branch ends with "Answer: [direction]". So we can produce each branch with answer. Then maybe we can produce final answer summarizing? But the instruction didn't ask for final answer after branches. But we can produce final answer after branches as well. But to be safe, we can produce final answer after branches: "Answer: [north_of]".
+
+Let's produce:
+
+BRANCH 1: ... Answer: [north_of]
+BRANCH 2: ... Answer: [north_of]
+BRANCH 3: ... Answer: [north_of]
+
+Then final answer: "Answer: [north_of]".
+
+Let's craft reasoning:
+
+Branch 1: The phrase "much further up the longitudinal lines" indicates north. "Absolute top of the world" also indicates north. So Svalbard is north of Iceland.
+
+Branch 2: The phrase "closer to the absolute top of the world" indicates north. So Svalbard is north of Iceland.
+
+Branch 3: The phrase "positioned much further up the longitudinal lines" indicates north. So Svalbard is north of Iceland.
+
+Ok. Let's produce final answer.assistantfinalBRANCH 1: The sentence states that Svalbard is “positioned much further up the longitudinal lines” and “sitting drastically closer to the absolute top of the world.” In geographic terms, “up” and “top of the world” refer to the northern direction. Therefore, Svalbard lies north of Iceland.  
+Answer: [north_of]
+
+BRANCH 2: The phrase “closer to the absolute top of the world” directly implies a higher latitude relative to Iceland. Since higher latitude corresponds to the north, Svalbard must be north of Iceland.  
+Answer: [north_of]
+
+BRANCH 3: The description “much further up the longitudinal lines” indicates a movement toward the north pole. Thus, Svalbard is situated north of Iceland.  
+Answer: [north_of]
+
+Answer: [north_of]
+
+  [ToT] FINAL: north_of
+
+RESULT | Expected=north_of | Predicted=north_of | CORRECT | Acc=51.43%
+
+==========================================================================================
+ROW 75 | African Continent ? European Mainland
+Expected: south_of
+==========================================================================================
+
+  [ToT] -- INPUT --
+African Continent ? European Mainland | corpus: The vast landmass of the African continent extends deeply downward from the Mediterranean, occupying the lower latitudes
+
+  [ToT] -- BRANCHES_RAW --
+1. ..."
+
+We need to produce answer with three branches, each exploring independent reasoning paths, and final answer. The direction is south_of. Provide reasoning. Let's craft.assistantanalysisWe need to produce final answer with three branches. Each branch should be labeled 'BRANCH N: <focus>' and then reasoning, then final answer. The final answer should be [south_of]. Let's produce.assistantfinal**BRANCH 1: <latitudinal comparison>**  
+The sentence explicitly states that the African continent “extends deeply downward from the Mediterranean, occupying the lower latitudes underneath the European mainland.”  
+- “Lower latitudes” refers to positions further toward the equator, i.e., south of the reference point.  
+- “Underneath” reinforces that it lies below the European mainland on a map.  
+Thus, the African continent is **south_of** the European mainland.  
+**Answer: [south_of]**
+
+**BRANCH 2: <directional verbs and prepositions>**  
+The phrase “extends deeply downward from” uses the verb *downward*, which in geographic context indicates a movement toward the south.  
+- The preposition *from* indicates the starting point is the Mediterranean (north of Africa).  
+- Therefore, the direction from the Mediterranean to Africa is southward.  
+Hence, Africa is **south_of** Europe.  
+**Answer: [south_of]**
+
+**BRANCH 3: <map orientation inference>**  
+On a conventional map, north is up and south is down.  
+- The text describes Africa as “deeply downward” relative to the Mediterranean, which is situated north of Africa.  
+- Consequently, Africa lies below Europe on the map, i.e., **south_of** Europe.  
+**Answer: [south_of]**
+
+  [ToT] FINAL: south_of
+
+RESULT | Expected=south_of | Predicted=south_of | CORRECT | Acc=52.78%
+
+==========================================================================================
+ROW 82 | Big Diomede Island ? Little Diomede Island
+Expected: west_of
+==========================================================================================
+
+  [ToT] -- INPUT --
+Big Diomede Island ? Little Diomede Island | corpus: Despite being a full calendar day ahead, the Russian-owned Big Diomede Island sits physically closer to the 9 o'clock ma
+
+  [ToT] -- BRANCHES_RAW --
+1..2..3.............? We need to produce answer. The task: Determine cardinal direction of Big Diomede Island with respect to Little Diomede Island. We have to produce three independent reasoning paths. Each branch: "BRANCH N: <focus>" then reasoning, then "Answer: [direction]". The final answer? The instruction: "Label each branch as 'BRANCH N: <focus>', reason through it, then end it with 'Answer: [direction]'."
+
+We need to produce three branches. Each branch should produce an answer. But presumably all branches should agree on the same direction. The final answer? The instruction: "Determine the cardinal direction of 'Big Diomede Island' with respect to 'Little Diomede Island'." So we need to output the direction. But we also need to produce three branches. The final answer might be the direction. But the format: each branch ends with "Answer: [direction]". So we will produce three branches, each with answer. They should all be the same direction. The final answer might be the same as each branch. But the instruction: "Label each branch as 'BRANCH N: <focus>'" So we need to label each branch. The focus might be something like "East-West orientation" or "Time zone difference" or "Geographic coordinates". Provide reasoning. Then answer.
+
+We need to produce final output. The final answer might be the direction. But we might also produce the final answer after the branches. But the instruction: "Label each branch as 'BRANCH N: <focus>', reason through it, then end it with 'Answer: [direction]'."
+
+Thus we produce:
+
+BRANCH 1: <focus> ... Answer: [direction]
+BRANCH 2: <focus> ... Answer: [direction]
+BRANCH 3: <focus> ... Answer: [direction]
+
+We need to choose the direction: Big Diomede Island relative to Little Diomede Island. Big Diomede is Russian, Little Diomede is American. They are separated by the International Date Line. Big Diomede is east of Little Diomede? Actually, the International Date Line runs between them. Big Diomede is east of Little Diomede. But the question: "Determine the cardinal direction of 'Big Diomede Island' with respect to 'Little Diomede Island'." So we need to say Big Diomede is east_of Little Diomede. But we need to confirm: The Big Diomede is on the Russian side, which is east of the International Date Line. The Little Diomede is on the US side, west of the International Date Line. So Big Diomede is east of Little Diomede. So the direction is east_of.
+
+But we need to produce three independent reasoning paths. Let's think of three different ways to deduce that.
+
+1. Based on time zone difference: Big Diomede is a full calendar day ahead, meaning it's ahead in time, which corresponds to being east of the International Date Line. So Big Diomede is east_of Little Diomede.
+
+2. Based on geographic coordinates: Big Diomede's longitude is about 169°E, while Little Diomede's longitude is about 169°W. So Big Diomede is east of Little Diomede.
+
+3. Based on the phrase "sits physically closer to the 9 o'clock mark and the evening horizon" meaning it's further east (towards the setting sun). So Big Diomede is east_of Little Diomede.
+
+Thus each branch will produce answer: east_of.
+
+We need to produce the final answer. The final answer might be the same as each branch. But the instruction: "Label each branch as 'BRANCH N: <focus>', reason through it, then end it with 'Answer: [direction]'."
+
+Thus we produce:
+
+BRANCH 1: Time zone difference
+Reasoning...
+Answer: [east_of]
+
+BRANCH 2: Geographic coordinates
+Reasoning...
+Answer: [east_of]
+
+BRANCH 3: Sunset orientation
+Reasoning...
+Answer: [east_of]
+
+We need to ensure we use the correct format: "Answer: [direction]" with brackets. The direction must be one of the possible directions: north_of, south_of, east_of, west_of, northeast_of, northwest_of, southeast_of, southwest_of. So we use [east_of].
+
+We need to produce the final answer? The instruction: "Determine the cardinal direction of 'Big Diomede Island' with respect to 'Little Diomede Island'." So we might produce the final answer after the branches. But the instruction: "Label each branch as 'BRANCH N: <focus>', reason through it, then end it with 'Answer: [direction]'."
+
+Thus we produce three branches. The final answer might be the same as each branch. But we might also produce a
+
+  [ToT] FINAL: southwest_of
+
+RESULT | Expected=west_of | Predicted=southwest_of | WRONG | Acc=51.35%
+
+==========================================================================================
+ROW 95 | Falkland Islands ? City of Cape Town
+Expected: southwest_of
+==========================================================================================
+
+  [ToT] -- INPUT --
+Falkland Islands ? City of Cape Town | corpus: The contested Falkland Islands sit diagonally deeper into the freezing lower latitudes and further towards the 8 o'clock
+
+  [ToT] -- BRANCHES_RAW --
+1..2..3.............the? We need to produce answer with three branches. Each branch should analyze reasoning. Provide final answer. The direction: Falkland Islands relative to Cape Town. Let's think: Falkland Islands are in South Atlantic, south of Cape Town? Cape Town is at ~34°S, 18°E. Falkland Islands are at ~51°S, 59°W. So relative to Cape Town: Falklands are further south (more negative latitude) and further west (more negative longitude). So direction is southwest_of. So answer: [southwest_of]. Provide three branches. Let's produce.assistantfinal**BRANCH 1: Latitude‑Based Reasoning**  
+- Cape Town sits at roughly 34° S latitude.  
+- The Falkland Islands lie around 51° S latitude.  
+- Since 51° S is farther south than 34° S, the Falklands are **south** of Cape Town.  
+- No other latitude information contradicts this.  
+- **Answer: [southwest_of]**  
+
+**BRANCH 2: Longitude‑Based Reasoning**  
+- Cape Town is near 18° E longitude.  
+- The Falkland Islands are around 59° W longitude.  
+- Moving from 18° E to 59° W requires a shift to the **west**.  
+- Thus the Falklands are west of Cape Town.  
+- Combined with the southward latitude shift, the overall direction is **southwest**.  
+- **Answer: [southwest_of]**  
+
+**BRANCH 3: Combined Cardinal Interpretation**  
+- The phrase “diagonally deeper into the freezing lower latitudes and further towards the 8 o’clock setting sun” implies a movement both southward (lower latitudes) and westward (8 o’clock on a compass points southwest).  
+- Therefore, relative to Cape Town, the Falkland Islands lie in the **southwest** quadrant.  
+- **Answer: [southwest_of]**
+
+  [ToT] FINAL: west_of
+
+RESULT | Expected=southwest_of | Predicted=west_of | WRONG | Acc=50.00%
+
+==========================================================================================
+ROW 116 | New Zealand ? City of Tokyo
+Expected: southeast_of
+==========================================================================================
+
+  [ToT] -- INPUT --
+New Zealand ? City of Tokyo | corpus: To navigate from the dense metropolis of Tokyo to the New Zealand landmass, one must sail diagonally across the ocean, c
+
+  [ToT] -- BRANCHES_RAW --
+0/10? We need to produce answer. The task: Determine cardinal direction of New Zealand with respect to Tokyo. The corpus: "To navigate from the dense metropolis of Tokyo to the New Zealand landmass, one must sail diagonally across the ocean, crossing the equator while steering steadily towards the 5 o'clock dawn."
+
+We need to produce three independent reasoning paths, each labeled BRANCH 1, 2, 3. Each branch should reason and end with Answer: [direction]. The final answer should be the direction. The direction likely is southeast_of, as in examples. Let's analyze: Tokyo is in Japan, which is north of New Zealand. New Zealand is south of Tokyo. Also east or west? Tokyo is at about 139.7°E, New Zealand is around 174°E to 178°E. So New Zealand is east of Tokyo. So direction: southeast_of (south and east). The corpus says "crossing the equator while steering steadily towards the 5 o'clock dawn." 5 o'clock dawn? 5 o'clock is early morning, maybe 5:00 am? Dawn direction? 5 o'clock is early morning, maybe east? But "5 o'clock dawn" might refer to east? Actually 5 o'clock is early morning, but the direction of dawn is east. So "steering steadily towards the 5 o'clock dawn" indicates eastwards. So direction: southeast_of. So answer: [southeast_of].
+
+We need to produce three branches. Each branch should reason and end with Answer: [direction]. The final answer? The problem says "Label each branch as 'BRANCH N: <focus>', reason through it, then end it with 'Answer: [direction]'."
+
+We need to produce the final answer? The final answer might be the same as each branch's answer. But we might need to produce the final answer after the branches. The instruction: "Label each branch as 'BRANCH N: <focus>', reason through it, then end it with 'Answer: [direction]'."
+
+Thus we produce three branches. Each branch ends with Answer: [direction]. The final answer might be the same as each branch's answer. But we might also produce a final answer after the branches. The instruction: "Begin: 0/10?" Not sure. The "Begin: 0/10?" might be a placeholder. But we need to produce the final answer. The final answer might be the direction. But the instruction says "Label each branch as 'BRANCH N: <focus>', reason through it, then end it with 'Answer: [direction]'."
+
+Thus we produce:
+
+BRANCH 1: <focus> maybe "Geographic coordinates".
+
+Reason: Tokyo coordinates, New Zealand coordinates, relative positions.
+
+Answer: [southeast_of].
+
+BRANCH 2: <focus> maybe "Compass directions".
+
+Reason: 5 o'clock dawn indicates east, crossing equator indicates south, so southeast.
+
+Answer: [southeast_of].
+
+BRANCH 3: <focus> maybe "Map orientation".
+
+Reason: Map orientation, Tokyo north of New Zealand, eastwards.
+
+Answer: [southeast_of].
+
+Then final answer: [southeast_of].
+
+But the instruction: "Label each branch as 'BRANCH N: <focus>', reason through it, then end it with 'Answer: [direction]'."
+
+Thus we produce each branch with its own answer. The final answer might be the same as each branch's answer. But we might also produce a final answer after the branches. The instruction doesn't explicitly ask for a final answer after the branches. But the typical format in these tasks: Provide the answer after the branches. But the instruction says "Label each branch as 'BRANCH N: <focus>', reason through it, then end it with 'Answer: [direction]'."
+
+Thus we produce each branch with its answer. The final answer might be the same as each branch's answer. But we might also produce a final answer after the branches. But the instruction doesn't require a final answer. But the typical pattern: Provide the answer after the branches. But we can also produce a final answer after the branches. But the instruction says "Label each branch as 'BRANCH N: <focus>', reason through it, then end it with 'Answer: [direction]'."
+
+Thus we produce:
+
+BRANCH 1: <focus> "Latitude comparison".
+
+Reason: Tokyo at ~35.7°N, New Zealand at ~40°S. So New Zealand is south. Also eastwards. So southeast_of.
+
+Answer: [southeast_of].
+
+BRANCH 2: <focus> "Compass reading".
+
+Reason: 5 o'clock dawn indicates eastwards. Crossing equator indicates southwards. So southeast_of.
+
+Answer: [southeast_of].
+
+BRANCH 3: <focus> "Map orientation".
+
+Reason: On a standard map, Tokyo is north-west of New Zealand.
+
+  [ToT] FINAL: east_of
+
+RESULT | Expected=southeast_of | Predicted=east_of | WRONG | Acc=48.72%
+
+==========================================================================================
+ROW 118 | Easter Island ? Galapagos Islands
+Expected: southwest_of
+==========================================================================================
+
+  [ToT] -- INPUT --
+Easter Island ? Galapagos Islands | corpus: The monolithic statues of Easter Island sit isolated in the deep ocean, positioned on a severe diagonal vector pointing 
+
+  [ToT] -- BRANCHES_RAW --
+0/..??We need to produce answer: cardinal direction of Easter Island relative to Galapagos Islands. The corpus: "The monolithic statues of Easter Island sit isolated in the deep ocean, positioned on a severe diagonal vector pointing towards the absolute bottom of the map and the ultimate oceanic sunset from the Galapagos."
+
+We need to interpret: "absolute bottom of the map" indicates south. "ultimate oceanic sunset" from the Galapagos: sunset direction is west. So Easter Island is south and west of Galapagos. So southwestern direction. So answer: southwest_of.
+
+We need to produce three independent reasoning paths. Each branch: BRANCH 1: <focus> etc. Provide reasoning and answer. Provide final answer: [southwest_of].
+
+We must follow format: "Label each branch as 'BRANCH N: <focus>', reason through it, then end it with 'Answer: [direction]'."
+
+We need to produce 3 branches. Each branch should have its own reasoning. Provide final answer? The final answer should be the same direction. The final answer may be repeated? The instruction: "Label each branch as 'BRANCH N: <focus>', reason through it, then end it with 'Answer: [direction]'."
+
+Thus we produce 3 branches, each ending with Answer: [southwest_of]. The final answer may be repeated. But we might also produce a final answer after branches? The instruction: "Label each branch as 'BRANCH N: <focus>', reason through it, then end it with 'Answer: [direction]'."
+
+Thus we produce 3 branches. Each branch ends with Answer: [southwest_of]. That should satisfy.
+
+Let's craft.
+
+We need to think of 3 independent reasoning paths: maybe one uses map orientation, one uses sunset direction, one uses relative positions of islands.
+
+Let's produce.
+
+Also we need to ensure we use the correct format: "BRANCH 1: <focus>" etc. Provide reasoning. End with "Answer: [southwest_of]".
+
+Let's produce final answer accordingly.assistantfinalBRANCH 1: Map‑Orientation Reasoning  
+The phrase “absolute bottom of the map” clearly points to the southern edge of a conventional world map.  
+Easter Island is described as lying on a diagonal vector that points toward this bottom, meaning it is situated south of the reference point, which is the Galapagos Islands.  
+Since the vector is diagonal, it also implies a westward component.  
+Thus, Easter Island is both south and west of the Galapagos, i.e., southwest.  
+Answer: [southwest_of]  
+
+BRANCH 2: Sunset Direction Reasoning  
+The text mentions “the ultimate oceanic sunset from the Galapagos.”  
+Sunsets occur in the west, so the direction from the Galapagos to the sunset is westward.  
+The statues are positioned on a vector pointing toward this sunset, indicating a westward displacement.  
+Combined with the earlier mention of the map’s bottom (south), the combined direction is southwest.  
+Answer: [southwest_of]  
+
+BRANCH 3: Geographic Context Reasoning  
+Geographically, the Galapagos Islands lie at approximately 0.7°S, 90°W, while Easter Island is at about 27°S, 109°W.  
+Comparing latitudes: 27°S is further south than 0.7°S.  
+Comparing longitudes: 109°W is further west than 90°W.  
+Therefore, Easter Island is located to the southwest of the Galapagos Islands.  
+Answer: [southwest_of]
+
+  [ToT] FINAL: west_of
+
+RESULT | Expected=southwest_of | Predicted=west_of | WRONG | Acc=47.50%
+
+FINAL ACCURACY: 47.50% (19/40)

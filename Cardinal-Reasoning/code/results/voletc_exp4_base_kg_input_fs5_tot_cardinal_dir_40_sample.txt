@@ -2164,3 +2164,380 @@ RESULT | Expected=northwest_of | Predicted=west_of | WRONG | Acc=38.24%
 FINAL ACCURACY: 38.24% (13/34)
 
 FINAL ACCURACY: 38.24% (13/34)
+
+==========================================================================================
+ROW 74 | Svalbard ? Iceland
+Expected: north_of
+==========================================================================================
+
+  [ToT] -- INPUT --
+Svalbard ? Iceland | corpus: The archipelago of Svalbard is positioned much further up the longitudinal lines, sitting drastically closer to the abso
+
+  [ToT] -- OSM_EVIDENCE --
+Sentence: "The archipelago of Svalbard is positioned much further up the longitudinal lines, sitting drastically closer to the absolute top of the world than Iceland."
+
+--- OpenStreetMap (OSM) Evidence ---
+Use the coordinates, bounding boxes, hierarchy and computed geometry below as supporting evidence. Do not invent facts.
+
+Entity A: Svalbard
+  • Coordinates: Lat 78.7198519, Lon 20.3493328
+  • Bounding Box: [South: 74.1354451, North: 81.0280176, West: 9.4208924, East: 34.6889114]
+  • Feature Category: boundary / administrative
+  • Administrative Hierarchy: region: Svalbard > ISO3166-2-lvl4: NO-21 > postcode: 9170 > country: Norge > country_code: no
+
+Entity B: Iceland
+  • Coordinates: Lat 39.3733802, Lon -120.0291430
+  • Bounding Box: [South: 39.3733302, North: 39.3734302, West: -120.0291930, East: -120.0290930]
+  • Feature Category: place / isolated_dwelling
+  • Administrative Hierarchy: isolated_dwelling: Iceland > county: Nevada County > state: California > ISO3166-2-lvl4: US-CA > country: United States > country_code: us
+
+--- Computed Geometry (from OSM coordinates) ---
+  • Centroid distance: 6630.1 km
+  • Bearing from Iceland to Svalbard: 8° (north)
+  • Svalbard is ~4375 km north and ~2358 km east of Iceland
+  (These facts describe absolute map geometry. The reference frame for any observer-relative answer must still come from the text.)
+
+  [ToT] -- BRANCHES_RAW --
+We need to produce answer with three independent reasoning paths. Each path should analyze the corpus sentence and maybe OSM evidence. Then produce final answer: cardinal direction of Svalbard relative to Iceland. The sentence says "The archipelago of Svalbard is positioned much further up the longitudinal lines, sitting drastically closer to the absolute top of the world than Iceland." That indicates Svalbard is north of Iceland. So answer: north_of. Provide three branches. Each branch should be labeled BRANCH 1, 2, 3. Provide reasoning. End each with Answer: [north_of]. Let's produce. Also mention OSM evidence: bearing 8°, north. Provide cross-check. Let's produce final.assistantfinal**BRANCH 1: Text‑only reasoning**  
+The sentence explicitly states that Svalbard is “much further up the longitudinal lines” and “closer to the absolute top of the world” than Iceland. In geographic terms, “up the longitudinal lines” and “closer to the top of the world” both refer to a higher latitude, i.e., a position northward.  
+Answer: **[north_of]**
+
+**BRANCH 2: Text + OSM coordinate check**  
+The OSM coordinates give Svalbard at latitude 78.72° N and Iceland at latitude 39.37° N. The computed bearing from Iceland to Svalbard is 8°, which is almost due north. The offset is ~4375 km north and ~2358 km east. The text’s claim that Svalbard is “closer to the absolute top of the world” matches the coordinate evidence that it lies far to the north.  
+Answer: **[north_of]**
+
+**BRANCH 3: Cross‑checking bearing and wording**  
+The bearing of 8° indicates a direction slightly east of due north. The wording “much further up the longitudinal lines” implies a northward displacement. Even though there is a small easterly component, the dominant direction is north. The phrase “closer to the absolute top of the world” reinforces this.  
+Answer: **[north_of]**
+
+  [ToT] FINAL: north_of
+
+RESULT | Expected=north_of | Predicted=north_of | CORRECT | Acc=40.00%
+
+==========================================================================================
+ROW 75 | African Continent ? European Mainland
+Expected: south_of
+==========================================================================================
+
+  [ToT] -- INPUT --
+African Continent ? European Mainland | corpus: The vast landmass of the African continent extends deeply downward from the Mediterranean, occupying the lower latitudes
+
+  [ToT] -- OSM_EVIDENCE --
+Sentence: "The vast landmass of the African continent extends deeply downward from the Mediterranean, occupying the lower latitudes underneath the European mainland."
+
+--- OpenStreetMap (OSM) Evidence ---
+Use the coordinates, bounding boxes, hierarchy and computed geometry below as supporting evidence. Do not invent facts.
+
+Entity A: African Continent
+  • Coordinates: Lat 37.3469253, Lon 9.7423190
+  • Bounding Box: [South: 37.3469030, North: 37.3469475, West: 9.7422853, East: 9.7423527]
+  • Feature Category: tourism / attraction
+  • Administrative Hierarchy: tourism: Le point le plus septentrional du continent africain, depuis 2014. > road: RL401 > residential: دوار الحاج محمد بن حسان > hamlet: دوار الحاج محمد بن حسان > county: مرنيصة > state_district: معتمدية بنزرت الجنوبية > state: ولاية بنزرت > ISO3166-2-lvl4: TN-23 > postcode: 7028 > country: تونس > country_code: tn
+
+Entity B: European Mainland
+  • Coordinates: Lat 60.1583739, Lon 24.9322048
+  • Bounding Box: [South: 60.1581452, North: 60.1586032, West: 24.9315724, East: 24.9328372]
+  • Feature Category: office / government
+  • Administrative Hierarchy: office: ECHA > house_number: 6 > road: Telakkakatu > neighbourhood: Telakkaranta > quarter: Hietalahti > suburb: Punavuori > city_district: Eteläinen suurpiiri > city: Helsinki > municipality: Helsingin seutukunta > state: Uusimaa > ISO3166-2-lvl4: FI-18 > region: Manner-Suomi > postcode: 00150 > country: Suomi / Finland > country_code: fi
+
+--- Computed Geometry (from OSM coordinates) ---
+  • Centroid distance: 2754.8 km
+  • Bearing from European Mainland to African Continent: 210° (south-west)
+  • African Continent is ~2537 km south and ~1341 km west of European Mainland
+  (These facts describe absolute map geometry. The reference frame for any observer-relative answer must still come from the text.)
+
+  [ToT] -- BRANCHES_RAW --
+We need to produce answer: cardinal direction of African Continent relative to European Mainland. The corpus says: "The vast landmass of the African continent extends deeply downward from the Mediterranean, occupying the lower latitudes underneath the European mainland." That indicates African continent is south of European mainland. So answer: [south_of].
+
+We need to produce three independent reasoning paths. Each branch should be labeled BRANCH 1, BRANCH 2, BRANCH 3. Each branch should reason and then answer. Use OSM evidence. Provide final answer? The instruction: "Label each branch as 'BRANCH N: <focus>', reason through it, then end it with 'Answer: [direction]'."
+
+We need to produce final answer? The final answer may be the same across branches. Provide each branch. Let's produce.
+
+We need to incorporate OSM evidence: coordinates show African continent at lat 37.3469253, European mainland at lat 60.1583739. So African continent is south. Bearing 210° indicates south-west. So direction south_of. Provide reasoning.
+
+Let's produce three branches: one focusing on textual analysis, one focusing on OSM coordinates, one focusing on computed geometry.
+
+Let's produce final answer.assistantfinal**BRANCH 1: Textual Analysis**  
+The corpus explicitly states that the African continent “extends deeply downward from the Mediterranean, occupying the lower latitudes underneath the European mainland.” The phrase *“lower latitudes”* and *“underneath”* both indicate a position below the European mainland on a conventional north‑south axis. Therefore, the African continent is **south** of the European mainland.  
+Answer: **[south_of]**
+
+---
+
+**BRANCH 2: OSM Coordinate Comparison**  
+- African Continent: latitude 37.3469253  
+- European Mainland: latitude 60.1583739  
+
+Since 37.3469253 < 60.1583739, the African continent lies at a lower latitude, i.e., to the south of the European mainland. The longitude values (9.7423190 vs. 24.9322048) are irrelevant for the north‑south relation.  
+Answer: **[south_of]**
+
+---
+
+**BRANCH 3: Bearing & Offset Verification**  
+The computed bearing from the European mainland to the African continent is 210°, which points to the south‑west quadrant. The offset is approximately 2537 km south and 1341 km west. The dominant component is the southern displacement, confirming that the African continent is **south** of the European mainland.  
+Answer: **[south_of]**
+
+  [ToT] FINAL: south_of
+
+RESULT | Expected=south_of | Predicted=south_of | CORRECT | Acc=41.67%
+
+==========================================================================================
+ROW 82 | Big Diomede Island ? Little Diomede Island
+Expected: west_of
+==========================================================================================
+
+  [ToT] -- INPUT --
+Big Diomede Island ? Little Diomede Island | corpus: Despite being a full calendar day ahead, the Russian-owned Big Diomede Island sits physically closer to the 9 o'clock ma
+
+  [ToT] -- OSM_EVIDENCE --
+Sentence: "Despite being a full calendar day ahead, the Russian-owned Big Diomede Island sits physically closer to the 9 o'clock mark and the evening horizon than its American twin."
+
+--- OpenStreetMap (OSM) Evidence ---
+Use the coordinates, bounding boxes, hierarchy and computed geometry below as supporting evidence. Do not invent facts.
+
+Entity A: Big Diomede Island
+  • Coordinates: Lat 65.7821870, Lon -169.0583349
+  • Bounding Box: [South: 65.7443904, North: 65.8200353, West: -169.1200720, East: -168.9977660]
+  • Feature Category: place / island
+  • Administrative Hierarchy: island: Остров Ратманова > county: Чукотский район > state: Чукотский автономный округ > ISO3166-2-lvl4: RU-CHU > region: Дальневосточный федеральный округ > country: Россия > country_code: ru
+
+Entity B: Little Diomede Island
+  • Coordinates: Lat 65.7546597, Lon -168.9265284
+  • Bounding Box: [South: 65.7394185, North: 65.7698810, West: -168.9545489, East: -168.8960856]
+  • Feature Category: place / island
+  • Administrative Hierarchy: island: Little Diomede Island > town: Diomede > county: Unorganized Borough > state: Alaska > ISO3166-2-lvl4: US-AK > country: United States > country_code: us
+
+--- Computed Geometry (from OSM coordinates) ---
+  • Centroid distance: 6.7 km
+  • Bearing from Little Diomede Island to Big Diomede Island: 297° (north-west)
+  • Big Diomede Island is ~3 km north and ~6 km west of Little Diomede Island
+  (These facts describe absolute map geometry. The reference frame for any observer-relative answer must still come from the text.)
+
+  [ToT] -- BRANCHES_RAW --
+**BRANCH 1**......................
+
+We have to produce answer: cardinal direction of Big Diomede Island relative to Little Diomede Island. The text: "Despite being a full calendar day ahead, the Russian-owned Big Diomede Island sits physically closer to the 9 o'clock mark and the evening horizon than its American twin." 9 o'clock mark is west (assuming standard analog clock orientation: 12 up, 3 right, 6 down, 9 left). Evening horizon is west. So Big Diomede is west of Little Diomede. Also OSM says Big Diomede is ~3 km north and ~6 km west. So direction is northwest_of. But the text says "closer to the 9 o'clock mark and the evening horizon" meaning west. But also "full calendar day ahead" indicates east? Wait: "full calendar day ahead" refers to time zone difference: Big Diomede is in Russia, ahead of US by 24 hours. That indicates east relative to Little Diomede? Actually time zone difference: Big Diomede is in Russia, ahead of US by 24 hours. That means Big Diomede is east of Little Diomede? Wait: The International Date Line is between them. Big Diomede is on the Russian side of the International Date Line, which is east of the line? Actually the International Date Line runs roughly along the 180° longitude. Big Diomede is at -169°, Little Diomede at -168.9°, so Big Diomede is slightly west of Little Diomede? Wait: -169° is more negative, meaning further west. So Big Diomede is west of Little Diomede. But the time zone difference: Big Diomede is ahead by 24 hours because it's on the other side of the International Date Line. So the text says "full calendar day ahead" referencing time zone difference. But the question: "Determine the cardinal direction of 'Big Diomede Island' with respect to 'Little Diomede Island'." So we need to answer cardinal direction: north_of, south_of, east_of, west_of, northeast_of, northwest_of, southeast_of, southwest_of. The OSM says Big Diomede is north-west of Little Diomede. The text says "closer to the 9 o'clock mark and the evening horizon" which is west. So we have to combine: The text says west, but OSM says northwest. The question: "Explore THREE independent reasoning paths." So we need to produce three branches, each exploring a reasoning path. Each branch should produce an answer. But the final answer? The instruction: "Label each branch as 'BRANCH N: <focus>', reason through it, then end it with 'Answer: [direction]'." So each branch will produce an answer. But we need to produce the final answer? The instruction: "Now answer this new case: ... Determine the cardinal direction of 'Big Diomede Island' with respect to 'Little Diomede Island'. Explore THREE independent reasoning paths." So we need to produce three branches, each with answer. But the final answer? Usually we produce the final answer after exploring branches. But the instruction says "Label each branch as 'BRANCH N: <focus>', reason through it, then end it with 'Answer: [direction]'." So each branch ends with answer. But we might need to produce a final answer after all branches? The instruction: "Use the OSM coordinates and the computed bearing/offset above as evidence. Cross-check them against the corpus wording before deciding." So we need to cross-check. So we might produce three branches: one focusing on text, one focusing on OSM coordinates, one focusing on both. Then we might produce final answer: maybe "northwest_of" because OSM says that. But the text says west. But the question: "Determine the cardinal direction of 'Big Diomede Island' with respect to 'Little Diomede Island'." The correct cardinal direction is northwest_of. But the text says west. But we need to cross-check. The instruction: "Cross-check them against the corpus wording before deciding." So we need to consider both. The text says "closer to the 9 o'clock mark and the evening horizon" which is west. But also "full calendar day ahead" indicates east? Actually "full calendar day ahead" indicates that Big Diomede is ahead by 24 hours, which is east relative to Little Diomede. But the phrase "closer to the 9 o'clock mark and the evening horizon" indicates west. So we have conflicting directions. But we need to decide which direction is correct. The OSM coordinates show Big Diomede is northwest. So the correct cardinal direction is northwest_of. So we need to produce final answer: [northwest_of]. But we need to produce three branches. Each branch will
+
+  [ToT] FINAL: northeast_of
+
+RESULT | Expected=west_of | Predicted=northeast_of | WRONG | Acc=40.54%
+
+==========================================================================================
+ROW 95 | Falkland Islands ? City of Cape Town
+Expected: southwest_of
+==========================================================================================
+
+  [ToT] -- INPUT --
+Falkland Islands ? City of Cape Town | corpus: The contested Falkland Islands sit diagonally deeper into the freezing lower latitudes and further towards the 8 o'clock
+
+  [ToT] -- OSM_EVIDENCE --
+Sentence: "The contested Falkland Islands sit diagonally deeper into the freezing lower latitudes and further towards the 8 o'clock setting sun than the African city of Cape Town."
+
+--- OpenStreetMap (OSM) Evidence ---
+Use the coordinates, bounding boxes, hierarchy and computed geometry below as supporting evidence. Do not invent facts.
+
+Entity A: Falkland Islands
+  • Coordinates: Lat -51.9492937, Lon -59.5383657
+  • Bounding Box: [South: -53.1186766, North: -50.7973007, West: -61.7726772, East: -57.3662367]
+  • Feature Category: boundary / administrative
+  • Administrative Hierarchy: country: Falkland Islands > country_code: fk
+
+Entity B: City of Cape Town
+  • Coordinates: Lat 37.3714489, Lon -121.8659987
+  • Bounding Box: [South: 37.3712795, North: 37.3716188, West: -121.8661891, East: -121.8658077]
+  • Feature Category: highway / residential
+  • Administrative Hierarchy: road: Cape Town Place > suburb: Berryessa > city: San Jose > county: Santa Clara County > state: California > ISO3166-2-lvl4: US-CA > postcode: 95133 > country: United States > country_code: us
+
+--- Computed Geometry (from OSM coordinates) ---
+  • Centroid distance: 11620.6 km
+  • Bearing from City of Cape Town to Falkland Islands: 146° (south-east)
+  • Falkland Islands is ~9932 km south and ~4136 km east of City of Cape Town
+  (These facts describe absolute map geometry. The reference frame for any observer-relative answer must still come from the text.)
+
+  [ToT] -- BRANCHES_RAW --
+**BRANCH 1**
+
+We have to produce answer: cardinal direction of Falkland Islands relative to City of Cape Town. The corpus says: "The contested Falkland Islands sit diagonally deeper into the freezing lower latitudes and further towards the 8 o'clock setting sun than the African city of Cape Town." 8 o'clock setting sun indicates southwest? Wait: 8 o'clock on a clock face: 12 is north, 3 east, 6 south, 9 west. 8 o'clock is between 6 and 9, i.e., southwest direction. So "further towards the 8 o'clock setting sun" indicates southwestern direction relative to Cape Town. Also "deeper into the freezing lower latitudes" indicates southwards. So southwestern. So answer: southwest_of.
+
+But we need to produce three independent reasoning paths. Each branch: reasoning and answer. Provide final answer? The instruction: "Label each branch as 'BRANCH N: <focus>', reason through it, then end it with 'Answer: [direction]'."
+
+Thus we produce three branches. Each branch may produce same answer. Provide final answer? The final answer may be the same as each branch. But we might need to produce final answer after all branches? The instruction: "Now answer this new case: ... Use the OSM coordinates and the computed bearing/offset above as evidence. Cross-check them against the corpus wording before deciding." So we produce three branches. Each branch will produce answer. The final answer may be the same as each branch. But we might need to produce final answer after all branches? The instruction: "Label each branch as 'BRANCH N: <focus>', reason through it, then end it with 'Answer: [direction]'."
+
+Thus we produce:
+
+BRANCH 1: textual analysis of corpus. Provide reasoning. Answer: [southwest_of].
+
+BRANCH 2: OSM coordinate analysis. Provide reasoning. Answer: [southwest_of].
+
+BRANCH 3: Bearing analysis. Provide reasoning. Answer: [southwest_of].
+
+We need to ensure we use the OSM coordinates and computed bearing/offset. Provide cross-check. Provide final answer? The final answer may be the same as each branch. But we might need to produce final answer after all branches? The instruction: "Label each branch as 'BRANCH N: <focus>', reason through it, then end it with 'Answer: [direction]'."
+
+Thus we produce each branch. The final answer may be the same as each branch. But we might also produce a final answer summarizing. But the instruction doesn't ask for final answer after all branches. But we can produce final answer after all branches. But we can produce final answer as the same as each branch. But we can also produce final answer as the same as each branch. But we can produce final answer after all branches: "Final Answer: [southwest_of]".
+
+But the instruction: "Label each branch as 'BRANCH N: <focus>', reason through it, then end it with 'Answer: [direction]'."
+
+Thus we produce each branch. The final answer may be the same as each branch. But we can also produce final answer after all branches. But the instruction doesn't require final answer. But we can produce final answer after all branches. But we can produce final answer as the same as each branch. But we can produce final answer after all branches. But we can produce final answer as the same as each branch. But we can produce final answer after all branches. But we can produce final answer as the same as each branch. But we can produce final answer after all branches. But we can produce final answer as the same as each branch. But we can produce final answer after all branches. But we can produce final answer as the same as each branch. But we can produce final answer after all branches.
+
+Ok.
+
+Let's produce:
+
+BRANCH 1: textual analysis.
+
+BRANCH 2: coordinate analysis.
+
+BRANCH 3: bearing analysis.
+
+Now produce final answer: [southwest_of].
+
+Let's produce final answer accordingly.assistantfinal**BRANCH 1: Textual Analysis of the Corpus**  
+The sentence states that the Falkland Islands are “diagonally deeper into the freezing lower latitudes” and “further towards the 8 o’clock setting sun” than Cape Town.  
+- “Lower latitudes” implies a southern position.  
+- “8 o’clock” on a clock face corresponds to a direction between 6 o’clock (south) and 9 o’clock (west), i.e., southwest.  
+Thus the text explicitly places the Falkland Islands to the southwest of Cape Town.  
+**Answer: [southwest_of]**
+
+---
+
+**BRANCH 2: Coordinate Comparison**  
+Using the OSM coordinates:  
+- Falkland Islands: latitude ≈ –51.95°, longitude ≈ –59.54°  
+- City of Cape Town (San
+
+  [ToT] FINAL: west_of
+
+RESULT | Expected=southwest_of | Predicted=west_of | WRONG | Acc=39.47%
+
+==========================================================================================
+ROW 116 | New Zealand ? City of Tokyo
+Expected: southeast_of
+==========================================================================================
+
+  [ToT] -- INPUT --
+New Zealand ? City of Tokyo | corpus: To navigate from the dense metropolis of Tokyo to the New Zealand landmass, one must sail diagonally across the ocean, c
+
+  [ToT] -- OSM_EVIDENCE --
+Sentence: "To navigate from the dense metropolis of Tokyo to the New Zealand landmass, one must sail diagonally across the ocean, crossing the equator while steering steadily towards the 5 o'clock dawn."
+
+--- OpenStreetMap (OSM) Evidence ---
+Use the coordinates, bounding boxes, hierarchy and computed geometry below as supporting evidence. Do not invent facts.
+
+Entity A: New Zealand
+  • Coordinates: Lat 42.8965173, Lon -70.8847756
+  • Bounding Box: [South: 42.8964673, North: 42.8965673, West: -70.8848256, East: -70.8847256]
+  • Feature Category: natural / peak
+  • Administrative Hierarchy: peak: New Zealand Hill > town: Seabrook > county: Rockingham County > state: New Hampshire > ISO3166-2-lvl4: US-NH > postcode: 03874 > country: United States > country_code: us
+
+Entity B: City of Tokyo
+  • Coordinates: Lat 34.0485055, Lon -118.2398899
+  • Bounding Box: [South: 34.0385055, North: 34.0585055, West: -118.2498899, East: -118.2298899]
+  • Feature Category: place / quarter
+  • Administrative Hierarchy: quarter: Little Tokyo > suburb: Downtown > city: Los Angeles > county: Los Angeles County > state: California > ISO3166-2-lvl4: US-CA > postcode: 90013 > country: United States > country_code: us
+
+--- Computed Geometry (from OSM coordinates) ---
+  • Centroid distance: 4180.7 km
+  • Bearing from City of Tokyo to New Zealand: 62° (north-east)
+  • New Zealand is ~984 km north and ~3805 km east of City of Tokyo
+  (These facts describe absolute map geometry. The reference frame for any observer-relative answer must still come from the text.)
+
+  [ToT] -- BRANCHES_RAW --
+**BRANCH 1**.....
+
+We have to produce answer: cardinal direction of New Zealand relative to City of Tokyo. The text: "To navigate from the dense metropolis of Tokyo to the New Zealand landmass, one must sail diagonally across the ocean, crossing the equator while steering steadily towards the 5 o'clock dawn."
+
+We need to interpret cardinal direction. The phrase "5 o'clock dawn" indicates direction? 5 o'clock on a clock face: 12 is north, 3 east, 6 south, 9 west. 5 o'clock is slightly south of east? Actually 5 o'clock is 30 degrees before 6, so 5 is 150 degrees from 12? Wait: On a clock, 12 is top, 3 right, 6 bottom, 9 left. 5 is between 4 and 6, so it's slightly downwards from right. So 5 o'clock is roughly southeast direction? Let's think: 12 north, 3 east, 6 south, 9 west. 5 is between 4 and 6, so it's between east and south, closer to south? Actually 4 is between 3 and 6, 5 is between 4 and 6. So 5 is slightly south of east. So direction is southeast-ish. But the phrase "5 o'clock dawn" might refer to sunrise direction? Dawn direction depends on time of day. But "5 o'clock dawn" might be a poetic way to say "east" because dawn occurs in the east. But 5 o'clock is after sunrise? But the phrase "5 o'clock dawn" might be a metaphor for "east" or "southeast"? Let's analyze.
+
+The text: "To navigate from the dense metropolis of Tokyo to the New Zealand landmass, one must sail diagonally across the ocean, crossing the equator while steering steadily towards the 5 o'clock dawn."
+
+We need to determine cardinal direction of New Zealand relative to Tokyo. The text says "sail diagonally across the ocean, crossing the equator while steering steadily towards the 5 o'clock dawn." That implies direction of travel: diagonally across ocean, crossing equator, steering towards 5 o'clock dawn. So the direction is likely southeast? Because 5 o'clock is slightly south of east. So New Zealand is southeast of Tokyo. The OSM coordinates: New Zealand is ~984 km north and ~3805 km east of Tokyo. That indicates New Zealand is northeast of Tokyo, not southeast. Wait, the OSM coordinates show New Zealand is north and east of Tokyo. That would be northeast. But the text says "crossing the equator" which would mean going southwards from Tokyo (Tokyo is at 34°N, New Zealand is at 42°S? Actually the coordinates given for New Zealand are lat 42.8965173, lon -70.8847756. That is in New Hampshire, USA, not New Zealand. So the OSM coordinates are wrong. The coordinates for New Zealand should be around lat -41.5, lon 174.8. But the OSM coordinates given are for a peak in New Hampshire. So the OSM coordinates are wrong. But we must use them as evidence. The computed bearing from City of Tokyo to New Zealand is 62° (north-east). That indicates NE. So the OSM evidence says NE. But the text says "crossing the equator" which would be going southwards. So there's a conflict. We need to cross-check them against the corpus wording before deciding. The instruction: "Use the OSM coordinates and the computed bearing/offset above as evidence. Cross-check them against the corpus wording before deciding." So we need to weigh the evidence. The text says "crossing the equator" which implies going southwards. But the OSM coordinates say New Zealand is north of Tokyo. So there's a conflict. We need to decide which direction to output. The instruction: "Determine the cardinal direction of 'New Zealand' with respect to 'City of Tokyo'. Explore THREE independent reasoning paths." So we need to produce three branches, each exploring a different reasoning path. Then we need to produce an answer. The answer should be a single direction. We need to decide which direction is correct. We need to consider the evidence: The text says "crossing the equator" and "5 o'clock dawn". The OSM coordinates say NE. The computed bearing says 62° (north-east). The offset says New Zealand is ~984 km north and ~3805 km east of Tokyo. So the OSM evidence strongly indicates NE. The text says crossing equator (southwards). But maybe the text is metaphorical: "crossing the equator" could be a poetic way to say "going across the world" or "across the globe" not literally crossing the equator. But the phrase "crossing the equator" is quite literal. But the text
+
+  [ToT] FINAL: southeast_of
+
+RESULT | Expected=southeast_of | Predicted=southeast_of | CORRECT | Acc=41.03%
+
+==========================================================================================
+ROW 118 | Easter Island ? Galapagos Islands
+Expected: southwest_of
+==========================================================================================
+
+  [ToT] -- INPUT --
+Easter Island ? Galapagos Islands | corpus: The monolithic statues of Easter Island sit isolated in the deep ocean, positioned on a severe diagonal vector pointing 
+
+  [ToT] -- OSM_EVIDENCE --
+Sentence: "The monolithic statues of Easter Island sit isolated in the deep ocean, positioned on a severe diagonal vector pointing towards the absolute bottom of the map and the ultimate oceanic sunset from the Galapagos."
+
+--- OpenStreetMap (OSM) Evidence ---
+Use the coordinates, bounding boxes, hierarchy and computed geometry below as supporting evidence. Do not invent facts.
+
+Entity A: Easter Island
+  • Coordinates: Lat 32.7742221, Lon -85.9902153
+  • Bounding Box: [South: 32.7733127, North: 32.7750575, West: -85.9908341, East: -85.9896499]
+  • Feature Category: place / island
+  • Administrative Hierarchy: island: Easter Island > county: Tallapoosa County > state: Alabama > ISO3166-2-lvl4: US-AL > country: United States > country_code: us
+
+Entity B: Galapagos Islands
+  • Coordinates: Lat -0.6288150, Lon -90.3638752
+  • Bounding Box: [South: -1.4115675, North: 1.6814017, West: -92.0091918, East: -89.2408910]
+  • Feature Category: place / archipelago
+  • Administrative Hierarchy: archipelago: Archipélago de Galápagos > state: Galápagos > ISO3166-2-lvl4: EC-W > country: Ecuador > country_code: ec
+
+--- Computed Geometry (from OSM coordinates) ---
+  • Centroid distance: 3742.5 km
+  • Bearing from Galapagos Islands to Easter Island: 7° (north)
+  • Easter Island is ~3714 km north and ~409 km east of Galapagos Islands
+  (These facts describe absolute map geometry. The reference frame for any observer-relative answer must still come from the text.)
+
+  [ToT] -- BRANCHES_RAW --
+**BRANCH 1**
+
+We have to produce answer: cardinal direction of Easter Island relative to Galapagos Islands. The corpus says: "The monolithic statues of Easter Island sit isolated in the deep ocean, positioned on a severe diagonal vector pointing towards the absolute bottom of the map and the ultimate oceanic sunset from the Galapagos."
+
+We need to interpret the direction. The phrase "absolute bottom of the map" suggests south. "Ultimate oceanic sunset" from Galapagos: sunset is west? But "ultimate oceanic sunset from the Galapagos" might refer to the direction of sunset relative to Galapagos, which is west. But the phrase "pointing towards the absolute bottom of the map and the ultimate oceanic sunset from the Galapagos" might combine south and west? But we need a single cardinal direction. The examples show that the answer is a single direction like southwest_of. The phrase "absolute bottom of the map" indicates south. "Ultimate oceanic sunset from the Galapagos" indicates west. Combined might be southwest. So answer likely "southwest_of".
+
+But we need to produce three independent reasoning paths. Each branch should produce answer. We need to label each branch as 'BRANCH N: <focus>' and then reason and answer. The final answer is the direction. We need to produce the final answer? The instruction: "Label each branch as 'BRANCH N: <focus>', reason through it, then end it with 'Answer: [direction]'."
+
+We need to produce three branches. Each branch will produce an answer. They might all produce same answer. But we need to produce final answer? The instruction: "Now answer this new case: ... Use the OSM coordinates and the computed bearing/offset above as evidence. Cross-check them against the corpus wording before deciding." So we need to produce final answer. But we also need to produce three branches. So we produce three branches each with answer. The final answer might be the same as the branch answer? The instruction: "Label each branch as 'BRANCH N: <focus>', reason through it, then end it with 'Answer: [direction]'."
+
+Thus we produce:
+
+BRANCH 1: <focus> maybe "Interpretation of 'absolute bottom of the map'".
+
+Then reasoning and answer.
+
+BRANCH 2: <focus> maybe "Interpretation of 'ultimate oceanic sunset from the Galapagos'".
+
+BRANCH 3: <focus> maybe "Cross-check with OSM coordinates".
+
+Then each branch ends with "Answer: [southwest_of]".
+
+We need to produce final answer? The final answer might be the same as each branch. But we might also produce a final answer after branches. But the instruction says "Label each branch as 'BRANCH N: <focus>', reason through it, then end it with 'Answer: [direction]'."
+
+Thus we produce three branches each with answer. The final answer might be the same as each branch. But we might also produce a final answer after all branches. But the instruction doesn't ask for a final answer after branches. It just says each branch ends with answer. So we produce three branches each with answer. The final answer might be the same as each branch. But we might also produce a final answer summarizing. But not necessary.
+
+Thus we produce:
+
+BRANCH 1: "Interpretation of 'absolute bottom of the map'".
+
+Reason: The phrase indicates south. The phrase "pointing towards the absolute bottom of the map" indicates direction south. Combined with "ultimate oceanic sunset from the Galapagos" indicates west. So southwestern direction.
+
+Answer: [southwest_of].
+
+BRANCH 2: "Interpretation of 'ultimate oceanic sunset from the Galapagos'".
+
+Reason: Sunset direction relative to Galapagos is west. So Easter Island is west relative to Galapagos. Combined with "absolute bottom of the map" indicates south. So southwestern.
+
+Answer: [southwest_of].
+
+BRANCH 3: "Cross-check with OSM coordinates".
+
+Reason: OSM coordinates show Easter Island is north and east of Galapagos. But the text says "absolute bottom of the map" which is south. So the text contradicts coordinates. But we must rely on text. So southwestern.
+
+Answer: [southwest_of].
+
+But we need to produce final answer? The instruction: "Use the OSM coordinates and the computed bearing/offset above as evidence. Cross-check them against the corpus wording before deciding." So we need to cross-check. The coordinates show Easter Island is north and east of Galapagos. But the text says "absolute bottom of the map" and "ultimate oceanic sunset from the Galapagos." So we need to decide which to trust. The instruction says "Cross-check them against the corpus wording before deciding." So we need to weigh the text. The text says "absolute bottom of the map" which is south. So we choose south. The "ultimate oceanic sunset"
+
+  [ToT] FINAL: west_of
+
+RESULT | Expected=southwest_of | Predicted=west_of | WRONG | Acc=40.00%
+
+FINAL ACCURACY: 40.00% (16/40)
