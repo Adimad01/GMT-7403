@@ -16,16 +16,24 @@
 #   cd ~/Topological-Reasoning/code
 #   bash run_experiments_v2.sh              # full run (trains + evaluates)
 #   bash run_experiments_v2.sh --skip-train # skip fine-tuning
+#   bash run_experiments_v2.sh --fresh      # wipe adapters + results, restart
 # =============================================================================
 
 set -euo pipefail
 
 PYTHON="${PYTHON:-python}"
 SKIP_TRAIN=0
+FRESH=0
 
 for arg in "$@"; do
     [[ "$arg" == "--skip-train" ]] && SKIP_TRAIN=1
+    [[ "$arg" == "--fresh" ]]      && FRESH=1
 done
+
+# Default behavior is RESUME: existing adapters are reused, existing result
+# checkpoints are kept, and the eval engine skips rows already done. Pass
+# --fresh to wipe adapters + results and start completely from scratch
+# (use this when the dataset / eval split changed).
 
 line()   { echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"; }
 header() { line; printf "  %s\n" "$1"; line; echo ""; }
@@ -66,21 +74,34 @@ echo "  [OK] osm_kg_balanced_train.jsonl"
 # ─────────────────────────────────────────────────────────────────────────────
 # PHASE 1 — Fine-tuning
 # ─────────────────────────────────────────────────────────────────────────────
+if [[ $FRESH -eq 1 ]]; then
+    echo ""
+    header "FRESH START — wiping adapters and result checkpoints"
+    rm -rf finetuned_gptoss_topo_v2/ finetuned_gptoss_osm_kg/
+    rm -f results/voletc_*
+    echo "  [OK] cleared adapters + results"
+fi
+
 if [[ $SKIP_TRAIN -eq 0 ]]; then
     echo ""
-    header "PHASE 1 — Fine-tuning adapters from scratch"
-    rm -rf finetuned_gptoss_topo_v2/ finetuned_gptoss_osm_kg/
-    rm -f results/*_ckpt.json
-    echo ""
+    header "PHASE 1 — Fine-tuning adapters (train only if missing)"
 
     echo "  FT-1 · No-KG LoRA → finetuned_gptoss_topo_v2"
     line
-    $PYTHON train_runner_topo_v2.py
+    if [[ -f "finetuned_gptoss_topo_v2/final_adapter/adapter_model.safetensors" ]]; then
+        echo "  [SKIP] adapter already exists — reusing (pass --fresh to retrain)"
+    else
+        $PYTHON train_runner_topo_v2.py
+    fi
 
     echo ""
     echo "  FT-2 · OSM-KG LoRA → finetuned_gptoss_osm_kg"
     line
-    $PYTHON train_runner_osm_kg.py
+    if [[ -f "finetuned_gptoss_osm_kg/final_adapter/adapter_model.safetensors" ]]; then
+        echo "  [SKIP] adapter already exists — reusing (pass --fresh to retrain)"
+    else
+        $PYTHON train_runner_osm_kg.py
+    fi
 else
     echo ""
     header "PHASE 1 — Skipping fine-tuning (--skip-train)"

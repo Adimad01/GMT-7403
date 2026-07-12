@@ -16,16 +16,24 @@
 #   cd ~/Cardinal-Reasoning/code
 #   bash run_experiments_cardinal.sh              # full run (trains + evaluates)
 #   bash run_experiments_cardinal.sh --skip-train # skip fine-tuning
+#   bash run_experiments_cardinal.sh --fresh      # wipe adapters + results, restart
 # =============================================================================
 
 set -euo pipefail
 
 PYTHON="${PYTHON:-python}"
 SKIP_TRAIN=0
+FRESH=0
 
 for arg in "$@"; do
     [[ "$arg" == "--skip-train" ]] && SKIP_TRAIN=1
+    [[ "$arg" == "--fresh" ]]      && FRESH=1
 done
+
+# Default behavior is RESUME: existing adapters are reused, existing result
+# checkpoints are kept, and the eval engine skips rows already done. Pass
+# --fresh to wipe adapters + results and start completely from scratch
+# (use this when the dataset / eval split changed).
 
 line()   { echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"; }
 header() { line; printf "  %s\n" "$1"; line; echo ""; }
@@ -45,26 +53,11 @@ if [[ ! -f "../dataset/cardinal_direction_relations.csv" ]]; then
 fi
 echo "  [OK] cardinal_direction_relations.csv"
 
-if [[ ! -f "../dataset/eval_32_balanced_indices.json" ]]; then
-    echo "  Generating eval index files..."
-    $PYTHON - << 'PYEOF'
-import csv, json
-from collections import defaultdict
-DIRECTIONS = ["north","south","east","west","north-east","north-west","south-east","south-west"]
-rows = list(csv.DictReader(open("../dataset/cardinal_direction_relations.csv")))
-by_dir = defaultdict(list)
-for i, row in enumerate(rows):
-    d = row.get("direction","").strip().lower()
-    if d in DIRECTIONS:
-        by_dir[d].append(i)
-eval_32 = []
-for d in DIRECTIONS:
-    eval_32.extend(by_dir[d][:4])
-json.dump(sorted(eval_32), open("../dataset/eval_32_balanced_indices.json","w"))
-print(f"  [OK] eval_32 ({len(eval_32)} indices)")
-PYEOF
+if [[ ! -f "../dataset/eval_40_balanced_indices.json" ]]; then
+    echo "  [ERROR] ../dataset/eval_40_balanced_indices.json not found (committed in repo — git pull?)"
+    exit 1
 fi
-echo "  [OK] eval_32_balanced_indices.json"
+echo "  [OK] eval_40_balanced_indices.json"
 
 if [[ ! -f "../dataset/cardinal_nokg_train.csv" ]] || [[ ! -f "../dataset/cardinal_osm_kg_train.jsonl" ]]; then
     echo "  Building training data..."
@@ -75,21 +68,34 @@ echo "  [OK] Training data ready"
 # ─────────────────────────────────────────────────────────────────────────────
 # PHASE 1 — Fine-tuning
 # ─────────────────────────────────────────────────────────────────────────────
+if [[ $FRESH -eq 1 ]]; then
+    echo ""
+    header "FRESH START — wiping adapters and result checkpoints"
+    rm -rf finetuned_gptoss_cardinal/ finetuned_gptoss_cardinal_kg/ finetuned_gptoss_cardinal_osm_kg/
+    rm -f results/voletc_*
+    echo "  [OK] cleared adapters + results"
+fi
+
 if [[ $SKIP_TRAIN -eq 0 ]]; then
     echo ""
-    header "PHASE 1 — Fine-tuning adapters from scratch"
-    rm -rf finetuned_gptoss_cardinal/ finetuned_gptoss_cardinal_kg/ finetuned_gptoss_cardinal_osm_kg/
-    rm -f results/*_ckpt.json
-    echo ""
+    header "PHASE 1 — Fine-tuning adapters (train only if missing)"
 
     echo "  FT-1 · No-KG LoRA → finetuned_gptoss_cardinal"
     line
-    $PYTHON train_runner_cardinal_nokg.py
+    if [[ -f "finetuned_gptoss_cardinal/final_adapter/adapter_model.safetensors" ]]; then
+        echo "  [SKIP] adapter already exists — reusing (pass --fresh to retrain)"
+    else
+        $PYTHON train_runner_cardinal_nokg.py
+    fi
 
     echo ""
-    echo "  FT-2 · OSM-KG LoRA → finetuned_gptoss_cardinal_kg"
+    echo "  FT-2 · OSM-KG LoRA → finetuned_gptoss_cardinal_osm_kg"
     line
-    $PYTHON train_runner_cardinal_osm_kg.py
+    if [[ -f "finetuned_gptoss_cardinal_osm_kg/final_adapter/adapter_model.safetensors" ]]; then
+        echo "  [SKIP] adapter already exists — reusing (pass --fresh to retrain)"
+    else
+        $PYTHON train_runner_cardinal_osm_kg.py
+    fi
 else
     echo ""
     header "PHASE 1 — Skipping fine-tuning (--skip-train)"
@@ -107,7 +113,7 @@ fi
 # PHASE 2a — Zero-shot evaluation
 # ─────────────────────────────────────────────────────────────────────────────
 echo ""
-header "PHASE 2a — Zero-shot: 6 experiments × 3 strategies on 32 examples"
+header "PHASE 2a — Zero-shot: 6 experiments × 3 strategies on 40 examples"
 
 echo "  Exp 1 · Base GPT-OSS-20B (no adapter, no KG) · CoT / ToT / GoT"
 line
@@ -142,7 +148,7 @@ $PYTHON exp6_base_kg_rag.py
 # PHASE 2b — Few-shot evaluation (5 same-label demos)
 # ─────────────────────────────────────────────────────────────────────────────
 echo ""
-header "PHASE 2b — Few-shot (5 shots): 6 experiments × 3 strategies on 32 examples"
+header "PHASE 2b — Few-shot (5 shots): 6 experiments × 3 strategies on 40 examples"
 
 echo "  Exp 1 · Base GPT-OSS-20B (no adapter, no KG) · CoT / ToT / GoT · 5-shot"
 line
