@@ -89,17 +89,32 @@ def main():
         key = (r["relation_label"].strip().lower(), r["ambiguity_level"].strip())
         cells[key].append(r)
 
-    # ── Stratified split ──────────────────────────────────────────────────────
+    # ── Stratified split (eval drawn from OSM-geocodable rows only) ──────────
+    # Eval rows must pass the runtime OSM filter, so sample them exclusively
+    # from candidates whose BOTH entities resolve in the warmed geocode cache.
+    import sys as _sys, os as _os
+    _sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))
+    from osm_client import load_cache, is_geocodable
+    cache = load_cache(_os.path.join(_os.path.dirname(_os.path.abspath(__file__)),
+                                     "results", "osm_cache.json"))
+    if not cache:
+        raise SystemExit("[ERROR] results/osm_cache.json missing/empty — warm it first "
+                         "(warm_osm_cache.py); eval selection requires geocodability.")
+
     eval_rows, train_rows = [], []
     stats = {}
     for pred in PREDICATES:
         for lvl in LEVELS:
             pool = cells[(pred, lvl)]
-            if len(pool) < args.n_per_cell:
+            geo_pool = [r for r in pool
+                        if is_geocodable(cache, r["source_entity"], r["target_entity"])]
+            if len(geo_pool) < args.n_per_cell:
                 raise ValueError(
-                    f"Only {len(pool)} examples for ({pred}, {lvl}) — need {args.n_per_cell}"
+                    f"Only {len(geo_pool)} geocodable examples for ({pred}, {lvl}) — "
+                    f"need {args.n_per_cell}. Warm more entities of this cell "
+                    f"(warm_osm_cache.py) and retry."
                 )
-            chosen = rng.sample(pool, args.n_per_cell)
+            chosen = rng.sample(geo_pool, args.n_per_cell)
             chosen_set = set(id(r) for r in chosen)
             eval_rows.extend(chosen)
             train_rows.extend(r for r in pool if id(r) not in chosen_set)
