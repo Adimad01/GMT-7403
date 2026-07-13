@@ -58,10 +58,13 @@ def extract_direction(text: str) -> Optional[str]:
     if not text:
         return None
     clean = re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL)
-    clean = re.sub(r"[*_`]", "", clean)
+    # Keep underscores — labels use them (north_of); stripping them used to
+    # turn 'Answer: north_of' into unmatchable 'northof'.
+    clean = re.sub(r"[*`]", "", clean)
     lower = clean.lower()
 
-    # Explicit answer patterns (prefer later occurrences)
+    # Explicit answer patterns (last valid occurrence wins — the model may
+    # self-correct; only the final stated answer counts)
     patterns = [
         r"answer\s*[:=]\s*\[?([a-z_\-]+)\]?",
         r"final\s+(?:answer|direction|relation)\s*[:=]\s*\[?([a-z_\-]+)\]?",
@@ -70,23 +73,23 @@ def extract_direction(text: str) -> Optional[str]:
         r"therefore[,\s]+(?:it is|the direction is|the relation is)\s*\[?([a-z_\-]+)\]?",
     ]
     for pat in patterns:
-        for m in re.finditer(pat, lower):
+        for m in reversed(list(re.finditer(pat, lower))):
             raw = m.group(1).strip().rstrip(".,;:")
             if raw in VALID_DIRECTIONS:
                 return raw
             if raw in _LABEL_ALIASES:
                 return _LABEL_ALIASES[raw]
 
-    # Scan for valid labels (take last occurrence)
+    # Scan for valid labels / aliases as WHOLE WORDS (take last occurrence).
+    # Word boundaries are essential: bare substring search let the alias 'sw'
+    # match inside the word 'anSWer', mis-scoring degenerate outputs.
     found = []
     for lbl in VALID_DIRECTIONS:
-        idx = lower.rfind(lbl)
-        if idx != -1:
-            found.append((idx, lbl))
+        for m in re.finditer(rf"\b{re.escape(lbl)}\b", lower):
+            found.append((m.start(), lbl))
     for alias, canonical in _LABEL_ALIASES.items():
-        idx = lower.rfind(alias)
-        if idx != -1:
-            found.append((idx, canonical))
+        for m in re.finditer(rf"\b{re.escape(alias)}\b", lower):
+            found.append((m.start(), canonical))
     if found:
         found.sort(key=lambda x: x[0])
         return found[-1][1]
@@ -154,6 +157,9 @@ class ChainOfThought(ReasoningStrategy):
             "'north of', 'up', 'below', 'to the east', etc.).\n"
             "2. Map those cues to a cardinal direction.\n"
             f"3. State your conclusion: '{src}' is [direction] '{tgt}'.\n\n"
+            "Rules: keep the reasoning to a few short steps; use the exact label "
+            "format with underscores (e.g. north_of); write the Answer line exactly "
+            "ONCE, then stop immediately — do not repeat yourself.\n\n"
             "End with: Answer: [direction]\n\n"
             "Reasoning:"
         )
@@ -207,7 +213,9 @@ class TreeOfThought(ReasoningStrategy):
             f"Corpus: \"{corpus}\"\n\n"
             f"Possible directions: {VALID_LIST}\n\n"
             "Label each branch as 'BRANCH N: <your chosen focus>', reason through it, "
-            "then end it with 'Answer: [direction]'.\n\n"
+            "then end it with 'Answer: [direction]'. Keep each branch short; use the "
+            "exact label format with underscores (e.g. north_of); after the third "
+            "branch stop immediately — do not repeat yourself.\n\n"
             "Begin:"
         )
 
@@ -281,7 +289,9 @@ class GraphOfThought(ReasoningStrategy):
             f"Corpus: \"{corpus}\"\n\n"
             f"Possible directions: {VALID_LIST}\n\n"
             "Label each node as 'THOUGHT N: <your chosen focus>', reason through it, "
-            "then end it with 'Direction: [direction]'.\n\n"
+            "then end it with 'Direction: [direction]'. Keep each thought short; use "
+            "the exact label format with underscores (e.g. north_of); after the "
+            "fourth thought stop immediately — do not repeat yourself.\n\n"
             "Begin:"
         )
 

@@ -100,6 +100,9 @@ class ChainOfThought(ReasoningStrategy):
             "1. Identify the spatial language in the corpus.\n"
             "2. If OSM evidence is present, read the computed bearing/offset.\n"
             f"3. State your conclusion: '{src}' is [direction] '{tgt}'.\n\n"
+            "Rules: keep the reasoning to a few short steps; use the exact label "
+            "format with underscores (e.g. north_of); write the Answer line exactly "
+            "ONCE, then stop immediately — do not repeat yourself.\n\n"
             "End with: Answer: [direction]\n\n"
             "Reasoning:"
         )
@@ -148,7 +151,9 @@ class TreeOfThought(ReasoningStrategy):
             f"Possible directions: {VALID_LIST}\n"
             f"{_evidence_clause(evidence)}\n"
             "Label each branch as 'BRANCH N: <focus>', reason through it, then end "
-            "it with 'Answer: [direction]'.\n\nBegin:"
+            "it with 'Answer: [direction]'. Keep each branch short; use the exact "
+            "label format with underscores (e.g. north_of); after the third branch "
+            "stop immediately — do not repeat yourself.\n\nBegin:"
         )
         branch_resp = self._generate(prompt)
         _log("BRANCHES_RAW", branch_resp)
@@ -213,7 +218,9 @@ class GraphOfThought(ReasoningStrategy):
             f"Possible directions: {VALID_LIST}\n"
             f"{_evidence_clause(evidence)}\n"
             "Label each node as 'THOUGHT N: <focus>', reason through it, then end it "
-            "with 'Direction: [direction]'.\n\nBegin:"
+            "with 'Direction: [direction]'. Keep each thought short; use the exact "
+            "label format with underscores (e.g. north_of); after the fourth thought "
+            "stop immediately — do not repeat yourself.\n\nBegin:"
         )
         phase1 = self._generate(prompt)
         _log("PHASE1_RAW", phase1)
