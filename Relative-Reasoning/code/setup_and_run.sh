@@ -64,12 +64,19 @@ else
     echo "  [FIX] environment broken — repairing..."
 
     echo ""
-    echo "  1a. Remove torchaudio/torchvision (they force torch back to 1.13.1)"
-    pip uninstall -y torchaudio torchvision 2>/dev/null || true
+    echo "  1a. Remove torchaudio + ALL stale torchvision copies (~/.local AND /opt/conda)"
+    # pip uninstall removes one copy per call; container resets restore an old
+    # cu116 torchvision in /opt/conda that poisons transformers — purge both.
+    for _ in 1 2; do pip uninstall -y torchaudio torchvision 2>/dev/null || true; done
 
     echo ""
-    echo "  1b. Install torch 2.5.1 explicitly (never let it come in as a dep)"
+    echo "  1b. Install torch 2.5.1 + matching torchvision (never as deps)"
     pip install --user torch==2.5.1
+    # torchvision 0.20.1 pairs with torch 2.5.1; transformers 5.x needs a real
+    # torchvision (InterpolationMode.NEAREST_EXACT) or peft fails to import.
+    # --no-deps so it can never touch torch; PyPI index avoids the broken
+    # download-r2.pytorch.org host.
+    pip install --user --no-deps --index-url https://pypi.org/simple torchvision==0.20.1
 
     echo ""
     echo "  1c. Install the ML stack"
