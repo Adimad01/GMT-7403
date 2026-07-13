@@ -98,8 +98,10 @@ class ChainOfThought(ReasoningStrategy):
             f"{_evidence_clause(evidence)}\n"
             "Think step by step:\n"
             "1. Identify the spatial language in the corpus.\n"
-            "2. If OSM evidence is present, read the computed bearing/offset.\n"
-            f"3. State your conclusion: '{src}' is [direction] '{tgt}'.\n\n"
+            + ("2. Read the computed bearing/offset in the OSM evidence above.\n"
+               if evidence else
+               "2. Map those cues to a cardinal direction.\n")
+            + f"3. State your conclusion: '{src}' is [direction] '{tgt}'.\n\n"
             "Rules: keep the reasoning to a few short steps; use the exact label "
             "format with underscores (e.g. north_of); write the Answer line exactly "
             "ONCE, then stop immediately — do not repeat yourself.\n\n"
