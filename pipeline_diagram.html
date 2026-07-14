@@ -1,0 +1,173 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Experimental Pipeline — Spatial Relation Reasoning</title>
+<style>
+:root{--ink:#1d1d1f;--dim:#86868b;--line:#e8e8ed;--bg:#fbfbfd;--card:#fff;
+ --topo:#5856d6;--card2:#0a84ff;--rel:#2da44e;--kg:#bf6a00}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+ -webkit-font-smoothing:antialiased;line-height:1.45}
+.wrap{max-width:1080px;margin:0 auto;padding:56px 24px 90px}
+.eyebrow{font-size:13px;font-weight:600;color:#5856d6;margin:0 0 6px}
+h1{font-size:40px;line-height:1.08;letter-spacing:-.02em;margin:0 0 10px}
+h1 .grad{background:linear-gradient(90deg,#5856d6,#0a84ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{font-size:17px;color:var(--dim);max-width:760px;margin:0 0 34px}
+.stage{position:relative;margin:0 0 8px}
+.stage-label{font-size:12px;font-weight:700;letter-spacing:.06em;color:var(--dim);
+ text-transform:uppercase;margin:0 0 10px}
+.arrow{display:flex;justify-content:center;margin:14px 0}
+.arrow svg{display:block}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 20px}
+.card h3{margin:0 0 4px;font-size:16px}
+.card .sub{font-size:12px;color:var(--dim);margin:0 0 10px}
+.chips{display:flex;flex-wrap:wrap;gap:5px}
+.chip{font-size:11px;font-weight:600;padding:2px 9px;border-radius:999px;background:#f0f0f4;color:#555}
+.stat{display:flex;gap:14px;margin-top:12px;font-size:12px;color:var(--dim)}
+.stat b{color:var(--ink);font-size:15px;display:block}
+.dom-topo{border-top:3px solid var(--topo)}
+.dom-card{border-top:3px solid var(--card2)}
+.dom-rel{border-top:3px solid var(--rel)}
+.wide{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 22px}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:0;position:relative}
+.step{padding:4px 18px 4px 0;position:relative}
+.step:not(:last-child)::after{content:'→';position:absolute;right:2px;top:50%;transform:translateY(-50%);
+ color:#c7c7cc;font-size:18px;font-weight:700}
+.step b{display:block;font-size:14px;margin-bottom:3px}
+.step span{font-size:12px;color:var(--dim)}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{background:#f5f5f7;color:var(--dim);font-weight:600;font-size:11px;letter-spacing:.03em;
+ padding:9px 10px;text-align:center}
+th:first-child,td:first-child{text-align:left}
+td{padding:9px 10px;text-align:center;border-top:1px solid #f0f0f4}
+td.exp{font-weight:700;white-space:nowrap}
+.yes{color:#1a7f37;font-weight:700}
+.no{color:#c7c7cc}
+.kgcell{color:var(--kg);font-weight:700}
+.model-b{font-size:12px;font-weight:600;color:#555;background:#f0f0f4;border-radius:6px;padding:2px 8px;white-space:nowrap}
+.model-ft{font-size:12px;font-weight:600;color:#3b39b3;background:#eef0ff;border-radius:6px;padding:2px 8px;white-space:nowrap}
+.legend{font-size:12px;color:var(--dim);margin-top:10px}
+.proto{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.proto .card{text-align:center}
+.proto .big{font-size:26px;font-weight:800;letter-spacing:-.01em}
+.proto .big small{font-size:13px;font-weight:600;color:var(--dim);display:block;margin-top:2px}
+.outs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.foot{margin-top:56px;color:var(--dim);font-size:12px;border-top:1px solid var(--line);padding-top:16px}
+@media (max-width:760px){.grid3,.proto,.outs,.steps{grid-template-columns:1fr}.step:not(:last-child)::after{content:'↓';right:auto;left:50%;top:auto;bottom:-14px;transform:none}}
+@media print{body{background:#fff}.wrap{padding:20px}}
+</style>
+</head>
+<body><div class="wrap">
+
+<p class="eyebrow">Experimental Design</p>
+<h1>One pipeline, <span class="grad">three spatial relation domains.</span></h1>
+<p class="lead">A unified 6-experiment ablation of <b>where a knowledge graph helps</b> a 20B LLM reason
+about space — injected at training, at input, at inference, or not at all — replicated identically over
+topological, cardinal and relative relations.</p>
+
+<!-- STAGE 1 · DATASETS -->
+<div class="stage">
+  <p class="stage-label">1 · Relation datasets (OSM-grounded, 5 ambiguity levels each)</p>
+  <div class="grid3">
+    <div class="card dom-topo">
+      <h3>Topological</h3>
+      <p class="sub">region–region predicates (RCC-style)</p>
+      <div class="chips"><span class="chip">contains</span><span class="chip">within</span><span class="chip">touches</span><span class="chip">crosses</span><span class="chip">overlaps</span><span class="chip">disjoint</span><span class="chip">equals</span></div>
+      <div class="stat"><div><b>1320</b>rows</div><div><b>105</b>eval · 3/cell</div><div><b>595</b>train</div></div>
+    </div>
+    <div class="card dom-card">
+      <h3>Cardinal</h3>
+      <p class="sub">absolute compass directions</p>
+      <div class="chips"><span class="chip">north_of</span><span class="chip">south_of</span><span class="chip">east_of</span><span class="chip">west_of</span><span class="chip">NE</span><span class="chip">NW</span><span class="chip">SE</span><span class="chip">SW</span></div>
+      <div class="stat"><div><b>120</b>rows</div><div><b>40</b>eval · 1/cell</div><div><b>80</b>train</div></div>
+    </div>
+    <div class="card dom-rel">
+      <h3>Relative</h3>
+      <p class="sub">observer-frame directions</p>
+      <div class="chips"><span class="chip">left_of</span><span class="chip">right_of</span><span class="chip">in_front_of</span><span class="chip">behind</span><span class="chip">next_to</span></div>
+      <div class="stat"><div><b>75</b>rows</div><div><b>25</b>eval · 1/cell</div><div><b>50</b>train</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="arrow"><svg width="24" height="26"><path d="M12 0v18M5 12l7 8 7-8" fill="none" stroke="#c7c7cc" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+<!-- STAGE 2 · PREPARATION -->
+<div class="stage">
+  <p class="stage-label">2 · Shared preparation (per domain)</p>
+  <div class="wide">
+    <div class="steps">
+      <div class="step"><b>OSM grounding</b><span>geocode every entity via Nominatim → offline <code>osm_cache.json</code>; eval rows selected to be fully geocodable</span></div>
+      <div class="step"><b>Level-balanced split</b><span>held-out eval stratified per (label × ambiguity level L1–L5); remainder = train, zero overlap</span></div>
+      <div class="step"><b>Two training sets</b><span>plain corpus→label CSV (no-KG) · prompt+OSM-evidence JSONL (OSM-KG)</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="arrow"><svg width="24" height="26"><path d="M12 0v18M5 12l7 8 7-8" fill="none" stroke="#c7c7cc" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+<!-- STAGE 3 · MODELS -->
+<div class="stage">
+  <p class="stage-label">3 · Models (GPT-OSS-20B, MXFP4 → bf16)</p>
+  <div class="grid3">
+    <div class="card"><h3>Base</h3><p class="sub">no adapter — frozen pretrained weights</p></div>
+    <div class="card"><h3>LoRA · no-KG</h3><p class="sub">fine-tuned on the plain train split (~4M trainable params)</p></div>
+    <div class="card"><h3>LoRA · OSM-KG</h3><p class="sub">fine-tuned on OSM-evidence-augmented examples (KG seen only at training)</p></div>
+  </div>
+</div>
+
+<div class="arrow"><svg width="24" height="26"><path d="M12 0v18M5 12l7 8 7-8" fill="none" stroke="#c7c7cc" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+<!-- STAGE 4 · EXPERIMENT MATRIX -->
+<div class="stage">
+  <p class="stage-label">4 · The six experiments — where does the KG enter?</p>
+  <div class="wide">
+    <table>
+      <thead><tr><th>Experiment</th><th>Model</th><th>KG @ training</th><th>KG @ input</th><th>KG @ inference</th><th>Question it answers</th></tr></thead>
+      <tbody>
+        <tr><td class="exp">Exp 1 · Base</td><td><span class="model-b">base</span></td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td style="text-align:left">raw spatial ability of the LLM</td></tr>
+        <tr><td class="exp">Exp 2 · FT no-KG</td><td><span class="model-ft">LoRA no-KG</span></td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td style="text-align:left">does task fine-tuning alone help?</td></tr>
+        <tr><td class="exp">Exp 3 · FT OSM-KG</td><td><span class="model-ft">LoRA OSM-KG</span></td><td class="kgcell">✓</td><td class="no">—</td><td class="no">—</td><td style="text-align:left">does the KG internalize into weights?</td></tr>
+        <tr><td class="exp">Exp 4 · Base + KG@input</td><td><span class="model-b">base</span></td><td class="no">—</td><td class="kgcell">✓</td><td class="no">—</td><td style="text-align:left">does static KG context help untouched weights?</td></tr>
+        <tr><td class="exp">Exp 5 · FT + KG@input</td><td><span class="model-ft">LoRA no-KG</span></td><td class="no">—</td><td class="kgcell">✓</td><td class="no">—</td><td style="text-align:left">do fine-tuning and KG context stack?</td></tr>
+        <tr><td class="exp">Exp 6 · Base + RAG</td><td><span class="model-b">base</span></td><td class="no">—</td><td class="no">—</td><td class="kgcell">✓</td><td style="text-align:left">does per-step retrieval beat static context?</td></tr>
+      </tbody>
+    </table>
+    <p class="legend"><span class="kgcell">✓</span> = OSM evidence enters at that point ·
+    KG@training = evidence embedded in the fine-tuning examples ·
+    KG@input = evidence prepended once to the prompt ·
+    KG@inference = evidence retrieved per reasoning step (RAG loop)</p>
+  </div>
+</div>
+
+<div class="arrow"><svg width="24" height="26"><path d="M12 0v18M5 12l7 8 7-8" fill="none" stroke="#c7c7cc" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+<!-- STAGE 5 · INFERENCE PROTOCOL -->
+<div class="stage">
+  <p class="stage-label">5 · Inference protocol (every experiment × every domain)</p>
+  <div class="proto">
+    <div class="card"><div class="big">× 3<small>reasoning strategies<br>CoT · ToT · GoT</small></div></div>
+    <div class="card"><div class="big">× 2<small>prompting modes<br>zero-shot · 5-shot (label-conditioned ⚠)</small></div></div>
+    <div class="card"><div class="big">= 36<small>configs per domain · 108 total<br>per-row checkpointed, resumable</small></div></div>
+  </div>
+</div>
+
+<div class="arrow"><svg width="24" height="26"><path d="M12 0v18M5 12l7 8 7-8" fill="none" stroke="#c7c7cc" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+<!-- STAGE 6 · OUTPUTS -->
+<div class="stage">
+  <p class="stage-label">6 · Evaluation &amp; reporting</p>
+  <div class="outs">
+    <div class="card"><h3>Exact-match scoring</h3><p class="sub">robust label extraction (explicit answer patterns → whole-word scan) · 3 retries on invalid output</p></div>
+    <div class="card"><h3>Combined report</h3><p class="sub">accuracy matrices, per-label &amp; per-level difficulty, confusion, hardest cases, full reasoning explorer — per domain</p></div>
+    <div class="card"><h3>Run history</h3><p class="sub">every result push becomes a tracked run — accuracy evolution across dataset and method revisions</p></div>
+  </div>
+</div>
+
+<div class="foot"><b>Spatial Relation Reasoning</b> · GPT-OSS-20B × OSM knowledge graph · unified 6-experiment ablation · PhD Research 2026</div>
+</div></body></html>
