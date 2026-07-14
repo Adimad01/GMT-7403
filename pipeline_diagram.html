@@ -57,6 +57,19 @@ td.exp{font-weight:700;white-space:nowrap}
 .proto .big{font-size:26px;font-weight:800;letter-spacing:-.01em}
 .proto .big small{font-size:13px;font-weight:600;color:var(--dim);display:block;margin-top:2px}
 .outs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.future{border:2px dashed #b8a4f0;background:linear-gradient(180deg,#fdfcff,#f7f4ff);border-radius:18px;padding:20px 22px}
+.future .stage-label{color:#7a5af5}
+.fsteps{display:grid;grid-template-columns:repeat(4,1fr);gap:0;position:relative;margin-top:4px}
+.fstep{padding:4px 18px 4px 0;position:relative}
+.fstep:not(:last-child)::after{content:'→';position:absolute;right:2px;top:50%;transform:translateY(-50%);
+ color:#c5b6f2;font-size:18px;font-weight:700}
+.fstep b{display:block;font-size:14px;margin-bottom:3px;color:#4b3fa8}
+.fstep span{font-size:12px;color:var(--dim)}
+.fnote{font-size:12.5px;color:#6b5bb8;background:#efe9ff;border-radius:10px;padding:10px 14px;margin-top:14px}
+.fex{font-size:13px;color:var(--ink);background:#fff;border:1px solid #e4dcf8;border-radius:10px;
+ padding:10px 14px;margin:2px 0 14px;font-style:italic}
+.fex b{font-style:normal;color:#7a5af5}
+@media (max-width:760px){.fsteps{grid-template-columns:1fr}.fstep:not(:last-child)::after{content:'↓';right:auto;left:50%;top:auto;bottom:-14px;transform:none}}
 .foot{margin-top:56px;color:var(--dim);font-size:12px;border-top:1px solid var(--line);padding-top:16px}
 @media (max-width:760px){.grid3,.proto,.outs,.steps{grid-template-columns:1fr}.step:not(:last-child)::after{content:'↓';right:auto;left:50%;top:auto;bottom:-14px;transform:none}}
 @media print{body{background:#fff}.wrap{padding:20px}}
@@ -166,6 +179,28 @@ topological, cardinal and relative relations.</p>
     <div class="card"><h3>Exact-match scoring</h3><p class="sub">robust label extraction (explicit answer patterns → whole-word scan) · 3 retries on invalid output</p></div>
     <div class="card"><h3>Combined report</h3><p class="sub">accuracy matrices, per-label &amp; per-level difficulty, confusion, hardest cases, full reasoning explorer — per domain</p></div>
     <div class="card"><h3>Run history</h3><p class="sub">every result push becomes a tracked run — accuracy evolution across dataset and method revisions</p></div>
+  </div>
+</div>
+
+<div class="arrow"><svg width="24" height="26"><path d="M12 0v18M5 12l7 8 7-8" fill="none" stroke="#c5b6f2" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3 4"/></svg></div>
+
+<!-- STAGE 7 · FUTURE PIPELINE -->
+<div class="stage">
+  <div class="future">
+    <p class="stage-label">7 · Future pipeline — end-to-end vernacular understanding</p>
+    <div class="fex">Input is <b>only</b> the vernacular expression — no entities given:<br>
+    “Standing on the lawn looking at the main entrance, the West Wing is positioned towards your port arm.”</div>
+    <div class="fsteps">
+      <div class="fstep"><b>① Entity extraction</b><span>the model identifies the subject entity and the object entity itself from the free text (no gold entities provided)</span></div>
+      <div class="fstep"><b>② OSM grounding on demand</b><span>the model decides when it needs geographic facts and queries OSM as a tool (agentic retrieval, not pre-injected)</span></div>
+      <div class="fstep"><b>③ Relation analysis</b><span>combine the vernacular cues (observer frame, cultural references) with the retrieved geometry</span></div>
+      <div class="fstep"><b>④ Prediction</b><span>output the spatial relation label — topological, cardinal or relative — plus the grounded entity pair</span></div>
+    </div>
+    <div class="fnote"><b>What changes vs. the current pipeline:</b> stages 1–6 hand the model the
+    (subject, object) pair and control exactly where the KG enters. The future pipeline removes that
+    scaffolding — extraction, grounding and tool use become part of the task itself, so evaluation
+    extends from label accuracy to <i>entity-extraction accuracy</i>, <i>grounding success</i> and
+    <i>end-to-end correctness</i>.</div>
   </div>
 </div>
 
