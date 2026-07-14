@@ -233,21 +233,35 @@ def analysis_html(cfg, meta, noun="predicate"):
     else:
         H.append(f"<div class='card'>{A.matrix_html(cfg,0)}</div>")
     H.append("</div>")
-    # difficulty
+    # difficulty — zero-shot AND few-shot side by side
     H.append(f"<div class='sec'><h2>Difficulty</h2><h3>Which {noun}s are hard.</h3><div class='grid2'>")
-    H.append(f"<div class='card'><b>Accuracy by {noun}</b><div style='height:14px'></div>"
+    H.append(f"<div class='card'><b>Accuracy by {noun} — zero-shot</b><div style='height:14px'></div>"
              f"{A.bars_html(A.per_predicate(cfg,0))}</div>")
+    if has_few:
+        H.append(f"<div class='card'><b>Accuracy by {noun} — few-shot (5) ⚠</b><div style='height:14px'></div>"
+                 f"{A.bars_html(A.per_predicate(cfg,5))}</div>")
     lvl = A.level_accuracy(cfg, 0, meta)
     if lvl:
-        H.append(f"<div class='card'><b>Accuracy by ambiguity level</b><div style='height:14px'></div>"
+        H.append(f"<div class='card'><b>Accuracy by ambiguity level — zero-shot</b><div style='height:14px'></div>"
                  f"{A.bars_html(lvl)}</div>")
+        lvl5 = A.level_accuracy(cfg, 5, meta) if has_few else []
+        if lvl5:
+            H.append(f"<div class='card'><b>Accuracy by ambiguity level — few-shot (5) ⚠</b>"
+                     f"<div style='height:14px'></div>{A.bars_html(lvl5)}</div>")
     else:
         H.append("<div class='card muted'><b>Accuracy by ambiguity level</b>"
                  "<p class='small'>Needs the eval CSV (not found).</p></div>")
     H.append("</div></div>")
-    # overall confusion
-    H.append("<div class='sec'><h2>Confusion</h2><h3>Where errors go (overall).</h3>"
-             f"<div class='card'>{A.confusion_html(cfg,0)}</div></div>")
+    # overall confusion — zero-shot AND few-shot
+    H.append("<div class='sec'><h2>Confusion</h2><h3>Where errors go (overall).</h3>")
+    if has_few:
+        H.append("<div class='grid2' style='align-items:start'>"
+                 f"<div class='card'><b>Zero-shot</b><div style='height:10px'></div>{A.confusion_html(cfg,0)}</div>"
+                 f"<div class='card'><b>Few-shot (5) ⚠</b><div style='height:10px'></div>{A.confusion_html(cfg,5)}</div>"
+                 "</div>")
+    else:
+        H.append(f"<div class='card'>{A.confusion_html(cfg,0)}</div>")
+    H.append("</div>")
     # per-experiment breakdown
     exps_present = [e for e in A.EXP_ORDER if any((0, e, s) in cfg for s in A.STRATS)]
     H.append("<div class='sec'><h2>Per-experiment breakdown</h2>"
