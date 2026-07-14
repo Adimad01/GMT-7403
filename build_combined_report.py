@@ -267,14 +267,15 @@ def analysis_html(cfg, meta, noun="predicate"):
     H.append("<div class='sec'><h2>Per-experiment breakdown</h2>"
              "<h3>What goes wrong, experiment by experiment.</h3>")
     for e in exps_present:
-        narrative, _ = A.exp_narrative(cfg, e, 0)
+        parts, _ = A.exp_narrative_parts(cfg, e, 0)
+        bullets = "".join(f"<li>{p}</li>" for p in parts) or "<li>No data.</li>"
         conf, labels = A.confusion_counts(cfg, 0, e)
         cap = f"rows = expected · columns = predicted · CoT/ToT/GoT (zero-shot) · {A.EXP_LABELS[e]}"
         sacc = [(s.upper(), sum(r["match"] for r in cfg[(0, e, s)]) / len(cfg[(0, e, s)]) * 100)
                 for s in A.STRATS if (0, e, s) in cfg]
         H.append("<div class='card'>"
                  f"<div class='exp-title'>{A.EXP_LABELS[e]}</div>"
-                 f"<p class='para'>{narrative or 'No data.'}</p>"
+                 f"<ul class='blist'>{bullets}</ul>"
                  "<div class='grid2' style='align-items:start'>"
                  f"<div>{A.bars_html(sacc)}</div>"
                  f"<div>{A.confusion_table_html(conf, labels, cap)}</div></div>"

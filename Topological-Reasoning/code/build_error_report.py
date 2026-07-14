@@ -211,8 +211,8 @@ def confusion_html(cfg, shots):
     return confusion_table_html(conf, labels, cap)
 
 
-def exp_narrative(cfg, exp, shots=0):
-    """Auto-generate a prose paragraph describing this experiment's failure modes."""
+def exp_narrative_parts(cfg, exp, shots=0):
+    """Auto-generate analysis sentences (one bullet each) for this experiment."""
     # per-strategy accuracy
     sacc = {}
     for s in STRATS:
@@ -220,7 +220,7 @@ def exp_narrative(cfg, exp, shots=0):
         if rows:
             sacc[s] = sum(r["match"] for r in rows) / len(rows) * 100
     if not sacc:
-        return None, {}
+        return [], {}
     avg = sum(sacc.values()) / len(sacc)
     conf, _ = confusion_counts(cfg, shots, exp)
     errors = {(a, b): n for (a, b), n in conf.items() if a != b}
@@ -286,7 +286,12 @@ def exp_narrative(cfg, exp, shots=0):
                          f"than help.")
         else:
             parts.append("Few-shot barely moves it (~{:+.0f} pts), notable given the demos leak the label.".format(md))
-    return " ".join(parts), {"avg": avg, "sacc": sacc}
+    return parts, {"avg": avg, "sacc": sacc}
+
+
+def exp_narrative(cfg, exp, shots=0):
+    parts, stats = exp_narrative_parts(cfg, exp, shots)
+    return (" ".join(parts) if parts else None), stats
 
 
 def per_predicate(cfg, shots):
@@ -393,6 +398,9 @@ table{border-collapse:collapse;width:100%}
 .exp-title{font-size:18px;font-weight:700;margin-bottom:8px}
 .para{font-size:15px;line-height:1.65;color:#333;margin:0 0 18px}
 .para i{color:#cf222e;font-style:normal;font-weight:600}
+.blist{margin:0 0 18px;padding-left:20px;font-size:15px;line-height:1.6;color:#333}
+.blist li{margin:5px 0}
+.blist i{color:#cf222e;font-style:normal;font-weight:600}
 .cm-grid{display:flex;flex-direction:column;gap:16px;margin-top:6px}
 .cm-strat{display:flex;align-items:flex-start;gap:14px}
 .cm-slabel{font-weight:700;font-size:13px;color:#5856d6;width:42px;padding-top:18px;flex:none}
@@ -491,7 +499,8 @@ def main():
     P.append("<div class='sec'><h2>Per-experiment breakdown</h2>"
              "<h3>What goes wrong, experiment by experiment.</h3>")
     for e in exps_present:
-        narrative, _ = exp_narrative(cfg, e, 0)
+        parts, _ = exp_narrative_parts(cfg, e, 0)
+        bullets = ''.join(f'<li>{p}</li>' for p in parts) or '<li>No data.</li>'
         conf, labels = confusion_counts(cfg, 0, e)
         cap = (f"rows = expected · columns = predicted · aggregated over CoT/ToT/GoT "
                f"(zero-shot) for {EXP_LABELS[e]}")
@@ -503,7 +512,7 @@ def main():
         P.append(
             "<div class='card'>"
             f"<div class='exp-title'>{EXP_LABELS[e]}</div>"
-            f"<p class='para'>{narrative or 'No data.'}</p>"
+            f"<ul class='blist'>{bullets}</ul>"
             "<div class='grid2' style='align-items:start'>"
             f"<div>{bars_html(sacc)}</div>"
             f"<div>{confusion_table_html(conf, labels, cap)}</div>"
