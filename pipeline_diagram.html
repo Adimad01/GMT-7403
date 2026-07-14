@@ -59,7 +59,7 @@ td.exp{font-weight:700;white-space:nowrap}
 .outs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
 .future{border:2px dashed #b8a4f0;background:linear-gradient(180deg,#fdfcff,#f7f4ff);border-radius:18px;padding:20px 22px}
 .future .stage-label{color:#7a5af5}
-.fsteps{display:grid;grid-template-columns:repeat(4,1fr);gap:0;position:relative;margin-top:4px}
+.fsteps{display:grid;grid-template-columns:repeat(5,1fr);gap:0;position:relative;margin-top:4px}
 .fstep{padding:4px 18px 4px 0;position:relative}
 .fstep:not(:last-child)::after{content:'→';position:absolute;right:2px;top:50%;transform:translateY(-50%);
  color:#c5b6f2;font-size:18px;font-weight:700}
@@ -191,16 +191,17 @@ topological, cardinal and relative relations.</p>
     <div class="fex">Input is <b>only</b> the vernacular expression — no entities given:<br>
     “Standing on the lawn looking at the main entrance, the West Wing is positioned towards your port arm.”</div>
     <div class="fsteps">
-      <div class="fstep"><b>① Entity extraction</b><span>the model identifies the subject entity and the object entity itself from the free text (no gold entities provided)</span></div>
-      <div class="fstep"><b>② OSM grounding on demand</b><span>the model decides when it needs geographic facts and queries OSM as a tool (agentic retrieval, not pre-injected)</span></div>
-      <div class="fstep"><b>③ Relation analysis</b><span>combine the vernacular cues (observer frame, cultural references) with the retrieved geometry</span></div>
-      <div class="fstep"><b>④ Prediction</b><span>output the spatial relation label — topological, cardinal or relative — plus the grounded entity pair</span></div>
+      <div class="fstep"><b>① Relation-type routing</b><span>the model first decides which relation family the sentence expresses — topological, cardinal or relative (possibly several at once) — instead of being told</span></div>
+      <div class="fstep"><b>② Entity extraction</b><span>the model identifies the subject entity and the object entity itself from the free text (no gold entities provided)</span></div>
+      <div class="fstep"><b>③ OSM grounding on demand</b><span>the model decides when it needs geographic facts and queries OSM as a tool (agentic retrieval, not pre-injected)</span></div>
+      <div class="fstep"><b>④ Relation analysis</b><span>combine the vernacular cues (observer frame, cultural references) with the retrieved geometry</span></div>
+      <div class="fstep"><b>⑤ Prediction</b><span>output the spatial relation label within the routed family, plus the grounded entity pair</span></div>
     </div>
     <div class="fnote"><b>What changes vs. the current pipeline:</b> stages 1–6 hand the model the
     (subject, object) pair and control exactly where the KG enters. The future pipeline removes that
-    scaffolding — extraction, grounding and tool use become part of the task itself, so evaluation
-    extends from label accuracy to <i>entity-extraction accuracy</i>, <i>grounding success</i> and
-    <i>end-to-end correctness</i>.</div>
+    scaffolding — routing, extraction, grounding and tool use become part of the task itself, so
+    evaluation extends from label accuracy to <i>routing accuracy</i>, <i>entity-extraction
+    accuracy</i>, <i>grounding success</i> and <i>end-to-end correctness</i>.</div>
   </div>
 </div>
 
