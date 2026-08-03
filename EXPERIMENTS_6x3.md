@@ -11,10 +11,47 @@ Each domain runs the **same 6 experiments × 3 strategies (CoT/ToT/GoT)** at a
 | 4 | `exp4_base_kg_input.py` | base        | — | OSM (static) | — |
 | 5 | `exp5_ft_kg_input.py`   | no-KG LoRA  | — | OSM (static) | — |
 | 6 | `exp6_base_kg_rag.py`   | base        | — | — | OSM (per-step RAG) |
+| 7 | `exp7_base_graphrag.py` | base        | — | — | OSM (GraphRAG sub-graph) |
 
 **KG mechanism = the `--kg-mode` flag** on every eval engine:
 `none` (Exp 1/2/3) · `input` = evidence prepended once (Exp 4/5) ·
-`rag` = per-step `NEXT_QUERY`→`RETRIEVED` loop during reasoning (Exp 6).
+`rag` = per-step `NEXT_QUERY`→`RETRIEVED` loop during reasoning (Exp 6) ·
+`graphrag` = k-hop sub-graph + connecting path, prepended once (Exp 7).
+
+## Exp 7 — GraphRAG
+Exp 6 retrieves one *place record* at a time and nothing connects the records, so
+no multi-hop fact is reachable. Exp 7 retrieves a *sub-graph*:
+
+- **Graph** — `graph_kg.py` derives nodes (geocoded places + administrative levels)
+  and edges (`within`/`contains` from the Nominatim hierarchy, `near` from haversine)
+  straight out of `results/osm_cache.json`. No LLM extraction; OSM is already structured.
+- **Retrieval** — GraphRAG *local search*: both entities are given, so there is no
+  embedding step. Pull each entity's containment chain and nearest neighbours, plus the
+  shortest path between them. Global (community-summary) search is deliberately not
+  implemented — every row is a two-entity classification, not corpus-wide sensemaking.
+- **Evidence** = Exp 4's static OSM evidence **+** the sub-graph, so the Exp 4 → Exp 7
+  delta isolates the graph structure itself.
+- **Fallback** — entities missing from the graph keep Exp 4 evidence and stay in eval,
+  so the row set matches the other six exactly.
+
+Build the artifact locally (deterministic, network-free — it only reads the cache) and
+commit it; the GPU server has no internet:
+```bash
+python build_osm_graph.py          # each */code dir → results/osm_graph.json
+python exp7_base_graphrag.py       # zero-shot ; --shots 5 for few-shot
+```
+
+### ⚠ Known limitation, measured before running
+On the Topological eval set only **54 / 105** geocodable rows have a connecting path, and
+the path signature does **not** separate the labels (containment paths occur for `contains`
+10, `within` 8, `equals` 8, `touches` 5, `disjoint` 4, `overlaps` 3, `crosses` 2). The graph
+is only as good as `osm_cache.json`, and that cache carries bad geocodes — the **Cardinal**
+cache in particular resolves `Canada` → Pike County, Kentucky; `Scotland` → North Carolina;
+`England` → Lonoke County, Arkansas; `City of Seattle` → Yakutat, Alaska. Those come from an
+older `osm_client.py` that pinned `countrycodes=us,mx` (still present in
+`Topological-Reasoning/code/strategies_osm.py:298`); the current `osm_client.py` has no such
+filter. **This affects Exp 4/5/6 equally, not just Exp 7.** Re-warming the Cardinal cache
+would fix it but changes the evidence feeding already-published Exp 4/5/6 numbers.
 
 ## Shared modules (duplicated into each `*/code/` dir)
 - `osm_client.py` — Nominatim client + cache, geometry helpers (bearing, offset,

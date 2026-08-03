@@ -183,6 +183,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 from strategies_cardinal import VALID_DIRECTIONS, VALID_LIST, extract_direction
 from strategies_osm_cardinal import get_strategy, STRATEGY_MAP
 from osm_client import OSMEvidenceKG, NullKG, load_cache, is_geocodable
+from graph_kg import GraphKG
 from rag_loop import RAGStrategy, DomainSpec
 from fewshot import FewShotSelector
 
@@ -347,9 +348,10 @@ def main():
     parser.add_argument("--model-id",       default="openai/gpt-oss-20b")
     parser.add_argument("--adapter-path",   default=None)
     parser.add_argument("--kg-mode",        default="none",
-                        choices=["none", "input", "rag"],
+                        choices=["none", "input", "rag", "graphrag"],
                         help="none = no KG (Exp 1/2/3); input = OSM evidence prepended "
-                             "once (Exp 4/5); rag = per-step OSM retrieval (Exp 6)")
+                             "once (Exp 4/5); rag = per-step OSM retrieval (Exp 6); "
+                             "graphrag = k-hop sub-graph + connecting path (Exp 7)")
     parser.add_argument("--strategy",       required=True,
                         choices=list(STRATEGY_MAP.keys()) + ["all"])
     parser.add_argument("--output-dir",     default="./results")
@@ -547,8 +549,11 @@ def main():
         print("[KG] kg-mode=none — no OSM evidence (Exp 1/2/3)")
     else:
         kg = OSMEvidenceKG("results/osm_cache.json")
+        if args.kg_mode == "graphrag":
+            kg = GraphKG("results/osm_graph.json", kg)
         print(f"[KG] kg-mode={args.kg_mode} — OSM evidence active "
-              f"({'static input' if args.kg_mode == 'input' else 'per-step RAG'})")
+              f"({ {'input': 'static input', 'rag': 'per-step RAG',
+                    'graphrag': 'GraphRAG sub-graph'}[args.kg_mode] })")
 
     card_spec = DomainSpec(
         task_noun="cardinal direction",

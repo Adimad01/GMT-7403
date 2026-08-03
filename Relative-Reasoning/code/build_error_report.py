@@ -39,6 +39,7 @@ EXP_LABELS = {
     "exp4_base_kg_input": "Exp 4 · base + KG@input",
     "exp5_ft_kg_input": "Exp 5 · no-KG LoRA + KG@input",
     "exp6_base_kg_rag": "Exp 6 · base + KG@inference (RAG)",
+    "exp7_base_graphrag": "Exp 7 · base + KG@inference (GraphRAG)",
 }
 EXP_ORDER = list(EXP_LABELS)
 

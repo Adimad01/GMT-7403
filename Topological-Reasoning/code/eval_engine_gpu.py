@@ -221,6 +221,7 @@ from strategies_osm import (
     extract_predicate,
 )
 from osm_client import NullKG, load_cache, is_geocodable
+from graph_kg import GraphKG
 from rag_loop import RAGStrategy, DomainSpec
 from fewshot import FewShotSelector
 
@@ -396,10 +397,11 @@ def main():
     parser.add_argument("--max-new-tokens",  type=int,   default=1024)
     parser.add_argument("--model-tag",       default="dynamic_osm_finetuned_gpu")
     parser.add_argument("--kg-mode",         default="none",
-                        choices=["none", "input", "rag"],
+                        choices=["none", "input", "rag", "graphrag"],
                         help="none = no KG evidence (Exp 1/2/3); "
                              "input = OSM evidence prepended once (Exp 4/5); "
-                             "rag = per-step OSM retrieval during reasoning (Exp 6)")
+                             "rag = per-step OSM retrieval during reasoning (Exp 6); "
+                             "graphrag = k-hop sub-graph + connecting path, prepended once (Exp 7)")
     parser.add_argument("--no-kg",           action="store_true",
                         help="(deprecated) alias for --kg-mode none")
     parser.add_argument("--shots",            type=int, default=0,
@@ -634,8 +636,11 @@ def main():
         print("[KG] kg-mode=none — no OSM evidence at inference (Exp 1/2/3)")
     else:
         kg = GeographicKnowledgeGraph("results/osm_cache.json")
+        if args.kg_mode == "graphrag":
+            kg = GraphKG("results/osm_graph.json", kg)
         print(f"[KG] kg-mode={args.kg_mode} — OSM evidence active "
-              f"({'static input' if args.kg_mode == 'input' else 'per-step RAG'})")
+              f"({ {'input': 'static input', 'rag': 'per-step RAG',
+                    'graphrag': 'GraphRAG sub-graph'}[args.kg_mode] })")
 
     topo_spec = DomainSpec(
         task_noun="DE-9IM topological predicate",
