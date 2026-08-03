@@ -638,9 +638,10 @@ def main():
         kg = GeographicKnowledgeGraph("results/osm_cache.json")
         if args.kg_mode == "graphrag":
             kg = GraphKG("results/osm_graph.json", kg)
-        print(f"[KG] kg-mode={args.kg_mode} — OSM evidence active "
-              f"({ {'input': 'static input', 'rag': 'per-step RAG',
-                    'graphrag': 'GraphRAG sub-graph'}[args.kg_mode] })")
+        _mode_desc = {"input": "static input",
+                      "rag": "per-step RAG",
+                      "graphrag": "GraphRAG sub-graph"}[args.kg_mode]
+        print(f"[KG] kg-mode={args.kg_mode} — OSM evidence active ({_mode_desc})")
 
     topo_spec = DomainSpec(
         task_noun="DE-9IM topological predicate",
