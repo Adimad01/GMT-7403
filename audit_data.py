@@ -61,7 +61,10 @@ DOMAINS = {
         "labels": CARD_LABELS,
         "corpus": ("dataset/cardinal_direction_relations.csv", "relation_label",
                    "source_entity", "target_entity"),
-        "splits": [],
+        "splits": [
+            ("dataset/cardinal_nokg_train.csv", "relation_label",
+             "source_entity", "target_entity", "train"),
+        ],
         "index_split": ("dataset/eval_40_balanced_indices.json",
                         "dataset/cardinal_direction_relations.csv",
                         "relation_label", "source_entity", "target_entity"),
@@ -152,7 +155,11 @@ def geocodable(cache: dict, *names: str) -> bool:
 # CHECKS
 # ---------------------------------------------------------------------------
 def check_split(name: str, rows: list[dict], label_col: str,
-                sc: str, tc: str, expected_labels: set, cache: dict) -> None:
+                sc: str, tc: str, expected_labels: set, cache: dict,
+                is_pool: bool = False) -> None:
+    """is_pool=True for the raw corpus: it is the source to sample FROM, so
+    imbalance and partial geocoding there are expected, not defects."""
+    bad = warn if is_pool else fail
     print(f"\n  -- {name}  ({len(rows)} rows) " + "-" * max(0, 46 - len(name)))
 
     if not rows:
@@ -203,12 +210,12 @@ def check_split(name: str, rows: list[dict], label_col: str,
     else:
         empty = [k for k, v in full.items() if v == 0]
         if empty:
-            fail(f"balance: {len(empty)} EMPTY cells, e.g. {empty[:3]}")
+            bad(f"balance: {len(empty)} EMPTY cells, e.g. {empty[:3]}")
         lvset = sorted(set(per_level.values()))
         if len(lvset) == 1:
             warn(f"balance: per-level totals equal ({lvset[0]}) but cells vary {vals}")
         else:
-            fail(f"balance: cells vary {vals}; per-level totals {per_level}")
+            bad(f"balance: cells vary {vals}; per-level totals {per_level}")
         info("per-level: " + ", ".join(
             f"{lv.replace('Level ', 'L')}={n}" for lv, n in sorted(per_level.items())))
 
@@ -230,7 +237,7 @@ def check_split(name: str, rows: list[dict], label_col: str,
         elif pct >= 90:
             warn(msg + " — KG arms drop the rest")
         else:
-            fail(msg + " — KG arms lose a large share")
+            bad(msg + " — KG arms lose a large share")
         lost = Counter(r[label_col].strip().lower() for r in rows
                        if not geocodable(cache, r[sc], r[tc]))
         if lost:
@@ -294,7 +301,8 @@ def audit_domain(domain: str) -> None:
     corpus_full = os.path.join(domain, corpus_path)
     if os.path.exists(corpus_full):
         check_split("corpus " + os.path.basename(corpus_path),
-                    read_csv(corpus_full), c_lab, c_sc, c_tc, spec["labels"], cache)
+                    read_csv(corpus_full), c_lab, c_sc, c_tc, spec["labels"], cache,
+                    is_pool=True)
 
     loaded = {}
     for rel, lab, sc, tc, kind in spec["splits"]:
@@ -326,8 +334,9 @@ def audit_domain(domain: str) -> None:
                             ev, lab, sc, tc, spec["labels"], cache)
                 rest = [r for i, r in enumerate(src) if i not in set(idx)]
                 loaded.setdefault("train", (rest, sc, tc))
-                check_split("train remainder (corpus minus eval indices)",
-                            rest, lab, sc, tc, spec["labels"], cache)
+                if "train" not in loaded:
+                    check_split("train remainder (corpus minus eval indices)",
+                                rest, lab, sc, tc, spec["labels"], cache)
 
     if "train" in loaded and "eval" in loaded:
         (tr, tsc, ttc), (ev, esc, etc) = loaded["train"], loaded["eval"]

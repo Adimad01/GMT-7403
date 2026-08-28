@@ -67,9 +67,25 @@ def main():
         fieldnames = reader.fieldnames
         rows = list(reader)
 
-    train_rows = [r for i, r in enumerate(rows)
-                  if i not in eval_idx and r.get("relation_label", "").strip().lower() in VALID_DIRECTIONS]
-    print(f"[DATA] {len(rows)} total, {len(eval_idx)} eval excluded → {len(train_rows)} training rows")
+    def _pair(r):
+        return (r.get("source_entity", "").strip().lower(),
+                r.get("target_entity", "").strip().lower())
+
+    # Excluding eval by ROW INDEX alone is not enough: the corpus repeats entity
+    # pairs, so the same (subject, object) with the same label can sit in both
+    # splits. The fine-tuned arms (Exp 2/3/5) would then memorise eval answers
+    # that the base arms (Exp 1/4/6/7) cannot see, confounding the very
+    # comparison this study is built on. Drop pair collisions as well.
+    eval_pairs = {_pair(r) for i, r in enumerate(rows) if i in eval_idx}
+
+    candidates = [r for i, r in enumerate(rows)
+                  if i not in eval_idx
+                  and r.get("relation_label", "").strip().lower() in VALID_DIRECTIONS]
+    train_rows = [r for r in candidates if _pair(r) not in eval_pairs]
+    n_leaked = len(candidates) - len(train_rows)
+    print(f"[DATA] {len(rows)} total, {len(eval_idx)} eval excluded → "
+          f"{len(train_rows)} training rows "
+          f"({n_leaked} dropped for sharing an entity pair with eval)")
 
     # --- no-KG CSV ---------------------------------------------------------
     os.makedirs(os.path.dirname(os.path.abspath(OUT_CSV)), exist_ok=True)

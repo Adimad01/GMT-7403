@@ -73,6 +73,11 @@ def main():
                              "this many rows, so train is balanced across predicate "
                              "AND ambiguity level. Default: keep every remaining row "
                              "(unbalanced, legacy behaviour).")
+    parser.add_argument("--pair-disjoint", action="store_true",
+                        help="Assign every entity pair to exactly ONE split. "
+                             "Without this, a pair repeated in the corpus can land "
+                             "in both train and eval, letting fine-tuned arms "
+                             "memorise eval answers that base arms cannot.")
     parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
 
@@ -108,7 +113,69 @@ def main():
 
     eval_rows, train_rows = [], []
     stats = {}
-    for pred in PREDICATES:
+
+    def _pair(r):
+        return (r["source_entity"].strip().lower(), r["target_entity"].strip().lower())
+
+    if args.pair_disjoint:
+        if args.train_per_cell is None:
+            raise SystemExit("[ERROR] --pair-disjoint requires --train-per-cell.")
+
+        # An entity pair can appear in several (predicate, level) cells, so the
+        # eval/train assignment has to be decided GLOBALLY per pair, not per
+        # cell. Cells are filled scarcest-first: a cell with few distinct pairs
+        # has the least freedom, so it must claim its pairs before roomier
+        # cells exhaust the shared pool.
+        assigned: dict[tuple, str] = {}
+        cell_pairs = {k: {_pair(r) for r in v} for k, v in cells.items()}
+        order = sorted(cells, key=lambda k: len(cell_pairs[k]))
+
+        def _claim(cell, want, side):
+            """Take `want` pairs for `side`, preferring pairs already on that
+            side (reusing them costs nothing and conserves the shared pool),
+            then geocodable ones, then anything unassigned."""
+            by_pair = defaultdict(list)
+            for r in cells[cell]:
+                by_pair[_pair(r)].append(r)
+            usable = [pr for pr in by_pair if assigned.get(pr) in (None, side)]
+
+            def rank(pr):
+                geo = any(is_geocodable(cache, r["source_entity"], r["target_entity"])
+                          for r in by_pair[pr])
+                return (assigned.get(pr) != side, not geo, rng.random())
+
+            usable.sort(key=rank)
+            if len(usable) < want:
+                raise SystemExit(
+                    f"[ERROR] --pair-disjoint infeasible for {cell}: only "
+                    f"{len(usable)} pairs available for '{side}', need {want}. "
+                    f"Lower --n-per-cell/--train-per-cell."
+                )
+            picked, out = usable[:want], []
+            for pr in picked:
+                assigned[pr] = side
+                rows_for_pair = sorted(
+                    by_pair[pr],
+                    key=lambda r: not is_geocodable(cache, r["source_entity"],
+                                                   r["target_entity"]))
+                out.append(rows_for_pair[0])       # one row per pair, geocodable first
+            return out
+
+        for cell in order:
+            ev = _claim(cell, args.n_per_cell, "eval")
+            tr = _claim(cell, args.train_per_cell, "train")
+            eval_rows.extend(ev)
+            train_rows.extend(tr)
+            stats[cell] = (len(ev), len(tr))
+
+        ev_pairs = {_pair(r) for r in eval_rows}
+        tr_pairs = {_pair(r) for r in train_rows}
+        overlap = ev_pairs & tr_pairs
+        assert not overlap, f"pair-disjoint violated: {sorted(overlap)[:3]}"
+        print(f"[PAIR-DISJOINT] {len(ev_pairs)} eval pairs / {len(tr_pairs)} train "
+              f"pairs, zero overlap")
+
+    for pred in (PREDICATES if not args.pair_disjoint else []):
         for lvl in LEVELS:
             pool = cells[(pred, lvl)]
             geo_pool = [r for r in pool
