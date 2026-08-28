@@ -25,6 +25,14 @@ __pycache__/
 !Topological-Reasoning/dataset/topological_relations.csv
 !Cardinal-Reasoning/dataset/cardinal_direction_relations.csv
 !Relative-Reasoning/dataset/relative_direction_relations.csv
+# The train/eval SPLITS must be versioned too, not regenerated on the server.
+# They are the experiment's inputs: a split rebuilt elsewhere is a different
+# split, and pairing a new eval with a stale train silently reintroduces the
+# train/eval leakage the pair-disjoint rebuild removed.
+!Topological-Reasoning/dataset/topo_v2_train.csv
+!Topological-Reasoning/dataset/topo_v2_eval.csv
+!Cardinal-Reasoning/dataset/cardinal_nokg_train.csv
+!Relative-Reasoning/dataset/relative_balanced_train.csv
 
 # Tool config
 .claude/
@@ -46,3 +54,4 @@ finetuned_gptoss_*/
 **/.vscode/
 Data Collection/locations.json
 __pycache__/
+.exp_running.lock

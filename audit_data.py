@@ -92,20 +92,26 @@ LEVEL_COL = "ambiguity_level"
 # ---------------------------------------------------------------------------
 _counts = Counter()
 
+# Colour only when writing to a terminal. Piped or redirected output must stay
+# plain text so log files are readable and callers can grep the status words --
+# escape codes sit between "FAIL" and the message and break naive matching.
+_COLOR = sys.stdout.isatty()
+_C = (lambda code, t: f"\033[{code}m{t}\033[0m") if _COLOR else (lambda code, t: t)
+
 
 def ok(msg: str) -> None:
     _counts["pass"] += 1
-    print(f"    \033[92mPASS\033[0m  {msg}")
+    print(f"    {_C(92, 'PASS')}  {msg}")
 
 
 def warn(msg: str) -> None:
     _counts["warn"] += 1
-    print(f"    \033[93mWARN\033[0m  {msg}")
+    print(f"    {_C(93, 'WARN')}  {msg}")
 
 
 def fail(msg: str) -> None:
     _counts["fail"] += 1
-    print(f"    \033[91mFAIL\033[0m  {msg}")
+    print(f"    {_C(91, 'FAIL')}  {msg}")
 
 
 def info(msg: str) -> None:

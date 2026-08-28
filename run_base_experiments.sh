@@ -39,6 +39,24 @@ PY="${PY:-python3}"
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$ROOT" || exit 1
 
+# --- single-instance lock ----------------------------------------------------
+# Two of these running at once put two 20B model loads on the same GPU, which
+# on a MIG A100 surfaces as an NVML assert inside the CUDA caching allocator
+# rather than a clean OOM. Refuse to start instead.
+LOCK="$ROOT/.exp_running.lock"
+if [ -e "$LOCK" ]; then
+  other=$(cat "$LOCK" 2>/dev/null || echo "?")
+  if kill -0 "$other" 2>/dev/null; then
+    echo "ERROR: another experiment run is already active (PID $other)."
+    echo "       Wait for it, or stop it with:  kill $other"
+    echo "       Two runs share one GPU and will fail with NVML/allocator errors."
+    exit 2
+  fi
+  echo "[LOCK] stale lock from PID $other (not running) - taking over"
+fi
+echo $$ > "$LOCK"
+trap 'rm -f "$LOCK"' EXIT INT TERM
+
 total=0; done_n=0; failed=0
 declare -a FAILURES=()
 
@@ -57,11 +75,29 @@ echo "  invocations: $total   (each runs every selected strategy)"
 echo "  started   : $(date '+%Y-%m-%d %H:%M:%S')"
 echo
 
-# Informational pre-flight. Not a gate: the audit reports known, accepted
-# failures (train-split geocoding coverage), and those must not block a run.
+# Pre-flight. Geocoding-coverage failures are known and accepted, so they do not
+# block. LEAKAGE does block: if an eval row's answer is also in train, the
+# fine-tuned arms can memorise it and every comparison against the base arms
+# becomes meaningless. Burning GPU hours to produce invalid numbers is worse
+# than stopping. Override with ALLOW_LEAKAGE=1 only to reproduce a known-bad run.
 if [ -f audit_data.py ]; then
   echo "--- data pre-flight -----------------------------------------------------------"
-  $PY audit_data.py 2>&1 | grep -E "leakage:|SUMMARY" || true
+  # Strip any ANSI codes so the status words are greppable regardless.
+  audit_out=$($PY audit_data.py 2>&1 | sed $'s/\033\[[0-9;]*m//g')
+  echo "$audit_out" | grep -E "leakage:|SUMMARY" || true
+  if echo "$audit_out" | grep -qE "FAIL[[:space:]]+leakage"; then
+    echo
+    echo "ERROR: train/eval leakage detected - refusing to run."
+    echo "$audit_out" | grep -E "FAIL[[:space:]]+leakage" | sed 's/^/       /'
+    echo
+    echo "       Most likely the split files on this machine are out of sync."
+    echo "       Fix:   git pull --rebase origin main"
+    echo "       Check: $PY audit_data.py"
+    if [ "${ALLOW_LEAKAGE:-0}" != "1" ]; then
+      exit 3
+    fi
+    echo "       ALLOW_LEAKAGE=1 set - continuing with KNOWN-INVALID data."
+  fi
   echo
 fi
 
