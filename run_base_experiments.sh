@@ -63,14 +63,27 @@ if [ -e "$LOCK" ]; then
   fi
   echo "[LOCK] stale lock from PID $other (not running) - taking over"
 fi
-# A stale lock is not the only way to collide: an orphaned child from a killed
-# run holds the GPU without holding the lock.
-_orphans=$(pgrep -f "exp[0-9]_.*\.py" 2>/dev/null | grep -v "^$$\$" || true)
-if [ -n "$_orphans" ]; then
-  echo "ERROR: experiment processes are already running (PIDs: $(echo $_orphans | tr '\n' ' '))."
-  echo "       These hold the GPU. Stop them first:"
-  echo "         kill $(echo $_orphans | tr '\n' ' ')"
-  echo "       Then confirm none remain:  pgrep -af 'exp[0-9]_.*\.py'"
+# A stale lock is not the only way to collide. Two cases matter:
+#   * an orphaned python child from a killed run, still holding the GPU;
+#   * another copy of THIS script, which keeps spawning new cells even after
+#     its children are killed -- killing the children alone is useless while the
+#     parent survives to start the next one.
+_self=$$
+_others=$(pgrep -f "run_base_experiments\.sh" 2>/dev/null | grep -vw "$_self" || true)
+_orphans=$(pgrep -f "exp[0-9]_.*\.py" 2>/dev/null || true)
+_alive=$(printf '%s\n%s\n' "$_others" "$_orphans" | grep -v '^$' | sort -u || true)
+if [ -n "$_alive" ]; then
+  _pids=$(echo $_alive | tr '\n' ' ')
+  echo "ERROR: an experiment is already running (PIDs: $_pids)."
+  echo
+  echo "       Stop the RUNNER first -- killing only the python child is futile,"
+  echo "       the runner just starts the next cell:"
+  echo "         pkill -f run_base_experiments.sh"
+  echo "         sleep 2"
+  echo "         pkill -f 'exp[0-9]_.*\.py'"
+  echo
+  echo "       Then confirm nothing remains (must print nothing):"
+  echo "         pgrep -af 'run_base_experiments|exp[0-9]_.*\.py'"
   exit 2
 fi
 
