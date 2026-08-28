@@ -44,6 +44,9 @@ def run():
     parser.add_argument("--strategy", choices=STRATEGIES + ["all"], default="all")
     parser.add_argument("--shots", type=int, default=0,
                         help="0 = zero-shot (default); 5 = few-shot (same-label demos, one per level)")
+    parser.add_argument("--seed", type=int, default=0,
+                        help="RNG seed. Sampling is stochastic, so vary this "
+                             "across runs to measure run-to-run variance.")
     args = parser.parse_args()
 
     if ADAPTER_PATH and not os.path.exists(
@@ -69,6 +72,7 @@ def run():
         "--max-new-tokens", str(MAX_NEW_TOKENS),
         "--kg-mode",        KG_MODE,
         "--shots",          str(args.shots),
+        "--seed",          str(args.seed),
     ]
     if args.shots > 0:
         argv += ["--train-data", TRAIN_DATA]
