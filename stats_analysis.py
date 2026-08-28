@@ -250,6 +250,21 @@ def report_domain(domain: str, baseline: str, alpha: float,
 
     print(f"  eval rows: {n_rows}    seeds present: {seeds}    "
           f"conditions: {len(grouped)}")
+
+    # A checkpoint is written incrementally, so a run still in progress looks
+    # exactly like a completed small-n run. Uneven row counts across conditions
+    # are the tell -- surface them instead of silently reporting partial data.
+    row_counts = sorted({r["n"] for r in runs})
+    if len(row_counts) > 1:
+        short = [f'{r["exp"]}/{r["strat"]}/s{r["seed"]}={r["n"]}'
+                 for r in runs if r["n"] < n_rows]
+        print(f"  ⚠ INCOMPLETE: row counts differ across runs {row_counts}. "
+              f"Some runs are still in flight or died early:")
+        for chunk in (short[i:i + 3] for i in range(0, min(len(short), 9), 3)):
+            print("      " + "  ".join(chunk))
+        if len(short) > 9:
+            print(f"      ... and {len(short) - 9} more")
+        print("    Numbers below mix complete and partial runs — do not report them.")
     print(f"  resolution floor: +/-{floor:.1f}pp  "
           f"(widest 95% CI half-width at n={n_rows})")
     if len(seeds) == 1:

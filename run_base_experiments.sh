@@ -63,8 +63,33 @@ if [ -e "$LOCK" ]; then
   fi
   echo "[LOCK] stale lock from PID $other (not running) - taking over"
 fi
+# A stale lock is not the only way to collide: an orphaned child from a killed
+# run holds the GPU without holding the lock.
+_orphans=$(pgrep -f "exp[0-9]_.*\.py" 2>/dev/null | grep -v "^$$\$" || true)
+if [ -n "$_orphans" ]; then
+  echo "ERROR: experiment processes are already running (PIDs: $(echo $_orphans | tr '\n' ' '))."
+  echo "       These hold the GPU. Stop them first:"
+  echo "         kill $(echo $_orphans | tr '\n' ' ')"
+  echo "       Then confirm none remain:  pgrep -af 'exp[0-9]_.*\.py'"
+  exit 2
+fi
+
 echo $$ > "$LOCK"
-trap 'rm -f "$LOCK"' EXIT INT TERM
+
+# Killing this script does NOT kill the python child it is waiting on: the child
+# is orphaned, keeps holding the GPU, and the next launch then runs two model
+# loads at once. Track the child and take it down with us.
+CHILD=""
+_cleanup() {
+  if [ -n "$CHILD" ] && kill -0 "$CHILD" 2>/dev/null; then
+    echo "[CLEANUP] stopping child $CHILD"
+    kill "$CHILD" 2>/dev/null
+    for _ in 1 2 3 4 5; do kill -0 "$CHILD" 2>/dev/null || break; sleep 1; done
+    kill -9 "$CHILD" 2>/dev/null
+  fi
+  rm -f "$LOCK"
+}
+trap _cleanup EXIT INT TERM
 
 total=0; done_n=0; failed=0
 declare -a FAILURES=()
@@ -156,9 +181,12 @@ for domain in $DOMAINS; do
       t0=$(date +%s)
       (
         cd "$domain/code" || exit 1
-        $PY exp1_base.py --strategy "$STRATEGY" --shots "$shots" --seed "$seed"
-      )
+        exec $PY exp1_base.py --strategy "$STRATEGY" --shots "$shots" --seed "$seed"
+      ) &
+      CHILD=$!
+      wait "$CHILD"
       rc=$?
+      CHILD=""
       t1=$(date +%s)
       if [ $rc -eq 0 ]; then
         echo "[OK]   $label   ($((t1 - t0))s)"
