@@ -55,13 +55,26 @@ cd "$ROOT" || exit 1
 LOCK="$ROOT/.exp_running.lock"
 if [ -e "$LOCK" ]; then
   other=$(cat "$LOCK" 2>/dev/null || echo "?")
-  if kill -0 "$other" 2>/dev/null; then
+  # `kill -0` only proves SOMETHING owns that PID. `pkill -9` never runs the EXIT
+  # trap, so the lock outlives the run and the PID it names may since have been
+  # recycled by an unrelated process -- which would then block every future run
+  # for no reason. Confirm the PID really is one of these scripts.
+  _is_runner=0
+  if [ -n "$other" ] && kill -0 "$other" 2>/dev/null; then
+    if tr '\0' ' ' < "/proc/$other/cmdline" 2>/dev/null | grep -q "run_base_experiments"; then
+      _is_runner=1
+    elif [ ! -r "/proc/$other/cmdline" ] && ps -p "$other" -o args= 2>/dev/null | grep -q "run_base_experiments"; then
+      _is_runner=1   # no procfs (e.g. macOS): fall back to ps
+    fi
+  fi
+  if [ "$_is_runner" = "1" ]; then
     echo "ERROR: another experiment run is already active (PID $other)."
-    echo "       Wait for it, or stop it with:  kill $other"
+    echo "       Stop it with:  pkill -f run_base_experiments.sh"
     echo "       Two runs share one GPU and will fail with NVML/allocator errors."
     exit 2
   fi
-  echo "[LOCK] stale lock from PID $other (not running) - taking over"
+  echo "[LOCK] stale lock from PID $other (not an active run) - taking over"
+  rm -f "$LOCK"
 fi
 # A stale lock is not the only way to collide. Two cases matter:
 #   * an orphaned python child from a killed run, still holding the GPU;
