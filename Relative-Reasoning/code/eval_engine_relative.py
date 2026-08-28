@@ -195,6 +195,32 @@ from fewshot import FewShotSelector
 EXPERIMENT_SUFFIX = "relative_dir_25_sample"
 
 
+def _seed_for_prompt(run_seed: int, prompt: str) -> None:
+    """Seed every RNG from (run_seed, prompt).
+
+    Generation uses do_sample=True, so without this each run is an
+    unreproducible stochastic draw. Deriving the seed from the prompt (rather
+    than seeding once at startup) makes a row's output independent of the order
+    rows are processed in and of any checkpoint-resume state, so re-running a
+    partially-complete job reproduces the same predictions.
+    """
+    import zlib
+    s = (run_seed * 1000003 + zlib.crc32(prompt.encode("utf-8"))) % (2 ** 31 - 1)
+    try:
+        from transformers import set_seed as _hf_set_seed
+        _hf_set_seed(s)
+    except Exception:
+        import random
+        random.seed(s)
+        try:
+            import torch
+            torch.manual_seed(s)
+        except Exception:
+            pass
+
+
+
+
 # ---------------------------------------------------------------------------
 # HELPERS
 # ---------------------------------------------------------------------------
@@ -362,6 +388,9 @@ def main():
                         choices=list(STRATEGY_MAP.keys()) + ["all"])
     parser.add_argument("--output-dir",     default="./results")
     parser.add_argument("--temperature",    type=float, default=0.1)
+    parser.add_argument("--seed", type=int, default=0,
+                        help="RNG seed. Sampling is stochastic (do_sample=True), so "
+                             "vary this across runs to measure run-to-run variance.")
     parser.add_argument("--max-new-tokens", type=int,   default=1024)
     parser.add_argument("--model-tag",      default="exp1_rel_base_gpu")
     parser.add_argument("--shots",          type=int, default=0,
@@ -405,6 +434,9 @@ def main():
     # ------------------------------------------------------------------
     _strats  = list(STRATEGY_MAP.keys()) if args.strategy == "all" else [args.strategy]
     _eff_tag = f"{args.model_tag}_fs{args.shots}" if args.shots > 0 else args.model_tag
+    # Seed goes in the tag so multiple seeds do not overwrite each other.
+    if args.seed:
+        _eff_tag = f"{_eff_tag}_s{args.seed}"
     _expected = set(df.index.tolist())
 
     def _strategy_done(sname: str) -> bool:
@@ -522,6 +554,8 @@ def main():
     prefix_holder = {"v": ""}   # few-shot demo prefix, set per row
 
     def gpu_inference_fn(prompt: str) -> str:
+
+        _seed_for_prompt(args.seed, prompt)
         prompt = prefix_holder["v"] + prompt
         inputs = tokenizer(
             prompt,

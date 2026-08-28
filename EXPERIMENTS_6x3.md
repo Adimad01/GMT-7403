@@ -44,14 +44,16 @@ python exp7_base_graphrag.py       # zero-shot ; --shots 5 for few-shot
 ### ⚠ Known limitation, measured before running
 On the Topological eval set only **54 / 105** geocodable rows have a connecting path, and
 the path signature does **not** separate the labels (containment paths occur for `contains`
-10, `within` 8, `equals` 8, `touches` 5, `disjoint` 4, `overlaps` 3, `crosses` 2). The graph
-is only as good as `osm_cache.json`, and that cache carries bad geocodes — the **Cardinal**
-cache in particular resolves `Canada` → Pike County, Kentucky; `Scotland` → North Carolina;
-`England` → Lonoke County, Arkansas; `City of Seattle` → Yakutat, Alaska. Those come from an
-older `osm_client.py` that pinned `countrycodes=us,mx` (still present in
-`Topological-Reasoning/code/strategies_osm.py:298`); the current `osm_client.py` has no such
-filter. **This affects Exp 4/5/6 equally, not just Exp 7.** Re-warming the Cardinal cache
-would fix it but changes the evidence feeding already-published Exp 4/5/6 numbers.
+10, `within` 8, `equals` 8, `touches` 5, `disjoint` 4, `overlaps` 3, `crosses` 2).
+
+**Geocode corruption (fixed 2026-08-28).** A legacy `countrycodes=us,mx` filter mis-resolved
+global entities in **all three domains**, not just Cardinal: `Australia`, `Argentina`,
+`Portugal`, `Chile` → Mexico. The filter is removed and all three caches re-warmed
+(`warm_osm_cache.py --force`). Row coverage: Cardinal 95% → 99%, Relative 57% → 71%.
+Residual: `State of Colorado` and `State of Tasmania` still mis-resolve because the
+preferred-class heuristic in `osm_client.py` takes the first result whose class is in the
+list rather than the highest-priority class, so a `natural/peak` can outrank a
+`boundary/administrative`.
 
 ## Shared modules (duplicated into each `*/code/` dir)
 - `osm_client.py` — Nominatim client + cache, geometry helpers (bearing, offset,
@@ -128,3 +130,31 @@ python analyze_results.py        # run inside each */code dir
   shore/compass task), their datasets, old result files, and stale
   analysis/visualization scripts were removed. They remain recoverable from git
   history if ever needed.
+
+## Statistical protocol
+Eval sets are small (Topological 105, Cardinal 40, Relative 25). The resolution floor —
+the tightest 95% CI the set can produce — is **±9.4pp / ±14.8pp / ±18.2pp** respectively.
+Any claimed effect smaller than that cannot be seen at this n, whatever the point estimate.
+
+Generation uses `do_sample=True`, so every run is a stochastic draw. Each engine now takes
+`--seed`, seeded **per prompt** so a row's output is independent of processing order and of
+checkpoint-resume state. The seed is folded into the output filename, so seeds do not
+overwrite one another.
+
+```bash
+for s in 1 2 3; do python exp1_base.py --seed $s; done
+python ../../stats_analysis.py --by-level
+```
+
+`stats_analysis.py` reports:
+- **Wilson 95% CIs** on every accuracy (not the normal approximation, which undercovers at
+  small n and near 0/100%).
+- **Exact McNemar** against the baseline arm. All experiments score the *same* eval rows, so
+  comparisons are paired — far more powerful here than two-independent-proportions.
+- **Holm–Bonferroni** correction across the comparison family.
+- **Bootstrap CIs** on the paired accuracy delta, resampling rows to preserve pairing.
+
+⚠ **Seeds are repeated measurements of the same rows, not extra rows.** They are collapsed
+to one verdict per row before any test. Crossing baseline seeds with variant seeds would
+replicate each row seeds² times and manufacture significance — verified against synthetic
+data where only one arm carried a real effect.
