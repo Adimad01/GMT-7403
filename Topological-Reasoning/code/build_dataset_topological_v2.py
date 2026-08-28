@@ -68,6 +68,11 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--n-per-cell", type=int, default=3,
                         help="Eval examples per (predicate, level) cell (default 3)")
+    parser.add_argument("--train-per-cell", type=int, default=None,
+                        help="Cap each (predicate, level) cell in the TRAIN split to "
+                             "this many rows, so train is balanced across predicate "
+                             "AND ambiguity level. Default: keep every remaining row "
+                             "(unbalanced, legacy behaviour).")
     parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
 
@@ -117,8 +122,30 @@ def main():
             chosen = rng.sample(geo_pool, args.n_per_cell)
             chosen_set = set(id(r) for r in chosen)
             eval_rows.extend(chosen)
-            train_rows.extend(r for r in pool if id(r) not in chosen_set)
-            stats[(pred, lvl)] = (len(chosen), len(pool) - len(chosen))
+
+            remaining = [r for r in pool if id(r) not in chosen_set]
+            if args.train_per_cell is not None:
+                # Cap every cell to the same size so the train split is balanced
+                # across BOTH predicate and ambiguity level. Prefer geocodable
+                # rows so the KG arms keep as many usable examples as possible;
+                # top up with ungeocodable rows only if the cell is short.
+                if len(remaining) < args.train_per_cell:
+                    raise ValueError(
+                        f"Only {len(remaining)} rows left for ({pred}, {lvl}) after the "
+                        f"eval draw — need {args.train_per_cell}. Lower --train-per-cell."
+                    )
+                geo = [r for r in remaining
+                       if is_geocodable(cache, r["source_entity"], r["target_entity"])]
+                geo_ids = set(id(r) for r in geo)
+                non = [r for r in remaining if id(r) not in geo_ids]
+                if len(geo) >= args.train_per_cell:
+                    take = rng.sample(geo, args.train_per_cell)
+                else:
+                    take = geo + rng.sample(non, args.train_per_cell - len(geo))
+                remaining = take
+
+            train_rows.extend(remaining)
+            stats[(pred, lvl)] = (len(chosen), len(remaining))
 
     n_eval  = len(eval_rows)
     n_train = len(train_rows)

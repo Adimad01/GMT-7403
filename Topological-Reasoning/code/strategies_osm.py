@@ -295,7 +295,7 @@ class GeographicKnowledgeGraph:
             "format": "json",
             "addressdetails": 1,
             "limit": 5,
-            "countrycodes": "us,mx",
+            # no countrycodes filter — datasets contain global entities
         }
         headers = {"User-Agent": "LavalUniversity-GeomaticsPhDEval/1.0"}
 

@@ -26,6 +26,9 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--dataset", required=True, help="CSV with source_entity/target_entity columns")
     ap.add_argument("--cache", default="results/osm_cache.json")
+    ap.add_argument("--force", action="store_true",
+                    help="Re-query entities already present in the cache "
+                         "(use after fixing a geocoding bug)")
     ap.add_argument("--cols", nargs="+", default=["source_entity", "target_entity",
                                                   "place_name_subject", "place_name_object"],
                     help="Candidate columns holding place names")
@@ -45,6 +48,12 @@ def main():
 
     print(f"[DATA] {len(names)} unique entities to geocode from {args.dataset}")
     client = OSMClient(args.cache)
+
+    if args.force:
+        stale = [n for n in names if n in client.cache]
+        for n in stale:
+            del client.cache[n]
+        print(f"[FORCE] dropped {len(stale)} cached entries; re-querying")
 
     hit = miss = 0
     for i, name in enumerate(sorted(names), 1):
