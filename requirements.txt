@@ -1,0 +1,38 @@
+# Pinned dependencies for the GPU evaluation engines.
+#
+# WHY THESE BOUNDS
+# The engines run gpt-oss-20b with MXFP4->bf16 dequantization on a MIG-
+# partitioned A100, and carry monkey-patches against transformers' mxfp4
+# integration:
+#     transformers.integrations.mxfp4._convert_moe_packed_tensors
+#     transformers.modeling_utils.caching_allocator_warmup
+#     transformers.Mxfp4Config
+# Those are transformers 4.5x APIs. transformers 5.x replaced the loader with
+# core_model_loading.py / Mxfp4Dequantize, so the patches still get called but
+# the surrounding allocation path changed -- which surfaced as
+#     NVML_SUCCESS == r INTERNAL ASSERT FAILED at CUDACachingAllocator.cpp:995
+# during weight conversion, plus randomly varying MISSING expert layers.
+# A GPU diagnostic (diagnose_gpu.py) confirmed plain CUDA allocation is healthy
+# under every allocator config, so this is a library mismatch, not hardware.
+#
+# The cluster runs torch 2.5.1+cu121 (late 2024). Newer transformers expects a
+# much newer torch -- torch.float8_e8m0fnu only exists in torch 2.7+, which is
+# why the engines shim it. Pinning transformers is far less disruptive than
+# upgrading torch under MIG.
+#
+# Install:
+#   pip install -r requirements.txt
+#
+# Do NOT relax the transformers ceiling without re-running:
+#   python3 diagnose_gpu.py
+#   DOMAINS="Relative-Reasoning" SEEDS="1" SHOTS="0" ./run_base_experiments.sh
+
+transformers>=4.55,<5      # 4.55 introduced gpt-oss + mxfp4; 5.x breaks the patches
+accelerate>=1.0,<2
+peft>=0.14
+safetensors>=0.4
+numpy>=1.24                # stats_analysis.py; no scipy/statsmodels needed
+requests>=2.31             # osm_client.py Nominatim queries (local warming only)
+
+# torch is intentionally NOT pinned here: it ships with the cluster image
+# (2.5.1+cu121) and reinstalling it risks breaking the MIG-capable CUDA build.

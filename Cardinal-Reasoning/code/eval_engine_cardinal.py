@@ -151,6 +151,28 @@ except Exception as _kp_err:
     pass
 # ===========================================================================
 
+# --- transformers version guard ---------------------------------------------
+# The MXFP4 patches below target the transformers 4.5x loader. 5.x replaced it
+# with core_model_loading / Mxfp4Dequantize: the patches still get called, but
+# the surrounding allocation path differs and the run dies ~4 minutes in with an
+# opaque "NVML_SUCCESS == r INTERNAL ASSERT FAILED" from the CUDA caching
+# allocator, plus a randomly varying set of MISSING expert layers. Fail now,
+# with the fix, instead of after the weight download.
+import transformers as _tf
+try:
+    _tf_major = int(str(_tf.__version__).split(".")[0])
+except Exception:
+    _tf_major = 0
+if _tf_major >= 5:
+    sys.stderr.write(
+        f"\n[FATAL] transformers {_tf.__version__} is not supported by this engine.\n"
+        "        These engines patch the 4.5x MXFP4 loader; under 5.x that path no\n"
+        "        longer exists and model loading fails on MIG with an NVML assert.\n"
+        "\n        Fix:  pip install 'transformers>=4.55,<5'\n"
+        "        Then: python3 diagnose_gpu.py\n"
+        "        See:  requirements.txt\n\n")
+    sys.exit(2)
+
 from transformers import AutoTokenizer, AutoModelForCausalLM, Mxfp4Config
 
 # Monkey-patch mxfp4 MoE dequantization to run on CPU — prevents

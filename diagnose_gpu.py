@@ -96,8 +96,25 @@ def main() -> None:
         try:
             m = __import__(mod)
             print(f"    {mod:<13} {getattr(m, '__version__', '?')}")
-        except Exception:
-            print(f"    {mod:<13} not installed")
+        except ImportError as e:
+            # "not installed" and "installed but fails to import here" are very
+            # different diagnoses: peft imports only AFTER the engines install
+            # their torch shims (torch.float8_e8m0fnu, Module.set_submodule),
+            # so a bare probe can report it absent when it is merely unshimmed.
+            print(f"    {mod:<13} NOT INSTALLED ({e})")
+        except Exception as e:
+            print(f"    {mod:<13} present but import FAILED: "
+                  f"{type(e).__name__}: {str(e)[:90]}")
+            print(f"    {'':<13} (may still import inside the engine, after its torch shims)")
+
+    try:
+        import transformers as _tf
+        if int(str(_tf.__version__).split(".")[0]) >= 5:
+            print(f"\n    *** transformers {_tf.__version__} is INCOMPATIBLE with these engines.")
+            print("        They patch the 4.5x MXFP4 loader, which 5.x replaced.")
+            print("        Fix: pip install 'transformers>=4.55,<5'")
+    except Exception:
+        pass
 
     print("\n-- environment ----------------------------------------------------------------")
     for k in ("CUDA_VISIBLE_DEVICES", "PYTORCH_CUDA_ALLOC_CONF",
