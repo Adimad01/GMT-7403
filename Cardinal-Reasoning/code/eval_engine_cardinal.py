@@ -667,6 +667,16 @@ def main():
         print(f"[FEWSHOT] {args.shots}-shot label-conditioned demos from {args.train_data} "
               f"(tag → {args.model_tag})")
 
+    # The seed MUST reach the output tag, because the tag is the checkpoint
+    # filename and the checkpoint is resumed by row index. Without it, seed 2
+    # opens seed 1's checkpoint, sees every row already processed, skips the
+    # whole run and reports seed 1's predictions as its own -- producing
+    # perfectly identical "seeds" and an apparent zero run-to-run variance.
+    # That would silently invalidate every confidence interval built on them.
+    if args.seed:
+        args.model_tag = f"{args.model_tag}_s{args.seed}"
+        print(f"[SEED] {args.seed}  (tag → {args.model_tag})")
+
     # ------------------------------------------------------------------
     # 6. Run selected strategies
     # ------------------------------------------------------------------
