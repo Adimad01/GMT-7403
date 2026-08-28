@@ -36,6 +36,15 @@ STRATEGY="${STRATEGY:-all}"
 DOMAINS="${DOMAINS:-Topological-Reasoning Cardinal-Reasoning Relative-Reasoning}"
 PY="${PY:-python3}"
 
+# Set before any python starts, so import order inside the scripts cannot matter.
+# transformers imports TensorFlow via image_transforms when TF looks available;
+# the cluster's TF has protobuf-incompatible generated code and takes the whole
+# import chain down with it. These engines are torch-only.
+export USE_TF="${USE_TF:-0}"
+export USE_JAX="${USE_JAX:-0}"
+export TF_CPP_MIN_LOG_LEVEL="${TF_CPP_MIN_LOG_LEVEL:-3}"
+export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION="${PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION:-python}"
+
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$ROOT" || exit 1
 
@@ -100,6 +109,35 @@ if [ -f audit_data.py ]; then
   fi
   echo
 fi
+
+# Environment pre-flight. A 20B load takes minutes; version skew should surface
+# in seconds. Warn rather than block -- only the user can judge their cluster.
+echo "--- environment ---------------------------------------------------------------"
+$PY - <<'PYCHK' || true
+import importlib
+def v(m):
+    try:
+        return importlib.import_module(m).__version__
+    except Exception as e:
+        return f"UNAVAILABLE ({type(e).__name__})"
+tf_v, hub_v = v("transformers"), v("huggingface_hub")
+print(f"    torch {v('torch')}   transformers {tf_v}   huggingface_hub {hub_v}")
+try:
+    maj = int(str(tf_v).split(".")[0])
+    if maj >= 5:
+        print("    WARNING: transformers 5.x breaks the MXFP4 patches — "
+              "pip install 'transformers>=4.55,<5'")
+except Exception:
+    pass
+try:
+    a, b = (int(x) for x in str(hub_v).split(".")[:2])
+    if (a, b) < (0, 34):
+        print(f"    WARNING: huggingface_hub {hub_v} is too old for transformers "
+              f"{tf_v} (needs >=0.34) — pip install 'huggingface-hub>=0.34,<1.0'")
+except Exception:
+    pass
+PYCHK
+echo
 
 start_all=$(date +%s)
 

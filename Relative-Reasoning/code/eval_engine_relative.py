@@ -32,6 +32,20 @@ Usage:
 
 import os
 os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "backend:native")
+
+# transformers pulls TensorFlow in through image_transforms whenever TF looks
+# importable. The cluster's TF is old enough that its generated protobuf code is
+# rejected by the installed protobuf ("Descriptors cannot not be created
+# directly"), and that kills the whole import chain
+# (peft -> transformers.models.bloom -> ... -> import tensorflow).
+# These engines are torch-only, so switch TF off rather than repair it. Must be
+# set before transformers is imported anywhere in the process.
+os.environ.setdefault("USE_TF", "0")
+os.environ.setdefault("USE_JAX", "0")
+os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "3")
+# Belt and braces: if something still drags TF in, the pure-Python protobuf
+# implementation accepts the older generated descriptors.
+os.environ.setdefault("PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION", "python")
 import sys
 import json
 import argparse
@@ -184,15 +198,36 @@ from transformers import AutoTokenizer, AutoModelForCausalLM, Mxfp4Config
 # NVML_SUCCESS assert at CUDACachingAllocator.cpp:995 on MIG A100.
 try:
     import transformers.integrations.mxfp4 as _mxfp4_m
-    _orig_moe_cvt = _mxfp4_m._convert_moe_packed_tensors
-    def _cpu_moe_cvt(blocks, scales, dtype=torch.bfloat16, rows_per_chunk=None):
-        target_device = blocks.device
-        b = blocks.cpu() if blocks.device.type != "cpu" else blocks
-        s = scales.cpu() if scales.device.type != "cpu" else scales
-        result = _orig_moe_cvt(b, s, dtype=dtype, rows_per_chunk=rows_per_chunk)
-        return result.to(target_device)  # move back to GPU after CPU dequantization
-    _mxfp4_m._convert_moe_packed_tensors = _cpu_moe_cvt
-    print("[PATCH] mxfp4 MoE dequantization → CPU  (MIG A100 NVML fix)")
+
+    def _make_cpu_moe_cvt(_orig):
+        # Signature-agnostic: forward *args/**kwargs untouched so this keeps
+        # working when the upstream signature changes between releases.
+        def _cpu_moe_cvt(blocks, scales, *args, **kwargs):
+            target_device = blocks.device
+            b = blocks.cpu() if blocks.device.type != "cpu" else blocks
+            s = scales.cpu() if scales.device.type != "cpu" else scales
+            result = _orig(b, s, *args, **kwargs)
+            return result.to(target_device)  # back to GPU after CPU dequantization
+        return _cpu_moe_cvt
+
+    # The function was renamed across transformers releases (4.55 exposes
+    # _convert_moe_packed_tensors, later ones convert_moe_packed_tensors, and
+    # the public wrapper calls the private one). Patch every name that exists
+    # rather than pinning to one, and say clearly when none matched -- the
+    # previous version silently skipped the patch and the run died minutes
+    # later with an opaque allocator assert.
+    _patched = []
+    for _nm in ("_convert_moe_packed_tensors", "convert_moe_packed_tensors"):
+        _orig_fn = getattr(_mxfp4_m, _nm, None)
+        if callable(_orig_fn):
+            setattr(_mxfp4_m, _nm, _make_cpu_moe_cvt(_orig_fn))
+            _patched.append(_nm)
+    if _patched:
+        print(f"[PATCH] mxfp4 MoE dequantization → CPU  ({', '.join(_patched)})")
+    else:
+        print("[WARN] mxfp4 MoE patch found NO conversion function to patch — "
+              "model loading may fail on MIG. Check the transformers version "
+              "against requirements.txt.")
 except Exception as _mxfp4_e:
     print(f"[WARN] mxfp4 MoE patch skipped: {_mxfp4_e}")
 

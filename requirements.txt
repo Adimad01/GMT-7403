@@ -28,6 +28,8 @@
 #   DOMAINS="Relative-Reasoning" SEEDS="1" SHOTS="0" ./run_base_experiments.sh
 
 transformers>=4.55,<5      # 4.55 introduced gpt-oss + mxfp4; 5.x breaks the patches
+huggingface-hub>=0.34,<1.0 # transformers 4.57 requires >=0.34; pip resolved 0.16.4
+                           # from the conda prefix, which breaks model download
 accelerate>=1.0,<2
 peft>=0.14
 safetensors>=0.4
@@ -36,3 +38,18 @@ requests>=2.31             # osm_client.py Nominatim queries (local warming only
 
 # torch is intentionally NOT pinned here: it ships with the cluster image
 # (2.5.1+cu121) and reinstalling it risks breaking the MIG-capable CUDA build.
+
+# --- environment notes (cluster-specific) -----------------------------------
+# 1. TensorFlow is installed in the conda prefix and its generated protobuf code
+#    is rejected by the installed protobuf. transformers imports TF through
+#    image_transforms whenever TF looks available, which takes the whole import
+#    chain down. The engines and run_base_experiments.sh set USE_TF=0 and
+#    PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python to avoid it. Do not "fix"
+#    this by upgrading TF -- nothing here uses it.
+#
+# 2. Packages are split across /opt/conda/lib/python3.10/site-packages and
+#    ~/.local/lib/python3.10/site-packages, and pip resolves against both. After
+#    any install, verify what actually loads:
+#       python3 -c "import transformers, huggingface_hub as h; \
+#                   print(transformers.__version__, transformers.__file__); \
+#                   print(h.__version__, h.__file__)"
