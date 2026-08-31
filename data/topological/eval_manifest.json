@@ -1,0 +1,963 @@
+{
+  "domain": "Topological-Reasoning",
+  "source_csv": "dataset/topo_v2_eval.csv",
+  "n_rows": 105,
+  "n_unique_facts": 68,
+  "duplicate_rows": 37,
+  "manifest_sha256": "bd350c84f24ae65e863bb1516781a7c3b78dfab1e7170b0e0315e2fe0f6a47df",
+  "contract": {
+    "every_experiment_must": [
+      "evaluate exactly these row_index values, in this order",
+      "apply NO geocodability filtering (--keep-ungeocodable): the OSM cache is mutable, so filtering at runtime makes the eval set differ between arms run before and after a cache re-warm",
+      "verify manifest_sha256 before running"
+    ],
+    "analysis_note": "rows sharing a fact_id assert the same (subject, target, label) and are NOT independent; cluster or de-duplicate on fact_id when computing confidence intervals"
+  },
+  "rows": [
+    {
+      "row_index": 0,
+      "fact_id": "f0000",
+      "subject": "Borough of Queens",
+      "target": "Queens County",
+      "label": "equals",
+      "ambiguity_level": "Level 4",
+      "row_sha256": "b07f714dc1f3bccf"
+    },
+    {
+      "row_index": 1,
+      "fact_id": "f0001",
+      "subject": "City of London",
+      "target": "The Square Mile",
+      "label": "equals",
+      "ambiguity_level": "Level 4",
+      "row_sha256": "31182648f8e25181"
+    },
+    {
+      "row_index": 2,
+      "fact_id": "f0002",
+      "subject": "Borough of Manhattan",
+      "target": "New York County",
+      "label": "equals",
+      "ambiguity_level": "Level 4",
+      "row_sha256": "0cc098b3a8f4ba62"
+    },
+    {
+      "row_index": 3,
+      "fact_id": "f0003",
+      "subject": "City of Philadelphia",
+      "target": "Philadelphia County",
+      "label": "equals",
+      "ambiguity_level": "Level 5",
+      "row_sha256": "9bb7ed60a55c1d66"
+    },
+    {
+      "row_index": 4,
+      "fact_id": "f0004",
+      "subject": "Borough of Staten Island",
+      "target": "Richmond County",
+      "label": "equals",
+      "ambiguity_level": "Level 5",
+      "row_sha256": "6350cfdfb77d44da"
+    },
+    {
+      "row_index": 5,
+      "fact_id": "f0005",
+      "subject": "City of Denver",
+      "target": "Denver County",
+      "label": "equals",
+      "ambiguity_level": "Level 5",
+      "row_sha256": "b6f781e0d1f514c5"
+    },
+    {
+      "row_index": 6,
+      "fact_id": "f0006",
+      "subject": "Falkland Islands EEZ",
+      "target": "Argentine Sea",
+      "label": "overlaps",
+      "ambiguity_level": "Level 4",
+      "row_sha256": "6dfffbbccec6c257"
+    },
+    {
+      "row_index": 7,
+      "fact_id": "f0007",
+      "subject": "Tornado Alley",
+      "target": "State of Oklahoma",
+      "label": "overlaps",
+      "ambiguity_level": "Level 4",
+      "row_sha256": "75f0fb788dd24cf9"
+    },
+    {
+      "row_index": 8,
+      "fact_id": "f0008",
+      "subject": "Rust Belt",
+      "target": "American Midwest",
+      "label": "overlaps",
+      "ambiguity_level": "Level 4",
+      "row_sha256": "8e323d5d3c3f9d07"
+    },
+    {
+      "row_index": 9,
+      "fact_id": "f0009",
+      "subject": "Mount Everest Summit",
+      "target": "Nepal-China Border",
+      "label": "touches",
+      "ambiguity_level": "Level 4",
+      "row_sha256": "beba81aea6d1b944"
+    },
+    {
+      "row_index": 10,
+      "fact_id": "f0010",
+      "subject": "State of Colorado",
+      "target": "State of New Mexico",
+      "label": "touches",
+      "ambiguity_level": "Level 4",
+      "row_sha256": "08db577136b18480"
+    },
+    {
+      "row_index": 11,
+      "fact_id": "f0011",
+      "subject": "Republic of Botswana",
+      "target": "Republic of Zambia",
+      "label": "touches",
+      "ambiguity_level": "Level 4",
+      "row_sha256": "90fa76e191ff4f44"
+    },
+    {
+      "row_index": 12,
+      "fact_id": "f0012",
+      "subject": "Channel Islands",
+      "target": "United Kingdom",
+      "label": "disjoint",
+      "ambiguity_level": "Level 4",
+      "row_sha256": "2d2bc8190bbb4b60"
+    },
+    {
+      "row_index": 13,
+      "fact_id": "f0013",
+      "subject": "Point Nemo",
+      "target": "Ducie Island",
+      "label": "disjoint",
+      "ambiguity_level": "Level 4",
+      "row_sha256": "d976fef920d0e898"
+    },
+    {
+      "row_index": 14,
+      "fact_id": "f0014",
+      "subject": "Northwest Angle",
+      "target": "Contiguous United States",
+      "label": "disjoint",
+      "ambiguity_level": "Level 4",
+      "row_sha256": "f8ad9595bd197763"
+    },
+    {
+      "row_index": 15,
+      "fact_id": "f0006",
+      "subject": "Falkland Islands EEZ",
+      "target": "Argentine Sea",
+      "label": "overlaps",
+      "ambiguity_level": "Level 5",
+      "row_sha256": "143a0211f2e5c2e9"
+    },
+    {
+      "row_index": 16,
+      "fact_id": "f0015",
+      "subject": "Abyei Area",
+      "target": "Republic of South Sudan",
+      "label": "overlaps",
+      "ambiguity_level": "Level 5",
+      "row_sha256": "725c4d3c2f52706c"
+    },
+    {
+      "row_index": 17,
+      "fact_id": "f0016",
+      "subject": "Sahara Desert",
+      "target": "Sahel Region",
+      "label": "overlaps",
+      "ambiguity_level": "Level 5",
+      "row_sha256": "9ef7f16ea4323842"
+    },
+    {
+      "row_index": 18,
+      "fact_id": "f0017",
+      "subject": "Panama Canal",
+      "target": "Isthmus of Panama",
+      "label": "crosses",
+      "ambiguity_level": "Level 1",
+      "row_sha256": "ebdf981e7c6f3ca0"
+    },
+    {
+      "row_index": 19,
+      "fact_id": "f0018",
+      "subject": "Eurostar Railway",
+      "target": "France",
+      "label": "crosses",
+      "ambiguity_level": "Level 1",
+      "row_sha256": "ac02f5072ab06b04"
+    },
+    {
+      "row_index": 20,
+      "fact_id": "f0019",
+      "subject": "Trans-Alaska Pipeline",
+      "target": "State of Alaska",
+      "label": "crosses",
+      "ambiguity_level": "Level 1",
+      "row_sha256": "9219d41ef7f4a0d8"
+    },
+    {
+      "row_index": 21,
+      "fact_id": "f0014",
+      "subject": "Northwest Angle",
+      "target": "Contiguous United States",
+      "label": "disjoint",
+      "ambiguity_level": "Level 5",
+      "row_sha256": "721752be357ae686"
+    },
+    {
+      "row_index": 22,
+      "fact_id": "f0013",
+      "subject": "Point Nemo",
+      "target": "Ducie Island",
+      "label": "disjoint",
+      "ambiguity_level": "Level 5",
+      "row_sha256": "506bb15182874600"
+    },
+    {
+      "row_index": 23,
+      "fact_id": "f0020",
+      "subject": "Falkland Islands",
+      "target": "United Kingdom Mainland",
+      "label": "disjoint",
+      "ambiguity_level": "Level 5",
+      "row_sha256": "2c6d144ffd22b90e"
+    },
+    {
+      "row_index": 24,
+      "fact_id": "f0008",
+      "subject": "Rust Belt",
+      "target": "American Midwest",
+      "label": "overlaps",
+      "ambiguity_level": "Level 3",
+      "row_sha256": "5d13c964965385a2"
+    },
+    {
+      "row_index": 25,
+      "fact_id": "f0006",
+      "subject": "Falkland Islands EEZ",
+      "target": "Argentine Sea",
+      "label": "overlaps",
+      "ambiguity_level": "Level 3",
+      "row_sha256": "3346172b13a606a4"
+    },
+    {
+      "row_index": 26,
+      "fact_id": "f0021",
+      "subject": "Rocky Mountains",
+      "target": "Canada",
+      "label": "overlaps",
+      "ambiguity_level": "Level 3",
+      "row_sha256": "c597dcf2a80a1b7f"
+    },
+    {
+      "row_index": 27,
+      "fact_id": "f0022",
+      "subject": "Pacific Ocean",
+      "target": "State of Hawaii",
+      "label": "contains",
+      "ambiguity_level": "Level 4",
+      "row_sha256": "da7e438a85f12e76"
+    },
+    {
+      "row_index": 28,
+      "fact_id": "f0023",
+      "subject": "Swiss Canton of Schaffhausen",
+      "target": "Busingen am Hochrhein",
+      "label": "contains",
+      "ambiguity_level": "Level 4",
+      "row_sha256": "be09f2452032e5aa"
+    },
+    {
+      "row_index": 29,
+      "fact_id": "f0024",
+      "subject": "Senegal",
+      "target": "The Gambia",
+      "label": "contains",
+      "ambiguity_level": "Level 4",
+      "row_sha256": "e9ebe09856c0891b"
+    },
+    {
+      "row_index": 30,
+      "fact_id": "f0022",
+      "subject": "Pacific Ocean",
+      "target": "State of Hawaii",
+      "label": "contains",
+      "ambiguity_level": "Level 5",
+      "row_sha256": "5137a461f3b1350e"
+    },
+    {
+      "row_index": 31,
+      "fact_id": "f0025",
+      "subject": "Commonwealth of Australia",
+      "target": "Ashmore and Cartier Islands",
+      "label": "contains",
+      "ambiguity_level": "Level 5",
+      "row_sha256": "d29937039f93e1ee"
+    },
+    {
+      "row_index": 32,
+      "fact_id": "f0026",
+      "subject": "Kingdom of Saudi Arabia",
+      "target": "Rub' al Khali Desert",
+      "label": "contains",
+      "ambiguity_level": "Level 5",
+      "row_sha256": "b00b2d5282ea57d0"
+    },
+    {
+      "row_index": 33,
+      "fact_id": "f0027",
+      "subject": "Italy",
+      "target": "City of Rome",
+      "label": "contains",
+      "ambiguity_level": "Level 1",
+      "row_sha256": "3da3b4264992f572"
+    },
+    {
+      "row_index": 34,
+      "fact_id": "f0028",
+      "subject": "State of California",
+      "target": "City of Los Angeles",
+      "label": "contains",
+      "ambiguity_level": "Level 1",
+      "row_sha256": "22da5a1eac85ef40"
+    },
+    {
+      "row_index": 35,
+      "fact_id": "f0029",
+      "subject": "State of New York",
+      "target": "Central Park",
+      "label": "contains",
+      "ambiguity_level": "Level 1",
+      "row_sha256": "32dc495f705932fc"
+    },
+    {
+      "row_index": 36,
+      "fact_id": "f0022",
+      "subject": "Pacific Ocean",
+      "target": "State of Hawaii",
+      "label": "contains",
+      "ambiguity_level": "Level 2",
+      "row_sha256": "43dec1fda58e4195"
+    },
+    {
+      "row_index": 37,
+      "fact_id": "f0029",
+      "subject": "State of New York",
+      "target": "Central Park",
+      "label": "contains",
+      "ambiguity_level": "Level 2",
+      "row_sha256": "67e693497c8bfebe"
+    },
+    {
+      "row_index": 38,
+      "fact_id": "f0030",
+      "subject": "France",
+      "target": "City of Paris",
+      "label": "contains",
+      "ambiguity_level": "Level 2",
+      "row_sha256": "2d345c6aee0d7158"
+    },
+    {
+      "row_index": 39,
+      "fact_id": "f0024",
+      "subject": "Senegal",
+      "target": "The Gambia",
+      "label": "contains",
+      "ambiguity_level": "Level 3",
+      "row_sha256": "f79f7f1ffb2675ab"
+    },
+    {
+      "row_index": 40,
+      "fact_id": "f0031",
+      "subject": "Switzerland",
+      "target": "Campione d'Italia",
+      "label": "contains",
+      "ambiguity_level": "Level 3",
+      "row_sha256": "5b37cdab2c5497bd"
+    },
+    {
+      "row_index": 41,
+      "fact_id": "f0032",
+      "subject": "City of Los Angeles",
+      "target": "City of Beverly Hills",
+      "label": "contains",
+      "ambiguity_level": "Level 3",
+      "row_sha256": "c92d0a2b825631d7"
+    },
+    {
+      "row_index": 42,
+      "fact_id": "f0019",
+      "subject": "Trans-Alaska Pipeline",
+      "target": "State of Alaska",
+      "label": "crosses",
+      "ambiguity_level": "Level 2",
+      "row_sha256": "53d3360907a8777d"
+    },
+    {
+      "row_index": 43,
+      "fact_id": "f0017",
+      "subject": "Panama Canal",
+      "target": "Isthmus of Panama",
+      "label": "crosses",
+      "ambiguity_level": "Level 2",
+      "row_sha256": "0ef08809f2ae53e0"
+    },
+    {
+      "row_index": 44,
+      "fact_id": "f0033",
+      "subject": "Colorado River",
+      "target": "State of Utah",
+      "label": "crosses",
+      "ambiguity_level": "Level 2",
+      "row_sha256": "2b65d5db731e36f9"
+    },
+    {
+      "row_index": 45,
+      "fact_id": "f0017",
+      "subject": "Panama Canal",
+      "target": "Isthmus of Panama",
+      "label": "crosses",
+      "ambiguity_level": "Level 3",
+      "row_sha256": "dd731343787347e7"
+    },
+    {
+      "row_index": 46,
+      "fact_id": "f0034",
+      "subject": "Channel Tunnel",
+      "target": "Prime Meridian",
+      "label": "crosses",
+      "ambiguity_level": "Level 3",
+      "row_sha256": "6c469114a4368459"
+    },
+    {
+      "row_index": 47,
+      "fact_id": "f0035",
+      "subject": "Appalachian Trail",
+      "target": "Mason-Dixon Line",
+      "label": "crosses",
+      "ambiguity_level": "Level 3",
+      "row_sha256": "99bc4ba18200959b"
+    },
+    {
+      "row_index": 48,
+      "fact_id": "f0017",
+      "subject": "Panama Canal",
+      "target": "Isthmus of Panama",
+      "label": "crosses",
+      "ambiguity_level": "Level 4",
+      "row_sha256": "f9f00846d2afd8bf"
+    },
+    {
+      "row_index": 49,
+      "fact_id": "f0035",
+      "subject": "Appalachian Trail",
+      "target": "Mason-Dixon Line",
+      "label": "crosses",
+      "ambiguity_level": "Level 4",
+      "row_sha256": "9a5eff2dc324f59f"
+    },
+    {
+      "row_index": 50,
+      "fact_id": "f0036",
+      "subject": "Trans-Canada Highway",
+      "target": "Canadian Shield",
+      "label": "crosses",
+      "ambiguity_level": "Level 4",
+      "row_sha256": "e7c8d9ba13d7b89a"
+    },
+    {
+      "row_index": 51,
+      "fact_id": "f0037",
+      "subject": "Argentina",
+      "target": "Norway",
+      "label": "disjoint",
+      "ambiguity_level": "Level 1",
+      "row_sha256": "a59f83d5b8664c46"
+    },
+    {
+      "row_index": 52,
+      "fact_id": "f0038",
+      "subject": "Japan",
+      "target": "Brazil",
+      "label": "disjoint",
+      "ambiguity_level": "Level 1",
+      "row_sha256": "0311e551a6b8ae05"
+    },
+    {
+      "row_index": 53,
+      "fact_id": "f0039",
+      "subject": "Iceland",
+      "target": "Madagascar",
+      "label": "disjoint",
+      "ambiguity_level": "Level 1",
+      "row_sha256": "5214c7e500fe0f6b"
+    },
+    {
+      "row_index": 54,
+      "fact_id": "f0001",
+      "subject": "City of London",
+      "target": "The Square Mile",
+      "label": "equals",
+      "ambiguity_level": "Level 2",
+      "row_sha256": "efe4783c31efdf2c"
+    },
+    {
+      "row_index": 55,
+      "fact_id": "f0003",
+      "subject": "City of Philadelphia",
+      "target": "Philadelphia County",
+      "label": "equals",
+      "ambiguity_level": "Level 2",
+      "row_sha256": "1db7583e28002dc2"
+    },
+    {
+      "row_index": 56,
+      "fact_id": "f0005",
+      "subject": "City of Denver",
+      "target": "Denver County",
+      "label": "equals",
+      "ambiguity_level": "Level 2",
+      "row_sha256": "1cd3202d481b5e15"
+    },
+    {
+      "row_index": 57,
+      "fact_id": "f0040",
+      "subject": "Diego Garcia",
+      "target": "Indian Ocean",
+      "label": "within",
+      "ambiguity_level": "Level 4",
+      "row_sha256": "359d8422b751d92d"
+    },
+    {
+      "row_index": 58,
+      "fact_id": "f0041",
+      "subject": "Prince Edward Islands",
+      "target": "Republic of South Africa",
+      "label": "within",
+      "ambiguity_level": "Level 4",
+      "row_sha256": "9427f6eddb12e1bf"
+    },
+    {
+      "row_index": 59,
+      "fact_id": "f0042",
+      "subject": "Camp David",
+      "target": "Catoctin Mountain Park",
+      "label": "within",
+      "ambiguity_level": "Level 4",
+      "row_sha256": "b4dbb8488597c03e"
+    },
+    {
+      "row_index": 60,
+      "fact_id": "f0003",
+      "subject": "City of Philadelphia",
+      "target": "Philadelphia County",
+      "label": "equals",
+      "ambiguity_level": "Level 1",
+      "row_sha256": "a1f103f9105448e0"
+    },
+    {
+      "row_index": 61,
+      "fact_id": "f0005",
+      "subject": "City of Denver",
+      "target": "Denver County",
+      "label": "equals",
+      "ambiguity_level": "Level 1",
+      "row_sha256": "fb5b64868219b7b7"
+    },
+    {
+      "row_index": 62,
+      "fact_id": "f0000",
+      "subject": "Borough of Queens",
+      "target": "Queens County",
+      "label": "equals",
+      "ambiguity_level": "Level 1",
+      "row_sha256": "3f8fe8aaa81e5f82"
+    },
+    {
+      "row_index": 63,
+      "fact_id": "f0043",
+      "subject": "Sahara Desert",
+      "target": "Sahel Region",
+      "label": "touches",
+      "ambiguity_level": "Level 2",
+      "row_sha256": "1235e592c9880a2d"
+    },
+    {
+      "row_index": 64,
+      "fact_id": "f0044",
+      "subject": "City of El Paso",
+      "target": "Ciudad Juarez",
+      "label": "touches",
+      "ambiguity_level": "Level 2",
+      "row_sha256": "13741dba125a2ca1"
+    },
+    {
+      "row_index": 65,
+      "fact_id": "f0045",
+      "subject": "State of California",
+      "target": "Pacific Ocean",
+      "label": "touches",
+      "ambiguity_level": "Level 2",
+      "row_sha256": "84e468aceafb923b"
+    },
+    {
+      "row_index": 66,
+      "fact_id": "f0010",
+      "subject": "State of Colorado",
+      "target": "State of New Mexico",
+      "label": "touches",
+      "ambiguity_level": "Level 3",
+      "row_sha256": "3e775a5bc879a6c4"
+    },
+    {
+      "row_index": 67,
+      "fact_id": "f0009",
+      "subject": "Mount Everest Summit",
+      "target": "Nepal-China Border",
+      "label": "touches",
+      "ambiguity_level": "Level 3",
+      "row_sha256": "8927cb765a2348d0"
+    },
+    {
+      "row_index": 68,
+      "fact_id": "f0046",
+      "subject": "State of Utah",
+      "target": "State of New Mexico",
+      "label": "touches",
+      "ambiguity_level": "Level 3",
+      "row_sha256": "3ecb6f325cb2906e"
+    },
+    {
+      "row_index": 69,
+      "fact_id": "f0009",
+      "subject": "Mount Everest Summit",
+      "target": "Nepal-China Border",
+      "label": "touches",
+      "ambiguity_level": "Level 5",
+      "row_sha256": "604d2d8ed1881fdd"
+    },
+    {
+      "row_index": 70,
+      "fact_id": "f0010",
+      "subject": "State of Colorado",
+      "target": "State of New Mexico",
+      "label": "touches",
+      "ambiguity_level": "Level 5",
+      "row_sha256": "b0c8e861b285fc02"
+    },
+    {
+      "row_index": 71,
+      "fact_id": "f0011",
+      "subject": "Republic of Botswana",
+      "target": "Republic of Zambia",
+      "label": "touches",
+      "ambiguity_level": "Level 5",
+      "row_sha256": "fe0e966e5560cf04"
+    },
+    {
+      "row_index": 72,
+      "fact_id": "f0047",
+      "subject": "Buckingham Palace",
+      "target": "City of London",
+      "label": "within",
+      "ambiguity_level": "Level 1",
+      "row_sha256": "72c1e6a8fb9f4966"
+    },
+    {
+      "row_index": 73,
+      "fact_id": "f0048",
+      "subject": "City of Madrid",
+      "target": "Spain",
+      "label": "within",
+      "ambiguity_level": "Level 1",
+      "row_sha256": "1ed72ad4dce0b040"
+    },
+    {
+      "row_index": 74,
+      "fact_id": "f0049",
+      "subject": "Mount Fuji",
+      "target": "Japan",
+      "label": "within",
+      "ambiguity_level": "Level 1",
+      "row_sha256": "a119dafb696ff3bd"
+    },
+    {
+      "row_index": 75,
+      "fact_id": "f0042",
+      "subject": "Camp David",
+      "target": "Catoctin Mountain Park",
+      "label": "within",
+      "ambiguity_level": "Level 3",
+      "row_sha256": "2abf0b8dd3567d55"
+    },
+    {
+      "row_index": 76,
+      "fact_id": "f0050",
+      "subject": "Golden Gate Park",
+      "target": "City of San Francisco",
+      "label": "within",
+      "ambiguity_level": "Level 3",
+      "row_sha256": "e6a46b3db66e4356"
+    },
+    {
+      "row_index": 77,
+      "fact_id": "f0051",
+      "subject": "United Nations Headquarters",
+      "target": "City of New York",
+      "label": "within",
+      "ambiguity_level": "Level 3",
+      "row_sha256": "83bf5451be80c05d"
+    },
+    {
+      "row_index": 78,
+      "fact_id": "f0052",
+      "subject": "Suez Canal",
+      "target": "Egypt",
+      "label": "crosses",
+      "ambiguity_level": "Level 5",
+      "row_sha256": "3549305be57845cd"
+    },
+    {
+      "row_index": 79,
+      "fact_id": "f0053",
+      "subject": "Abstract Geodetic Prime Meridian",
+      "target": "Physical River Thames Current",
+      "label": "crosses",
+      "ambiguity_level": "Level 5",
+      "row_sha256": "a79d5f1ece1c2926"
+    },
+    {
+      "row_index": 80,
+      "fact_id": "f0054",
+      "subject": "Vennbahn Railway Legal Footprint",
+      "target": "German Sovereign Territory",
+      "label": "crosses",
+      "ambiguity_level": "Level 5",
+      "row_sha256": "b89892e9b7e456b2"
+    },
+    {
+      "row_index": 81,
+      "fact_id": "f0055",
+      "subject": "State of Alaska",
+      "target": "Contiguous United States",
+      "label": "disjoint",
+      "ambiguity_level": "Level 2",
+      "row_sha256": "5c25ba625fa8a63b"
+    },
+    {
+      "row_index": 82,
+      "fact_id": "f0056",
+      "subject": "Lake Victoria",
+      "target": "Lake Superior",
+      "label": "disjoint",
+      "ambiguity_level": "Level 2",
+      "row_sha256": "1d5d89c27b28e444"
+    },
+    {
+      "row_index": 83,
+      "fact_id": "f0057",
+      "subject": "City of Miami",
+      "target": "City of Seattle",
+      "label": "disjoint",
+      "ambiguity_level": "Level 2",
+      "row_sha256": "e31f4870a87fb570"
+    },
+    {
+      "row_index": 84,
+      "fact_id": "f0013",
+      "subject": "Point Nemo",
+      "target": "Ducie Island",
+      "label": "disjoint",
+      "ambiguity_level": "Level 3",
+      "row_sha256": "c5b627cbeab2155f"
+    },
+    {
+      "row_index": 85,
+      "fact_id": "f0014",
+      "subject": "Northwest Angle",
+      "target": "Contiguous United States",
+      "label": "disjoint",
+      "ambiguity_level": "Level 3",
+      "row_sha256": "07ee01fd4c9fea69"
+    },
+    {
+      "row_index": 86,
+      "fact_id": "f0055",
+      "subject": "State of Alaska",
+      "target": "Contiguous United States",
+      "label": "disjoint",
+      "ambiguity_level": "Level 3",
+      "row_sha256": "46864d2f0a922322"
+    },
+    {
+      "row_index": 87,
+      "fact_id": "f0001",
+      "subject": "City of London",
+      "target": "The Square Mile",
+      "label": "equals",
+      "ambiguity_level": "Level 3",
+      "row_sha256": "de6bd4345bc09c1b"
+    },
+    {
+      "row_index": 88,
+      "fact_id": "f0003",
+      "subject": "City of Philadelphia",
+      "target": "Philadelphia County",
+      "label": "equals",
+      "ambiguity_level": "Level 3",
+      "row_sha256": "6521c4f6df72f6d0"
+    },
+    {
+      "row_index": 89,
+      "fact_id": "f0058",
+      "subject": "Mount McKinley Summit",
+      "target": "Denali Summit",
+      "label": "equals",
+      "ambiguity_level": "Level 3",
+      "row_sha256": "9c2b0f7bcbe6a133"
+    },
+    {
+      "row_index": 90,
+      "fact_id": "f0059",
+      "subject": "Great Barrier Reef",
+      "target": "Coral Sea",
+      "label": "overlaps",
+      "ambiguity_level": "Level 1",
+      "row_sha256": "df28d989d5ad7a6e"
+    },
+    {
+      "row_index": 91,
+      "fact_id": "f0060",
+      "subject": "Pampas Grassland",
+      "target": "Argentina",
+      "label": "overlaps",
+      "ambiguity_level": "Level 1",
+      "row_sha256": "797adc35403bd3c9"
+    },
+    {
+      "row_index": 92,
+      "fact_id": "f0061",
+      "subject": "Navajo Nation",
+      "target": "State of Arizona",
+      "label": "overlaps",
+      "ambiguity_level": "Level 1",
+      "row_sha256": "bfdfd4c11c19bdc6"
+    },
+    {
+      "row_index": 93,
+      "fact_id": "f0010",
+      "subject": "State of Colorado",
+      "target": "State of New Mexico",
+      "label": "touches",
+      "ambiguity_level": "Level 1",
+      "row_sha256": "911c60560b5188b6"
+    },
+    {
+      "row_index": 94,
+      "fact_id": "f0062",
+      "subject": "State of New York",
+      "target": "State of Pennsylvania",
+      "label": "touches",
+      "ambiguity_level": "Level 1",
+      "row_sha256": "ec9d692ec49be918"
+    },
+    {
+      "row_index": 95,
+      "fact_id": "f0063",
+      "subject": "Egypt",
+      "target": "Sudan",
+      "label": "touches",
+      "ambiguity_level": "Level 1",
+      "row_sha256": "33b8d8caa7e9f7b6"
+    },
+    {
+      "row_index": 96,
+      "fact_id": "f0047",
+      "subject": "Buckingham Palace",
+      "target": "City of London",
+      "label": "within",
+      "ambiguity_level": "Level 2",
+      "row_sha256": "0ccd7c2f09e760f3"
+    },
+    {
+      "row_index": 97,
+      "fact_id": "f0064",
+      "subject": "Eiffel Tower",
+      "target": "City of Paris",
+      "label": "within",
+      "ambiguity_level": "Level 2",
+      "row_sha256": "4b148b1f27e24d6f"
+    },
+    {
+      "row_index": 98,
+      "fact_id": "f0065",
+      "subject": "Zion National Park",
+      "target": "State of Utah",
+      "label": "within",
+      "ambiguity_level": "Level 2",
+      "row_sha256": "f43147bace0455ab"
+    },
+    {
+      "row_index": 99,
+      "fact_id": "f0042",
+      "subject": "Camp David",
+      "target": "Catoctin Mountain Park",
+      "label": "within",
+      "ambiguity_level": "Level 5",
+      "row_sha256": "2ec5309d65071029"
+    },
+    {
+      "row_index": 100,
+      "fact_id": "f0066",
+      "subject": "Rub' al Khali Desert",
+      "target": "Kingdom of Saudi Arabia",
+      "label": "within",
+      "ambiguity_level": "Level 5",
+      "row_sha256": "bca6c0cd63e3abec"
+    },
+    {
+      "row_index": 101,
+      "fact_id": "f0067",
+      "subject": "United Nations Headquarters",
+      "target": "Borough of Manhattan",
+      "label": "within",
+      "ambiguity_level": "Level 5",
+      "row_sha256": "5b4bf6e490437b0b"
+    },
+    {
+      "row_index": 102,
+      "fact_id": "f0061",
+      "subject": "Navajo Nation",
+      "target": "State of Arizona",
+      "label": "overlaps",
+      "ambiguity_level": "Level 2",
+      "row_sha256": "20ec11963c712f1f"
+    },
+    {
+      "row_index": 103,
+      "fact_id": "f0007",
+      "subject": "Tornado Alley",
+      "target": "State of Oklahoma",
+      "label": "overlaps",
+      "ambiguity_level": "Level 2",
+      "row_sha256": "3e64ce72a178f50e"
+    },
+    {
+      "row_index": 104,
+      "fact_id": "f0016",
+      "subject": "Sahara Desert",
+      "target": "Sahel Region",
+      "label": "overlaps",
+      "ambiguity_level": "Level 2",
+      "row_sha256": "791d5cf97347fb5e"
+    }
+  ]
+}

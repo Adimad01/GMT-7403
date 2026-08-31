@@ -1,55 +1,15 @@
-# Pinned dependencies for the GPU evaluation engines.
+# Runtime dependencies for the GPU cluster.
 #
-# WHY THESE BOUNDS
-# The engines run gpt-oss-20b with MXFP4->bf16 dequantization on a MIG-
-# partitioned A100, and carry monkey-patches against transformers' mxfp4
-# integration:
-#     transformers.integrations.mxfp4._convert_moe_packed_tensors
-#     transformers.modeling_utils.caching_allocator_warmup
-#     transformers.Mxfp4Config
-# Those are transformers 4.5x APIs. transformers 5.x replaced the loader with
-# core_model_loading.py / Mxfp4Dequantize, so the patches still get called but
-# the surrounding allocation path changed -- which surfaced as
-#     NVML_SUCCESS == r INTERNAL ASSERT FAILED at CUDACachingAllocator.cpp:995
-# during weight conversion, plus randomly varying MISSING expert layers.
-# A GPU diagnostic (diagnose_gpu.py) confirmed plain CUDA allocation is healthy
-# under every allocator config, so this is a library mismatch, not hardware.
-#
-# The cluster runs torch 2.5.1+cu121 (late 2024). Newer transformers expects a
-# much newer torch -- torch.float8_e8m0fnu only exists in torch 2.7+, which is
-# why the engines shim it. Pinning transformers is far less disruptive than
-# upgrading torch under MIG.
-#
-# Install:
-#   pip install -r requirements.txt
-#
-# Do NOT relax the transformers ceiling without re-running:
-#   python3 diagnose_gpu.py
-#   DOMAINS="Relative-Reasoning" SEEDS="1" SHOTS="0" ./run_base_experiments.sh
-
-transformers>=4.55,<5      # 4.55 introduced gpt-oss + mxfp4; 5.x breaks the patches
-huggingface-hub>=0.34,<1.0 # transformers 4.57 requires >=0.34; pip resolved 0.16.4
-                           # from the conda prefix, which breaks model download
-accelerate>=1.0,<2
-peft>=0.14
-safetensors>=0.4
-numpy>=1.24                # stats_analysis.py; no scipy/statsmodels needed
-requests>=2.31             # osm_client.py Nominatim queries (local warming only)
-
-# torch is intentionally NOT pinned here: it ships with the cluster image
+# torch is deliberately NOT pinned: it ships with the cluster image
 # (2.5.1+cu121) and reinstalling it risks breaking the MIG-capable CUDA build.
 
-# --- environment notes (cluster-specific) -----------------------------------
-# 1. TensorFlow is installed in the conda prefix and its generated protobuf code
-#    is rejected by the installed protobuf. transformers imports TF through
-#    image_transforms whenever TF looks available, which takes the whole import
-#    chain down. The engines and run_base_experiments.sh set USE_TF=0 and
-#    PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python to avoid it. Do not "fix"
-#    this by upgrading TF -- nothing here uses it.
-#
-# 2. Packages are split across /opt/conda/lib/python3.10/site-packages and
-#    ~/.local/lib/python3.10/site-packages, and pip resolves against both. After
-#    any install, verify what actually loads:
-#       python3 -c "import transformers, huggingface_hub as h; \
-#                   print(transformers.__version__, transformers.__file__); \
-#                   print(h.__version__, h.__file__)"
+transformers>=4.55,<5      # 4.55 introduced gpt-oss + MXFP4. 5.x replaced the
+                           # loader; the dequantisation patch no longer applies
+                           # and loading fails on MIG with an NVML assert.
+huggingface-hub>=0.34,<1.0 # transformers 4.57 requires >=0.34; pip has been
+                           # seen resolving it down to 0.16.4, breaking download
+accelerate>=1.0,<2
+safetensors>=0.4
+
+# The evaluation, metrics and reporting code is standard library only, so
+# analysis runs on a machine with no ML stack at all.

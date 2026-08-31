@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "spatial-eval"
+version = "1.0.0"
+description = "Prompting-strategy evaluation for spatial relation reasoning"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = []          # see requirements.txt; kept empty so the package
+                           # installs on the cluster without touching torch
+
+[project.scripts]
+spatial-eval = "spatial_eval.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
