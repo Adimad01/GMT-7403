@@ -117,9 +117,26 @@ and the report flags it.
 ## Setup
 
 ```bash
-git clone <repo-url> && cd <repo>
-python3 -m pip install -r requirements.txt
-python3 -m pip install -e .
+git clone https://github.com/Adimad01/GMT-7403.git && cd GMT-7403
+python3 -m pip install --user -r requirements.txt
+python3 -m pip install --user -e .
+```
+
+### Invoking the tool
+
+Two equivalent forms. The module form needs no PATH setup and is used
+throughout this README and in `scripts/run_all.sh`:
+
+```bash
+python3 -m spatial_eval.cli verify
+```
+
+The console script is shorter but `pip install --user` puts it in
+`~/.local/bin`, which is often not on PATH:
+
+```bash
+export PATH="$HOME/.local/bin:$PATH"        # add to ~/.bashrc to persist
+spatial-eval verify
 ```
 
 `torch` is deliberately **not** pinned — it ships with the cluster image
@@ -145,37 +162,37 @@ Verify the data before anything else. This checks both manifest hashes and
 exits non-zero on a mismatch:
 
 ```bash
-spatial-eval verify
+python3 -m spatial_eval.cli verify
 ```
 
 Dry-run the whole pipeline without a GPU:
 
 ```bash
-spatial-eval run --all --backend mock --limit 5
+python3 -m spatial_eval.cli run --all --backend mock --limit 5
 ```
 
 One cell:
 
 ```bash
-spatial-eval run -r cardinal -s cot --seeds 1
+python3 -m spatial_eval.cli run -r cardinal -s cot --seeds 1
 ```
 
 Everything (3 relations × 5 strategies × 3 seeds = 45 cells):
 
 ```bash
-spatial-eval run --all --seeds 1 2 3
+python3 -m spatial_eval.cli run --all --seeds 1 2 3
 ```
 
 Rerun only rows that errored, keeping every success:
 
 ```bash
-spatial-eval run --all --seeds 1 2 3          # resume is the default
+python3 -m spatial_eval.cli run --all --seeds 1 2 3          # resume is the default
 ```
 
 Metrics and comparison:
 
 ```bash
-spatial-eval evaluate
+python3 -m spatial_eval.cli evaluate
 spatial-eval report --metric accuracy_by_fact --per-label
 spatial-eval report --csv results/comparison.csv --json results/comparison.json
 ```

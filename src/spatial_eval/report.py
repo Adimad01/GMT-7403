@@ -59,7 +59,7 @@ def _agg(values: list[float]) -> tuple[float, float]:
 def render(cells: dict, metric: str = "accuracy") -> str:
     if not cells:
         return ("No results found under results/.\n"
-                "Run an experiment first:  spatial-eval run --all\n")
+                "Run an experiment first:  python3 -m spatial_eval.cli run --all\n")
 
     strategies = sorted({k[1] for k in cells})
     relations = [r for r in RELATIONS if any(k[0] == r for k in cells)]
@@ -114,7 +114,7 @@ def render(cells: dict, metric: str = "accuracy") -> str:
                    + ", ".join(f"{k[0]}/{k[1]}/s{k[2]}={v}" for k, v in sorted(unparsed)))
     failed = [(k, len(c["failed_rows"])) for k, c in cells.items() if c.get("failed_rows")]
     if failed:
-        out.append("  ⚠ failed rows (rerun with `spatial-eval run --retry-failed`): "
+        out.append("  ⚠ failed rows (rerun with `python3 -m spatial_eval.cli run --all`): "
                    + ", ".join(f"{k[0]}/{k[1]}/s{k[2]}={v}" for k, v in sorted(failed)))
     out.append("")
     return "\n".join(out)

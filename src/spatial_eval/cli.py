@@ -117,7 +117,7 @@ def cmd_run(args) -> int:
         for f in failures:
             print(f"    - {f}")
         print("\n  Rerun only the failed rows:")
-        print("    spatial-eval run --all --retry-failed")
+        print("    python3 -m spatial_eval.cli run --all --seeds <same seeds>")
     else:
         print("  all cells completed")
     print("=" * 78 + "\n")
