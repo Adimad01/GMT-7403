@@ -193,8 +193,8 @@ Metrics and comparison:
 
 ```bash
 python3 -m spatial_eval.cli evaluate
-spatial-eval report --metric accuracy_by_fact --per-label
-spatial-eval report --csv results/comparison.csv --json results/comparison.json
+python3 -m spatial_eval.cli report --metric accuracy_by_fact --per-label
+python3 -m spatial_eval.cli report --csv results/comparison.csv --json results/comparison.json
 ```
 
 ---
