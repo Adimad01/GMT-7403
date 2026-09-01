@@ -201,6 +201,36 @@ def test_parse_health_separates_formatting_from_reasoning():
     assert r["accuracy_parsed_only"] >= 100 * sum(1 for x in recs if x["correct"]) / 50
 
 
+def test_got_fallback_rescues_unparseable_synthesis():
+    """GoT lost 21 rows to formatting in the first full run; ToT lost none,
+    because ToT had a fallback and GoT did not. This locks the fix in."""
+    ex = load_examples("relative", limit=1)[0][0]
+    budgets = []
+
+    def rambling(prompt, seed, max_new_tokens=None):
+        budgets.append(max_new_tokens)
+        if "Reply with one line only" in prompt:
+            return "ANSWER: left_of"
+        return "I considered the arrangement but will not conclude."
+
+    ctx = Context(relation="relative", labels=LABELS["relative"], seed=1,
+                  generate=rambling, demos=None)
+    res = get_strategy("got")().run(ex, ctx)
+    assert res.prediction == "left_of"
+    assert res.parse_rule.startswith("recovered_")
+    assert res.n_calls == 5                 # 3 thoughts + synthesis + extraction
+    assert budgets[-1] == 24                # extraction gets a small budget
+
+    def clean(prompt, seed, max_new_tokens=None):
+        return "Done.\nANSWER: right_of"
+
+    ctx2 = Context(relation="relative", labels=LABELS["relative"], seed=1,
+                   generate=clean, demos=None)
+    res2 = get_strategy("got")().run(ex, ctx2)
+    assert res2.prediction == "right_of"
+    assert res2.n_calls == 4                # no extraction when not needed
+
+
 def main() -> int:
     tests = [(n, f) for n, f in sorted(globals().items())
              if n.startswith("test_") and callable(f)]

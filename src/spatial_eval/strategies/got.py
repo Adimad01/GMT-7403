@@ -2,9 +2,21 @@
 
 Where Tree-of-Thought keeps branches independent until a final vote, this
 strategy explicitly asks the model to relate the partial thoughts to each other
--- to note where they agree, where they conflict, and what a conflict implies --
-before committing. The distinguishing feature is the edges between thoughts,
-not the number of calls.
+-- where they agree, where they conflict, and what a conflict implies -- before
+committing. The distinguishing feature is the edges between thoughts, not the
+number of calls.
+
+Answer extraction is deliberately defensive. The first version of this strategy
+lost 21 completions to unparseable output across a full run, while
+Tree-of-Thought lost none -- not because the reasoning was worse, but because
+ToT had a fallback and this did not. Measured on the same rows, excluding the
+unparseable ones moved cardinal accuracy from 91.7% to 99.1%, i.e. almost the
+entire apparent deficit was a formatting failure. Two changes address it:
+
+  * the synthesis step is given a tight length budget, so it cannot spend its
+    whole token allowance on prose and get truncated before the answer line;
+  * if synthesis still yields nothing parseable, a short extraction call asks
+    only for the label.
 """
 from __future__ import annotations
 
@@ -13,6 +25,8 @@ from ..parsing import parse_label
 from .base import Context, Strategy, StrategyResult, register
 
 N_THOUGHTS = 3
+THOUGHT_CHARS = 500          # how much of each thought is carried into synthesis
+EXTRACT_TOKENS = 24          # an extraction reply is a label, not an essay
 
 
 @register
@@ -36,7 +50,29 @@ class GraphOfThought(Strategy):
         return (self.task_header(ctx.relation, ctx.labels)
                 + "\n" + self.question(ex)
                 + f"\nPartial analysis {i + 1}. {facets[i % len(facets)]}\n"
-                  "Answer in at most four sentences.\n")
+                  "Answer in at most three sentences.\n")
+
+    def _synthesis_prompt(self, ex: Example, ctx: Context, thoughts: list[str]) -> str:
+        nodes = "\n\n".join(f"Thought {i + 1}: {t[:THOUGHT_CHARS]}"
+                            for i, t in enumerate(thoughts))
+        return (self.task_header(ctx.relation, ctx.labels)
+                + "\n" + self.question(ex)
+                + "\nThree partial analyses were produced. None is a final answer.\n\n"
+                + nodes
+                + "\n\nIn at most four sentences, say where these analyses agree, "
+                  "where they conflict, and which reading the description supports. "
+                  "Be brief -- the final line matters more than the discussion.\n\n"
+                + f"Then, on its own final line, write exactly:\nANSWER: <one of "
+                  f"{', '.join(ctx.labels)}>\n")
+
+    def _extract_prompt(self, ex: Example, ctx: Context, synthesis: str) -> str:
+        """Last resort: ask only for the label, with almost no room to ramble."""
+        return (f"An analysis of a spatial relation concluded:\n\n"
+                f"{synthesis.strip()[:800]}\n\n"
+                f"Which single label does that conclusion support?\n"
+                f"Allowed answers: {', '.join(ctx.labels)}\n"
+                f"Reply with one line only, in exactly this form:\n"
+                f"ANSWER: <label>\n")
 
     def run(self, ex: Example, ctx: Context) -> StrategyResult:
         trace, thoughts = [], []
@@ -46,18 +82,26 @@ class GraphOfThought(Strategy):
             thoughts.append(raw.strip())
             trace.append({"step": f"thought_{i + 1}", "prompt": prompt, "output": raw})
 
-        nodes = "\n\n".join(f"Thought {i + 1}: {t[:600]}" for i, t in enumerate(thoughts))
-        synth = (self.task_header(ctx.relation, ctx.labels)
-                 + "\n" + self.question(ex)
-                 + "\nThree partial analyses were produced. None is a final answer.\n\n"
-                 + nodes
-                 + "\n\nRelate them to one another: state where they agree, where "
-                   "they conflict, and what each conflict implies about the "
-                   "correct label. Then resolve the graph into one answer.\n"
-                 + self.answer_instruction())
+        synth = self._synthesis_prompt(ex, ctx, thoughts)
         raw = ctx.generate(synth, ctx.seed)
         lab, rule = parse_label(raw, ctx.labels, ctx.relation)
         trace.append({"step": "synthesise", "prompt": synth, "output": raw,
                       "parsed": lab, "rule": rule})
+        n_calls = N_THOUGHTS + 1
+
+        if lab is None:
+            # Recover the answer rather than scoring the row wrong for a
+            # formatting slip. This mirrors the fallback Tree-of-Thought has had
+            # from the start, whose absence here cost 21 rows in the first run.
+            extract = self._extract_prompt(ex, ctx, raw)
+            raw2 = ctx.generate(extract, ctx.seed + 7919,
+                                max_new_tokens=EXTRACT_TOKENS)
+            lab, rule = parse_label(raw2, ctx.labels, ctx.relation)
+            n_calls += 1
+            trace.append({"step": "extract", "prompt": extract, "output": raw2,
+                          "parsed": lab, "rule": rule})
+            if lab is not None:
+                rule = f"recovered_{rule}"
+
         return StrategyResult(prediction=lab, parse_rule=rule, raw=raw,
-                              trace=trace, n_calls=N_THOUGHTS + 1)
+                              trace=trace, n_calls=n_calls)

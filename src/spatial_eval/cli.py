@@ -164,6 +164,58 @@ def cmd_report(args) -> int:
     return 0
 
 
+def cmd_prompts(args) -> int:
+    """Print the exact prompt every strategy sends, for one evaluation row.
+
+    Prompts are the experimental manipulation -- the only thing that differs
+    between arms -- so they belong in the writeup verbatim rather than being
+    reconstructed from the source.
+    """
+    from .data import load_demos, load_examples
+    from .strategies import Context, get_strategy
+
+    examples, _ = load_examples(args.relation)
+    ex = next((e for e in examples if e.row_index == args.row), examples[0])
+    demos = None
+    try:
+        demos, _ = load_demos(args.relation)
+    except Exception:
+        pass
+
+    captured: list[tuple[str, str]] = []
+
+    def recording_generate(prompt, seed, max_new_tokens=None):
+        captured.append((f"call {len(captured) + 1}", prompt))
+        # A plausible reply keeps multi-step strategies walking their full path.
+        return f"Reasoning placeholder.\nANSWER: {ex.label}"
+
+    ctx = Context(relation=args.relation, labels=LABELS[args.relation],
+                  seed=1, generate=recording_generate, demos=demos)
+
+    print("=" * 78)
+    print(f"  PROMPTS — {args.relation}, eval row {ex.row_index}")
+    print("=" * 78)
+    print(f"  subject : {ex.subject}")
+    print(f"  object  : {ex.target}")
+    print(f"  gold    : {ex.label}   ({ex.ambiguity_level})")
+    print(f"  text    : {ex.text}")
+
+    for name in (available() if not args.strategy else [args.strategy]):
+        captured.clear()
+        strat = get_strategy(name)()
+        strat.run(ex, ctx)
+        print("\n" + "=" * 78)
+        print(f"  STRATEGY: {name}   ({len(captured)} model call"
+              f"{'s' if len(captured) != 1 else ''})")
+        print(f"  {strat.description}")
+        print("=" * 78)
+        for label, prompt in captured:
+            print(f"\n--- {label} " + "-" * (70 - len(label)))
+            print(prompt.rstrip())
+    print()
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="spatial-eval", description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -187,6 +239,12 @@ def build_parser() -> argparse.ArgumentParser:
     r.add_argument("-v", "--verbose", action="store_true")
     _add_model_args(r)
     r.set_defaults(func=cmd_run)
+
+    pr = sub.add_parser("prompts", help="print the exact prompts each strategy sends")
+    pr.add_argument("-r", "--relation", choices=RELATIONS, default="relative")
+    pr.add_argument("-s", "--strategy", choices=available())
+    pr.add_argument("--row", type=int, help="eval row_index (default: the first)")
+    pr.set_defaults(func=cmd_prompts)
 
     e = sub.add_parser("evaluate", help="recompute metrics from saved predictions")
     e.set_defaults(func=cmd_evaluate)

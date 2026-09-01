@@ -35,10 +35,13 @@ class Backend(ABC):
         self.cfg = cfg
 
     @abstractmethod
-    def generate(self, prompt: str, seed: int) -> str:
+    def generate(self, prompt: str, seed: int,
+                 max_new_tokens: int | None = None) -> str:
         """Return the model's completion for `prompt`.
 
         `seed` must make the output reproducible for a given (prompt, seed).
+        `max_new_tokens` overrides the configured budget for this call only --
+        a short extraction call needs a handful of tokens, not the full budget.
         """
 
     def describe(self) -> dict:
@@ -70,7 +73,8 @@ class MockBackend(Backend):
         super().__init__(cfg)
         self.calls = 0
 
-    def generate(self, prompt: str, seed: int) -> str:
+    def generate(self, prompt: str, seed: int,
+                 max_new_tokens: int | None = None) -> str:
         self.calls += 1
         # Read the allowed labels out of the prompt itself, so the mock stays
         # agnostic about which relation it is answering and the Backend
@@ -176,7 +180,8 @@ class HFBackend(Backend):
         except Exception as exc:                      # pragma: no cover
             log.debug("warmup patch skipped: %s", exc)
 
-    def generate(self, prompt: str, seed: int) -> str:
+    def generate(self, prompt: str, seed: int,
+                 max_new_tokens: int | None = None) -> str:
         from transformers import set_seed
         set_seed(prompt_seed(seed, prompt))
 
@@ -186,7 +191,7 @@ class HFBackend(Backend):
         with self.torch.no_grad():
             out = self.model.generate(
                 **inputs,
-                max_new_tokens=self.cfg.max_new_tokens,
+                max_new_tokens=max_new_tokens or self.cfg.max_new_tokens,
                 do_sample=self.cfg.do_sample,
                 temperature=self.cfg.temperature,
                 pad_token_id=self.tokenizer.eos_token_id,

@@ -73,7 +73,7 @@ class TreeOfThought(Strategy):
             votes = [c for c, _ in candidates if c]
             if votes:
                 lab = max(set(votes), key=votes.count)
-                rule = "branch_majority"
+                rule = "recovered_branch_majority"
 
         return StrategyResult(prediction=lab, parse_rule=rule, raw=raw,
                               trace=trace, n_calls=N_BRANCHES + 1)
