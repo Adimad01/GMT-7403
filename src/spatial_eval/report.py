@@ -78,6 +78,29 @@ def render(cells: dict, metric: str = "accuracy") -> str:
                "pooled estimate")
     out.append("")
 
+    # A checkpoint is written incrementally, so a cell still running looks
+    # exactly like a finished small-n cell. Cells short of their relation's
+    # full row count are the tell -- say so loudly, before any table is read.
+    expected = {}
+    for (rel, _s, _sd), c in cells.items():
+        if c.get("n"):
+            expected[rel] = max(expected.get(rel, 0), c["n"])
+    partial = [(k, c["n"], expected[k[0]]) for k, c in cells.items()
+               if c.get("n") and c["n"] < expected[k[0]]]
+    if partial:
+        out.append("  " + "!" * 80)
+        out.append("  INCOMPLETE RESULTS — do not read the table below.")
+        out.append(f"  {len(partial)} cell(s) have fewer rows than the relation's "
+                   "full evaluation set, which means a run is still in progress "
+                   "or died early:")
+        for (rel, strat, seed), got, want in sorted(partial)[:8]:
+            out.append(f"      {rel}/{strat}/seed{seed}: {got}/{want} rows")
+        if len(partial) > 8:
+            out.append(f"      ... and {len(partial) - 8} more")
+        out.append("  Wait for the run to finish, then re-run evaluate and report.")
+        out.append("  " + "!" * 80)
+        out.append("")
+
     head = f"  {'relation':<14}" + "".join(f"{s:>17}" for s in strategies)
     out.append(head)
     out.append("  " + "-" * (len(head) - 2))

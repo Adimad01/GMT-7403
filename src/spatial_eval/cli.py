@@ -130,6 +130,15 @@ def cmd_run(args) -> int:
 
 def cmd_evaluate(args) -> int:
     n = 0
+    short: list[str] = []
+    # Row counts per relation, so a cell still being written is visible rather
+    # than reported as a finished small-n result.
+    expected: dict[str, int] = {}
+    for rel in RELATIONS:
+        try:
+            expected[rel] = len(load_examples(rel)[0])
+        except Exception:
+            expected[rel] = 0
     for rel in RELATIONS:
         for strat in available():
             base = RESULTS_DIR / rel / strat
@@ -142,11 +151,23 @@ def cmd_evaluate(args) -> int:
                 m = compute(recs, LABELS[rel])
                 (seed_dir / "metrics.json").write_text(
                     json.dumps(m, indent=2), encoding="utf-8")
+                flag = ""
+                if expected.get(rel) and m.get("n", 0) < expected[rel]:
+                    flag = f"   << INCOMPLETE ({m.get('n', 0)}/{expected[rel]})"
+                    short.append(f"{rel}/{strat}/{seed_dir.name}")
                 print(f"  {rel:<13} {strat:<11} {seed_dir.name:<7} "
                       f"acc={m.get('accuracy', 0):>6.2f}%  "
-                      f"macroF1={m.get('macro_f1', 0):.3f}  n={m.get('n', 0)}")
+                      f"macroF1={m.get('macro_f1', 0):.3f}  n={m.get('n', 0)}{flag}")
                 n += 1
     print(f"\n  wrote metrics.json for {n} cell(s)")
+    if short:
+        print(f"\n  WARNING: {len(short)} cell(s) are incomplete — a run is still "
+              "in progress or died early.")
+        print("  Metrics for these are partial and must not be reported:")
+        for c in short[:8]:
+            print(f"      {c}")
+        if len(short) > 8:
+            print(f"      ... and {len(short) - 8} more")
     return 0
 
 

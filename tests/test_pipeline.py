@@ -231,6 +231,34 @@ def test_got_fallback_rescues_unparseable_synthesis():
     assert res2.n_calls == 4                # no extraction when not needed
 
 
+def test_report_flags_partial_cells():
+    """A cell still being written must never be reported as a finished result.
+
+    The first GoT rerun was analysed one row in and produced 'got 100.0%'.
+    Nothing warned, because the check existed in an earlier codebase and was
+    not carried into this one."""
+    import spatial_eval.report as R
+    tmp = Path(tempfile.mkdtemp())
+    original = C.RESULTS_DIR
+    try:
+        C.RESULTS_DIR = R.RESULTS_DIR = tmp
+        cells = {
+            ("relative", "cot", 1): {"n": 25, "accuracy": 80.0, "unparsed": 0,
+                                     "failed_rows": [], "n_unique_facts": 20},
+            ("relative", "got", 1): {"n": 1, "accuracy": 100.0, "unparsed": 0,
+                                     "failed_rows": [], "n_unique_facts": 1},
+        }
+        text = R.render(cells)
+        assert "INCOMPLETE RESULTS" in text
+        assert "relative/got/seed1: 1/25 rows" in text
+        # a complete set must NOT be flagged
+        ok = {k: v for k, v in cells.items() if v["n"] == 25}
+        assert "INCOMPLETE RESULTS" not in R.render(ok)
+    finally:
+        C.RESULTS_DIR = R.RESULTS_DIR = original
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
 def main() -> int:
     tests = [(n, f) for n, f in sorted(globals().items())
              if n.startswith("test_") and callable(f)]
