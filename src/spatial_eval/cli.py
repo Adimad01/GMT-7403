@@ -82,8 +82,11 @@ def cmd_list(args) -> int:
 
 def cmd_run(args) -> int:
     env_guards()
-    relations = RELATIONS if args.all or not args.relation else [args.relation]
-    strategies = available() if args.all or not args.strategy else [args.strategy]
+    # An explicit -r/-s always narrows the grid, including alongside --all:
+    # `--all -s got` reads as "every relation, this one strategy", and used to
+    # silently queue all five instead. Resume made that harmless but confusing.
+    relations = [args.relation] if args.relation else RELATIONS
+    strategies = [args.strategy] if args.strategy else available()
     seeds = args.seeds
 
     setup_logging(args.verbose, LOGS_DIR / "run.log")
@@ -227,7 +230,8 @@ def build_parser() -> argparse.ArgumentParser:
     r = sub.add_parser("run", help="run experiments")
     r.add_argument("-r", "--relation", choices=RELATIONS)
     r.add_argument("-s", "--strategy", choices=available())
-    r.add_argument("--all", action="store_true", help="every relation x strategy")
+    r.add_argument("--all", action="store_true",
+                   help="every relation x strategy (the default; -r/-s narrow it)")
     r.add_argument("--seeds", type=int, nargs="+", default=[1])
     r.add_argument("--limit", type=int, help="evaluate only the first N rows (debug)")
     r.add_argument("--no-resume", action="store_true",
