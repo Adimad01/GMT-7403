@@ -118,3 +118,68 @@ def compute(records: list[dict], labels: list[str]) -> dict:
                                                             key=lambda x: -x[1])},
         "failed_rows": [r["row_index"] for r in records if r.get("status") == "error"],
     }
+
+
+def mcnemar_exact(b: int, c: int) -> float:
+    """Two-sided exact McNemar p-value for paired binary outcomes.
+
+    b = rows A got right and B got wrong;  c = the reverse.
+
+    Rows both arms agree on carry no information about which is better and drop
+    out. Under the null each discordant row is a fair coin, so the count is
+    Binomial(b + c, 0.5). Computed exactly: the chi-square approximation is
+    unreliable when discordant rows are few, which is the norm at these sizes.
+
+    This is the right test here because every strategy scores the SAME rows.
+    Comparing two independent confidence intervals instead would be far more
+    conservative and would miss real differences.
+    """
+    n = b + c
+    if n == 0:
+        return 1.0
+    k = max(b, c)
+    tail = sum(math.comb(n, i) for i in range(k, n + 1)) * (0.5 ** n)
+    return min(1.0, 2.0 * tail)
+
+
+def holm_bonferroni(pvals: list[float]) -> list[float]:
+    """Holm step-down adjusted p-values.
+
+    Ten pairwise comparisons per relation would throw up false positives
+    uncorrected; Holm controls the family-wise error rate and is uniformly more
+    powerful than plain Bonferroni.
+    """
+    m = len(pvals)
+    if m == 0:
+        return []
+    order = sorted(range(m), key=lambda i: pvals[i])
+    adj, running = [0.0] * m, 0.0
+    for rank, idx in enumerate(order):
+        running = max(running, (m - rank) * pvals[idx])
+        adj[idx] = min(1.0, running)
+    return adj
+
+
+def per_row_correct(records: list[dict]) -> dict[int, bool]:
+    """row_index -> was it right. Only completed rows."""
+    return {r["row_index"]: bool(r.get("correct"))
+            for r in records if r.get("status") == "ok"}
+
+
+def accuracy_excluding_unparsed(records: list[dict]) -> dict:
+    """Accuracy over rows the parser could actually read.
+
+    An unparseable completion is scored wrong, which conflates two different
+    failures: the model reasoned badly, or it reasoned fine and formatted the
+    answer badly. Reporting both figures separates them.
+    """
+    ok = [r for r in records if r.get("status") == "ok"]
+    parsed = [r for r in ok if r.get("predicted") is not None]
+    if not parsed:
+        return {"n_parsed": 0}
+    hits = sum(1 for r in parsed if r.get("correct"))
+    lo, hi = wilson(hits, len(parsed))
+    return {"n_parsed": len(parsed),
+            "n_unparsed": len(ok) - len(parsed),
+            "accuracy_parsed_only": round(100 * hits / len(parsed), 2),
+            "accuracy_parsed_only_ci95": [round(lo, 2), round(hi, 2)]}

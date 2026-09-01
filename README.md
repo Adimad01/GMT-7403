@@ -197,6 +197,28 @@ python3 -m spatial_eval.cli report --metric accuracy_by_fact --per-label
 python3 -m spatial_eval.cli report --csv results/comparison.csv --json results/comparison.json
 ```
 
+### Deciding whether a difference is real
+
+The comparison table shows means and a resolution floor, which is the right
+caution for a *single* arm. But every strategy answers the same questions, so
+strategy-vs-strategy contrasts are **paired**, and an exact McNemar test is far
+more sensitive than asking whether two intervals overlap:
+
+```bash
+python3 -m spatial_eval.cli report --pairwise
+```
+
+Seeds are collapsed to one verdict per row before testing — they are repeated
+measurements of the same rows, not extra rows, and treating them as independent
+would manufacture significance. Ten comparisons per relation are Holm-corrected.
+
+An unparseable completion is scored wrong, which mixes "reasoned badly" with
+"answered in the wrong format". To separate them:
+
+```bash
+python3 -m spatial_eval.cli report --parse-health
+```
+
 ---
 
 ## Adding a strategy

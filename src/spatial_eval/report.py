@@ -10,7 +10,8 @@ import json
 from pathlib import Path
 
 from .config import LABELS, RELATIONS, RESULTS_DIR
-from .metrics import compute, load_predictions, wilson
+from .metrics import (accuracy_excluding_unparsed, compute, holm_bonferroni,
+                      load_predictions, mcnemar_exact, per_row_correct, wilson)
 from .strategies import available
 
 
@@ -160,3 +161,126 @@ def write_json(cells: dict, path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     payload = {f"{r}/{s}/seed{sd}": c for (r, s, sd), c in sorted(cells.items())}
     path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+
+
+def _pooled_correct(rel: str, strat: str, seeds=None) -> dict[int, bool]:
+    """row_index -> correct, pooling seeds by majority vote.
+
+    Seeds are repeated measurements of the SAME rows, not extra rows. Treating
+    each seed as an independent observation would multiply the effective sample
+    size and manufacture significance, so they are collapsed to one verdict per
+    row first.
+    """
+    from collections import defaultdict
+    votes: dict[int, list[bool]] = defaultdict(list)
+    base = RESULTS_DIR / rel / strat
+    if not base.exists():
+        return {}
+    for seed_dir in sorted(base.glob("seed*")):
+        if seeds:
+            try:
+                if int(seed_dir.name.replace("seed", "")) not in seeds:
+                    continue
+            except ValueError:
+                continue
+        for idx, ok in per_row_correct(
+                load_predictions(seed_dir / "predictions.jsonl")).items():
+            votes[idx].append(ok)
+    return {i: (sum(v) * 2 > len(v)) for i, v in votes.items()}
+
+
+def render_pairwise(relations=RELATIONS, seeds=None, alpha: float = 0.05) -> str:
+    """Strategy-vs-strategy paired comparisons.
+
+    Every strategy answers the same questions, so the comparison is paired and
+    an exact McNemar test applies. That is far more sensitive than asking
+    whether two confidence intervals overlap -- the resolution floor is the
+    right caution for a single arm, but too conservative for a paired contrast.
+    """
+    out = ["=" * 90,
+           "  PAIRWISE STRATEGY COMPARISON  (exact McNemar on shared rows, "
+           "Holm-corrected)",
+           "=" * 90,
+           "  A>B / B>A counts rows where exactly one strategy was right.",
+           "  Rows both got right, or both wrong, carry no information and drop out.",
+           ""]
+    strategies = available()
+    for rel in relations:
+        vectors = {s: _pooled_correct(rel, s, seeds) for s in strategies}
+        vectors = {s: v for s, v in vectors.items() if v}
+        if len(vectors) < 2:
+            continue
+        names = sorted(vectors)
+        rows, pvals = [], []
+        for i, a in enumerate(names):
+            for b in names[i + 1:]:
+                shared = sorted(set(vectors[a]) & set(vectors[b]))
+                if not shared:
+                    continue
+                a_only = sum(1 for k in shared if vectors[a][k] and not vectors[b][k])
+                b_only = sum(1 for k in shared if vectors[b][k] and not vectors[a][k])
+                delta = 100.0 * (a_only - b_only) / len(shared)
+                p = mcnemar_exact(a_only, b_only)
+                rows.append([a, b, len(shared), a_only, b_only, delta, p])
+                pvals.append(p)
+        if not rows:
+            continue
+        for row, adj in zip(rows, holm_bonferroni(pvals)):
+            row.append(adj)
+
+        out.append(f"  {rel.upper()}   (n={rows[0][2]} shared rows)")
+        out.append(f"    {'A':<11}{'B':<11}{'A>B':>5}{'B>A':>5}"
+                   f"{'delta pp':>10}{'p':>9}{'p_holm':>9}   verdict")
+        out.append("    " + "-" * 72)
+        for a, b, n, ao, bo, d, p, adj in sorted(rows, key=lambda r: r[-1]):
+            if adj < 0.001:
+                mark = "*** "
+            elif adj < 0.01:
+                mark = "**  "
+            elif adj < alpha:
+                mark = "*   "
+            else:
+                mark = "n.s."
+            better = a if d > 0 else b
+            verdict = f"{mark} {better} better" if adj < alpha else f"{mark} indistinguishable"
+            out.append(f"    {a:<11}{b:<11}{ao:>5}{bo:>5}{d:>+10.1f}"
+                       f"{p:>9.4f}{adj:>9.4f}   {verdict}")
+        n_sig = sum(1 for r in rows if r[-1] < alpha)
+        out.append(f"    -> {n_sig}/{len(rows)} pairs separate after correction")
+        out.append("")
+    return "\n".join(out)
+
+
+def render_parse_health(relations=RELATIONS) -> str:
+    """Accuracy with and without unparseable completions.
+
+    An unparseable answer is scored wrong, which mixes 'reasoned badly' with
+    'answered in the wrong format'. Showing both figures says which one a
+    strategy is actually suffering from.
+    """
+    out = ["=" * 90,
+           "  PARSE HEALTH  —  does a strategy lose accuracy to formatting?",
+           "=" * 90,
+           f"    {'relation':<13}{'strategy':<12}{'unparsed':>9}"
+           f"{'acc (all)':>11}{'acc (parsed)':>14}{'gap':>7}", ""]
+    for rel in relations:
+        for strat in available():
+            base = RESULTS_DIR / rel / strat
+            if not base.exists():
+                continue
+            recs = []
+            for seed_dir in sorted(base.glob("seed*")):
+                recs.extend(load_predictions(seed_dir / "predictions.jsonl"))
+            if not recs:
+                continue
+            m = compute(recs, LABELS[rel])
+            pu = accuracy_excluding_unparsed(recs)
+            if not pu.get("n_parsed"):
+                continue
+            gap = pu["accuracy_parsed_only"] - m["accuracy"]
+            flag = "  <-- formatting, not reasoning" if gap >= 3.0 else ""
+            out.append(f"    {rel:<13}{strat:<12}{pu['n_unparsed']:>9}"
+                       f"{m['accuracy']:>11.1f}{pu['accuracy_parsed_only']:>14.1f}"
+                       f"{gap:>+7.1f}{flag}")
+        out.append("")
+    return "\n".join(out)

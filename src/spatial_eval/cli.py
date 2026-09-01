@@ -20,7 +20,8 @@ from .config import (LABELS, LOGS_DIR, RELATIONS, RESULTS_DIR, ModelConfig,
 from .data import ManifestError, load_demos, load_examples
 from .metrics import compute, load_predictions
 from .model import build_backend
-from .report import collect, render, render_per_label, write_csv, write_json
+from .report import (collect, render, render_pairwise, render_parse_health,
+                     render_per_label, write_csv, write_json)
 from .runner import run_cell, setup_logging
 from .strategies import available
 
@@ -151,6 +152,11 @@ def cmd_report(args) -> int:
     print(render(cells, metric=args.metric))
     if args.per_label:
         print(render_per_label(cells))
+    if args.pairwise:
+        print(render_pairwise(seeds=set(args.seeds) if args.seeds else None,
+                              alpha=args.alpha))
+    if args.parse_health:
+        print(render_parse_health())
     if args.csv:
         write_csv(cells, Path(args.csv)); print(f"  wrote {args.csv}")
     if args.json:
@@ -189,6 +195,11 @@ def build_parser() -> argparse.ArgumentParser:
     c.add_argument("--metric", default="accuracy",
                    choices=["accuracy", "accuracy_by_fact", "macro_f1"])
     c.add_argument("--per-label", action="store_true")
+    c.add_argument("--pairwise", action="store_true",
+                   help="paired McNemar tests between every strategy pair")
+    c.add_argument("--parse-health", action="store_true",
+                   help="accuracy with vs without unparseable completions")
+    c.add_argument("--alpha", type=float, default=0.05)
     c.add_argument("--seeds", type=int, nargs="+")
     c.add_argument("--csv", help="also write a CSV here")
     c.add_argument("--json", help="also write JSON here")

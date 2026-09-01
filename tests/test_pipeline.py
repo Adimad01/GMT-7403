@@ -173,6 +173,34 @@ def test_metrics_on_synthetic_records():
     assert 0 <= m["macro_f1"] <= 1
 
 
+def test_mcnemar_reference_values():
+    from spatial_eval.metrics import mcnemar_exact
+    assert abs(mcnemar_exact(10, 2) - 0.03857) < 1e-3
+    assert abs(mcnemar_exact(8, 0) - 0.0078125) < 1e-6
+    assert mcnemar_exact(5, 5) == 1.0          # symmetric -> no evidence
+    assert mcnemar_exact(0, 0) == 1.0          # no discordant rows
+
+
+def test_holm_is_monotone_and_bounded():
+    from spatial_eval.metrics import holm_bonferroni
+    adj = holm_bonferroni([0.01, 0.02, 0.03])
+    assert [round(a, 4) for a in adj] == [0.03, 0.04, 0.04]
+    assert holm_bonferroni([]) == []
+    assert all(0 <= a <= 1 for a in holm_bonferroni([0.5, 0.9, 0.99]))
+
+
+def test_parse_health_separates_formatting_from_reasoning():
+    from spatial_eval.metrics import accuracy_excluding_unparsed
+    # 10 unparseable rows, all of which would have been wrong anyway
+    recs = [{"row_index": i, "status": "ok", "correct": i % 2 == 0,
+             "predicted": None if i < 10 else "x"} for i in range(50)]
+    r = accuracy_excluding_unparsed(recs)
+    assert r["n_unparsed"] == 10
+    assert r["n_parsed"] == 40
+    # parsed-only accuracy must be at least the all-rows figure
+    assert r["accuracy_parsed_only"] >= 100 * sum(1 for x in recs if x["correct"]) / 50
+
+
 def main() -> int:
     tests = [(n, f) for n, f in sorted(globals().items())
              if n.startswith("test_") and callable(f)]
