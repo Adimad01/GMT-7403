@@ -27,10 +27,31 @@ Level 6 matters more than the others for this project: it is the case where a
 knowledge graph should demonstrably help, because the KG supplies the
 intermediate link the model would otherwise have to know.
 
-Only logically forced compositions are allowed. `A within C` + `C within B`
-gives `A within B`; `A touches C` + `C touches B` gives **nothing**, so
-`touches`, `crosses` and `overlaps` cannot be chained and the validator rejects
-them at Level 6.
+Only logically forced compositions are allowed, so **the Level 6 grid is
+deliberately smaller than Levels 1–5**:
+
+| relation | labels with a valid two-hop composition |
+|---|---|
+| topological | `contains`, `within`, `disjoint` — 3 of 7 |
+| cardinal | all 8 (each direction composes along its own axis) |
+| relative | `left_of`, `right_of`, `in_front_of`, `behind` — 4 of 5 |
+
+`A touches C` + `C touches B` implies nothing about A and B, and `next_to`
+likewise fails to compose. `equals` is excluded because it is reachable only by
+chaining synonyms, which is a naming trick rather than spatial reasoning.
+
+### The rule that matters most
+
+**The description must state BOTH links.** The first generated batch failed this
+on 34 of 35 multi-hop rows: each stated only "A relates to C" and never
+mentioned B, so the answer could not be derived from the sentence at all — only
+recalled from world knowledge. That inverts the purpose of the level.
+
+    BAD   A=United States, C=California, B=San Francisco
+          "The federal republic fully surrounds the golden state."
+
+    GOOD  "The federal republic fully surrounds the golden state, and that
+           state in turn completely encloses the bay city." 
 
 ## Workflow
 

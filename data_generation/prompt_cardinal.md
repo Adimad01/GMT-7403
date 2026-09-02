@@ -1,9 +1,16 @@
 # TASK: generate 144 new spatial-relation examples (cardinal)
 
 You are extending a research dataset used to test how well language models
-reason about space. I need 144 NEW rows: 3 for every
-combination of label and ambiguity level (8 labels x 6
-levels = 48 combinations). 24 of those are Level 6 (multi-hop).
+reason about space. I need 144 NEW rows, 3 per cell:
+
+  Levels 1-5: all 8 labels x 5 levels = 40 cells
+  Level 6   : only 8 labels (north_of, south_of, east_of, west_of, northeast_of, northwest_of, southeast_of, southwest_of) = 8 cells
+
+  total 48 cells x 3 = 144 rows, of which 24 are multi-hop.
+
+The Level 6 grid is deliberately smaller: the remaining labels have no forced
+two-hop composition, so multi-hop rows for them would have no determinate
+answer.
 
 ## What the data captures
 
@@ -32,16 +39,44 @@ Level 6 is different in kind — it adds an inference step instead.
   Level 6 makes the *inference* harder. If a row is both obscurely worded and
   multi-hop, we cannot tell which caused the difficulty, and the row is wasted.
 
+  **Level 6 exists ONLY for these labels: north_of, south_of, east_of, west_of, northeast_of, northwest_of, southeast_of, southwest_of.**
+  The other labels have no forced two-hop composition, so do not produce Level 6
+  rows for them at all. The grid is deliberately ragged here.
+
 North/south and east/west compose along their own axis. State two links and let the reader chain them:
   A is north of C  +  C is north of B   =>  A is north of B
 Diagonals compose only when both steps share the diagonal (northeast + northeast => northeast). Do NOT chain a north step with an east step and claim northeast — that is not forced unless the distances make it so, and the reader cannot know them.
+
+  THREE RULES THAT DECIDE WHETHER THE ROW IS USABLE:
+
+  1. The description MUST state BOTH links. It must mention A, C and B. A
+     description that only says "A relates to C" is unusable, because nothing
+     connects C to B and the answer cannot be derived from the text.
+
+       BAD  — mentions only the first link:
+         A=United States, C=California, B=San Francisco
+         "The federal republic fully surrounds the golden state."
+         (San Francisco never appears; the reader cannot answer.)
+
+       GOOD — both links present:
+         "The federal republic fully surrounds the golden state, and that state
+          in turn completely encloses the bay city."
+
+  2. C must be a genuinely DIFFERENT PLACE, not another name for A or B.
+     Chaining synonyms ("United Mexican States equals Mexico, which touches the
+     United States") satisfies the letter of the composition rule but involves
+     no spatial reasoning at all. Never use 'equals' or a naming alias as a hop.
+
+  3. A reader who knows only the sentence — not world geography — must be able
+     to reach the answer. If the row can only be solved by already knowing where
+     things are, it tests memory rather than composition.
 
   Name the intermediate place in the `via_entity` column. It must satisfy the
   same OpenStreetMap requirements as A and B — it is part of the reasoning
   chain and gets geocoded too.
 
   Example of the style wanted:
-    "Travelling up the Nile, Khartoum lies upstream of Cairo along the 12 o'clock axis, and Kampala in turn lies upstream of Khartoum on the same axis."
+    "Kampala sits further up the 12 o'clock axis than Khartoum, and Khartoum in turn sits further up that same axis than Cairo. (A=Kampala, C=Khartoum, B=Cairo — all three named, both links stated.)"
 
 
 ## HARD REQUIREMENT: every place must be findable in OpenStreetMap

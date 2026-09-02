@@ -1,9 +1,16 @@
-# TASK: generate 180 new spatial-relation examples (relative)
+# TASK: generate 174 new spatial-relation examples (relative)
 
 You are extending a research dataset used to test how well language models
-reason about space. I need 180 NEW rows: 6 for every
-combination of label and ambiguity level (5 labels x 6
-levels = 30 combinations). 30 of those are Level 6 (multi-hop).
+reason about space. I need 174 NEW rows, 6 per cell:
+
+  Levels 1-5: all 5 labels x 5 levels = 25 cells
+  Level 6   : only 4 labels (left_of, right_of, in_front_of, behind) = 4 cells
+
+  total 29 cells x 6 = 174 rows, of which 24 are multi-hop.
+
+The Level 6 grid is deliberately smaller: the remaining labels have no forced
+two-hop composition, so multi-hop rows for them would have no determinate
+answer.
 
 ## What the data captures
 
@@ -32,16 +39,44 @@ Level 6 is different in kind — it adds an inference step instead.
   Level 6 makes the *inference* harder. If a row is both obscurely worded and
   multi-hop, we cannot tell which caused the difficulty, and the row is wasted.
 
+  **Level 6 exists ONLY for these labels: left_of, right_of, in_front_of, behind.**
+  The other labels have no forced two-hop composition, so do not produce Level 6
+  rows for them at all. The grid is deliberately ragged here.
+
 From a SINGLE fixed viewpoint, left/right ordering is transitive. State two links and let the reader compose them:
   A is left of C  +  C is left of B   =>  A is left of B
 The same holds for right_of, in_front_of and behind along one axis. For next_to, use adjacency in a stated row: 'A sits beside C, and C beside B, with nothing between them' => A is near B — only claim next_to when the three genuinely form a compact row.
+
+  THREE RULES THAT DECIDE WHETHER THE ROW IS USABLE:
+
+  1. The description MUST state BOTH links. It must mention A, C and B. A
+     description that only says "A relates to C" is unusable, because nothing
+     connects C to B and the answer cannot be derived from the text.
+
+       BAD  — mentions only the first link:
+         A=United States, C=California, B=San Francisco
+         "The federal republic fully surrounds the golden state."
+         (San Francisco never appears; the reader cannot answer.)
+
+       GOOD — both links present:
+         "The federal republic fully surrounds the golden state, and that state
+          in turn completely encloses the bay city."
+
+  2. C must be a genuinely DIFFERENT PLACE, not another name for A or B.
+     Chaining synonyms ("United Mexican States equals Mexico, which touches the
+     United States") satisfies the letter of the composition rule but involves
+     no spatial reasoning at all. Never use 'equals' or a naming alias as a hop.
+
+  3. A reader who knows only the sentence — not world geography — must be able
+     to reach the answer. If the row can only be solved by already knowing where
+     things are, it tests memory rather than composition.
 
   Name the intermediate place in the `via_entity` column. It must satisfy the
   same OpenStreetMap requirements as A and B — it is part of the reasoning
   chain and gets geocoded too.
 
   Example of the style wanted:
-    "Standing on the National Mall facing the Capitol, the Washington Monument sits to the port side of the National Museum of American History, and that museum in turn sits to the port side of the National Gallery of Art."
+    "Standing on the National Mall facing the Capitol, the Washington Monument sits to the port side of the National Museum of American History, and that museum in turn sits to the port side of the National Gallery of Art. (A=Washington Monument, C=Museum of American History, B=National Gallery — all three named, both links stated.)"
 
 
 ## HARD REQUIREMENT: every place must be findable in OpenStreetMap
@@ -74,7 +109,7 @@ on the right object, do not use it.
 ## Output format
 
 Return ONLY valid CSV. No prose, no markdown fences, no commentary.
-Header row exactly as below, then 180 data rows.
+Header row exactly as below, then 174 data rows.
 
 Columns:
   source_entity     the subject place (A)

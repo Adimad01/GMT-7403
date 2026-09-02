@@ -1,9 +1,16 @@
-# TASK: generate 210 new spatial-relation examples (topological)
+# TASK: generate 190 new spatial-relation examples (topological)
 
 You are extending a research dataset used to test how well language models
-reason about space. I need 210 NEW rows: 5 for every
-combination of label and ambiguity level (7 labels x 6
-levels = 42 combinations). 35 of those are Level 6 (multi-hop).
+reason about space. I need 190 NEW rows, 5 per cell:
+
+  Levels 1-5: all 7 labels x 5 levels = 35 cells
+  Level 6   : only 3 labels (contains, within, disjoint) = 3 cells
+
+  total 38 cells x 5 = 190 rows, of which 15 are multi-hop.
+
+The Level 6 grid is deliberately smaller: the remaining labels have no forced
+two-hop composition, so multi-hop rows for them would have no determinate
+answer.
 
 ## What the data captures
 
@@ -32,20 +39,46 @@ Level 6 is different in kind — it adds an inference step instead.
   Level 6 makes the *inference* harder. If a row is both obscurely worded and
   multi-hop, we cannot tell which caused the difficulty, and the row is wasted.
 
+  **Level 6 exists ONLY for these labels: contains, within, disjoint.**
+  The other labels have no forced two-hop composition, so do not produce Level 6
+  rows for them at all. The grid is deliberately ragged here.
+
 Only some compositions are logically FORCED. Use these, and no others:
   A within C   + C within B    => A within B
   A contains C + C contains B  => A contains B
   A within C   + C disjoint B  => A disjoint from B
-  A equals C   + C <anything> B => A <that same relation> B
-  A within C   + C within B    => A within B  (chains of any depth)
 NEVER chain 'touches' with 'touches' — A touches C and C touches B implies NOTHING about A and B. The same applies to crosses and overlaps. If the composition is not forced, the item is unusable.
+
+  THREE RULES THAT DECIDE WHETHER THE ROW IS USABLE:
+
+  1. The description MUST state BOTH links. It must mention A, C and B. A
+     description that only says "A relates to C" is unusable, because nothing
+     connects C to B and the answer cannot be derived from the text.
+
+       BAD  — mentions only the first link:
+         A=United States, C=California, B=San Francisco
+         "The federal republic fully surrounds the golden state."
+         (San Francisco never appears; the reader cannot answer.)
+
+       GOOD — both links present:
+         "The federal republic fully surrounds the golden state, and that state
+          in turn completely encloses the bay city."
+
+  2. C must be a genuinely DIFFERENT PLACE, not another name for A or B.
+     Chaining synonyms ("United Mexican States equals Mexico, which touches the
+     United States") satisfies the letter of the composition rule but involves
+     no spatial reasoning at all. Never use 'equals' or a naming alias as a hop.
+
+  3. A reader who knows only the sentence — not world geography — must be able
+     to reach the answer. If the row can only be solved by already knowing where
+     things are, it tests memory rather than composition.
 
   Name the intermediate place in the `via_entity` column. It must satisfy the
   same OpenStreetMap requirements as A and B — it is part of the reasoning
   chain and gets geocoded too.
 
   Example of the style wanted:
-    "The Vatican Museums sit entirely inside the walls of Vatican City, and Vatican City in turn lies wholly inside the municipal boundary of Rome."
+    "The Vatican Museums sit entirely inside the walls of Vatican City, and Vatican City in turn lies wholly inside the municipal boundary of Rome. (A=Vatican Museums, C=Vatican City, B=Rome — all three named, both links stated, and C is a real third place rather than a synonym.)"
 
 
 ## HARD REQUIREMENT: every place must be findable in OpenStreetMap
@@ -78,7 +111,7 @@ on the right object, do not use it.
 ## Output format
 
 Return ONLY valid CSV. No prose, no markdown fences, no commentary.
-Header row exactly as below, then 210 data rows.
+Header row exactly as below, then 190 data rows.
 
 Columns:
   source_entity     the subject place (A)

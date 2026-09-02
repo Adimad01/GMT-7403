@@ -25,6 +25,9 @@ def rd(p: Path) -> list[dict]:
 SPEC = {
     "relative": dict(
         n_per_cell=6,
+        # next_to does NOT compose: A beside C and C beside B leaves A and B
+        # possibly far apart.
+        hop_labels=["left_of", "right_of", "in_front_of", "behind"],
         labels=["left_of", "right_of", "in_front_of", "behind", "next_to"],
         what="RELATIVE DIRECTION — where one place sits from a stated viewpoint",
         levels=[
@@ -51,12 +54,17 @@ SPEC = {
         hop_example=(
             "Standing on the National Mall facing the Capitol, the Washington Monument "
             "sits to the port side of the National Museum of American History, and that "
-            "museum in turn sits to the port side of the National Gallery of Art."),
+            "museum in turn sits to the port side of the National Gallery of Art. "
+            "(A=Washington Monument, C=Museum of American History, B=National Gallery — "
+            "all three named, both links stated.)"),
         note="Every description MUST state the observer's viewpoint or facing "
              "direction explicitly — 'left' is meaningless without one."),
 
     "cardinal": dict(
         n_per_cell=3,
+        # every direction composes with itself along its own axis
+        hop_labels=["north_of", "south_of", "east_of", "west_of",
+                    "northeast_of", "northwest_of", "southeast_of", "southwest_of"],
         labels=["north_of", "south_of", "east_of", "west_of",
                 "northeast_of", "northwest_of", "southeast_of", "southwest_of"],
         what="CARDINAL DIRECTION — the compass bearing from the second place to the first",
@@ -82,9 +90,9 @@ SPEC = {
             "claim northeast — that is not forced unless the distances make it so, and "
             "the reader cannot know them."),
         hop_example=(
-            "Travelling up the Nile, Khartoum lies upstream of Cairo along the "
-            "12 o'clock axis, and Kampala in turn lies upstream of Khartoum on the "
-            "same axis."),
+            "Kampala sits further up the 12 o'clock axis than Khartoum, and Khartoum in "
+            "turn sits further up that same axis than Cairo. "
+            "(A=Kampala, C=Khartoum, B=Cairo — all three named, both links stated.)"),
         note="CRITICAL: cardinal is currently SATURATED — the model already answers "
              "97-100% correctly, so easy items are worthless. Every new item must be "
              "genuinely HARD: the honest bearing must surprise an educated reader. If a "
@@ -92,6 +100,11 @@ SPEC = {
 
     "topological": dict(
         n_per_cell=5,
+        # Only these three are reachable by a forced composition that involves
+        # real spatial reasoning. touches/crosses/overlaps compose to nothing,
+        # and 'equals' is only reachable by chaining synonyms, which is a naming
+        # trick rather than an inference.
+        hop_labels=["contains", "within", "disjoint"],
         labels=["contains", "within", "touches", "crosses",
                 "disjoint", "overlaps", "equals"],
         what="TOPOLOGICAL RELATION — how the areas of two places relate (DE-9IM style)",
@@ -109,14 +122,14 @@ SPEC = {
             "  A within C   + C within B    => A within B\n"
             "  A contains C + C contains B  => A contains B\n"
             "  A within C   + C disjoint B  => A disjoint from B\n"
-            "  A equals C   + C <anything> B => A <that same relation> B\n"
-            "  A within C   + C within B    => A within B  (chains of any depth)\n"
             "NEVER chain 'touches' with 'touches' — A touches C and C touches B implies "
             "NOTHING about A and B. The same applies to crosses and overlaps. If the "
             "composition is not forced, the item is unusable."),
         hop_example=(
             "The Vatican Museums sit entirely inside the walls of Vatican City, and "
-            "Vatican City in turn lies wholly inside the municipal boundary of Rome."),
+            "Vatican City in turn lies wholly inside the municipal boundary of Rome. "
+            "(A=Vatican Museums, C=Vatican City, B=Rome — all three named, both links "
+            "stated, and C is a real third place rather than a synonym.)"),
         note="Label meanings: contains = A fully encloses B. within = A is fully inside "
              "B. touches = share a boundary but interiors do not overlap. crosses = they "
              "cut through each other. disjoint = no contact at all. overlaps = partial "
@@ -131,7 +144,35 @@ MULTIHOP_BLOCK = """- **Level 6 — MULTI-HOP** — the relation between A and B
   Level 6 makes the *inference* harder. If a row is both obscurely worded and
   multi-hop, we cannot tell which caused the difficulty, and the row is wasted.
 
+  **Level 6 exists ONLY for these labels: {hop_labels}.**
+  The other labels have no forced two-hop composition, so do not produce Level 6
+  rows for them at all. The grid is deliberately ragged here.
+
 {hop_rule}
+
+  THREE RULES THAT DECIDE WHETHER THE ROW IS USABLE:
+
+  1. The description MUST state BOTH links. It must mention A, C and B. A
+     description that only says "A relates to C" is unusable, because nothing
+     connects C to B and the answer cannot be derived from the text.
+
+       BAD  — mentions only the first link:
+         A=United States, C=California, B=San Francisco
+         "The federal republic fully surrounds the golden state."
+         (San Francisco never appears; the reader cannot answer.)
+
+       GOOD — both links present:
+         "The federal republic fully surrounds the golden state, and that state
+          in turn completely encloses the bay city."
+
+  2. C must be a genuinely DIFFERENT PLACE, not another name for A or B.
+     Chaining synonyms ("United Mexican States equals Mexico, which touches the
+     United States") satisfies the letter of the composition rule but involves
+     no spatial reasoning at all. Never use 'equals' or a naming alias as a hop.
+
+  3. A reader who knows only the sentence — not world geography — must be able
+     to reach the answer. If the row can only be solved by already knowing where
+     things are, it tests memory rather than composition.
 
   Name the intermediate place in the `via_entity` column. It must satisfy the
   same OpenStreetMap requirements as A and B — it is part of the reasoning
@@ -150,9 +191,11 @@ def build(rel: str, spec: dict) -> str:
                  r["ambiguity_level"].strip())].append(r)
 
     existing = sorted({f'{r["source_entity"]} | {r["target_entity"]}' for r in rows})
-    n_cells = len(spec["labels"]) * len(LV)
+    flat_cells = len(spec["labels"]) * 5           # Levels 1-5, every label
+    hop_cells = len(spec["hop_labels"])            # Level 6, composable labels only
+    n_cells = flat_cells + hop_cells
     total = n_cells * spec["n_per_cell"]
-    n_hop = len(spec["labels"]) * spec["n_per_cell"]
+    n_hop = hop_cells * spec["n_per_cell"]
 
     examples = []
     for lab in spec["labels"]:
@@ -167,15 +210,23 @@ def build(rel: str, spec: dict) -> str:
 
     shown = existing if len(existing) <= 120 else random.sample(existing, 120)
     levels_md = "\n".join(f"- **{LV[i]}** — {d}" for i, d in enumerate(spec["levels"]))
-    levels_md += "\n" + MULTIHOP_BLOCK.format(hop_rule=spec["hop_rule"],
-                                              hop_example=spec["hop_example"])
+    levels_md += "\n" + MULTIHOP_BLOCK.format(
+        hop_rule=spec["hop_rule"], hop_example=spec["hop_example"],
+        hop_labels=", ".join(spec["hop_labels"]))
 
     return f"""# TASK: generate {total} new spatial-relation examples ({rel})
 
 You are extending a research dataset used to test how well language models
-reason about space. I need {total} NEW rows: {spec['n_per_cell']} for every
-combination of label and ambiguity level ({len(spec['labels'])} labels x 6
-levels = {n_cells} combinations). {n_hop} of those are Level 6 (multi-hop).
+reason about space. I need {total} NEW rows, {spec['n_per_cell']} per cell:
+
+  Levels 1-5: all {len(spec['labels'])} labels x 5 levels = {flat_cells} cells
+  Level 6   : only {hop_cells} labels ({', '.join(spec['hop_labels'])}) = {hop_cells} cells
+
+  total {n_cells} cells x {spec['n_per_cell']} = {total} rows, of which {n_hop} are multi-hop.
+
+The Level 6 grid is deliberately smaller: the remaining labels have no forced
+two-hop composition, so multi-hop rows for them would have no determinate
+answer.
 
 ## What the data captures
 
@@ -276,11 +327,11 @@ def main() -> None:
         path = out_dir / f"prompt_{rel}.md"
         text = build(rel, spec)
         path.write_text(text, encoding="utf-8")
-        n_cells = len(spec["labels"]) * len(LV)
+        n_cells = len(spec["labels"]) * 5 + len(spec["hop_labels"])
+        n_hop = len(spec["hop_labels"]) * spec["n_per_cell"]
         print(f"  {path.name:<28} {n_cells * spec['n_per_cell']:>4} rows "
               f"({spec['n_per_cell']}/cell x {n_cells} cells, "
-              f"{len(spec['labels']) * spec['n_per_cell']} multi-hop)  "
-              f"{len(text):,} chars")
+              f"{n_hop} multi-hop across {len(spec['hop_labels'])} labels)")
 
 
 if __name__ == "__main__":

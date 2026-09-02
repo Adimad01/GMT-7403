@@ -31,6 +31,23 @@ HOP_LEVEL = "Level 6"          # multi-hop: relation inferred through via_entity
 # Relations whose 2-hop composition is NOT logically forced. A touches C and
 # C touches B implies nothing about A and B, so such a chain is unusable.
 NON_COMPOSABLE = {"touches", "crosses", "overlaps"}
+# Labels that admit a FORCED two-hop composition involving real spatial
+# reasoning. Everything else has no determinate answer at Level 6, and 'equals'
+# is reachable only by chaining synonyms, which is a naming trick.
+HOP_LABELS = {
+    "topological": {"contains", "within", "disjoint"},
+    "cardinal": {"north_of", "south_of", "east_of", "west_of",
+                 "northeast_of", "northwest_of", "southeast_of", "southwest_of"},
+    "relative": {"left_of", "right_of", "in_front_of", "behind"},
+}
+STOPWORDS = {"city", "state", "republic", "federal", "kingdom", "commonwealth",
+             "national", "park", "county", "borough", "province", "united",
+             "states", "the", "of", "and"}
+
+
+def content_words(text: str) -> set[str]:
+    import re as _re
+    return {w for w in _re.findall(r"[a-z]{4,}", text.lower()) if w not in STOPWORDS}
 
 LABELS = {
     "topological": ["contains", "within", "touches", "crosses",
@@ -244,17 +261,52 @@ def main() -> int:
         elif hop:
             ok("multi-hop: every intermediate is a distinct third place")
 
-    # compositions that are not logically forced
-    if rel == "topological" and hop:
+    # only labels with a forced composition may appear at Level 6
+    if hop:
+        allowed = HOP_LABELS[rel]
         unforced = [r for r in hop
-                    if r["relation_label"].strip().lower() in NON_COMPOSABLE]
+                    if r["relation_label"].strip().lower() not in allowed]
         if unforced:
-            bad(f"{len(unforced)} Level 6 row(s) use a label whose two-hop "
-                f"composition is NOT forced "
-                f"({', '.join(sorted({r['relation_label'] for r in unforced}))}). "
-                f"A touches C and C touches B implies nothing about A and B.")
+            got = sorted({r["relation_label"].strip().lower() for r in unforced})
+            bad(f"{len(unforced)} Level 6 row(s) use a label with no forced "
+                f"two-hop composition ({', '.join(got)}). "
+                f"Level 6 is valid only for: {', '.join(sorted(allowed))}.")
         else:
-            ok("multi-hop: all compositions are logically forced")
+            ok(f"multi-hop: every label has a forced composition "
+               f"({', '.join(sorted({r['relation_label'].strip().lower() for r in hop}))})")
+
+        # THE decisive check: the text must state BOTH links, so the answer is
+        # derivable from the sentence rather than from prior world knowledge.
+        # The first generated batch failed this on 35 of 35 rows -- each stated
+        # only A->C and never mentioned B at all.
+        silent = [r for r in hop
+                  if content_words(r["target_entity"])
+                  and not (content_words(r["target_entity"])
+                           & content_words(r["corpus"]))]
+        if silent:
+            bad(f"{len(silent)}/{len(hop)} Level 6 row(s) never mention the TARGET "
+                f"in the description — only the first link is stated, so the answer "
+                f"cannot be derived from the text. "
+                f"e.g. A={silent[0]['source_entity']!r} via={silent[0]['via_entity']!r} "
+                f"B={silent[0]['target_entity']!r}: \"{silent[0]['corpus'][:70]}...\"")
+        else:
+            ok("multi-hop: every description states both links")
+
+        # C must be a genuinely different place, not a synonym of an endpoint
+        def stem(t):
+            w = sorted(content_words(t), key=len, reverse=True)
+            return w[0][:5] if w else ""
+        alias = [r for r in hop
+                 if stem(r["via_entity"]) and
+                 stem(r["via_entity"]) in (stem(r["source_entity"]),
+                                           stem(r["target_entity"]))]
+        if alias:
+            warn(f"{len(alias)} Level 6 row(s) may route through a synonym of an "
+                 f"endpoint rather than a third place, e.g. "
+                 f"{alias[0]['source_entity']!r} via {alias[0]['via_entity']!r} — "
+                 f"chaining names is not spatial reasoning")
+        else:
+            ok("multi-hop: no intermediate looks like a synonym of an endpoint")
 
     # Level 6 should stay plainly worded — otherwise indirection and inference
     # depth are confounded and the level measures neither cleanly.
