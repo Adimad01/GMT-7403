@@ -61,6 +61,39 @@ COORDS = {
     "tripoli": (32.89, 13.19), "tunis": (36.81, 10.18), "ulaanbaatar": (47.89, 106.91),
     "vancouver": (49.28, -123.12), "vienna": (48.21, 16.37), "vientiane": (17.97, 102.60),
     "warsaw": (52.23, 21.01), "yangon": (16.87, 96.20), "yerevan": (40.18, 44.51),
+    "abu dhabi": (24.45, 54.38), "darwin": (-12.46, 130.84),
+    "doha": (25.29, 51.53), "ottawa": (45.42, -75.70), "portland": (45.52, -122.68), "amman": (31.95, 35.93), "amsterdam": (52.37, 4.90),
+    "ankara": (39.93, 32.86), "antananarivo": (-18.88, 47.51), "ashgabat": (37.95, 58.38),
+    "belgrade": (44.79, 20.45), "bergen": (60.39, 5.32), "birmingham": (52.49, -1.89),
+    "bishkek": (42.87, 74.59), "bratislava": (48.15, 17.11), "brussels": (50.85, 4.35),
+    "bucharest": (44.43, 26.10), "budapest": (47.50, 19.04), "cardiff": (51.48, -3.18),
+    "chengdu": (30.57, 104.07), "chisinau": (47.01, 28.86), "cleveland": (41.50, -81.69),
+    "copenhagen": (55.68, 12.57), "curitiba": (-25.43, -49.27), "dar es salaam": (-6.79, 39.21),
+    "detroit": (42.33, -83.05), "dushanbe": (38.56, 68.79), "edmonton": (53.55, -113.49),
+    "faro": (37.02, -7.93), "fortaleza": (-3.73, -38.52), "genoa": (44.41, 8.93),
+    "gothenburg": (57.71, 11.97), "harare": (-17.83, 31.05), "helsinki": (60.17, 24.94),
+    "islamabad": (33.68, 73.05), "jakarta": (-6.21, 106.85), "kathmandu": (27.72, 85.32),
+    "kinshasa": (-4.44, 15.27), "kolkata": (22.57, 88.36), "kuala lumpur": (3.14, 101.69),
+    "kuwait city": (29.38, 47.99), "las vegas": (36.17, -115.14), "lyon": (45.76, 4.84),
+    "malmo": (55.60, 13.00), "managua": (12.11, -86.24), "marseille": (43.30, 5.37),
+    "mexico city": (19.43, -99.13), "milan": (45.46, 9.19), "minneapolis": (44.98, -93.27),
+    "minsk": (53.90, 27.57), "mogadishu": (2.05, 45.32), "mumbai": (19.08, 72.88),
+    "munich": (48.14, 11.58), "muscat": (23.59, 58.41),
+    "naples": (40.85, 14.27), "new orleans": (29.95, -90.07), "nice": (43.70, 7.27),
+    "nicosia": (35.19, 33.38), "odesa": (46.48, 30.72),
+    "osaka": (34.69, 135.50), "philadelphia": (39.95, -75.17), "phoenix": (33.45, -112.07),
+    "porto": (41.15, -8.61), "prague": (50.08, 14.44),
+    "pune": (18.52, 73.86), "quebec city": (46.81, -71.21), "recife": (-8.05, -34.88),
+    "reno": (39.53, -119.81), "riga": (56.95, 24.11), "salvador": (-12.97, -38.51),
+    "salt lake city": (40.76, -111.89), "san antonio": (29.42, -98.49),
+    "san diego": (32.72, -117.16), "sapporo": (43.06, 141.35), "sarajevo": (43.86, 18.41),
+    "sofia": (42.70, 23.32), "st petersburg": (59.93, 30.34), "surabaya": (-7.25, 112.75),
+    "tallinn": (59.44, 24.75), "tashkent": (41.30, 69.24), "tijuana": (32.53, -117.02),
+    "tirana": (41.33, 19.82), "turin": (45.07, 7.69), "valencia": (39.47, -0.38),
+    "valparaiso": (-33.05, -71.62), "venice": (45.44, 12.32), "vilnius": (54.69, 25.28),
+    "vladivostok": (43.12, 131.89), "washington": (38.91, -77.04), "wellington": (-41.29, 174.78),
+    "windhoek": (-22.56, 17.08), "windsor": (42.31, -83.04), "winnipeg": (49.90, -97.14),
+    "wuhan": (30.59, 114.31), "zagreb": (45.81, 15.98), "zurich": (47.38, 8.54),
 }
 
 SECTORS = ["north_of", "northeast_of", "east_of", "southeast_of",
@@ -90,6 +123,46 @@ def separation(a: tuple[float, float], b: tuple[float, float]) -> float:
     h = (math.sin((la2 - la1) / 2) ** 2
          + math.cos(la1) * math.cos(la2) * math.sin((lo2 - lo1) / 2) ** 2)
     return math.degrees(2 * math.asin(min(1.0, math.sqrt(h))))
+
+
+OPPOSITE = {"north_of": "south_of", "south_of": "north_of",
+            "east_of": "west_of", "west_of": "east_of",
+            "northeast_of": "southwest_of", "southwest_of": "northeast_of",
+            "northwest_of": "southeast_of", "southeast_of": "northwest_of"}
+
+
+def reciprocal(pa, pb) -> bool:
+    """True when the reverse bearing lands in the opposite sector.
+
+    Over long distances the great circle can bend enough that A reads north of
+    B while B also reads north of A -- both routes cross the pole. Such a pair
+    has no coherent direction and must never become an item.
+    """
+    fwd, _ = sector(bearing(pb, pa))
+    rev, _ = sector(bearing(pa, pb))
+    return OPPOSITE[fwd] == rev
+
+
+def components_agree(pa, pb, label: str) -> bool:
+    """True when the cone label agrees with the projection-based reading.
+
+    The two standard qualitative models (cone-based sectors and Frank's
+    projection-based half-planes) usually concur, but not always: a great
+    circle that clips a pole can report 'north' for a city that is plainly at a
+    lower latitude. Requiring the signs to match keeps every item correct under
+    either model, and keeps it checkable by a reader with an atlas.
+    """
+    dlat = pa[0] - pb[0]
+    dlon = (pa[1] - pb[1] + 180) % 360 - 180
+    if "north" in label and dlat <= 0:
+        return False
+    if "south" in label and dlat >= 0:
+        return False
+    if "east" in label and dlon <= 0:
+        return False
+    if "west" in label and dlon >= 0:
+        return False
+    return True
 
 
 def sector(deg: float) -> tuple[str, float]:

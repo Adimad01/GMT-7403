@@ -10,6 +10,7 @@ crashes.
 """
 from __future__ import annotations
 
+import json
 import shutil
 import sys
 import tempfile
@@ -18,7 +19,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 import spatial_eval.config as C                                   # noqa: E402
-from spatial_eval.config import LABELS, RELATIONS, ModelConfig, RunConfig  # noqa: E402
+from spatial_eval.config import DATA_DIR, LABELS, RELATIONS, ModelConfig, RunConfig  # noqa: E402
 from spatial_eval.data import load_demos, load_examples           # noqa: E402
 from spatial_eval.metrics import compute, wilson                  # noqa: E402
 from spatial_eval.model import build_backend, prompt_seed         # noqa: E402
@@ -51,7 +52,11 @@ def test_demos_are_pinned_stable_and_label_matched():
         d1, h1 = load_demos(rel)
         d2, h2 = load_demos(rel)
         assert h1 == h2
-        assert all(len(v) == 5 for v in d1.values())
+        # shot count is per relation -- cardinal carries a sixth (multi-hop)
+        # level, so read the contract rather than assuming a fixed number
+        shots = json.loads(
+            (DATA_DIR / rel / "fewshot_manifest.json").read_text())["shots"]
+        assert all(len(v) == shots for v in d1.values()), rel
         ex = {e.key: e for e in load_examples(rel)[0]}
         for key, demos in d1.items():
             assert all(dm.label == ex[key].label for dm in demos), rel

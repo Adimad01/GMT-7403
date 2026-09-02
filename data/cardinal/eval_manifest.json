@@ -1,378 +1,883 @@
 {
   "domain": "Cardinal-Reasoning",
-  "source_csv": "dataset/cardinal_direction_relations.csv",
-  "n_rows": 40,
-  "n_unique_facts": 39,
-  "duplicate_rows": 1,
-  "manifest_sha256": "ca705ae2d311f39e0a1ad99d1220a600977c71fbba3f1682b6ef5cb8ca8626f0",
+  "source_csv": "data/cardinal/eval.csv",
+  "n_rows": 96,
+  "n_unique_facts": 96,
+  "duplicate_rows": 0,
+  "manifest_sha256": "d55dd93565e4018e11d81cf0dbc5eb55ce6a7a9607d1afbace6c35c0376f9f94",
   "contract": {
     "every_experiment_must": [
       "evaluate exactly these row_index values, in this order",
-      "apply NO geocodability filtering (--keep-ungeocodable): the OSM cache is mutable, so filtering at runtime makes the eval set differ between arms run before and after a cache re-warm",
+      "apply NO geocodability filtering: the OSM cache is mutable, so filtering at run time makes the eval set differ between arms run before and after a cache re-warm",
       "verify manifest_sha256 before running"
     ],
-    "analysis_note": "rows sharing a fact_id assert the same (subject, target, label) and are NOT independent; cluster or de-duplicate on fact_id when computing confidence intervals"
+    "analysis_note": "every row asserts a distinct fact; no fact_id clustering is needed for this relation",
+    "ground_truth": "labels are cone-based cardinal sectors computed from city centroids, each at least 8 degrees inside its 45-degree sector, agreeing with the projection-based reading, and reciprocal"
   },
   "rows": [
     {
       "row_index": 0,
       "fact_id": "f0000",
-      "subject": "City of Seattle",
-      "target": "City of Portland",
-      "label": "north_of",
+      "subject": "City of Islamabad",
+      "target": "City of Tehran",
+      "label": "east_of",
       "ambiguity_level": "Level 1",
-      "row_sha256": "ec69eab486511b48"
+      "row_sha256": "b23dfbd9ece10a4a"
+    },
+    {
+      "row_index": 1,
+      "fact_id": "f0001",
+      "subject": "City of Ankara",
+      "target": "City of Marseille",
+      "label": "east_of",
+      "ambiguity_level": "Level 1",
+      "row_sha256": "b6cab786ef6bb3a5"
+    },
+    {
+      "row_index": 2,
+      "fact_id": "f0002",
+      "subject": "City of Yangon",
+      "target": "City of Riyadh",
+      "label": "east_of",
+      "ambiguity_level": "Level 2",
+      "row_sha256": "ca72361ff0d867c7"
     },
     {
       "row_index": 3,
-      "fact_id": "f0001",
-      "subject": "Mexico",
-      "target": "United States",
-      "label": "south_of",
-      "ambiguity_level": "Level 1",
-      "row_sha256": "bd2fd1e491529cf1"
+      "fact_id": "f0003",
+      "subject": "City of Amman",
+      "target": "City of Algiers",
+      "label": "east_of",
+      "ambiguity_level": "Level 2",
+      "row_sha256": "45b54aa2692b2b62"
+    },
+    {
+      "row_index": 4,
+      "fact_id": "f0004",
+      "subject": "City of Beirut",
+      "target": "City of Tunis",
+      "label": "east_of",
+      "ambiguity_level": "Level 3",
+      "row_sha256": "7a05bbd6360cf33f"
+    },
+    {
+      "row_index": 5,
+      "fact_id": "f0005",
+      "subject": "City of Vientiane",
+      "target": "City of Dubai",
+      "label": "east_of",
+      "ambiguity_level": "Level 3",
+      "row_sha256": "50e3514a5eb4d5b2"
+    },
+    {
+      "row_index": 6,
+      "fact_id": "f0006",
+      "subject": "City of Lagos",
+      "target": "City of San Juan",
+      "label": "east_of",
+      "ambiguity_level": "Level 4",
+      "row_sha256": "0f764ae6d9b774fc"
+    },
+    {
+      "row_index": 7,
+      "fact_id": "f0007",
+      "subject": "City of Damascus",
+      "target": "City of Valencia",
+      "label": "east_of",
+      "ambiguity_level": "Level 4",
+      "row_sha256": "d0769ddd4c22d5ba"
     },
     {
       "row_index": 8,
-      "fact_id": "f0002",
-      "subject": "Japan",
-      "target": "China",
+      "fact_id": "f0008",
+      "subject": "City of Suva",
+      "target": "City of Pune",
       "label": "east_of",
-      "ambiguity_level": "Level 1",
-      "row_sha256": "581c1bb8e0d84ed2"
+      "ambiguity_level": "Level 5",
+      "row_sha256": "31d4d0a23c033cbb"
     },
     {
       "row_index": 9,
-      "fact_id": "f0003",
-      "subject": "Pacific Ocean",
-      "target": "United States",
-      "label": "west_of",
+      "fact_id": "f0009",
+      "subject": "City of Kampala",
+      "target": "City of Kingston",
+      "label": "east_of",
+      "ambiguity_level": "Level 5",
+      "row_sha256": "56a1aa41b8a1075c"
+    },
+    {
+      "row_index": 10,
+      "fact_id": "f0010",
+      "subject": "City of Jakarta",
+      "target": "City of Accra",
+      "label": "east_of",
+      "ambiguity_level": "Level 6",
+      "row_sha256": "2ec74f0dce0f9a5f"
+    },
+    {
+      "row_index": 11,
+      "fact_id": "f0011",
+      "subject": "City of Minsk",
+      "target": "City of Edinburgh",
+      "label": "east_of",
+      "ambiguity_level": "Level 6",
+      "row_sha256": "73c4c81f08072ac4"
+    },
+    {
+      "row_index": 12,
+      "fact_id": "f0012",
+      "subject": "City of Helsinki",
+      "target": "City of Athens",
+      "label": "north_of",
       "ambiguity_level": "Level 1",
-      "row_sha256": "1c918759ef762e77"
+      "row_sha256": "917321083230b08a"
+    },
+    {
+      "row_index": 13,
+      "fact_id": "f0013",
+      "subject": "City of New York",
+      "target": "City of Bogota",
+      "label": "north_of",
+      "ambiguity_level": "Level 1",
+      "row_sha256": "89d844215d79fe2b"
     },
     {
       "row_index": 14,
-      "fact_id": "f0004",
-      "subject": "Japan",
-      "target": "Taiwan",
-      "label": "northeast_of",
-      "ambiguity_level": "Level 1",
-      "row_sha256": "9d9ced3e02e1a8cb"
+      "fact_id": "f0014",
+      "subject": "City of Berlin",
+      "target": "City of Luanda",
+      "label": "north_of",
+      "ambiguity_level": "Level 2",
+      "row_sha256": "d88d44e97cb8ff4d"
+    },
+    {
+      "row_index": 15,
+      "fact_id": "f0015",
+      "subject": "City of Miami",
+      "target": "City of Lima",
+      "label": "north_of",
+      "ambiguity_level": "Level 2",
+      "row_sha256": "5a1403e1c14854dc"
     },
     {
       "row_index": 16,
-      "fact_id": "f0005",
-      "subject": "City of Seattle",
-      "target": "City of Las Vegas",
-      "label": "northwest_of",
-      "ambiguity_level": "Level 1",
-      "row_sha256": "77ce39aa032d285e"
+      "fact_id": "f0016",
+      "subject": "City of Amsterdam",
+      "target": "City of Lagos",
+      "label": "north_of",
+      "ambiguity_level": "Level 3",
+      "row_sha256": "6de3972f616a2472"
+    },
+    {
+      "row_index": 17,
+      "fact_id": "f0017",
+      "subject": "City of Quito",
+      "target": "City of Santiago",
+      "label": "north_of",
+      "ambiguity_level": "Level 3",
+      "row_sha256": "c88fea037fd8e177"
     },
     {
       "row_index": 18,
-      "fact_id": "f0006",
-      "subject": "State of Florida",
-      "target": "State of Alabama",
-      "label": "southeast_of",
-      "ambiguity_level": "Level 1",
-      "row_sha256": "7e95de5b154f28a5"
+      "fact_id": "f0018",
+      "subject": "City of Gothenburg",
+      "target": "City of Maputo",
+      "label": "north_of",
+      "ambiguity_level": "Level 4",
+      "row_sha256": "bc137b684d16f263"
+    },
+    {
+      "row_index": 19,
+      "fact_id": "f0019",
+      "subject": "City of Sarajevo",
+      "target": "City of Harare",
+      "label": "north_of",
+      "ambiguity_level": "Level 4",
+      "row_sha256": "a1a5d1f0e4d21962"
+    },
+    {
+      "row_index": 20,
+      "fact_id": "f0020",
+      "subject": "City of Ashgabat",
+      "target": "City of Muscat",
+      "label": "north_of",
+      "ambiguity_level": "Level 5",
+      "row_sha256": "50805e79cec8fbb6"
+    },
+    {
+      "row_index": 21,
+      "fact_id": "f0021",
+      "subject": "City of Malmo",
+      "target": "City of Windhoek",
+      "label": "north_of",
+      "ambiguity_level": "Level 5",
+      "row_sha256": "51d92845e3f1e5ad"
     },
     {
       "row_index": 22,
-      "fact_id": "f0007",
-      "subject": "City of San Diego",
-      "target": "City of Denver",
-      "label": "southwest_of",
-      "ambiguity_level": "Level 1",
-      "row_sha256": "892af5a66aff1b09"
+      "fact_id": "f0022",
+      "subject": "City of Prague",
+      "target": "City of Tripoli",
+      "label": "north_of",
+      "ambiguity_level": "Level 6",
+      "row_sha256": "b10e82fae80a3b7f"
+    },
+    {
+      "row_index": 23,
+      "fact_id": "f0023",
+      "subject": "City of Tbilisi",
+      "target": "City of Riyadh",
+      "label": "north_of",
+      "ambiguity_level": "Level 6",
+      "row_sha256": "a2c083d953ec5a9c"
     },
     {
       "row_index": 24,
-      "fact_id": "f0008",
-      "subject": "City of Edmonton",
-      "target": "City of Calgary",
-      "label": "north_of",
+      "fact_id": "f0024",
+      "subject": "City of Genoa",
+      "target": "City of Casablanca",
+      "label": "northeast_of",
+      "ambiguity_level": "Level 1",
+      "row_sha256": "507c377b920a34f3"
+    },
+    {
+      "row_index": 25,
+      "fact_id": "f0025",
+      "subject": "City of Riyadh",
+      "target": "City of Kinshasa",
+      "label": "northeast_of",
+      "ambiguity_level": "Level 1",
+      "row_sha256": "38d6560e7d69e17e"
+    },
+    {
+      "row_index": 26,
+      "fact_id": "f0026",
+      "subject": "City of Islamabad",
+      "target": "City of Windhoek",
+      "label": "northeast_of",
       "ambiguity_level": "Level 2",
-      "row_sha256": "2f4c6df46cb3d3d1"
+      "row_sha256": "2f2cd9007782e61a"
+    },
+    {
+      "row_index": 27,
+      "fact_id": "f0027",
+      "subject": "City of Karachi",
+      "target": "City of Cape Town",
+      "label": "northeast_of",
+      "ambiguity_level": "Level 2",
+      "row_sha256": "5266ad5d51432106"
+    },
+    {
+      "row_index": 28,
+      "fact_id": "f0028",
+      "subject": "City of Faro",
+      "target": "City of La Paz",
+      "label": "northeast_of",
+      "ambiguity_level": "Level 3",
+      "row_sha256": "03e3c99204e72e7c"
     },
     {
       "row_index": 29,
-      "fact_id": "f0009",
-      "subject": "Cuba",
-      "target": "State of Florida",
-      "label": "south_of",
-      "ambiguity_level": "Level 2",
-      "row_sha256": "dec8dd4c56ca5a08"
+      "fact_id": "f0029",
+      "subject": "City of Sarajevo",
+      "target": "City of Asuncion",
+      "label": "northeast_of",
+      "ambiguity_level": "Level 3",
+      "row_sha256": "ee0c02f83a4bbb59"
     },
     {
       "row_index": 30,
-      "fact_id": "f0010",
-      "subject": "State of Ohio",
-      "target": "State of Indiana",
-      "label": "east_of",
-      "ambiguity_level": "Level 2",
-      "row_sha256": "e519d405bb4bf0a1"
+      "fact_id": "f0030",
+      "subject": "City of Reno",
+      "target": "City of Auckland",
+      "label": "northeast_of",
+      "ambiguity_level": "Level 4",
+      "row_sha256": "e410357f440aea51"
+    },
+    {
+      "row_index": 31,
+      "fact_id": "f0031",
+      "subject": "City of San Francisco",
+      "target": "City of Wellington",
+      "label": "northeast_of",
+      "ambiguity_level": "Level 4",
+      "row_sha256": "e5f947ea83587504"
+    },
+    {
+      "row_index": 32,
+      "fact_id": "f0032",
+      "subject": "City of Naples",
+      "target": "City of Recife",
+      "label": "northeast_of",
+      "ambiguity_level": "Level 5",
+      "row_sha256": "2dfbe2fb08d8e2ce"
     },
     {
       "row_index": 33,
-      "fact_id": "f0011",
-      "subject": "State of Kansas",
-      "target": "State of Missouri",
-      "label": "west_of",
-      "ambiguity_level": "Level 2",
-      "row_sha256": "2a2dd0e5fc370e52"
+      "fact_id": "f0033",
+      "subject": "City of Athens",
+      "target": "City of Salvador",
+      "label": "northeast_of",
+      "ambiguity_level": "Level 5",
+      "row_sha256": "5920d47c65651fb4"
+    },
+    {
+      "row_index": 34,
+      "fact_id": "f0034",
+      "subject": "City of Warsaw",
+      "target": "City of Montevideo",
+      "label": "northeast_of",
+      "ambiguity_level": "Level 6",
+      "row_sha256": "7cc413de9061533c"
+    },
+    {
+      "row_index": 35,
+      "fact_id": "f0035",
+      "subject": "City of Berlin",
+      "target": "City of Madrid",
+      "label": "northeast_of",
+      "ambiguity_level": "Level 6",
+      "row_sha256": "7fa81f76fb95cea9"
+    },
+    {
+      "row_index": 36,
+      "fact_id": "f0036",
+      "subject": "City of Warsaw",
+      "target": "City of Yerevan",
+      "label": "northwest_of",
+      "ambiguity_level": "Level 1",
+      "row_sha256": "eb62b682546b031a"
+    },
+    {
+      "row_index": 37,
+      "fact_id": "f0037",
+      "subject": "City of Zurich",
+      "target": "City of Jerusalem",
+      "label": "northwest_of",
+      "ambiguity_level": "Level 1",
+      "row_sha256": "5aca66bbd3520602"
     },
     {
       "row_index": 38,
-      "fact_id": "f0012",
-      "subject": "State of Maine",
-      "target": "State of Pennsylvania",
-      "label": "northeast_of",
+      "fact_id": "f0038",
+      "subject": "City of Belgrade",
+      "target": "City of Abu Dhabi",
+      "label": "northwest_of",
       "ambiguity_level": "Level 2",
-      "row_sha256": "84bde357c7b97bbd"
+      "row_sha256": "a64b990861c131de"
     },
     {
       "row_index": 39,
-      "fact_id": "f0013",
-      "subject": "City of Seattle",
-      "target": "City of Denver",
+      "fact_id": "f0039",
+      "subject": "City of Hong Kong",
+      "target": "City of Port Moresby",
       "label": "northwest_of",
       "ambiguity_level": "Level 2",
-      "row_sha256": "f0cf72e51e51716f"
+      "row_sha256": "dd87fd0e9e057804"
+    },
+    {
+      "row_index": 40,
+      "fact_id": "f0040",
+      "subject": "City of Hanoi",
+      "target": "City of Sydney",
+      "label": "northwest_of",
+      "ambiguity_level": "Level 3",
+      "row_sha256": "c7d33d0fa7588f96"
+    },
+    {
+      "row_index": 41,
+      "fact_id": "f0041",
+      "subject": "City of Atlanta",
+      "target": "City of Fortaleza",
+      "label": "northwest_of",
+      "ambiguity_level": "Level 3",
+      "row_sha256": "aaa147bf4eb57a3c"
+    },
+    {
+      "row_index": 42,
+      "fact_id": "f0042",
+      "subject": "City of Yerevan",
+      "target": "City of Jakarta",
+      "label": "northwest_of",
+      "ambiguity_level": "Level 4",
+      "row_sha256": "0c7ac00d8d5df180"
+    },
+    {
+      "row_index": 43,
+      "fact_id": "f0043",
+      "subject": "City of Bishkek",
+      "target": "City of Melbourne",
+      "label": "northwest_of",
+      "ambiguity_level": "Level 4",
+      "row_sha256": "411f63ffbeee899d"
     },
     {
       "row_index": 44,
-      "fact_id": "f0014",
-      "subject": "Australia",
-      "target": "Indonesia",
-      "label": "southeast_of",
-      "ambiguity_level": "Level 2",
-      "row_sha256": "0ac12a01b77d2399"
+      "fact_id": "f0044",
+      "subject": "City of Atlanta",
+      "target": "City of Recife",
+      "label": "northwest_of",
+      "ambiguity_level": "Level 5",
+      "row_sha256": "964abc56ae8a1070"
     },
     {
       "row_index": 45,
-      "fact_id": "f0015",
-      "subject": "City of San Diego",
-      "target": "City of Salt Lake City",
-      "label": "southwest_of",
-      "ambiguity_level": "Level 2",
-      "row_sha256": "656ccd214810c938"
+      "fact_id": "f0045",
+      "subject": "City of Ulaanbaatar",
+      "target": "City of Wellington",
+      "label": "northwest_of",
+      "ambiguity_level": "Level 5",
+      "row_sha256": "0e6f0a470e2413d2"
+    },
+    {
+      "row_index": 46,
+      "fact_id": "f0046",
+      "subject": "City of Budapest",
+      "target": "City of Beirut",
+      "label": "northwest_of",
+      "ambiguity_level": "Level 6",
+      "row_sha256": "14cfa40531346ba9"
+    },
+    {
+      "row_index": 47,
+      "fact_id": "f0047",
+      "subject": "City of Oslo",
+      "target": "City of Odesa",
+      "label": "northwest_of",
+      "ambiguity_level": "Level 6",
+      "row_sha256": "9ce103e85aa385bc"
     },
     {
       "row_index": 48,
-      "fact_id": "f0016",
-      "subject": "City of Detroit",
-      "target": "City of Windsor",
-      "label": "north_of",
+      "fact_id": "f0048",
+      "subject": "City of Lagos",
+      "target": "City of London",
+      "label": "south_of",
+      "ambiguity_level": "Level 1",
+      "row_sha256": "9c8690c3331b87bd"
+    },
+    {
+      "row_index": 49,
+      "fact_id": "f0049",
+      "subject": "City of Johannesburg",
+      "target": "City of Helsinki",
+      "label": "south_of",
+      "ambiguity_level": "Level 1",
+      "row_sha256": "c060e4894c0944e3"
+    },
+    {
+      "row_index": 50,
+      "fact_id": "f0050",
+      "subject": "City of Antananarivo",
+      "target": "City of Mogadishu",
+      "label": "south_of",
+      "ambiguity_level": "Level 2",
+      "row_sha256": "2a8d3573e5d0ce06"
+    },
+    {
+      "row_index": 51,
+      "fact_id": "f0051",
+      "subject": "City of Luanda",
+      "target": "City of Tunis",
+      "label": "south_of",
+      "ambiguity_level": "Level 2",
+      "row_sha256": "76242f48ecaf8069"
+    },
+    {
+      "row_index": 52,
+      "fact_id": "f0052",
+      "subject": "City of Valparaiso",
+      "target": "City of La Paz",
+      "label": "south_of",
       "ambiguity_level": "Level 3",
-      "row_sha256": "b9510d518d352e62"
+      "row_sha256": "dfb971fac099ac99"
     },
     {
       "row_index": 53,
-      "fact_id": "f0017",
-      "subject": "City of New York",
-      "target": "City of Rome",
+      "fact_id": "f0053",
+      "subject": "City of Santiago",
+      "target": "City of Caracas",
       "label": "south_of",
       "ambiguity_level": "Level 3",
-      "row_sha256": "ed59f5f690fe5202"
+      "row_sha256": "7323c42211ad9d98"
     },
     {
       "row_index": 54,
-      "fact_id": "f0018",
-      "subject": "City of Los Angeles",
-      "target": "City of Reno",
-      "label": "east_of",
-      "ambiguity_level": "Level 3",
-      "row_sha256": "97950b6bef2b5fe6"
+      "fact_id": "f0054",
+      "subject": "City of Windhoek",
+      "target": "City of Bergen",
+      "label": "south_of",
+      "ambiguity_level": "Level 4",
+      "row_sha256": "33e356188768c693"
+    },
+    {
+      "row_index": 55,
+      "fact_id": "f0055",
+      "subject": "City of Quito",
+      "target": "City of Toronto",
+      "label": "south_of",
+      "ambiguity_level": "Level 4",
+      "row_sha256": "7e90ead825d9afa7"
+    },
+    {
+      "row_index": 56,
+      "fact_id": "f0056",
+      "subject": "City of Accra",
+      "target": "City of Paris",
+      "label": "south_of",
+      "ambiguity_level": "Level 5",
+      "row_sha256": "296b231d53b477c6"
+    },
+    {
+      "row_index": 57,
+      "fact_id": "f0057",
+      "subject": "City of Khartoum",
+      "target": "City of Helsinki",
+      "label": "south_of",
+      "ambiguity_level": "Level 5",
+      "row_sha256": "53bde656ae72d986"
+    },
+    {
+      "row_index": 58,
+      "fact_id": "f0058",
+      "subject": "City of Hong Kong",
+      "target": "City of Beijing",
+      "label": "south_of",
+      "ambiguity_level": "Level 6",
+      "row_sha256": "5e2b7ab59afbb12b"
     },
     {
       "row_index": 59,
-      "fact_id": "f0019",
-      "subject": "South America",
-      "target": "Africa",
-      "label": "west_of",
-      "ambiguity_level": "Level 3",
-      "row_sha256": "3b6a4075c1b58e56"
+      "fact_id": "f0059",
+      "subject": "City of Nice",
+      "target": "City of Bergen",
+      "label": "south_of",
+      "ambiguity_level": "Level 6",
+      "row_sha256": "5c2ba903c724c7aa"
+    },
+    {
+      "row_index": 60,
+      "fact_id": "f0060",
+      "subject": "City of Beirut",
+      "target": "City of Malmo",
+      "label": "southeast_of",
+      "ambiguity_level": "Level 1",
+      "row_sha256": "2abb06eb7eb0282c"
+    },
+    {
+      "row_index": 61,
+      "fact_id": "f0061",
+      "subject": "City of Riyadh",
+      "target": "City of Warsaw",
+      "label": "southeast_of",
+      "ambiguity_level": "Level 1",
+      "row_sha256": "d6de9c0ad6c35adb"
     },
     {
       "row_index": 62,
-      "fact_id": "f0020",
-      "subject": "City of Venice",
-      "target": "City of Boston",
-      "label": "northeast_of",
-      "ambiguity_level": "Level 3",
-      "row_sha256": "51807062a0616036"
+      "fact_id": "f0062",
+      "subject": "City of Antananarivo",
+      "target": "City of London",
+      "label": "southeast_of",
+      "ambiguity_level": "Level 2",
+      "row_sha256": "606e750a0a2f9846"
     },
     {
       "row_index": 63,
-      "fact_id": "f0021",
-      "subject": "State of Alaska",
-      "target": "State of Hawaii",
-      "label": "northwest_of",
+      "fact_id": "f0063",
+      "subject": "City of Nairobi",
+      "target": "City of Edinburgh",
+      "label": "southeast_of",
+      "ambiguity_level": "Level 2",
+      "row_sha256": "7d85b378cf2489ba"
+    },
+    {
+      "row_index": 64,
+      "fact_id": "f0064",
+      "subject": "City of Quito",
+      "target": "City of Salt Lake City",
+      "label": "southeast_of",
       "ambiguity_level": "Level 3",
-      "row_sha256": "683d96f0aef0115f"
+      "row_sha256": "e906a33bb3496319"
+    },
+    {
+      "row_index": 65,
+      "fact_id": "f0065",
+      "subject": "City of Dar es Salaam",
+      "target": "City of Edinburgh",
+      "label": "southeast_of",
+      "ambiguity_level": "Level 3",
+      "row_sha256": "600fd2c962454d33"
+    },
+    {
+      "row_index": 66,
+      "fact_id": "f0066",
+      "subject": "City of Montevideo",
+      "target": "City of Calgary",
+      "label": "southeast_of",
+      "ambiguity_level": "Level 4",
+      "row_sha256": "fe4645ba9672c643"
+    },
+    {
+      "row_index": 67,
+      "fact_id": "f0067",
+      "subject": "City of Sao Paulo",
+      "target": "City of Winnipeg",
+      "label": "southeast_of",
+      "ambiguity_level": "Level 4",
+      "row_sha256": "0f0b963eed76800d"
     },
     {
       "row_index": 68,
-      "fact_id": "f0022",
-      "subject": "City of Miami",
-      "target": "City of Seattle",
+      "fact_id": "f0068",
+      "subject": "City of La Paz",
+      "target": "City of Salt Lake City",
       "label": "southeast_of",
-      "ambiguity_level": "Level 3",
-      "row_sha256": "32dbfc67a4806670"
+      "ambiguity_level": "Level 5",
+      "row_sha256": "658a5ee9dd4d9554"
+    },
+    {
+      "row_index": 69,
+      "fact_id": "f0069",
+      "subject": "City of Perth",
+      "target": "City of Colombo",
+      "label": "southeast_of",
+      "ambiguity_level": "Level 5",
+      "row_sha256": "156b8842a6a6aac2"
     },
     {
       "row_index": 70,
-      "fact_id": "f0023",
-      "subject": "City of San Diego",
-      "target": "City of Chicago",
+      "fact_id": "f0070",
+      "subject": "City of Naples",
+      "target": "City of Dublin",
+      "label": "southeast_of",
+      "ambiguity_level": "Level 6",
+      "row_sha256": "b2919f82a3d93205"
+    },
+    {
+      "row_index": 71,
+      "fact_id": "f0071",
+      "subject": "City of Chennai",
+      "target": "City of Karachi",
+      "label": "southeast_of",
+      "ambiguity_level": "Level 6",
+      "row_sha256": "20cc4d23d47f9034"
+    },
+    {
+      "row_index": 72,
+      "fact_id": "f0072",
+      "subject": "City of Casablanca",
+      "target": "City of Stockholm",
       "label": "southwest_of",
-      "ambiguity_level": "Level 3",
-      "row_sha256": "2d0c2ecb6c258dc4"
+      "ambiguity_level": "Level 1",
+      "row_sha256": "8dfed25565b0b625"
+    },
+    {
+      "row_index": 73,
+      "fact_id": "f0073",
+      "subject": "City of Dakar",
+      "target": "City of Milan",
+      "label": "southwest_of",
+      "ambiguity_level": "Level 1",
+      "row_sha256": "2315d04b241bf1b4"
     },
     {
       "row_index": 74,
-      "fact_id": "f0024",
-      "subject": "Svalbard",
-      "target": "Iceland",
-      "label": "north_of",
-      "ambiguity_level": "Level 4",
-      "row_sha256": "bf0914dc30bf04f3"
+      "fact_id": "f0074",
+      "subject": "City of Dar es Salaam",
+      "target": "City of Islamabad",
+      "label": "southwest_of",
+      "ambiguity_level": "Level 2",
+      "row_sha256": "76d640debef6421c"
     },
     {
       "row_index": 75,
-      "fact_id": "f0025",
-      "subject": "African Continent",
-      "target": "European Mainland",
-      "label": "south_of",
+      "fact_id": "f0075",
+      "subject": "City of Harare",
+      "target": "City of Almaty",
+      "label": "southwest_of",
+      "ambiguity_level": "Level 2",
+      "row_sha256": "2d31ddc0d1e8d619"
+    },
+    {
+      "row_index": 76,
+      "fact_id": "f0076",
+      "subject": "City of Asuncion",
+      "target": "City of Faro",
+      "label": "southwest_of",
+      "ambiguity_level": "Level 3",
+      "row_sha256": "afb761e4a2cc43fb"
+    },
+    {
+      "row_index": 77,
+      "fact_id": "f0077",
+      "subject": "City of Salvador",
+      "target": "City of Lyon",
+      "label": "southwest_of",
+      "ambiguity_level": "Level 3",
+      "row_sha256": "55ac1f250557e73f"
+    },
+    {
+      "row_index": 78,
+      "fact_id": "f0078",
+      "subject": "City of Curitiba",
+      "target": "City of Paris",
+      "label": "southwest_of",
       "ambiguity_level": "Level 4",
-      "row_sha256": "eebebea670fffe6f"
+      "row_sha256": "22ec0c5bf0680004"
+    },
+    {
+      "row_index": 79,
+      "fact_id": "f0079",
+      "subject": "City of Cape Town",
+      "target": "City of Almaty",
+      "label": "southwest_of",
+      "ambiguity_level": "Level 4",
+      "row_sha256": "a641fa5969f02d29"
     },
     {
       "row_index": 80,
-      "fact_id": "f0026",
-      "subject": "New Zealand",
-      "target": "Australia",
-      "label": "east_of",
-      "ambiguity_level": "Level 4",
-      "row_sha256": "2bc4fc246d34b644"
+      "fact_id": "f0080",
+      "subject": "City of Montevideo",
+      "target": "City of Paris",
+      "label": "southwest_of",
+      "ambiguity_level": "Level 5",
+      "row_sha256": "ca78e9325e9a251a"
+    },
+    {
+      "row_index": 81,
+      "fact_id": "f0081",
+      "subject": "City of Windhoek",
+      "target": "City of Muscat",
+      "label": "southwest_of",
+      "ambiguity_level": "Level 5",
+      "row_sha256": "6ce8f89dd32baca8"
     },
     {
       "row_index": 82,
-      "fact_id": "f0027",
-      "subject": "Big Diomede Island",
-      "target": "Little Diomede Island",
-      "label": "west_of",
-      "ambiguity_level": "Level 4",
-      "row_sha256": "2cab3422d4da0d5f"
+      "fact_id": "f0082",
+      "subject": "City of Venice",
+      "target": "City of St Petersburg",
+      "label": "southwest_of",
+      "ambiguity_level": "Level 6",
+      "row_sha256": "537f713b78ae37fe"
+    },
+    {
+      "row_index": 83,
+      "fact_id": "f0083",
+      "subject": "City of Guayaquil",
+      "target": "City of Caracas",
+      "label": "southwest_of",
+      "ambiguity_level": "Level 6",
+      "row_sha256": "ea4b2938355fceae"
     },
     {
       "row_index": 84,
-      "fact_id": "f0028",
-      "subject": "Cuba",
-      "target": "Yucatan Peninsula",
-      "label": "northeast_of",
-      "ambiguity_level": "Level 4",
-      "row_sha256": "bac1c9a9a7e29306"
+      "fact_id": "f0084",
+      "subject": "City of Accra",
+      "target": "City of Mumbai",
+      "label": "west_of",
+      "ambiguity_level": "Level 1",
+      "row_sha256": "da4e87b40d3464f7"
+    },
+    {
+      "row_index": 85,
+      "fact_id": "f0085",
+      "subject": "City of Nicosia",
+      "target": "City of Ashgabat",
+      "label": "west_of",
+      "ambiguity_level": "Level 1",
+      "row_sha256": "2dcd41e89debd7a3"
+    },
+    {
+      "row_index": 86,
+      "fact_id": "f0086",
+      "subject": "City of Addis Ababa",
+      "target": "City of Yangon",
+      "label": "west_of",
+      "ambiguity_level": "Level 2",
+      "row_sha256": "1f2fcefbd7bbdfce"
     },
     {
       "row_index": 87,
-      "fact_id": "f0029",
-      "subject": "State of Alaska",
-      "target": "Contiguous United States",
-      "label": "northwest_of",
+      "fact_id": "f0087",
+      "subject": "City of Abu Dhabi",
+      "target": "City of Kathmandu",
+      "label": "west_of",
+      "ambiguity_level": "Level 2",
+      "row_sha256": "2d8458bb5d4b340a"
+    },
+    {
+      "row_index": 88,
+      "fact_id": "f0088",
+      "subject": "City of Salvador",
+      "target": "City of Windhoek",
+      "label": "west_of",
+      "ambiguity_level": "Level 3",
+      "row_sha256": "6e1b8418a51fcd83"
+    },
+    {
+      "row_index": 89,
+      "fact_id": "f0089",
+      "subject": "City of Jakarta",
+      "target": "City of Suva",
+      "label": "west_of",
+      "ambiguity_level": "Level 3",
+      "row_sha256": "174964b732132dd3"
+    },
+    {
+      "row_index": 90,
+      "fact_id": "f0090",
+      "subject": "City of Bogota",
+      "target": "City of Harare",
+      "label": "west_of",
       "ambiguity_level": "Level 4",
-      "row_sha256": "23eab57b869b6691"
+      "row_sha256": "3a7bac9d07ad6875"
+    },
+    {
+      "row_index": 91,
+      "fact_id": "f0091",
+      "subject": "City of Managua",
+      "target": "City of Windhoek",
+      "label": "west_of",
+      "ambiguity_level": "Level 4",
+      "row_sha256": "8a64c4e807e33f0c"
     },
     {
       "row_index": 92,
-      "fact_id": "f0030",
-      "subject": "Florida Keys",
-      "target": "State of Louisiana",
-      "label": "southeast_of",
-      "ambiguity_level": "Level 4",
-      "row_sha256": "e460543c22fc691b"
+      "fact_id": "f0092",
+      "subject": "City of Guayaquil",
+      "target": "City of Harare",
+      "label": "west_of",
+      "ambiguity_level": "Level 5",
+      "row_sha256": "beaf8b4287e1a733"
+    },
+    {
+      "row_index": 93,
+      "fact_id": "f0093",
+      "subject": "City of Accra",
+      "target": "City of Pune",
+      "label": "west_of",
+      "ambiguity_level": "Level 5",
+      "row_sha256": "520495a57ce06a13"
+    },
+    {
+      "row_index": 94,
+      "fact_id": "f0094",
+      "subject": "City of Bogota",
+      "target": "City of Khartoum",
+      "label": "west_of",
+      "ambiguity_level": "Level 6",
+      "row_sha256": "8437d9d5340d8bbc"
     },
     {
       "row_index": 95,
-      "fact_id": "f0031",
-      "subject": "Falkland Islands",
-      "target": "City of Cape Town",
-      "label": "southwest_of",
-      "ambiguity_level": "Level 4",
-      "row_sha256": "d3cb10f418dd7f61"
-    },
-    {
-      "row_index": 96,
-      "fact_id": "f0032",
-      "subject": "City of Venice",
-      "target": "City of Halifax",
-      "label": "north_of",
-      "ambiguity_level": "Level 5",
-      "row_sha256": "8334b7ce85691835"
-    },
-    {
-      "row_index": 101,
-      "fact_id": "f0033",
-      "subject": "Florida Keys",
-      "target": "City of Brownsville",
-      "label": "south_of",
-      "ambiguity_level": "Level 5",
-      "row_sha256": "63f2cec373e5ffca"
-    },
-    {
-      "row_index": 103,
-      "fact_id": "f0034",
-      "subject": "City of Lima",
-      "target": "City of Atlanta",
-      "label": "east_of",
-      "ambiguity_level": "Level 5",
-      "row_sha256": "ce87de345ffeee99"
-    },
-    {
-      "row_index": 106,
-      "fact_id": "f0035",
-      "subject": "City of New York",
-      "target": "City of Santiago",
+      "fact_id": "f0095",
+      "subject": "City of Lyon",
+      "target": "City of Chisinau",
       "label": "west_of",
-      "ambiguity_level": "Level 5",
-      "row_sha256": "444b61d745ea085e"
-    },
-    {
-      "row_index": 110,
-      "fact_id": "f0020",
-      "subject": "City of Venice",
-      "target": "City of Boston",
-      "label": "northeast_of",
-      "ambiguity_level": "Level 5",
-      "row_sha256": "21cecd3f17d15f59"
-    },
-    {
-      "row_index": 111,
-      "fact_id": "f0036",
-      "subject": "City of Seattle",
-      "target": "City of Miami",
-      "label": "northwest_of",
-      "ambiguity_level": "Level 5",
-      "row_sha256": "3552ff23e79f211c"
-    },
-    {
-      "row_index": 116,
-      "fact_id": "f0037",
-      "subject": "New Zealand",
-      "target": "City of Tokyo",
-      "label": "southeast_of",
-      "ambiguity_level": "Level 5",
-      "row_sha256": "b0855e5cdfced636"
-    },
-    {
-      "row_index": 118,
-      "fact_id": "f0038",
-      "subject": "Easter Island",
-      "target": "Galapagos Islands",
-      "label": "southwest_of",
-      "ambiguity_level": "Level 5",
-      "row_sha256": "7dd5b6cf875eda71"
+      "ambiguity_level": "Level 6",
+      "row_sha256": "33a0c7e5e9c1d492"
     }
   ]
 }
