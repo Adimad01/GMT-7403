@@ -77,7 +77,23 @@ recalled from world knowledge. That inverts the purpose of the level.
    Geocoding runs at 1 request/second. About a third of the *existing* corpus
    fails it, which is why every new row is checked before it is accepted.
 
-4. Send failures back to the generator and repeat. Merge only when clean.
+4. If it reports failures, generate a targeted replacement request rather than
+   regenerating the whole batch:
+
+   ```bash
+   python3 data_generation/make_fix_request.py new_topological.csv --relation topological
+   ```
+
+   That writes `fix_request_<relation>.md` naming each unusable row and why,
+   listing exactly how many replacements each (label, level) cell needs to stay
+   balanced, and carrying the full avoid-list. Paste it to the generator, append
+   the returned rows to your file after deleting the named ones, and validate
+   again.
+
+   Regenerating everything to fix twenty rows discards the good ones and invites
+   fresh mistakes in rows that were already fine.
+
+5. Merge only when the validator is clean.
 
 ## What the validator checks
 
