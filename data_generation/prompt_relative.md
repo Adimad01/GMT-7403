@@ -159,7 +159,7 @@ source_entity,source_geometry,target_entity,target_geometry,corpus,via_entity,re
 8. Vary geography: do not draw every example from the United States.
 9. Every row must be factually TRUE. Verify the geography before writing it.
 
-## Existing examples, one per label x level (match this style)
+## Worked examples — match this style
 
 Note these predate the `via_entity` column, so it is empty in all of them.
 

@@ -144,6 +144,44 @@ SPEC = {
             "river, which region. Never their relative position.\n"
             "\n"
             "Level 6 is the single exception, explained under that level."),
+        exemplars=[
+            'City of Oslo,Polygon,City of Rome,Polygon,"Oslo sits at the head of a '
+            'long fjord and serves as Norway\'s seat of government. Rome straddles '
+            'the Tiber in central Italy.",,cardinal_direction,north_of,"Oslo lies '
+            'near 60N, Rome near 42N. Nothing here is surprising; both are '
+            'well-placed in most mental maps.",Level 1',
+
+            'City of Lima,Polygon,City of Caracas,Polygon,"Lima is Peru\'s capital '
+            'and holds close to a third of the country\'s population. Caracas is '
+            'Venezuela\'s capital and largest city.",,cardinal_direction,west_of,'
+            '"Lima sits near 77W against Caracas near 67W. A reader who can place '
+            'Peru and Venezuela on the continent gets this right.",Level 2',
+
+            'City of Detroit,Polygon,City of Windsor,Polygon,"Detroit grew around '
+            'the American car industry on the river of the same name. Windsor faces '
+            'it from Ontario across that water.",,cardinal_direction,north_of,'
+            '"Detroit is at 42.33N and Windsor at 42.31N. Because Canada is drawn '
+            'above the United States, almost everyone guesses the reverse.",Level 3',
+
+            'City of Reno,Polygon,City of Los Angeles,Polygon,"Reno lies in the '
+            'Nevada high desert beside the Truckee River. Los Angeles is '
+            'California\'s largest coastal metropolis.",,cardinal_direction,west_of,'
+            '"Reno sits at 119.8W and Los Angeles at 118.2W. The California '
+            'coastline bends far enough that an inland Nevada city is the more '
+            'westerly of the two.",Level 4',
+
+            'City of Venice,Polygon,City of Halifax,Polygon,"Venice is built across '
+            'lagoon islands in the Italian Veneto. Halifax is the Atlantic port that '
+            'anchors Nova Scotia.",,cardinal_direction,north_of,"Venice is at 45.4N '
+            'and Halifax at 44.6N. A Mediterranean city and a cold Canadian port '
+            'invite the opposite guess.",Level 5',
+
+            'City of Kampala,Polygon,City of Cairo,Polygon,"Kampala sits further '
+            'from the North Pole than Khartoum, and Khartoum in turn sits further '
+            'from the North Pole than Cairo.",City of Khartoum,cardinal_direction,'
+            'south_of,"Two south-of steps compose. Kampala 0.3N, Khartoum 15.5N, '
+            'Cairo 30.0N.",Level 6',
+        ],
         extra_rules=[
             "NO TEMPLATES. The previous batch produced 144 rows from 48 sentence "
             "frames, each reused three times with only the names swapped, and 16 "
@@ -263,16 +301,28 @@ def build(rel: str, spec: dict) -> str:
     total = n_cells * spec["n_per_cell"]
     n_hop = hop_cells * spec["n_per_cell"]
 
-    examples = []
-    for lab in spec["labels"]:
-        for lv in LV[:5]:                      # no Level 6 exists yet to show
-            got = by_cell.get((lab, lv), [])
-            if got:
-                r = random.choice(got)
-                examples.append(
-                    f'{r["source_entity"]},{r["source_geometry"]},{r["target_entity"]},'
-                    f'{r["target_geometry"]},"{r["corpus"]}",,{r["relation_type"]},'
-                    f'{r["relation_label"]},"{r["explanation"]}",{r["ambiguity_level"]}')
+    # Where a relation supplies hand-written exemplars, use those. Sampling the
+    # corpus would be actively harmful for cardinal: its existing rows use the
+    # cue-based design this prompt forbids, and a demonstration outweighs an
+    # instruction every time.
+    if spec.get("exemplars"):
+        examples = list(spec["exemplars"])
+        examples_note = ("These are hand-written in the style wanted, one per level.\n"
+                         "The rows already in the corpus use an older design that this\n"
+                         "prompt forbids, so they are deliberately not shown.")
+    else:
+        examples = []
+        examples_note = ("Note these predate the `via_entity` column, so it is empty "
+                         "in all of them.")
+        for lab in spec["labels"]:
+            for lv in LV[:5]:                  # no Level 6 exists yet to show
+                got = by_cell.get((lab, lv), [])
+                if got:
+                    r = random.choice(got)
+                    examples.append(
+                        f'{r["source_entity"]},{r["source_geometry"]},{r["target_entity"]},'
+                        f'{r["target_geometry"]},"{r["corpus"]}",,{r["relation_type"]},'
+                        f'{r["relation_label"]},"{r["explanation"]}",{r["ambiguity_level"]}')
 
     # Show ALL of them. A sample cannot be avoided: the last batch collided with
     # 48 existing pairs, nearly all of them outside the 120 that were shown.
@@ -398,9 +448,9 @@ source_entity,source_geometry,target_entity,target_geometry,corpus,via_entity,re
 8. Vary geography: do not draw every example from the United States.
 9. Every row must be factually TRUE. Verify the geography before writing it.
 
-## Existing examples, one per label x level (match this style)
+## Worked examples — match this style
 
-Note these predate the `via_entity` column, so it is empty in all of them.
+{examples_note}
 
 {chr(10).join(examples)}
 

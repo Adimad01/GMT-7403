@@ -86,23 +86,57 @@ GIVEAWAY = {
     "disjoint": ["disjoint"], "overlaps": ["overlaps"], "equals": ["equals"],
 }
 
-# Phrases that encode a compass bearing without naming it. On cardinal Levels
-# 1-5 these make the item answerable without any geographic knowledge, which is
-# exactly what saturated the task at 97-100%.
-DIRECTION_CUES = [
-    "north", "south", "east", "west",
-    "top of the map", "top of the globe", "bottom of the map", "top of the world",
-    "upward", "downward", "leftward", "rightward",
-    "left side", "right side", "left-hand", "right-hand", "left edge", "right edge",
-    "o'clock",
-    "sunrise", "sunset", "setting sun", "morning sun", "morning light",
-    "morning sunrise", "sunset horizon", "greets the sun", "dawn",
-    "pole", "arctic", "antarctic", "equator", "equatorial", "latitude", "longitude",
-    "latitudinal", "longitudinal",
-    "upper left", "upper right", "lower left", "lower right",
-    "up and to the", "down and to the", "diagonally up", "diagonally down",
-    "further up", "further down", "closer to the top", "closer to the bottom",
+# Constructions that state a RELATIVE bearing, which on cardinal Levels 1-5
+# makes the item answerable without any geographic knowledge.
+#
+# A bare compass word is not enough to flag: "southern California", "South
+# Korea" and "West Africa" are place descriptions, not relational claims. Only
+# a compass word in relational context leaks the answer. Metaphors for a
+# bearing (clock faces, map edges, the sun) are relational by nature and are
+# flagged wherever they appear.
+import re as _re
+
+_COMPASS = r"(north|south|east|west|northeast|northwest|southeast|southwest)"
+RELATIONAL_PATTERNS = [
+    _re.compile(rf"\b{_COMPASS}(ern|erly|ward|wards)?\s+(of|from)\b", _re.I),
+    _re.compile(rf"\bto the {_COMPASS}(ern)?\b", _re.I),
+    _re.compile(rf"\b(further|farther|more|higher|lower)\s+{_COMPASS}", _re.I),
+    _re.compile(rf"\b{_COMPASS}(ward|wards)\b", _re.I),
+    _re.compile(rf"\blies?\s+{_COMPASS}\b", _re.I),
+    _re.compile(rf"\bsits?\s+{_COMPASS}\b", _re.I),
 ]
+# Always relational, whatever the surrounding words.
+BEARING_METAPHORS = [
+    "o'clock", "oclock",
+    "top of the map", "top of the globe", "top of the world",
+    "bottom of the map", "bottom of the globe",
+    "left of the map", "right of the map",
+    "left-hand edge", "right-hand edge", "left edge", "right edge",
+    "upward", "downward", "leftward", "rightward",
+    "up and to the", "down and to the", "diagonally up", "diagonally down",
+    "upper left", "upper right", "lower left", "lower right",
+    "closer to the top", "closer to the bottom", "further up", "further down",
+    "sunrise", "sunset", "setting sun", "morning sun", "morning light",
+    "greets the sun", "toward the dawn", "sunset horizon",
+    "closer to the pole", "toward the arctic", "toward the antarctic",
+    "nearer the equator", "closer to the equator", "equatorial line",
+    "latitudinal grid", "longitudinal grid", "higher latitude", "lower latitude",
+    "arctic pole", "icy top",
+]
+
+
+def bearing_cue(text: str) -> str | None:
+    """Return the offending phrase, or None. Used only on cardinal Levels 1-5."""
+    low = text.lower()
+    for m in BEARING_METAPHORS:
+        if m in low:
+            return m
+    for pat in RELATIONAL_PATTERNS:
+        hit = pat.search(text)
+        if hit:
+            return hit.group(0)
+    return None
+
 
 _counts = Counter()
 
@@ -376,8 +410,7 @@ def main() -> int:
         flat = [r for r in rows if r["ambiguity_level"].strip() != HOP_LEVEL]
         leaked = []
         for r in flat:
-            low = r["corpus"].lower()
-            hit = next((c for c in DIRECTION_CUES if c in low), None)
+            hit = bearing_cue(r["corpus"])
             if hit:
                 leaked.append((r, hit))
         if leaked:
