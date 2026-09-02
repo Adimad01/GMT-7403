@@ -134,17 +134,32 @@ source_entity,source_geometry,target_entity,target_geometry,corpus,via_entity,re
 
 1. The label describes A with respect to B, in that order.
 2. Do not reuse any (source_entity, target_entity) pair listed at the bottom.
-3. Do not use the same pair twice in your own output, and never produce a pair
-   together with its mirror (if you write "A contains B", do not also write
-   "B within A" — that leaks answers between our train and test splits).
-4. The `corpus` text must NOT contain the label word or an obvious synonym.
+3. Do not use the same pair twice in your own output.
+
+4. NEVER produce a pair together with its mirror. This is the rule most often
+   broken: the previous batch did it 21 times. Filling `contains` and `within`
+   from the same fact is the path of least resistance, and it is exactly what
+   ruins the data — the two rows become each other's answer key, and once they
+   land in different splits the model has seen the test answer during training.
+
+       FORBIDDEN, as a pair:
+         South Africa , Lesotho      , contains
+         Lesotho      , South Africa , within
+
+       CORRECT — different facts for each label:
+         South Africa , Lesotho      , contains
+         Vatican City , Italy        , within
+
+   Every `contains` row and every `within` row must use a DIFFERENT pair of
+   places. The same applies to any other label and its inverse.
+5. The `corpus` text must NOT contain the label word or an obvious synonym.
    Write "sits at the 12 o'clock mark", not "is north of".
-5. On Level 6 the text must state the two links and NOT the A-B relation. If a
+6. On Level 6 the text must state the two links and NOT the A-B relation. If a
    reader can answer without composing both steps, it is not multi-hop.
-6. `explanation` is never shown to the model — do not rely on it to make a row
+7. `explanation` is never shown to the model — do not rely on it to make a row
    solvable.
-7. Vary geography: do not draw every example from the United States.
-8. Every row must be factually TRUE. Verify the geography before writing it.
+8. Vary geography: do not draw every example from the United States.
+9. Every row must be factually TRUE. Verify the geography before writing it.
 
 ## Existing examples, one per label x level (match this style)
 
@@ -188,123 +203,458 @@ Demilitarized Zone (DMZ),Polygon,1953 Korean Armistice Ceasefire Buffer,Polygon,
 
 ## Entity pairs already used — do not repeat these
 
-Brooklyn Bridge | East River
-Abyei Area | Republic of South Sudan
-Australian Continent | Lake Eyre Basin
-Manitoulin Island | Lake Manitou
-The Pentagon Grounds | State of Virginia
-Mongolia | China
-City of Juneau | Juneau Borough
-Spratly Islands Maritime Claims | Vietnamese Exclusive Economic Zone
-Pampas Grassland | Argentina
-City of Miami | City of Seattle
-Lake Vostok Subglacial Volume | Antarctic Ice Sheet
-Navajo Nation | Hopi Reservation
-City of Minneapolis | City of St. Paul
-State of New Mexico | White Sands National Park
-Sub-Seabed Chunnel Transit Line | French Maritime Legal Zone
-Central Park | State of New York
-Kaliningrad Oblast | Mainland Russia
-Rust Belt | State of Ohio
-Inner Temple Legal Precinct | City of London Corporation
-Camp David Restricted Perimeter | Catoctin Mountain Park
-Interstate 80 | Continental Divide
-Kashmir Region | Indian Territorial Claim
-City of Sacramento | State of California
 Abstract Geodetic Equator | Physical Amazon River Basin
-Equator | Amazon River
-Trafalgar Square Base | Nelson's Column
-Province of Alberta | Canada
-Geographic South Pole | 90 Degrees South Latitude
-Amazon Rainforest | Brazil
-City of Rome | Vatican City
-City of Madrid | Spain
-Interstate 70 | State of Colorado
-Republic of Cyprus | UN Buffer Zone
-Rust Belt | American Midwest
-Prime Meridian | English Channel
-Zion National Park | State of Utah
-Argentina | Norway
-City of Anchorage | Anchorage Municipality
-City of San Diego | Mexico
-Lake Superior | Isle Royale
-Dutch Baarle-Nassau Enclave N8 | Belgian Baarle-Hertog Enclave H22
+Abstract Geodetic Prime Meridian | Physical River Thames Current
+Abstract Tropic of Cancer | Physical Nile River Flow
+Abstract Tropic of Capricorn | Physical Great Dividing Range
 Abyei Administrative Area | Republic of Sudan
-Suez Canal | Panama Canal
-Republic of Italy | San Marino
-Grand Teton National Park | State of Wyoming
-France | Spain
-International Date Line (Conceptual) | 180 Degrees Longitude
+Abyei Area | Republic of South Sudan
+Abyei Area | Republic of Sudan
+Abyei Demilitarized Box | Republic of Sudan
+Amazon Basin | Andes Mountains Foothills
+Amazon Basin | Peru
+Amazon Rainforest | Brazil
+Amazon River | Brazil
+Andes Mountains Foothills | Amazon Basin
+Andes Mountains | Chile
+Appalachian Footpath | Mason-Dixon Survey Line
+Appalachian Mountains | State of Pennsylvania
+Appalachian Trail Southern Terminus | Springer Mountain Summit
+Appalachian Trail | Mason-Dixon Line
+Appalachian Trail | Potomac River
+Appalachian Trail | Rocky Mountains
+Arctic Circle | Canada
+Argentina | Norway
+Argentine Antarctica Claim | British Antarctic Territory
+Artificial Panama Canal Trench | Continental Divide Geological Ridge
+Artificial Suez Canal Trench | Sinai Desert Landmass
+Ashmore and Cartier Islands | Commonwealth of Australia Maritime Bounds
+Australia | Australian Capital Territory
+Australia | Canada
+Australia | Uluru
+Australian Capital Territory | New South Wales
+Australian Continent | Lake Eyre Basin
+Baarle-Hertog Cadastral Plots | Baarle-Nassau Cadastral Plots
+Baarle-Hertog Municipality | Baarle-Nassau Municipality
+Baarle-Nassau Border Monument 214 | Belgian-Dutch Sovereignty Line
+Baarle-Nassau Border Monument | Belgian-Dutch Sovereignty Line
+Baden-Württemberg | Black Forest
+Badlands National Park | State of South Dakota
 Baja California Peninsula | Mainland Mexico
 Bermuda | Atlantic Ocean
-Borough of The Bronx | Bronx County
-City of Rome | Italy
-Prime Meridian | Spain
-Route 66 | State of Florida
-Dahlak Archipelago | Red Sea
-Abyei Demilitarized Box | Republic of Sudan
-Republic of Chile | Easter Island Landmass
-Iceland | Antarctica
-Independent City of Baltimore | Baltimore City Government Territory
-Rocky Mountains | Andes Mountains
-Lombard Street | Broadway (New York)
-Catacombs of Paris Subterranean Network | City of Paris
-Prince Edward Islands | Republic of South Africa
-Mojave Desert | State of California
-Prime Meridian (Greenwich) | 0 Degrees Longitude
-Channel Islands | United Kingdom
-Yellowstone National Park | Yellowstone Caldera
-City of London | United Kingdom
-Rocky Mountains | The Alps
-City of Carson City | Consolidated Municipality of Carson City
-Gobi Desert | Mongolia
-City of Sydney | City of Cape Town
-Uluru | Australia
-Demilitarized Zone (DMZ) | 1953 Ceasefire Buffer Zone
-State of Kansas | State of Nebraska
-Vesuvius Main Crater | Mount Vesuvius Volcanic Cone
-City of Dallas | City of Fort Worth
-State of Ohio | City of Columbus
-Route 66 | Colorado River
-Pacific Ocean | Mariana Trench
-City of Orlando | State of Florida
-Ssese Islands | Lake Victoria
-International Space Station Docking Ring | SpaceX Crew Dragon Adapter
-Statue of Liberty | Eiffel Tower
-Republic of Cyprus | UN Buffer Zone in Cyprus
+Bir Tawil | Hala'ib Triangle
 Black Forest | Baden-Württemberg
-United Nations Headquarters | Borough of Manhattan
-Artificial Suez Canal Trench | Sinai Desert Landmass
+Black Forest | State of Baden-Württemberg
+Borough of Brooklyn | Kings County
+Borough of Manhattan | New York County
+Borough of Queens | Queens County
+Borough of Staten Island | Richmond County
+Borough of The Bronx | Bronx County
+Bosphorus Bridge Roadway | Bosphorus Strait
+Bosphorus Bridge | Bosphorus Strait
+Brazil | Argentina
+Brooklyn Bridge Roadway | East River Surface
+Brooklyn Bridge | East River
+Buckingham Palace | City of London
 Busingen am Hochrhein | Federal Republic of Germany
+Busingen am Hochrhein | Mainland Germany
 Busingen am Hochrhein | Swiss Canton of Schaffhausen
-Appalachian Trail | Rocky Mountains
-Navigational International Date Line | Chukchi Sea Legal Boundary
-Diego Garcia | Indian Ocean
-Constantinople Walled City (1453) | Fatih District of Istanbul
-State of California | Yosemite National Park
-Interstate 40 | State of Arizona
-Diomede Islands Maritime Border | International Date Line
-State of Idaho | State of Montana
-Red Sea | Dahlak Archipelago
-Mount Fuji | Japan
-France | City of Paris
-Niagara Falls Horseshoe | Canada-US Border
-City of Jacksonville | Duval County
-Baden-Württemberg | Black Forest
+CERN Large Hadron Collider | City of Geneva
+CERN Large Hadron Collider | City of Geneva Surface
+Cabinda Province | Mainland Angola
+Camp David Restricted Perimeter | Catoctin Mountain Park
+Camp David | Catoctin Mountain Park
+Camp Zeist Legal Compound (1999) | Kingdom of the Netherlands
+Campione d'Italia | Mainland Italy
+Canada | Province of Saskatchewan
 Canada | United States
-State of Texas | City of Austin
-Mediterranean Sea | Island of Malta
-White Sands National Park | State of New Mexico
-San Marino | Italian Peninsula
-Rio Grande | State of New Mexico
-Ring of Fire | Pacific Plate
-The Gambia | Senegal
-Eurotunnel Terminal Boundary | French Maritime Customs Zone
-United Kingdom | New Zealand
+Catacombs of Paris Subterranean Network | City of Paris
+Central Park Reservoir | New York City Municipal Grid
+Central Park | State of New York
+Challenger Deep | Mariana Trench Geomorphic Bounds
+Channel Islands | United Kingdom
+Channel Islands | United Kingdom Mainland
+Channel Tunnel | English Channel
+Channel Tunnel | Prime Meridian
+City of Alexandria | Independent City of Alexandria
+City of Anchorage | Anchorage Municipality
+City of Baltimore | Independent City of Baltimore
+City of Beverly Hills | City of Los Angeles
+City of Broomfield | Broomfield County
+City of Carson City | Consolidated Municipality of Carson City
+City of Chicago | City of Houston
+City of Columbus | State of Ohio
+City of Dallas | City of Fort Worth
+City of Denver | Denver County
+City of Denver | State of Colorado
+City of Detroit | City of Hamtramck
+City of Detroit | City of Windsor
+City of El Paso | Ciudad Juarez
+City of Hamtramck | City of Detroit
+City of Honolulu | Mainland United States
+City of Jacksonville | Duval County
+City of Juneau | Juneau Borough
+City of London Corporation | Greater London Authority
+City of London | The Square Mile
+City of London | United Kingdom
+City of Los Angeles | City of Beverly Hills
+City of Madrid | Spain
+City of Miami | City of Seattle
+City of Minneapolis | City of St. Paul
+City of Nashville | Davidson County
+City of Norwood | City of Cincinnati
+City of Orlando | State of Florida
+City of Paris | Catacombs of Paris Subterranean Network
+City of Paris | City of Tokyo
+City of Paris | France
 City of Philadelphia | Philadelphia County
-Amazon Basin | Andes Mountains Foothills
-St. Peter's Basilica Footprint | Vatican City Jurisdiction
+City of Phoenix | State of Arizona
+City of Rome | Italy
+City of Rome | Vatican City
+City of Sacramento | State of California
+City of San Diego | Mexico
+City of San Francisco | San Francisco County
+City of Seattle | City of Bellevue
+City of Seattle | State of Washington
+City of Sitka | Sitka Borough
+City of Springfield | State of Illinois
+City of St. Louis | Independent City of St. Louis
+City of Sydney | City of Cape Town
+City of Washington | District of Columbia
+Colorado River | Grand Canyon National Park
+Colorado River | State of Utah
+Commonwealth of Australia | Ashmore and Cartier Islands
+Congo Basin | Democratic Republic of the Congo
+Constantinople Walled City (1453) | Fatih District of Istanbul
+Dahala Khagrabari | Cooch Behar District
+Dahlak Archipelago | Red Sea
+Danube River | Hungary
+Death Valley Below-Sea-Level Basin | State of California
+Demilitarized Zone (DMZ) | 1953 Ceasefire Buffer Zone
+Demilitarized Zone (DMZ) | 1953 Korean Armistice Ceasefire Buffer
+Denali Wilderness Area | State of Alaska
+Diego Garcia | Indian Ocean
+Diomede Islands Maritime Border | International Date Line
+Dutch Baarle-Nassau Enclave N8 | Belgian Baarle-Hertog Enclave H22
+Easter Island Landmass | Republic of Chile Maritime Claims
+Egypt | Sudan
+Eiffel Tower Spire Tip | Highest Architectural Node of Paris
+Eiffel Tower | City of Paris
 English Channel | French Coast
+Equator | Amazon River
+Equator | Lake Victoria
+Eurostar Railway | France
+Eurotunnel Subterranean Tube | English Channel Maritime Zone
+Eurotunnel Subterranean Tube | English Channel Surface Waters
+Eurotunnel Terminal Boundary | French Maritime Customs Zone
+Eurotunnel Terminal Entrance | French Customs Zone
+Falkland Islands EEZ | Argentine Sea
+Falkland Islands | United Kingdom
+Falkland Islands | United Kingdom Mainland
+Four Corners Monument Plaque | State of Arizona Boundary
+Four Corners Monument | State of Utah
+France | City of Paris
+France | Spain
+French Guiana | Metropolitan France
+Gaza Strip | Egypt
+Geographic North Pole | Convergence of All Longitude Lines
+Geographic South Pole | 90 Degrees South Latitude
+Germany | Poland
+Glacier National Park | State of Montana
+Gobi Desert | China
+Gobi Desert | Mongolia
+Golden Gate Bridge Northern Anchor | Marin Headlands
+Golden Gate Bridge | Marin County
+Golden Gate Park | City of San Francisco
+Gotthard Base Rail Tube | Swiss-Italian Geopolitical Plane
+Gotthard Base Tunnel North Portal | Swiss Alps Geomorphic Base
+Gotthard Base Tunnel Portal | Swiss Alps Base
+Gotthard Base Tunnel | Rhine River Watershed
+Gotthard Base Tunnel | Swiss Alps Surface
+Grand Teton National Park | State of Wyoming
+Great Barrier Reef | Coral Sea
+Great Pyramid Perimeter | King's Chamber Subterranean Volume
+Great Rift Valley | Kenya
+Great Victoria Desert | South Australia
+Great Victoria Desert | Western Australia
+Great Wall of China | Japan
+Greater London Authority | City of London Corporation
+Guantanamo Bay Naval Base | United States Mainland
+Gulf Stream | North Atlantic
+Hala'ib Triangle | Egyptian Territorial Claim
+Himalaya Mountains | Nepal
+Historic Route 66 Asphalt | Mississippi River Hydrological Flow
+Historical Mount McKinley Summit | Modern Denali Summit
+Historical Ottoman Empire Footprint (1683) | Modern European Union Territory
+Historical Roman Empire (AD 117) | Modern European Union
+Hoover Dam Concrete Face | Lake Mead
+Hoover Dam Concrete Face | Lake Mead Water Volume
+Hopi Reservation | Navajo Nation
+Iberian Peninsula | Spain
+Iceland | Antarctica
+Iceland | Madagascar
+Independent City of Baltimore | Baltimore City Government Territory
+Independent City of Baltimore | City of Baltimore
+Independent City of Baltimore | City of Baltimore Municipal Limits
+Independent City of St. Louis | St. Louis County Municipal Boundary
+India | Nepal
+Indian Ocean | Diego Garcia
+Inner Temple Legal Precinct | City of London Corporation
+International Date Line (Conceptual) | 180 Degrees Longitude
+International Space Station Docking Ring | SpaceX Crew Dragon Adapter
+Interstate 15 | Mojave Desert
+Interstate 40 | State of Arizona
+Interstate 70 | State of Colorado
+Interstate 80 | Continental Divide
+Interstate 90 | State of South Dakota
+Interstate 95 Asphalt | Mason-Dixon Historical Boundary
+Interstate 95 | Mason-Dixon Line
+Isla del Sol | Lake Titicaca
+Island of Malta | Mediterranean Sea
+Island of Oahu | Pacific Ocean
+Isle of Wight | Mainland England
 Italy | City of Rome
+Italy | San Marino
+Japan | Brazil
+Kalahari Desert | Botswana
+Kaliningrad Oblast | Mainland Russia
+Kashmir Region | Indian Territorial Claim
+King's Chamber Subterranean Volume | Great Pyramid Perimeter
+Kingdom of Lesotho | Indian Ocean Maritime Boundary
+Kingdom of Lesotho | South African Borders
+Kingdom of Saudi Arabia | Rub' al Khali Desert
+Kurdish Inhabited Region | Republic of Turkey
+Kurdish Inhabited Region | Turkey
+Kuril Islands | Japanese Territorial Claim
+Lake Baikal | Caspian Sea
+Lake Eyre Basin | Australian Continent
+Lake Nicaragua | Ometepe Island
+Lake Superior | Isle Royale
+Lake Victoria | Lake Superior
 Lake Victoria | Ssese Islands
+Lake Vostok Subglacial Volume | Antarctic Ice Sheet
+Little Diomede Island | Big Diomede Island
+Loch Ness Water Volume | Great Glen Fault
+Lombard Street | Broadway (New York)
+London Underground Central Line Subterranean Track | River Thames Surface Water
+Madagascar | Indian Ocean
+Madagascar | Mainland Africa
+Main Crater Lake | Vulcan Point Island
+Manitoulin Island | Lake Huron
+Manitoulin Island | Lake Manitou
+Mariana Trench Geomorphic Lip | Abyssal Plain
+Mariana Trench | Pacific Ocean
+Mauna Loa Magma Chamber | State of Hawaii
+Mediterranean Basin | European Union
+Mediterranean Deep Brine Pool | Mediterranean Sea Volume
+Mediterranean Sea | Island of Cyprus
+Mediterranean Sea | Island of Malta
+Mississippi River | State of Louisiana
+Mojave Desert | State of California
+Mojave Desert | State of Nevada
+Mongolia | China
+Mount Everest Summit | Nepal-China Border
+Mount Fuji | Japan
+Mount Kilimanjaro | Mount Everest
+Mount McKinley Summit | Denali Summit
+Mount Rainier Glacial Cap | Mount Rainier National Park
+Mount Rainier National Park | Mount Rainier Glacial Cap
+Mount Titano Summit | Republic of San Marino
+Municipality of Llivia | French Republic
+Nakhchivan Autonomous Republic | Mainland Azerbaijan
+Navajo Nation Reservation | Hopi Reservation
+Navajo Nation | Hopi Reservation
+Navajo Nation | State of Arizona
+Navigational International Date Line | Chukchi Sea Legal Boundary
+New Delhi District | Republic of India
+New York City Municipal Grid | Central Park Reservoir
+New Zealand | Greenland
+Niagara Falls Horseshoe | Canada-US Border
+Niagara Falls | Canada-US Border
+Nile River | Amazon River
+Nile River | Yellow River
+Nine-Dash Line Claim | Philippine Exclusive Economic Zone
+Nine-Dash Line Claim | Philippine Exclusive Economic Zone (EEZ)
+North Pole | 90 Degrees North Latitude
+Northwest Angle | Contiguous United States
+Null Island | WGS84 Origin Coordinate
+O'Hare International Airport Bounds | City of Chicago
+Omani Exclave of Madha | Mainland Oman
+Omani Exclave of Madha | UAE Enclave of Nahwa
+Ometepe Island | Lake Nicaragua
+PATH Train Tunnels | Hudson River
+PATH Train Tunnels | Hudson River Water Volume
+PATH Train Tunnels | New York-New Jersey State Line
+Pacific Ocean | Island of Oahu
+Pacific Ocean | Mariana Trench
+Pacific Ocean | Mediterranean Sea
+Pacific Ocean | State of Hawaii
+Pampas Grassland | Argentina
+Panama Canal | Isthmus of Panama
+Panmunjom T2 Conference Table | Military Demarcation Line
+Point Nemo Mathematical Isolation Zone | Pacific Ocean Maritime Bounds
+Point Nemo | Ducie Island
+Point Roberts Exclave | 49th Parallel North
+Portugal | Atlantic Ocean
+Portugal | Spain
+Prime Meridian (Greenwich) | 0 Degrees Longitude
+Prime Meridian | English Channel
+Prime Meridian | France
+Prime Meridian | River Thames
+Prime Meridian | Spain
+Prime Meridian | The Equator
+Prince Edward Islands | Republic of South Africa
+Principality of Monaco | City of Monaco
+Principality of Monaco | Municipality of Monaco
+Province of Alberta | Canada
+Pyrenees Mountains | France
+Red Sea | Dahlak Archipelago
+Republic of Botswana | Republic of Zambia
+Republic of Chile | Easter Island Landmass
+Republic of Cyprus | UN Buffer Zone
+Republic of Cyprus | UN Buffer Zone in Cyprus
+Republic of India | New Delhi
+Republic of Ireland | Northern Ireland
+Republic of Italy | San Marino
+Republic of Italy | Sovereign Military Order of Malta Magistral Villa
+Ring of Fire | Pacific Plate
+Rio Grande | State of New Mexico
+River Thames | City of London
+River Thames | Mississippi River
+Rocky Mountains | Andes Mountains
+Rocky Mountains | Canada
+Rocky Mountains | State of Colorado
+Rocky Mountains | The Alps
+Route 66 | Colorado River
+Route 66 | Continental Divide
+Route 66 | Mississippi River
+Route 66 | State of Florida
+Royal Botanic Garden Sydney | City of Sydney
+Rub' al Khali Desert | Kingdom of Saudi Arabia
+Rust Belt | American Midwest
+Rust Belt | State of Ohio
+Sahara Desert | Amazon Rainforest
+Sahara Desert | Egypt
+Sahara Desert | Republic of Mali
+Sahara Desert | Sahel Region
+San Marino | Italian Peninsula
+San Marino | Republic of Italy
+Scandinavia | Norway
+Seikan Tunnel | Tsugaru Strait
+Seikan Tunnel | Tsugaru Strait Water Volume
+Senegal | The Gambia
+Sonoran Desert | Mexico
+South Africa | Kingdom of Lesotho
+South Africa | Russia
+South Pole Station Flight Path | Convergence of 360 Meridians
+Sovereign Borders of The Gambia | Sovereign Borders of Senegal
+Sovereign Military Order of Malta HQ | City of Rome
+Sovereign Military Order of Malta Magistral Villa | Republic of Italy
+Spain | City of Madrid
+Spratly Islands Maritime Claims | Philippine Exclusive Economic Zone
+Spratly Islands Maritime Claims | Vietnamese Exclusive Economic Zone
+Sri Lanka | India
+Ssese Islands | Lake Victoria
+St. Peter's Basilica Footprint | Vatican City Jurisdiction
+State of Alaska | Contiguous United States
+State of Alaska | Yukon Territory
+State of Arizona | City of Phoenix
+State of Arizona | Grand Canyon National Park
+State of California | City of Los Angeles
+State of California | Death Valley Below-Sea-Level Basin
+State of California | Pacific Ocean
+State of California | Yosemite National Park
+State of Colorado | City of Denver
+State of Colorado | State of New Mexico
+State of Florida | State of Washington
+State of Georgia (USA) | Republic of Georgia (Country)
+State of Hawaii | Interstate Highway System
+State of Hawaii | Mauna Loa Magma Chamber
+State of Hawaii | North American Continent
+State of Hawaii | State of Ohio
+State of Idaho | State of Montana
+State of Illinois | City of Springfield
+State of Kansas | State of Nebraska
+State of Maine | State of Arizona
+State of Nevada | State of California
+State of New Mexico | White Sands National Park
+State of New York | Central Park
+State of New York | State of Pennsylvania
+State of North Dakota | State of South Dakota
+State of Ohio | City of Columbus
+State of Oregon | State of Washington
+State of Queensland | State of New South Wales
+State of Rhode Island | Providence Plantations
 State of South Dakota | Badlands National Park
+State of Tasmania | Mainland Australia
+State of Texas | City of Austin
+State of Texas | Gulf of Mexico
+State of Texas | The Alamo Mission Footprint
+State of Utah | State of Idaho
+State of Utah | State of New Mexico
+State of Utah | Zion National Park
+State of Victoria | State of South Australia
+State of Washington | City of Seattle
+Statue of Liberty | Eiffel Tower
+Sub-Seabed Chunnel Transit Line | French Maritime Legal Zone
+Suez Canal | Egypt
+Suez Canal | Panama Canal
+Suez Canal | Sinai Peninsula
+Svalbard Global Seed Vault Entrance | Equator
+Svalbard Global Seed Vault Entrance | Platåberget Mountain Surface
+Svalbard Global Seed Vault Portal | Platåberget Mountain Exterior
+Svalbard Global Seed Vault | Spitsbergen Permafrost Zone
+Svalbard Treaty Zone | Spitsbergen Archipelago
+Sweden | Norway
+Swiss Canton of Schaffhausen | Busingen am Hochrhein
+Switzerland | Campione d'Italia
+The Alps | Italy
+The Alps | Switzerland
+The Gambia | Senegal
+The Pentagon Grounds | State of Virginia
+The Pentagon | The Kremlin
+Tornado Alley | State of Oklahoma
+Trafalgar Square Base | Nelson's Column
+Trafalgar Square | Nelson's Column Base
+Trans-Alaska Oil Pipeline | Abstract Arctic Circle Latitude
+Trans-Alaska Pipeline | Arctic Circle
+Trans-Alaska Pipeline | State of Alaska
+Trans-Alaska Pipeline | Yukon River
+Trans-Amazonian Highway | Amazon Rainforest
+Trans-Amazonian Highway | Xingu River
+Trans-Canada Highway Ribbon | Precambrian Canadian Shield
+Trans-Canada Highway | Canadian Shield
+Trans-Canada Highway | Province of Ontario
+Trans-Sahara Highway | Sahara Desert
+Trans-Siberian Railway | Ural Mountains
+Trans-Siberian Steel Rail | Ob River Ice Flow
+Tropic of Cancer | Mexico
+Tropic of Cancer | Nile River
+Tropic of Capricorn | Australia
+Tropic of Capricorn | Great Dividing Range
+Uluru | Australia
+Union Pacific Railroad | State of Nevada
+United Kingdom | City of London
+United Kingdom | New Zealand
+United Nations Headquarters | Borough of Manhattan
+United Nations Headquarters | City of New York
+University Endowment Lands | City of Vancouver
+Vatican City Masonry Walls | City of Rome Streets
+Vatican City | City of Rome
+Vatican City | Holy See Jurisdiction
+Vatican City | Holy See Territory
+Vennbahn Railway Legal Footprint | German Sovereign Territory
+Vennbahn Railway Right-of-Way | German Micro-Enclaves
+Vesuvius Main Crater | Mount Vesuvius Volcanic Cone
+Victoria Island Landmass | Unnamed Third-Order Arctic Island (69.793 N 108.241 W)
+Victoria Island | Unnamed Arctic Sub-Island (69.793N 108.241W)
+WGS84 Ellipsoid Center | Earth Center of Mass
+White Sands National Park | State of New Mexico
+Windsor Castle Grounds | River Thames
+Yellowstone Caldera | Yellowstone National Park
+Yellowstone National Park | State of Wyoming
+Yellowstone National Park | Yellowstone Caldera
+Yellowstone National Park | Yellowstone Supervolcano Caldera
+Yosemite National Park | State of California
+Zero Mile Marker (Washington DC) | Geographic Anchor of DC
+Zion National Park | State of Utah

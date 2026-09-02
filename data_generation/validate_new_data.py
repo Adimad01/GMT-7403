@@ -170,7 +170,12 @@ def main() -> int:
     # --- balance ----------------------------------------------------------
     cells = Counter((r["relation_label"].strip().lower(),
                      r["ambiguity_level"].strip()) for r in rows)
-    grid = {(l, v): cells.get((l, v), 0) for l in labels for v in LV}
+    # Level 6 exists only for labels with a forced composition, so its grid is
+    # legitimately smaller. Expecting a full rectangle here would flag correct
+    # data as broken.
+    grid = {(l, v): cells.get((l, v), 0)
+            for l in labels for v in LV
+            if v != HOP_LEVEL or l in HOP_LABELS[rel]}
     vals = sorted(set(grid.values()))
     want = args.expect_per_cell
     if len(vals) == 1 and (want is None or vals[0] == want):

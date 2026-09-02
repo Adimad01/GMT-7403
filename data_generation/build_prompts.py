@@ -208,7 +208,9 @@ def build(rel: str, spec: dict) -> str:
                     f'{r["target_geometry"]},"{r["corpus"]}",,{r["relation_type"]},'
                     f'{r["relation_label"]},"{r["explanation"]}",{r["ambiguity_level"]}')
 
-    shown = existing if len(existing) <= 120 else random.sample(existing, 120)
+    # Show ALL of them. A sample cannot be avoided: the last batch collided with
+    # 48 existing pairs, nearly all of them outside the 120 that were shown.
+    shown = existing
     levels_md = "\n".join(f"- **{LV[i]}** — {d}" for i, d in enumerate(spec["levels"]))
     levels_md += "\n" + MULTIHOP_BLOCK.format(
         hop_rule=spec["hop_rule"], hop_example=spec["hop_example"],
@@ -297,17 +299,32 @@ source_entity,source_geometry,target_entity,target_geometry,corpus,via_entity,re
 
 1. The label describes A with respect to B, in that order.
 2. Do not reuse any (source_entity, target_entity) pair listed at the bottom.
-3. Do not use the same pair twice in your own output, and never produce a pair
-   together with its mirror (if you write "A contains B", do not also write
-   "B within A" — that leaks answers between our train and test splits).
-4. The `corpus` text must NOT contain the label word or an obvious synonym.
+3. Do not use the same pair twice in your own output.
+
+4. NEVER produce a pair together with its mirror. This is the rule most often
+   broken: the previous batch did it 21 times. Filling `contains` and `within`
+   from the same fact is the path of least resistance, and it is exactly what
+   ruins the data — the two rows become each other's answer key, and once they
+   land in different splits the model has seen the test answer during training.
+
+       FORBIDDEN, as a pair:
+         South Africa , Lesotho      , contains
+         Lesotho      , South Africa , within
+
+       CORRECT — different facts for each label:
+         South Africa , Lesotho      , contains
+         Vatican City , Italy        , within
+
+   Every `contains` row and every `within` row must use a DIFFERENT pair of
+   places. The same applies to any other label and its inverse.
+5. The `corpus` text must NOT contain the label word or an obvious synonym.
    Write "sits at the 12 o'clock mark", not "is north of".
-5. On Level 6 the text must state the two links and NOT the A-B relation. If a
+6. On Level 6 the text must state the two links and NOT the A-B relation. If a
    reader can answer without composing both steps, it is not multi-hop.
-6. `explanation` is never shown to the model — do not rely on it to make a row
+7. `explanation` is never shown to the model — do not rely on it to make a row
    solvable.
-7. Vary geography: do not draw every example from the United States.
-8. Every row must be factually TRUE. Verify the geography before writing it.
+8. Vary geography: do not draw every example from the United States.
+9. Every row must be factually TRUE. Verify the geography before writing it.
 
 ## Existing examples, one per label x level (match this style)
 
