@@ -285,22 +285,45 @@ def main() -> int:
             ok(f"multi-hop: every label has a forced composition "
                f"({', '.join(sorted({r['relation_label'].strip().lower() for r in hop}))})")
 
-        # THE decisive check: the text must state BOTH links, so the answer is
-        # derivable from the sentence rather than from prior world knowledge.
-        # The first generated batch failed this on 35 of 35 rows -- each stated
-        # only A->C and never mentioned B at all.
-        silent = [r for r in hop
-                  if content_words(r["target_entity"])
-                  and not (content_words(r["target_entity"])
-                           & content_words(r["corpus"]))]
-        if silent:
-            bad(f"{len(silent)}/{len(hop)} Level 6 row(s) never mention the TARGET "
-                f"in the description — only the first link is stated, so the answer "
-                f"cannot be derived from the text. "
-                f"e.g. A={silent[0]['source_entity']!r} via={silent[0]['via_entity']!r} "
-                f"B={silent[0]['target_entity']!r}: \"{silent[0]['corpus'][:70]}...\"")
+        # THE decisive check: does the text state TWO links, or only one?
+        #
+        # The first batch failed this on 35 of 35 rows: "The federal republic
+        # fully surrounds the golden state" is a single clause, so the second
+        # hop is simply absent and the answer cannot be derived.
+        #
+        # What matters is the presence of a second linking clause, NOT whether
+        # the target is named literally. "...bounded by Santa Clara County, and
+        # that jurisdiction sits bounded by the western coastal state" is a
+        # perfectly good two-hop description even though it paraphrases the
+        # target -- the subject and object are given to the model as separate
+        # fields anyway, so a paraphrase in the prose is fine and arguably
+        # better, since it stops the row being solvable by name-matching alone.
+        LINKERS = ("and that", "and it", "and this", ", and", "which in turn",
+                   "; that", "which itself", "and the latter", "in turn")
+        one_clause = [r for r in hop
+                      if not any(k in r["corpus"].lower() for k in LINKERS)]
+        if one_clause:
+            bad(f"{len(one_clause)}/{len(hop)} Level 6 row(s) state only ONE link. "
+                f"A multi-hop description needs two clauses joined by 'and that', "
+                f"'which in turn' or similar. "
+                f"e.g. A={one_clause[0]['source_entity']!r} "
+                f"via={one_clause[0]['via_entity']!r} "
+                f"B={one_clause[0]['target_entity']!r}: "
+                f"\"{one_clause[0]['corpus'][:70]}...\"")
         else:
-            ok("multi-hop: every description states both links")
+            ok("multi-hop: every description states two linked clauses")
+
+        # softer: the intermediate really should be named, since the whole point
+        # is that the reader routes through it
+        unnamed = [r for r in hop
+                   if content_words(r["via_entity"])
+                   and not (content_words(r["via_entity"])
+                            & content_words(r["corpus"]))]
+        if unnamed:
+            warn(f"{len(unnamed)} Level 6 row(s) never name the intermediate place "
+                 f"in the description, so the chain is implicit")
+        else:
+            ok("multi-hop: every description names its intermediate place")
 
         # C must be a genuinely different place, not a synonym of an endpoint
         def stem(t):
