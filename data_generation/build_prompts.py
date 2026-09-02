@@ -62,41 +62,107 @@ SPEC = {
 
     "cardinal": dict(
         n_per_cell=3,
-        # every direction composes with itself along its own axis
         hop_labels=["north_of", "south_of", "east_of", "west_of",
                     "northeast_of", "northwest_of", "southeast_of", "southwest_of"],
         labels=["north_of", "south_of", "east_of", "west_of",
                 "northeast_of", "northwest_of", "southeast_of", "southwest_of"],
         what="CARDINAL DIRECTION — the compass bearing from the second place to the first",
+        # Levels here grade the GEOGRAPHY, not the phrasing. Once the direction
+        # cue is removed from the text (see headline rule), difficulty can only
+        # come from how counter-intuitive the true bearing is.
         levels=[
-            "Straightforward, matching intuition: 'to reach Seattle from Portland you "
-            "drive straight up Interstate 5'.",
-            "Clock-face or map-axis phrasing instead of a compass word: 'head towards "
-            "the 12 o'clock position on your map'.",
-            "Mildly surprising, where a national stereotype misleads: Detroit is NORTH "
-            "of Windsor, Canada.",
-            "Clearly counter-intuitive: the true bearing contradicts what most people "
-            "assume from climate, culture or rough mental maps.",
-            "Strongly counter-intuitive, needing real geographic knowledge: 'Venice sits "
-            "closer to the icy top of the world than Halifax' (Venice IS north of "
-            "Halifax).",
+            "Both places are globally famous and the bearing matches everyone's "
+            "mental map. Oslo and Rome; Cairo and Johannesburg.",
+            "Still uncontroversial, but needs the reader to place the two "
+            "countries correctly. Warsaw and Athens; Lima and Caracas.",
+            "A stereotype misleads. Detroit and Windsor: Canada is 'above' the "
+            "USA, yet Detroit is the northern one. Reno and Los Angeles: Reno is "
+            "further west.",
+            "Clearly counter-intuitive. Most educated readers would guess wrong: "
+            "the bearing contradicts what climate, culture or a rough mental map "
+            "suggests.",
+            "Strongly counter-intuitive, needing real knowledge of latitudes or "
+            "longitudes. Venice is north of Halifax. Nairobi is east of Rio de "
+            "Janeiro. Most people are confident and wrong.",
         ],
         hop_rule=(
-            "North/south and east/west compose along their own axis. State two links "
-            "and let the reader chain them:\n"
+            "North/south and east/west compose along their own axis:\n"
             "  A is north of C  +  C is north of B   =>  A is north of B\n"
-            "Diagonals compose only when both steps share the diagonal (northeast + "
-            "northeast => northeast). Do NOT chain a north step with an east step and "
-            "claim northeast — that is not forced unless the distances make it so, and "
-            "the reader cannot know them."),
+            "Diagonals compose only when BOTH steps share the same diagonal "
+            "(northeast + northeast => northeast). Never chain a north step with "
+            "an east step and claim northeast: that is not forced unless the "
+            "distances happen to make it so, and the reader cannot know them."),
         hop_example=(
-            "Kampala sits further up the 12 o'clock axis than Khartoum, and Khartoum in "
-            "turn sits further up that same axis than Cairo. "
-            "(A=Kampala, C=Khartoum, B=Cairo — all three named, both links stated.)"),
-        note="CRITICAL: cardinal is currently SATURATED — the model already answers "
-             "97-100% correctly, so easy items are worthless. Every new item must be "
-             "genuinely HARD: the honest bearing must surprise an educated reader. If a "
-             "well-informed person would answer instantly, do not include it."),
+            "Kampala sits further from the North Pole than Khartoum, and Khartoum "
+            "in turn sits further from the North Pole than Cairo. "
+            "(A=Kampala, C=Khartoum, B=Cairo — all three named, both links "
+            "stated. Level 6 is the ONE place a directional phrase is allowed, "
+            "because without it there is no chain to compose.)"),
+        note=(
+            "READ THIS FIRST — it is the reason this dataset is being rebuilt.\n"
+            "\n"
+            "A model currently answers 97-100% of the existing cardinal items "
+            "correctly. Not because it knows geography, but because the previous "
+            "descriptions gave the answer away:\n"
+            "\n"
+            "    \"Despite assumptions about climate, Calgary actually sits closer\n"
+            "     to the top of the globe than Yangon.\"\n"
+            "\n"
+            "\"Closer to the top of the globe\" means north. The reader never needs "
+            "to know where Calgary or Yangon are — swap in any two names and the "
+            "answer is unchanged. The item measures paraphrase decoding, not "
+            "spatial knowledge, and that is why the task is saturated.\n"
+            "\n"
+            "THE HEADLINE RULE: on Levels 1-5, the description must NOT encode "
+            "the direction in any form. It introduces the two places and stops. "
+            "The answer must come from knowing where they are.\n"
+            "\n"
+            "FORBIDDEN anywhere in a Level 1-5 description — this list is not "
+            "exhaustive, the rule is the intent behind it:\n"
+            "  compass words        north, south, east, west, and compounds\n"
+            "  map metaphors        top/bottom/left/right of the map, upward,\n"
+            "                       downward, leftward, rightward, above, below\n"
+            "  clock bearings       12 o'clock, 3 o'clock, any dial reference\n"
+            "  sun references       sunrise, sunset, morning sun, setting sun,\n"
+            "                       greets the sun earlier\n"
+            "  pole/equator refs    closer to the pole, toward the Arctic, nearer\n"
+            "                       the equator, higher latitude\n"
+            "  travel directions    head up, drive down, travel toward the left\n"
+            "  quadrant language    upper left, lower right, diagonally up\n"
+            "\n"
+            "    BAD  \"Reykjavik sits closer to the top of the globe than\n"
+            "          Vientiane.\"\n"
+            "          (states the answer; no geography needed)\n"
+            "\n"
+            "    GOOD \"Reykjavik is Iceland's coastal capital. Vientiane sits on\n"
+            "          the Mekong in Laos.\"\n"
+            "          (identifies both places; the reader must know the\n"
+            "           latitudes)\n"
+            "\n"
+            "What the description IS for: disambiguating the two places and "
+            "giving them enough context to be well-posed — which country, which "
+            "river, which region. Never their relative position.\n"
+            "\n"
+            "Level 6 is the single exception, explained under that level."),
+        extra_rules=[
+            "NO TEMPLATES. The previous batch produced 144 rows from 48 sentence "
+            "frames, each reused three times with only the names swapped, and 16 "
+            "explanations reused nine times each. That inflates the row count "
+            "without adding information. Every description must be a distinct "
+            "sentence, and no two may share a recognisable frame. If you find "
+            "yourself writing \"Traveling from X, ... to reach Y\" a second time, "
+            "rewrite it.",
+            "Vary sentence length and shape: some one clause, some two; some "
+            "leading with the subject, some with the object; some naming a "
+            "river, a coastline, an economic role, a founding date.",
+            "Every `explanation` must also be distinct and must state the actual "
+            "reason — which latitude or longitude relation holds, and why a "
+            "reader might get it wrong. Not \"the phrase indicates a northern "
+            "trajectory\".",
+            "Prefer well-known cities over obscure ones. The task is to test "
+            "whether the model KNOWS the geography, so the places must be ones a "
+            "knowledgeable person could reasonably be expected to place.",
+        ]),
 
     "topological": dict(
         n_per_cell=5,
@@ -216,6 +282,12 @@ def build(rel: str, spec: dict) -> str:
         hop_rule=spec["hop_rule"], hop_example=spec["hop_example"],
         hop_labels=", ".join(spec["hop_labels"]))
 
+    extra = spec.get("extra_rules") or []
+    extra_block = ""
+    if extra:
+        extra_block = "\n" + "\n\n".join(
+            f"{chr(65 + i)}. {r}" for i, r in enumerate(extra)) + "\n"
+
     return f"""# TASK: generate {total} new spatial-relation examples ({rel})
 
 You are extending a research dataset used to test how well language models
@@ -296,7 +368,7 @@ Columns:
 source_entity,source_geometry,target_entity,target_geometry,corpus,via_entity,relation_type,relation_label,explanation,ambiguity_level
 
 ## Additional rules
-
+{extra_block}
 1. The label describes A with respect to B, in that order.
 2. Do not reuse any (source_entity, target_entity) pair listed at the bottom.
 3. Do not use the same pair twice in your own output.

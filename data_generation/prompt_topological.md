@@ -168,38 +168,38 @@ Note these predate the `via_entity` column, so it is empty in all of them.
 State of California,Polygon,City of Los Angeles,Polygon,"The State of California fully envelops the sprawling jurisdiction of the City of Los Angeles in its southern half.",,topological,contains,"A state polygon fully encompasses a city administrative polygon.",Level 1
 Lake Nicaragua,Polygon,Ometepe Island,Polygon,"The massive Central American freshwater basin completely wraps around the twin-volcano island landmass.",,topological,contains,"A lake polygon serving as the complete boundary for a volcanic island polygon.",Level 2
 State of Texas,Polygon,The Alamo Mission Footprint,Polygon,"The sprawling state lines completely serve as the absolute boundary box for the historical mission's real estate.",,topological,contains,"A massive state polygon acting as the absolute container for a historical architectural polygon.",Level 3
-Australia,Polygon,Australian Capital Territory,Polygon,"The massive continental bounds completely serve as the absolute container for the inland capital territory governing the nation.",,topological,contains,"A massive continental polygon completely enclosing a specific administrative territory.",Level 4
-Switzerland,Polygon,Campione d'Italia,Polygon,"The Swiss cantons completely encircle the tiny Italian exclave situated near the waters of Lake Lugano, isolating it from the Italian mainland.",,topological,contains,"A sovereign nation acting as the geographic container for a tiny foreign exclave.",Level 5
-City of Paris,Polygon,France,Polygon,"The densely populated capital city is strictly bounded by the national frontiers of the European nation.",,topological,within,"A city polygon entirely trapped by a nation polygon.",Level 1
-Badlands National Park,Polygon,State of South Dakota,Polygon,"The eroded buttes and pinnacles of the federal preserve are completely surrounded by the midwestern state boundaries.",,topological,within,"A park trapped by a complete geometric host.",Level 2
-Abyei Demilitarized Box,Polygon,Republic of Sudan,Polygon,"The highly contested, jointly administered zone is strictly bound by the sovereign national borders.",,topological,within,"A specialized demilitarized administrative zone completely encircled by a national polygon.",Level 3
-Busingen am Hochrhein,Polygon,Swiss Canton of Schaffhausen,Polygon,"The German municipal exclave operates entirely locked inside the Swiss regional borders, utilizing Swiss public services and currency.",,topological,within,"A foreign municipal exclave completely trapped by a host nation's regional canton.",Level 4
-United Nations Headquarters,Polygon,Borough of Manhattan,Polygon,"Despite its international diplomatic status, the physical real estate sits entirely confined inside the municipal borders of the massive urban grid.",,topological,within,"An international legal polygon physically completely confined inside a city borough polygon.",Level 5
+Uzbekistan,Polygon,Sokh District,Polygon,"The central Asian republic completely bounds the foreign administrative region.",,topological,contains,"Uzbekistan fully encloses Sokh District.",Level 4
+Australia,Polygon,Australian Capital Territory,Polygon,"The massive continental bounds completely serve as the absolute host for the inland capital territory governing the nation.",,topological,contains,"A massive continental polygon completely enclosing a specific administrative territory.",Level 5
+Central Park,Polygon,State of New York,Polygon,"The massive green rectangle located in Manhattan is completely enclosed by the state lines.",,topological,within,"A park polygon completely enveloped by a state polygon.",Level 1
+San Marino,Polygon,Republic of Italy,Polygon,"The ancient microstate is completely encircled by the sovereign territory, locking it permanently inland.",,topological,within,"A sovereign nation completely enveloped by an absolute geographic host.",Level 2
+City of Hamtramck,Polygon,City of Detroit,Polygon,"The smaller, independent municipality is perfectly trapped by the massive automotive hub, isolating it from the rest of the county.",,topological,within,"A minor city completely surrounded by a major city donut hole.",Level 3
+The Pentagon Grounds,Polygon,State of Virginia,Polygon,"The massive military structure and its sprawling parking infrastructure are completely encapsulated by the local county lines.",,topological,within,"A massive military footprint completely bounded by a state-level administrative polygon.",Level 4
+Camp David,Polygon,Catoctin Mountain Park,Polygon,"The highly secure, restricted perimeter of the Presidential retreat is completely hidden and locked deep inside the forested boundaries of the public federal preserve in Maryland.",,topological,within,"A classified, restricted federal polygon fully bounded by a public federal park polygon.",Level 5
 State of Colorado,Polygon,State of New Mexico,Polygon,"The southern edge of the State of Colorado meets the northern edge of the State of New Mexico forming a perfectly straight latitudinal line.",,topological,touches,"Two state administrative polygons meeting at a shared edge with no internal intersection.",Level 1
-Vatican City,Polygon,City of Rome,Polygon,"The ancient masonry walls that define the Vatican stand right at the municipal edge of the Italian capital.",,topological,touches,"A sovereign microstate polygon meeting a city municipal polygon at a physical wall.",Level 2
-City of Detroit,Polygon,City of Windsor,Polygon,"The American and Canadian municipalities sit flush against the international boundary drawn invisibly down the center of the Detroit River.",,topological,touches,"Two city polygons from different nations that share a continuous aquatic border.",Level 3
-Republic of Botswana,Polygon,Republic of Zambia,Polygon,"Near the Kazungula Bridge, the sovereign territories converge at a highly specific 150-meter micro-boundary precisely in the middle of the Zambezi River.",,topological,touches,"Two massive national polygons that meet at an incredibly tiny, almost microscopic linear boundary.",Level 4
-Vennbahn Railway Right-of-Way,Polygon,German Micro-Enclaves,MultiPolygon,"The narrow transit corridor slices through the landscape, abutting the fragmented sovereign territories it creates without entering them.",,topological,touches,"A narrow transit polygon abutting highly fractured micro-enclave polygons.",Level 5
-Suez Canal,LineString,Egypt,Polygon,"The engineered waterway cuts a path straight through the desert sands of the nation.",,topological,crosses,"An artificial canal traversing a national polygon.",Level 1
-Tropic of Capricorn,LineString,Australia,Polygon,"The global latitudinal line traverses the arid red center of the massive continent.",,topological,crosses,"An abstract planetary boundary line traversing a massive landmass polygon.",Level 2
-Eurotunnel Subterranean Tube,LineString,English Channel Maritime Zone,Polygon,"The massive transit architecture bores deep in the bedrock, threading directly under the national maritime jurisdiction.",,topological,crosses,"A subterranean line traversing a maritime polygon.",Level 3
-Appalachian Trail,LineString,Mason-Dixon Line,LineString,"The legendary hiking path weaves a route directly over the historical survey boundary severing the northern and southern states.",,topological,crosses,"A physical hiking trail line intersecting a historical boundary line.",Level 4
-Trans-Canada Highway Ribbon,LineString,Precambrian Canadian Shield,Polygon,"The massive continental road network threads its asphalt trajectory entirely through the exposed, ancient geological bedrock of the north.",,topological,crosses,"A highway passing completely through a massive geological polygon.",Level 5
-United Kingdom,Polygon,New Zealand,Polygon,"The British Isles and the Kiwi islands sit at nearly perfectly opposite ends of the planetary sphere.",,topological,disjoint,"Two island nations geographically completely severed from one another.",Level 1
-Nile River,LineString,Amazon River,LineString,"The longest waterway in Africa flows completely independently from the massive river network dominating South America.",,topological,disjoint,"Two massive river line geometries on different continents.",Level 2
-Brooklyn Bridge,LineString,East River,Polygon,"The suspended roadway of the Brooklyn Bridge spans high in the air above the East River without its physical structure ever making contact with the water's surface.",,topological,disjoint,"A bridge line geometry and a river polygon geometry that overlap in a 2D map but are strictly separated in 3D topological space.",Level 3
-Northwest Angle,Polygon,Contiguous United States,MultiPolygon,"Although legally part of Minnesota, the Northwest Angle is completely severed from the lower 48 states by the waters of the Lake of the Woods, requiring travelers to drive through Canada to reach it.",,topological,disjoint,"An exclave polygon and its parent MultiPolygon that share absolutely zero intersecting spatial coordinates due to an aquatic barrier.",Level 4
-London Underground Central Line Subterranean Track,LineString,River Thames Surface Water,Polygon,"The commuter rail dives deep into the clay earth beneath the capital, maintaining perfect vertical isolation from the historic waters above.",,topological,disjoint,"A subterranean transit line perfectly isolated in 3D space from a surface water body.",Level 5
-Navajo Nation,Polygon,State of Arizona,Polygon,"The tribal lands of the Navajo Nation cover a large portion of northeastern Arizona while holding lands elsewhere.",,topological,overlaps,"A tribal polygon and a state polygon sharing a massive interior area.",Level 1
-Andes Mountains,Polygon,Chile,Polygon,"The massive Andes mountain range blankets the entire eastern border region of Chile while also sprawling deep into Argentina.",,topological,overlaps,"A physical geological polygon and a political national polygon partially intersect.",Level 2
-The Alps,Polygon,Switzerland,Polygon,"The massive multinational geological footprint heavily shares space with the sovereign national territory of the Swiss.",,topological,overlaps,"A massive multinational geological polygon sharing interior space with a nation.",Level 3
-Tornado Alley,Polygon,State of Oklahoma,Polygon,"The dangerous meteorological zone heavily encompasses the entire state while bleeding outward into the surrounding plains.",,topological,overlaps,"A meteorological zone polygon intersecting heavily with a state polygon.",Level 4
-Kuril Islands,MultiPolygon,Japanese Territorial Claim,Polygon,"The competing diplomatic maps mutually project over the exact same frigid island chain in the northern Pacific.",,topological,overlaps,"A physical multi-polygon sharing identical coordinates with a diplomatic claim.",Level 5
-Principality of Monaco,Polygon,City of Monaco,Polygon,"The sovereign microstate and its single integrated municipality are entirely synonymous in their territorial extent.",,topological,equals,"A national polygon and a city polygon that are perfectly identical.",Level 1
-Vatican City,Polygon,Holy See Territory,Polygon,"The physical masonry walls that define Vatican City map perfectly to the sovereign territorial limits of the Holy See.",,topological,equals,"Physical architectural polygon maps exactly 1:1 with international legal polygon.",Level 2
-State of Rhode Island,Polygon,Providence Plantations,Polygon,"The modern geometric borders of the State of Rhode Island map flawlessly to the historical colonial land-grant lines of the Providence Plantations.",,topological,equals,"A modern administrative polygon and a historical legal polygon that resolve to the exact same geometric coordinates.",Level 3
-City of London,Polygon,The Square Mile,Polygon,"The ancient, independently governed municipal enclave officially known as the City of London shares a rigidly exact and identical topological footprint with the financial district colloquially defined as the Square Mile.",,topological,equals,"Two completely different semantic named entities (one historical/administrative, one colloquial/financial) that resolve to the exact same geospatial polygon.",Level 4
-Demilitarized Zone (DMZ),Polygon,1953 Korean Armistice Ceasefire Buffer,Polygon,"The heavily fortified physical perimeter of the DMZ seamlessly mirrors the theoretical boundaries drafted in the 1953 Korean Armistice Ceasefire Buffer agreement, creating a perfect mapping symmetry.",,topological,equals,"A physically constructed military buffer zone perfectly matching a legally codified treaty polygon down to the coordinate level.",Level 5
+State of Alaska,Polygon,Yukon Territory,Polygon,"The eastern frontier of the US state of Alaska meets the western edge of the Canadian territory of Yukon along a perfectly straight longitudinal line.",,topological,touches,"The administrative polygon of the US exclave meets the Canadian territory along a shared linear boundary without interior intersection.",Level 2
+State of Utah,Polygon,State of New Mexico,Polygon,"At the Four Corners Monument, the southeastern tip of Utah and the northwestern corner of New Mexico converge at exactly one singular mathematical coordinate.",,topological,touches,"Two state administrative polygons that meet at exactly one shared vertex without any shared interior area or linear edge.",Level 3
+Bir Tawil,Polygon,Hala'ib Triangle,Polygon,"The universally unclaimed territory of Bir Tawil and the fiercely disputed Hala'ib Triangle converge exclusively at a single zero-dimensional vertex located at the intersection of the 22nd parallel north and the 34th meridian east.",,topological,touches,"Two distinct administrative polygons that meet at exactly one mathematical coordinate without sharing any linear border.",Level 4
+Vatican City Masonry Walls,Polygon,City of Rome Streets,Polygon,"The ancient defensive fortifications stand right at the municipal edge of the Italian capital's modern thoroughfares, creating a hard stop to Italian jurisdiction.",,topological,touches,"A sovereign microstate wall abutting a city municipal polygon.",Level 5
+Trans-Siberian Railway,LineString,Ural Mountains,Polygon,"The famous Trans-Siberian Railway makes its way completely through the Ural Mountains to link Europe to Asia.",,topological,crosses,"A railway line passes through both the exterior and interior of a mountain range polygon.",Level 1
+River Thames,LineString,City of London,Polygon,"The historic waterway snakes right through the center of the massive British metropolis.",,topological,crosses,"A river line traversing a city polygon.",Level 2
+Channel Tunnel,LineString,Prime Meridian,LineString,"The subterranean transit line intersects the global longitude line deep beneath the ocean floor.",,topological,crosses,"A subterranean transit line intersecting a global latitudinal line.",Level 3
+Alaska Highway,LineString,Yukon,Polygon,"The historic northern supply road threads a path through the vast Canadian territory.",,topological,crosses,"Alaska Highway cuts through Yukon.",Level 4
+South Pole Station Flight Path,LineString,Convergence of 360 Meridians,MultiLineString,"The ascending aircraft banks in a tight arc, sequentially slicing through every single invisible global longitude line radiating from the planetary axis.",,topological,crosses,"A local transit LineString intersecting a planet-spanning MultiLineString network.",Level 5
+New Zealand,Polygon,Greenland,Polygon,"New Zealand sits near the Antarctic, completely separated from the icy landmass of Greenland near the Arctic.",,topological,disjoint,"Two island polygons at opposite ends of the earth.",Level 1
+Iceland,Polygon,Antarctica,Polygon,"The volcanic island in the North Atlantic sits at the extreme opposite end of the globe from the frozen southern continent.",,topological,disjoint,"Two landmass polygons with extreme global separation.",Level 2
+Cabinda Province,Polygon,Mainland Angola,Polygon,"The oil-rich territory is totally severed from the national mainland by a narrow strip of the Democratic Republic of the Congo.",,topological,disjoint,"An administrative polygon physically isolated from its parent nation.",Level 3
+Channel Islands,MultiPolygon,United Kingdom,Polygon,"Despite being British Crown Dependencies, the Channel Islands are situated off the coast of Normandy, sharing no spatial coordinates with the sovereign footprint of the United Kingdom.",,topological,disjoint,"Testing the difference between political affiliation and spatial geometry; the dependent MultiPolygon is totally separated from the sovereign Polygon.",Level 4
+Bosphorus Bridge Roadway,LineString,Bosphorus Strait,Polygon,"Massive suspension pylons keep the transcontinental roadway completely elevated above the turbulent shipping lanes connecting the two seas.",,topological,disjoint,"An elevated bridge line strictly separated from a maritime strait polygon.",Level 5
+Gobi Desert,Polygon,Mongolia,Polygon,"The sweeping sands cover the southern half of Mongolia and reach down into northern China.",,topological,overlaps,"A desert polygon partially intersecting a national polygon.",Level 1
+Falkland Islands EEZ,Polygon,Argentine Sea,Polygon,"The projected maritime boundaries clash and mutually share a vast swath of the turbulent South Atlantic ocean.",,topological,overlaps,"Two abstract legal maritime polygons intersecting across a vast ocean.",Level 2
+Hala'ib Triangle,Polygon,Egyptian Territorial Claim,Polygon,"The contested boundary shares a significant contested geographic zone with the southern sovereign claims made by Cairo.",,topological,overlaps,"A contested geographic polygon partially intersecting with a national claim polygon.",Level 3
+Argentine Antarctica Claim,Polygon,British Antarctic Territory,Polygon,"Under the frozen geopolitical realities of the South Pole, the pie-shaped sovereign territorial claim of Argentina massively encroaches upon the wedge claimed by the United Kingdom.",,topological,overlaps,"Two sovereign legal polygons projecting over the exact same physical landmass, resulting in a massive zone of shared coordinates.",Level 4
+Falkland Islands EEZ,Polygon,Argentine Sea,Polygon,"The 200-nautical-mile economic projection extending outward from the British islands deeply intrudes into the sovereign maritime territory recognized by Buenos Aires.",,topological,overlaps,"Two abstract legal maritime polygons that clash and intersect mutually in a vast swath of ocean.",Level 5
+City of Jacksonville,Polygon,Duval County,Polygon,"The consolidated government covers the entire county area, creating a perfectly mirrored geographic map.",,topological,equals,"A city and county that share a single territorial perimeter.",Level 1
+City of Richmond,Polygon,Independent City of Richmond,Polygon,"The Virginian capital projects the exact identical footprint as its unattached municipal zone.",,topological,equals,"City of Richmond has the same area as Independent City of Richmond.",Level 2
+Principality of Monaco,Polygon,Municipality of Monaco,Polygon,"The sovereign European microstate and its single integrated municipality are entirely coextensive.",,topological,equals,"A national polygon and a city polygon that are perfectly identical.",Level 3
+Independent City of Baltimore,Polygon,City of Baltimore Municipal Limits,Polygon,"Operating completely outside the county system, the local municipality maps identically to its highest-level administrative tier.",,topological,equals,"Two distinct legal definitions mapping perfectly to the same urban footprint.",Level 4
+Independent City of St. Louis,Polygon,St. Louis County Municipal Boundary,Polygon,"Because it operates entirely independently, the municipal limits represent the exact same geographical footprint as its county-level equivalent.",,topological,equals,"Two distinct levels of civic administration mapping to a perfectly identical topological footprint.",Level 5
 
 ## Entity pairs already used — do not repeat these
 
@@ -211,14 +211,26 @@ Abyei Administrative Area | Republic of Sudan
 Abyei Area | Republic of South Sudan
 Abyei Area | Republic of Sudan
 Abyei Demilitarized Box | Republic of Sudan
+Africa | Cairo Governorate
+Alaska Highway | Yukon
+Alps | Himalayas
+Alps | Switzerland
 Amazon Basin | Andes Mountains Foothills
+Amazon Basin | Bolivia
+Amazon Basin | Congo Basin
 Amazon Basin | Peru
 Amazon Rainforest | Brazil
+Amazon Rainforest | Colombia
 Amazon River | Brazil
 Andes Mountains Foothills | Amazon Basin
 Andes Mountains | Chile
+Andes | Peru
+Angeles National Forest | Los Angeles County
+Antelope Island | Great Salt Lake
 Appalachian Footpath | Mason-Dixon Survey Line
 Appalachian Mountains | State of Pennsylvania
+Appalachian Mountains | State of Tennessee
+Appalachian Mountains | State of Virginia
 Appalachian Trail Southern Terminus | Springer Mountain Summit
 Appalachian Trail | Mason-Dixon Line
 Appalachian Trail | Potomac River
@@ -229,11 +241,16 @@ Argentine Antarctica Claim | British Antarctic Territory
 Artificial Panama Canal Trench | Continental Divide Geological Ridge
 Artificial Suez Canal Trench | Sinai Desert Landmass
 Ashmore and Cartier Islands | Commonwealth of Australia Maritime Bounds
+Asia | City of Kyoto
+Atacama Desert | Andes Mountains
+Atlantic Ocean | Ascension Island
 Australia | Australian Capital Territory
 Australia | Canada
+Australia | New Zealand
 Australia | Uluru
 Australian Capital Territory | New South Wales
 Australian Continent | Lake Eyre Basin
+Ayers Rock | Uluru
 Baarle-Hertog Cadastral Plots | Baarle-Nassau Cadastral Plots
 Baarle-Hertog Municipality | Baarle-Nassau Municipality
 Baarle-Nassau Border Monument 214 | Belgian-Dutch Sovereignty Line
@@ -252,9 +269,11 @@ Borough of Staten Island | Richmond County
 Borough of The Bronx | Bronx County
 Bosphorus Bridge Roadway | Bosphorus Strait
 Bosphorus Bridge | Bosphorus Strait
+Brahmaputra River | Himalayas
 Brazil | Argentina
 Brooklyn Bridge Roadway | East River Surface
 Brooklyn Bridge | East River
+Brooklyn Heights | City of New York
 Buckingham Palace | City of London
 Busingen am Hochrhein | Federal Republic of Germany
 Busingen am Hochrhein | Mainland Germany
@@ -266,23 +285,40 @@ Camp David Restricted Perimeter | Catoctin Mountain Park
 Camp David | Catoctin Mountain Park
 Camp Zeist Legal Compound (1999) | Kingdom of the Netherlands
 Campione d'Italia | Mainland Italy
+Canada | Brazil
 Canada | Province of Saskatchewan
 Canada | United States
+Capitol Hill | City of Seattle
 Catacombs of Paris Subterranean Network | City of Paris
 Central Park Reservoir | New York City Municipal Grid
 Central Park | State of New York
+Ceuta | Mainland Spain
 Challenger Deep | Mariana Trench Geomorphic Bounds
 Channel Islands | United Kingdom
 Channel Islands | United Kingdom Mainland
 Channel Tunnel | English Channel
 Channel Tunnel | Prime Meridian
+City of Alamo Heights | City of San Antonio
 City of Alexandria | Independent City of Alexandria
+City of Anaconda | Deer Lodge County
 City of Anchorage | Anchorage Municipality
+City of Athens | Clarke County
+City of Augusta | Richmond County
+City of Austin | State of Texas
 City of Baltimore | Independent City of Baltimore
+City of Barcelona | Spain
+City of Bellaire | City of Houston
+City of Berlin | Italy
+City of Berlin | State of Berlin
 City of Beverly Hills | City of Los Angeles
+City of Boston | City of Cambridge
+City of Boston | City of Providence
 City of Broomfield | Broomfield County
+City of Butte | Silver Bow County
 City of Carson City | Consolidated Municipality of Carson City
 City of Chicago | City of Houston
+City of Chicago | City of Milwaukee
+City of Chicago | State of Illinois
 City of Columbus | State of Ohio
 City of Dallas | City of Fort Worth
 City of Denver | Denver County
@@ -290,42 +326,76 @@ City of Denver | State of Colorado
 City of Detroit | City of Hamtramck
 City of Detroit | City of Windsor
 City of El Paso | Ciudad Juarez
+City of Geneva | Canton of Geneva
+City of Hampton | Independent City of Hampton
 City of Hamtramck | City of Detroit
 City of Honolulu | Mainland United States
+City of Indianapolis | State of Indiana
 City of Jacksonville | Duval County
 City of Juneau | Juneau Borough
+City of Kyoto | Japan
+City of Las Vegas | City of Henderson
+City of Lexington | Fayette County
 City of London Corporation | Greater London Authority
+City of London | France
 City of London | The Square Mile
 City of London | United Kingdom
 City of Los Angeles | City of Beverly Hills
+City of Lyon | France
 City of Madrid | Spain
+City of Miami | City of Fort Lauderdale
 City of Miami | City of Seattle
+City of Miami | State of Florida
+City of Milan | Italy
 City of Minneapolis | City of St. Paul
+City of Munich | Germany
 City of Nashville | Davidson County
+City of New York | City of Jersey City
+City of Newport News | Independent City of Newport News
+City of Norfolk | Independent City of Norfolk
 City of Norwood | City of Cincinnati
 City of Orlando | State of Florida
 City of Paris | Catacombs of Paris Subterranean Network
 City of Paris | City of Tokyo
+City of Paris | Department of Paris
 City of Paris | France
 City of Philadelphia | Philadelphia County
+City of Phoenix | City of Scottsdale
 City of Phoenix | State of Arizona
+City of Richmond | Independent City of Richmond
+City of Roanoke | Independent City of Roanoke
 City of Rome | Italy
 City of Rome | Vatican City
 City of Sacramento | State of California
+City of San Diego | City of Tijuana
 City of San Diego | Mexico
+City of San Fernando | City of Los Angeles
+City of San Francisco | City and County of San Francisco
+City of San Francisco | City of Oakland
 City of San Francisco | San Francisco County
+City of San Jose | City of Santa Clara
+City of San Jose | State of California
 City of Seattle | City of Bellevue
 City of Seattle | State of Washington
 City of Sitka | Sitka Borough
 City of Springfield | State of Illinois
 City of St. Louis | Independent City of St. Louis
 City of Sydney | City of Cape Town
+City of Sydney | New Zealand
+City of Tokyo | South Korea
+City of Toronto | Mexico
+City of Vienna | State of Vienna
 City of Washington | District of Columbia
+City of West Hollywood | City of Los Angeles
+Clark County | State of Nevada
+Coconino National Forest | Yavapai County
 Colorado River | Grand Canyon National Park
+Colorado River | State of Arizona
 Colorado River | State of Utah
 Commonwealth of Australia | Ashmore and Cartier Islands
 Congo Basin | Democratic Republic of the Congo
 Constantinople Walled City (1453) | Fatih District of Istanbul
+Cook County | City of Evanston
 Dahala Khagrabari | Cooch Behar District
 Dahlak Archipelago | Red Sea
 Danube River | Hungary
@@ -333,29 +403,39 @@ Death Valley Below-Sea-Level Basin | State of California
 Demilitarized Zone (DMZ) | 1953 Ceasefire Buffer Zone
 Demilitarized Zone (DMZ) | 1953 Korean Armistice Ceasefire Buffer
 Denali Wilderness Area | State of Alaska
+Denmark | City of Copenhagen
 Diego Garcia | Indian Ocean
 Diomede Islands Maritime Border | International Date Line
 Dutch Baarle-Nassau Enclave N8 | Belgian Baarle-Hertog Enclave H22
 Easter Island Landmass | Republic of Chile Maritime Claims
+Egypt | South Africa
 Egypt | Sudan
 Eiffel Tower Spire Tip | Highest Architectural Node of Paris
 Eiffel Tower | City of Paris
 English Channel | French Coast
+English Channel | La Manche
 Equator | Amazon River
 Equator | Lake Victoria
+Europe | City of Paris
 Eurostar Railway | France
 Eurotunnel Subterranean Tube | English Channel Maritime Zone
 Eurotunnel Subterranean Tube | English Channel Surface Waters
 Eurotunnel Terminal Boundary | French Maritime Customs Zone
 Eurotunnel Terminal Entrance | French Customs Zone
 Falkland Islands EEZ | Argentine Sea
+Falkland Islands | Mainland Argentina
 Falkland Islands | United Kingdom
 Falkland Islands | United Kingdom Mainland
+Federal Republic of Germany | Germany
+Finland | City of Helsinki
 Four Corners Monument Plaque | State of Arizona Boundary
 Four Corners Monument | State of Utah
 France | City of Paris
+France | Llivia
 France | Spain
 French Guiana | Metropolitan France
+French Quarter | City of New Orleans
+French Republic | France
 Gaza Strip | Egypt
 Geographic North Pole | Convergence of All Longitude Lines
 Geographic South Pole | 90 Degrees South Latitude
@@ -371,22 +451,30 @@ Gotthard Base Tunnel North Portal | Swiss Alps Geomorphic Base
 Gotthard Base Tunnel Portal | Swiss Alps Base
 Gotthard Base Tunnel | Rhine River Watershed
 Gotthard Base Tunnel | Swiss Alps Surface
+Grand Island | Lake Superior
 Grand Teton National Park | State of Wyoming
 Great Barrier Reef | Coral Sea
+Great Basin Desert | State of Nevada
+Great Plains | State of Kansas
 Great Pyramid Perimeter | King's Chamber Subterranean Volume
+Great Rift Valley | Ethiopia
 Great Rift Valley | Kenya
+Great Rift Valley | Republic of Kenya
 Great Victoria Desert | South Australia
 Great Victoria Desert | Western Australia
 Great Wall of China | Japan
 Greater London Authority | City of London Corporation
+Greenland | Antarctica
 Guantanamo Bay Naval Base | United States Mainland
 Gulf Stream | North Atlantic
 Hala'ib Triangle | Egyptian Territorial Claim
 Himalaya Mountains | Nepal
+Himalayas | Tibetan Plateau
 Historic Route 66 Asphalt | Mississippi River Hydrological Flow
 Historical Mount McKinley Summit | Modern Denali Summit
 Historical Ottoman Empire Footprint (1683) | Modern European Union Territory
 Historical Roman Empire (AD 117) | Modern European Union
+Hollywood | City of Los Angeles
 Hoover Dam Concrete Face | Lake Mead
 Hoover Dam Concrete Face | Lake Mead Water Volume
 Hopi Reservation | Navajo Nation
@@ -398,34 +486,55 @@ Independent City of Baltimore | City of Baltimore
 Independent City of Baltimore | City of Baltimore Municipal Limits
 Independent City of St. Louis | St. Louis County Municipal Boundary
 India | Nepal
+Indian Ocean | Christmas Island
 Indian Ocean | Diego Garcia
 Inner Temple Legal Precinct | City of London Corporation
 International Date Line (Conceptual) | 180 Degrees Longitude
 International Space Station Docking Ring | SpaceX Crew Dragon Adapter
+Interstate 10 | State of Texas
 Interstate 15 | Mojave Desert
+Interstate 35 | City of Austin
 Interstate 40 | State of Arizona
+Interstate 40 | State of New Mexico
+Interstate 405 | City of Los Angeles
+Interstate 5 | City of Seattle
+Interstate 5 | State of California
 Interstate 70 | State of Colorado
+Interstate 70 | State of Utah
+Interstate 80 | City of Salt Lake City
 Interstate 80 | Continental Divide
+Interstate 80 | State of Nevada
+Interstate 90 | State of Idaho
 Interstate 90 | State of South Dakota
 Interstate 95 Asphalt | Mason-Dixon Historical Boundary
+Interstate 95 | City of Philadelphia
 Interstate 95 | Mason-Dixon Line
 Isla del Sol | Lake Titicaca
 Island of Malta | Mediterranean Sea
 Island of Oahu | Pacific Ocean
+Isle of Man | Northern Ireland
 Isle of Wight | Mainland England
+Italian Republic | Italy
 Italy | City of Rome
 Italy | San Marino
 Japan | Brazil
+Japan | United Kingdom
 Kalahari Desert | Botswana
+Kalahari Desert | Mojave Desert
+Kalahari Desert | Republic of Namibia
 Kaliningrad Oblast | Mainland Russia
 Kashmir Region | Indian Territorial Claim
+Kern County | State of California
+King County | City of Redmond
 King's Chamber Subterranean Volume | Great Pyramid Perimeter
 Kingdom of Lesotho | Indian Ocean Maritime Boundary
 Kingdom of Lesotho | South African Borders
 Kingdom of Saudi Arabia | Rub' al Khali Desert
+Kingdom of Spain | Spain
 Kurdish Inhabited Region | Republic of Turkey
 Kurdish Inhabited Region | Turkey
 Kuril Islands | Japanese Territorial Claim
+Kyrgyzstan | Vorukh
 Lake Baikal | Caspian Sea
 Lake Eyre Basin | Australian Continent
 Lake Nicaragua | Ometepe Island
@@ -433,38 +542,53 @@ Lake Superior | Isle Royale
 Lake Victoria | Lake Superior
 Lake Victoria | Ssese Islands
 Lake Vostok Subglacial Volume | Antarctic Ice Sheet
+Lincoln Park | City of Chicago
 Little Diomede Island | Big Diomede Island
 Loch Ness Water Volume | Great Glen Fault
 Lombard Street | Broadway (New York)
 London Underground Central Line Subterranean Track | River Thames Surface Water
+Mackinac Island | Lake Huron
 Madagascar | Indian Ocean
 Madagascar | Mainland Africa
+Madagascar | Sri Lanka
 Main Crater Lake | Vulcan Point Island
 Manitoulin Island | Lake Huron
 Manitoulin Island | Lake Manitou
 Mariana Trench Geomorphic Lip | Abyssal Plain
 Mariana Trench | Pacific Ocean
+Maricopa County | City of Tempe
 Mauna Loa Magma Chamber | State of Hawaii
 Mediterranean Basin | European Union
 Mediterranean Deep Brine Pool | Mediterranean Sea Volume
+Mediterranean Sea | Corsica
 Mediterranean Sea | Island of Cyprus
 Mediterranean Sea | Island of Malta
+Mercer Island | Lake Washington
+Miami-Dade County | State of Florida
+Mid-Atlantic Ridge | Iceland
+Mississippi River | State of Arkansas
 Mississippi River | State of Louisiana
 Mojave Desert | State of California
 Mojave Desert | State of Nevada
 Mongolia | China
 Mount Everest Summit | Nepal-China Border
+Mount Everest | Sagarmatha
 Mount Fuji | Japan
+Mount Hood National Forest | Clackamas County
 Mount Kilimanjaro | Mount Everest
 Mount McKinley Summit | Denali Summit
 Mount Rainier Glacial Cap | Mount Rainier National Park
 Mount Rainier National Park | Mount Rainier Glacial Cap
+Mount Rainier | Tahoma
 Mount Titano Summit | Republic of San Marino
+Multnomah County | State of Oregon
 Municipality of Llivia | French Republic
 Nakhchivan Autonomous Republic | Mainland Azerbaijan
 Navajo Nation Reservation | Hopi Reservation
 Navajo Nation | Hopi Reservation
 Navajo Nation | State of Arizona
+Navajo Nation | State of New Mexico
+Navajo Nation | State of Utah
 Navigational International Date Line | Chukchi Sea Legal Boundary
 New Delhi District | Republic of India
 New York City Municipal Grid | Central Park Reservoir
@@ -472,29 +596,42 @@ New Zealand | Greenland
 Niagara Falls Horseshoe | Canada-US Border
 Niagara Falls | Canada-US Border
 Nile River | Amazon River
+Nile River | Republic of Sudan
 Nile River | Yellow River
 Nine-Dash Line Claim | Philippine Exclusive Economic Zone
 Nine-Dash Line Claim | Philippine Exclusive Economic Zone (EEZ)
+North America | State of Kansas
 North Pole | 90 Degrees North Latitude
 Northwest Angle | Contiguous United States
+Norway | City of Oslo
 Null Island | WGS84 Origin Coordinate
 O'Hare International Airport Bounds | City of Chicago
 Omani Exclave of Madha | Mainland Oman
 Omani Exclave of Madha | UAE Enclave of Nahwa
 Ometepe Island | Lake Nicaragua
+Orange County | City of Irvine
 PATH Train Tunnels | Hudson River
 PATH Train Tunnels | Hudson River Water Volume
 PATH Train Tunnels | New York-New Jersey State Line
 Pacific Ocean | Island of Oahu
 Pacific Ocean | Mariana Trench
 Pacific Ocean | Mediterranean Sea
+Pacific Ocean | Pitcairn Island
 Pacific Ocean | State of Hawaii
 Pampas Grassland | Argentina
+Pan-American Highway | State of Sonora
 Panama Canal | Isthmus of Panama
+Panama Canal | Panamá Province
 Panmunjom T2 Conference Table | Military Demarcation Line
+Patagonian Desert | Argentina
+Pelee Island | Lake Erie
+Persian Gulf | Arabian Gulf
+Pike National Forest | Douglas County
+Pine Ridge Indian Reservation | State of South Dakota
 Point Nemo Mathematical Isolation Zone | Pacific Ocean Maritime Bounds
 Point Nemo | Ducie Island
 Point Roberts Exclave | 49th Parallel North
+Poland | City of Warsaw
 Portugal | Atlantic Ocean
 Portugal | Spain
 Prime Meridian (Greenwich) | 0 Degrees Longitude
@@ -507,24 +644,37 @@ Prince Edward Islands | Republic of South Africa
 Principality of Monaco | City of Monaco
 Principality of Monaco | Municipality of Monaco
 Province of Alberta | Canada
+Province of Alberta | Province of Saskatchewan
 Pyrenees Mountains | France
 Red Sea | Dahlak Archipelago
+Republic of Armenia | Tigranashen
+Republic of Austria | Federal Republic of Germany
+Republic of Azerbaijan | Artsvashen
+Republic of Botswana | Republic of Namibia
 Republic of Botswana | Republic of Zambia
 Republic of Chile | Easter Island Landmass
+Republic of Chile | Republic of Argentina
+Republic of Croatia | Bosnia and Herzegovina
 Republic of Cyprus | UN Buffer Zone
 Republic of Cyprus | UN Buffer Zone in Cyprus
 Republic of India | New Delhi
+Republic of Ireland | Cyprus
 Republic of Ireland | Northern Ireland
 Republic of Italy | San Marino
 Republic of Italy | Sovereign Military Order of Malta Magistral Villa
+Republic of Senegal | Republic of Guinea-Bissau
+Ring of Fire | Pacific Ocean
 Ring of Fire | Pacific Plate
 Rio Grande | State of New Mexico
 River Thames | City of London
 River Thames | Mississippi River
 Rocky Mountains | Andes Mountains
+Rocky Mountains | Appalachian Mountains
 Rocky Mountains | Canada
+Rocky Mountains | Great Plains
 Rocky Mountains | State of Colorado
 Rocky Mountains | The Alps
+Rosebud Indian Reservation | State of South Dakota
 Route 66 | Colorado River
 Route 66 | Continental Divide
 Route 66 | Mississippi River
@@ -533,20 +683,31 @@ Royal Botanic Garden Sydney | City of Sydney
 Rub' al Khali Desert | Kingdom of Saudi Arabia
 Rust Belt | American Midwest
 Rust Belt | State of Ohio
+Sahara Desert | Algeria
 Sahara Desert | Amazon Rainforest
 Sahara Desert | Egypt
+Sahara Desert | Gobi Desert
+Sahara Desert | Libya
 Sahara Desert | Republic of Mali
+Sahara Desert | Sahel
 Sahara Desert | Sahel Region
+San Andreas Fault | State of California
 San Marino | Italian Peninsula
 San Marino | Republic of Italy
+Santa Clara County | City of Cupertino
 Scandinavia | Norway
+Scotland | England
 Seikan Tunnel | Tsugaru Strait
 Seikan Tunnel | Tsugaru Strait Water Volume
 Senegal | The Gambia
+Shohimardon | Kyrgyzstan
 Sonoran Desert | Mexico
+Sonoran Desert | State of Arizona
 South Africa | Kingdom of Lesotho
 South Africa | Russia
+South America | State of Amazonas
 South Pole Station Flight Path | Convergence of 360 Meridians
+Southern Ocean | Bouvet Island
 Sovereign Borders of The Gambia | Sovereign Borders of Senegal
 Sovereign Military Order of Malta HQ | City of Rome
 Sovereign Military Order of Malta Magistral Villa | Republic of Italy
@@ -557,17 +718,23 @@ Sri Lanka | India
 Ssese Islands | Lake Victoria
 St. Peter's Basilica Footprint | Vatican City Jurisdiction
 State of Alaska | Contiguous United States
+State of Alaska | Province of British Columbia
+State of Alaska | State of Hawaii
 State of Alaska | Yukon Territory
 State of Arizona | City of Phoenix
 State of Arizona | Grand Canyon National Park
 State of California | City of Los Angeles
 State of California | Death Valley Below-Sea-Level Basin
+State of California | Fresno County
 State of California | Pacific Ocean
 State of California | Yosemite National Park
 State of Colorado | City of Denver
 State of Colorado | State of New Mexico
+State of Florida | Orange County
 State of Florida | State of Washington
 State of Georgia (USA) | Republic of Georgia (Country)
+State of Georgia | Fulton County
+State of Hawaii | Contiguous United States
 State of Hawaii | Interstate Highway System
 State of Hawaii | Mauna Loa Magma Chamber
 State of Hawaii | North American Continent
@@ -575,18 +742,26 @@ State of Hawaii | State of Ohio
 State of Idaho | State of Montana
 State of Illinois | City of Springfield
 State of Kansas | State of Nebraska
+State of Libya | Egypt
 State of Maine | State of Arizona
+State of Maine | State of Florida
 State of Nevada | State of California
+State of Nevada | State of Utah
+State of New Mexico | State of Oklahoma
 State of New Mexico | White Sands National Park
 State of New York | Central Park
+State of New York | State of New Jersey
 State of New York | State of Pennsylvania
 State of North Dakota | State of South Dakota
 State of Ohio | City of Columbus
+State of Ohio | Franklin County
+State of Oregon | State of Idaho
 State of Oregon | State of Washington
 State of Queensland | State of New South Wales
 State of Rhode Island | Providence Plantations
 State of South Dakota | Badlands National Park
 State of Tasmania | Mainland Australia
+State of Texas | Bexar County
 State of Texas | City of Austin
 State of Texas | Gulf of Mexico
 State of Texas | The Alamo Mission Footprint
@@ -595,9 +770,13 @@ State of Utah | State of New Mexico
 State of Utah | Zion National Park
 State of Victoria | State of South Australia
 State of Washington | City of Seattle
+State of Washington | State of Maine
+State of Wisconsin | State of Illinois
+State of Wyoming | State of Montana
 Statue of Liberty | Eiffel Tower
 Sub-Seabed Chunnel Transit Line | French Maritime Legal Zone
 Suez Canal | Egypt
+Suez Canal | Ismailia Governorate
 Suez Canal | Panama Canal
 Suez Canal | Sinai Peninsula
 Svalbard Global Seed Vault Entrance | Equator
@@ -605,6 +784,8 @@ Svalbard Global Seed Vault Entrance | Platåberget Mountain Surface
 Svalbard Global Seed Vault Portal | Platåberget Mountain Exterior
 Svalbard Global Seed Vault | Spitsbergen Permafrost Zone
 Svalbard Treaty Zone | Spitsbergen Archipelago
+Svalbard | Mainland Norway
+Sweden | City of Stockholm
 Sweden | Norway
 Swiss Canton of Schaffhausen | Busingen am Hochrhein
 Switzerland | Campione d'Italia
@@ -613,6 +794,8 @@ The Alps | Switzerland
 The Gambia | Senegal
 The Pentagon Grounds | State of Virginia
 The Pentagon | The Kremlin
+Tohono O'odham Nation | State of Arizona
+Tonto National Forest | Maricopa County
 Tornado Alley | State of Oklahoma
 Trafalgar Square Base | Nelson's Column
 Trafalgar Square | Nelson's Column Base
@@ -624,21 +807,27 @@ Trans-Amazonian Highway | Amazon Rainforest
 Trans-Amazonian Highway | Xingu River
 Trans-Canada Highway Ribbon | Precambrian Canadian Shield
 Trans-Canada Highway | Canadian Shield
+Trans-Canada Highway | Province of Manitoba
 Trans-Canada Highway | Province of Ontario
 Trans-Sahara Highway | Sahara Desert
+Trans-Siberian Railway | Russian Federation
 Trans-Siberian Railway | Ural Mountains
 Trans-Siberian Steel Rail | Ob River Ice Flow
+Travis County | State of Texas
 Tropic of Cancer | Mexico
 Tropic of Cancer | Nile River
 Tropic of Capricorn | Australia
 Tropic of Capricorn | Great Dividing Range
 Uluru | Australia
 Union Pacific Railroad | State of Nevada
+United Kingdom of Great Britain and Northern Ireland | United Kingdom
 United Kingdom | City of London
 United Kingdom | New Zealand
 United Nations Headquarters | Borough of Manhattan
 United Nations Headquarters | City of New York
 University Endowment Lands | City of Vancouver
+Ural Mountains | West Siberian Plain
+Uzbekistan | Sokh District
 Vatican City Masonry Walls | City of Rome Streets
 Vatican City | City of Rome
 Vatican City | Holy See Jurisdiction
@@ -656,5 +845,6 @@ Yellowstone National Park | State of Wyoming
 Yellowstone National Park | Yellowstone Caldera
 Yellowstone National Park | Yellowstone Supervolcano Caldera
 Yosemite National Park | State of California
+Yosemite National Park | Tuolumne County
 Zero Mile Marker (Washington DC) | Geographic Anchor of DC
 Zion National Park | State of Utah

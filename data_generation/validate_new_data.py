@@ -86,6 +86,24 @@ GIVEAWAY = {
     "disjoint": ["disjoint"], "overlaps": ["overlaps"], "equals": ["equals"],
 }
 
+# Phrases that encode a compass bearing without naming it. On cardinal Levels
+# 1-5 these make the item answerable without any geographic knowledge, which is
+# exactly what saturated the task at 97-100%.
+DIRECTION_CUES = [
+    "north", "south", "east", "west",
+    "top of the map", "top of the globe", "bottom of the map", "top of the world",
+    "upward", "downward", "leftward", "rightward",
+    "left side", "right side", "left-hand", "right-hand", "left edge", "right edge",
+    "o'clock",
+    "sunrise", "sunset", "setting sun", "morning sun", "morning light",
+    "morning sunrise", "sunset horizon", "greets the sun", "dawn",
+    "pole", "arctic", "antarctic", "equator", "equatorial", "latitude", "longitude",
+    "latitudinal", "longitudinal",
+    "upper left", "upper right", "lower left", "lower right",
+    "up and to the", "down and to the", "diagonally up", "diagonally down",
+    "further up", "further down", "closer to the top", "closer to the bottom",
+]
+
 _counts = Counter()
 
 
@@ -350,6 +368,57 @@ def main() -> int:
         if ornate:
             warn(f"{len(ornate)} Level 6 row(s) also use oblique Level 1-5 "
                  f"phrasing — that confounds wording with inference depth")
+
+    # --- cardinal: the description must not encode the bearing -------------
+    # Level 6 is exempt: a chain cannot be stated without directional language,
+    # and that level tests composition rather than knowledge.
+    if rel == "cardinal":
+        flat = [r for r in rows if r["ambiguity_level"].strip() != HOP_LEVEL]
+        leaked = []
+        for r in flat:
+            low = r["corpus"].lower()
+            hit = next((c for c in DIRECTION_CUES if c in low), None)
+            if hit:
+                leaked.append((r, hit))
+        if leaked:
+            bad(f"{len(leaked)}/{len(flat)} Level 1-5 rows encode the bearing in "
+                f"the description, so the answer needs no geographic knowledge. "
+                f"e.g. {leaked[0][0]['source_entity']!r} uses \"{leaked[0][1]}\": "
+                f"\"{leaked[0][0]['corpus'][:64]}...\"")
+        else:
+            ok(f"cardinal: no Level 1-5 description encodes the bearing — the "
+               f"answer requires knowing where the places are")
+
+    # --- template reuse ----------------------------------------------------
+    # 144 rows built from 48 frames is 48 items shown three times, not 144.
+    import re as _re
+
+    def _frame(r):
+        t = r["corpus"]
+        for n in (r.get("source_entity", ""), r.get("target_entity", ""),
+                  r.get("via_entity", "")):
+            if n:
+                t = t.replace(n, "@")
+        return _re.sub(r"\s+", " ", t).strip().lower()
+
+    frames = Counter(_frame(r) for r in rows)
+    reused = {f: n for f, n in frames.items() if n > 1}
+    ratio = len(frames) / len(rows)
+    if ratio < 0.75:
+        bad(f"only {len(frames)} distinct sentence frames across {len(rows)} rows "
+            f"({ratio:.0%}). Rows built from a shared template are one item shown "
+            f"several times, not several items. Worst frame repeats "
+            f"{max(frames.values())}x: \"{frames.most_common(1)[0][0][:60]}...\"")
+    elif reused:
+        warn(f"{len(reused)} sentence frame(s) reused; {len(frames)} distinct "
+             f"across {len(rows)} rows ({ratio:.0%})")
+    else:
+        ok(f"phrasing: {len(frames)} distinct sentence frames for {len(rows)} rows")
+
+    expl = Counter(r.get("explanation", "").strip().lower() for r in rows)
+    if len(expl) / len(rows) < 0.6:
+        warn(f"only {len(expl)} distinct explanations across {len(rows)} rows — "
+             f"they should state the actual reason, not a fixed phrase")
 
     # --- text sanity ------------------------------------------------------
     short = [r for r in rows if len(r["corpus"].strip()) < 40]

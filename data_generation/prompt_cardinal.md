@@ -18,7 +18,41 @@ CARDINAL DIRECTION — the compass bearing from the second place to the first
 
 Allowed labels (use these exact strings): north_of, south_of, east_of, west_of, northeast_of, northwest_of, southeast_of, southwest_of
 
-CRITICAL: cardinal is currently SATURATED — the model already answers 97-100% correctly, so easy items are worthless. Every new item must be genuinely HARD: the honest bearing must surprise an educated reader. If a well-informed person would answer instantly, do not include it.
+READ THIS FIRST — it is the reason this dataset is being rebuilt.
+
+A model currently answers 97-100% of the existing cardinal items correctly. Not because it knows geography, but because the previous descriptions gave the answer away:
+
+    "Despite assumptions about climate, Calgary actually sits closer
+     to the top of the globe than Yangon."
+
+"Closer to the top of the globe" means north. The reader never needs to know where Calgary or Yangon are — swap in any two names and the answer is unchanged. The item measures paraphrase decoding, not spatial knowledge, and that is why the task is saturated.
+
+THE HEADLINE RULE: on Levels 1-5, the description must NOT encode the direction in any form. It introduces the two places and stops. The answer must come from knowing where they are.
+
+FORBIDDEN anywhere in a Level 1-5 description — this list is not exhaustive, the rule is the intent behind it:
+  compass words        north, south, east, west, and compounds
+  map metaphors        top/bottom/left/right of the map, upward,
+                       downward, leftward, rightward, above, below
+  clock bearings       12 o'clock, 3 o'clock, any dial reference
+  sun references       sunrise, sunset, morning sun, setting sun,
+                       greets the sun earlier
+  pole/equator refs    closer to the pole, toward the Arctic, nearer
+                       the equator, higher latitude
+  travel directions    head up, drive down, travel toward the left
+  quadrant language    upper left, lower right, diagonally up
+
+    BAD  "Reykjavik sits closer to the top of the globe than
+          Vientiane."
+          (states the answer; no geography needed)
+
+    GOOD "Reykjavik is Iceland's coastal capital. Vientiane sits on
+          the Mekong in Laos."
+          (identifies both places; the reader must know the
+           latitudes)
+
+What the description IS for: disambiguating the two places and giving them enough context to be well-posed — which country, which river, which region. Never their relative position.
+
+Level 6 is the single exception, explained under that level.
 
 ## The six ambiguity levels
 
@@ -26,11 +60,11 @@ Levels 1-5 describe HOW HARD THE WORDING is, not how uncertain the geography
 is: the correct answer is always unambiguous, only the phrasing gets harder.
 Level 6 is different in kind — it adds an inference step instead.
 
-- **Level 1** — Straightforward, matching intuition: 'to reach Seattle from Portland you drive straight up Interstate 5'.
-- **Level 2** — Clock-face or map-axis phrasing instead of a compass word: 'head towards the 12 o'clock position on your map'.
-- **Level 3** — Mildly surprising, where a national stereotype misleads: Detroit is NORTH of Windsor, Canada.
-- **Level 4** — Clearly counter-intuitive: the true bearing contradicts what most people assume from climate, culture or rough mental maps.
-- **Level 5** — Strongly counter-intuitive, needing real geographic knowledge: 'Venice sits closer to the icy top of the world than Halifax' (Venice IS north of Halifax).
+- **Level 1** — Both places are globally famous and the bearing matches everyone's mental map. Oslo and Rome; Cairo and Johannesburg.
+- **Level 2** — Still uncontroversial, but needs the reader to place the two countries correctly. Warsaw and Athens; Lima and Caracas.
+- **Level 3** — A stereotype misleads. Detroit and Windsor: Canada is 'above' the USA, yet Detroit is the northern one. Reno and Los Angeles: Reno is further west.
+- **Level 4** — Clearly counter-intuitive. Most educated readers would guess wrong: the bearing contradicts what climate, culture or a rough mental map suggests.
+- **Level 5** — Strongly counter-intuitive, needing real knowledge of latitudes or longitudes. Venice is north of Halifax. Nairobi is east of Rio de Janeiro. Most people are confident and wrong.
 - **Level 6 — MULTI-HOP** — the relation between A and B is NOT stated. The
   description states two links through an intermediate place C, and the reader
   must compose them.
@@ -43,9 +77,9 @@ Level 6 is different in kind — it adds an inference step instead.
   The other labels have no forced two-hop composition, so do not produce Level 6
   rows for them at all. The grid is deliberately ragged here.
 
-North/south and east/west compose along their own axis. State two links and let the reader chain them:
+North/south and east/west compose along their own axis:
   A is north of C  +  C is north of B   =>  A is north of B
-Diagonals compose only when both steps share the diagonal (northeast + northeast => northeast). Do NOT chain a north step with an east step and claim northeast — that is not forced unless the distances make it so, and the reader cannot know them.
+Diagonals compose only when BOTH steps share the same diagonal (northeast + northeast => northeast). Never chain a north step with an east step and claim northeast: that is not forced unless the distances happen to make it so, and the reader cannot know them.
 
   THREE RULES THAT DECIDE WHETHER THE ROW IS USABLE:
 
@@ -76,7 +110,7 @@ Diagonals compose only when both steps share the diagonal (northeast + northeast
   chain and gets geocoded too.
 
   Example of the style wanted:
-    "Kampala sits further up the 12 o'clock axis than Khartoum, and Khartoum in turn sits further up that same axis than Cairo. (A=Kampala, C=Khartoum, B=Cairo — all three named, both links stated.)"
+    "Kampala sits further from the North Pole than Khartoum, and Khartoum in turn sits further from the North Pole than Cairo. (A=Kampala, C=Khartoum, B=Cairo — all three named, both links stated. Level 6 is the ONE place a directional phrase is allowed, because without it there is no chain to compose.)"
 
 
 ## HARD REQUIREMENT: every place must be findable in OpenStreetMap
@@ -129,6 +163,14 @@ Columns:
 source_entity,source_geometry,target_entity,target_geometry,corpus,via_entity,relation_type,relation_label,explanation,ambiguity_level
 
 ## Additional rules
+
+A. NO TEMPLATES. The previous batch produced 144 rows from 48 sentence frames, each reused three times with only the names swapped, and 16 explanations reused nine times each. That inflates the row count without adding information. Every description must be a distinct sentence, and no two may share a recognisable frame. If you find yourself writing "Traveling from X, ... to reach Y" a second time, rewrite it.
+
+B. Vary sentence length and shape: some one clause, some two; some leading with the subject, some with the object; some naming a river, a coastline, an economic role, a founding date.
+
+C. Every `explanation` must also be distinct and must state the actual reason — which latitude or longitude relation holds, and why a reader might get it wrong. Not "the phrase indicates a northern trajectory".
+
+D. Prefer well-known cities over obscure ones. The task is to test whether the model KNOWS the geography, so the places must be ones a knowledgeable person could reasonably be expected to place.
 
 1. The label describes A with respect to B, in that order.
 2. Do not reuse any (source_entity, target_entity) pair listed at the bottom.

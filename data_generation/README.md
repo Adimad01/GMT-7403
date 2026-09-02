@@ -11,7 +11,7 @@ fund both a well-powered evaluation and a usable fine-tuning split.
 | relation | have | add | of which multi-hop | why |
 |---|---:|---:|---:|---|
 | relative | 65 pairs | **+180** | 30 | eval is 20 facts, power ~0.04; the corpus is the hard cap |
-| cardinal | 96 pairs | **+144 harder** | 24 | 97–100% accuracy — saturated, so easy items add nothing |
+| cardinal | 96 pairs | **+144 redesigned** | 24 | see below — the task as built does not test geography |
 | topological | 455 pairs | **+210** | 35 | enough for eval already; this funds a training split |
 
 ## Level 6 — multi-hop
@@ -108,3 +108,48 @@ place resolves in OpenStreetMap and resolves to the *right kind* of object.
 That last check exists because "City of Detroit" currently resolves to a road
 in South Africa in the shipped cache, and roughly 27% of cardinal pairs have
 coordinates two or more compass sectors from the truth.
+
+
+## Why cardinal was redesigned
+
+The model answers 97–100% of the existing cardinal items correctly, and the
+reason is not that it knows geography. The descriptions state the bearing:
+
+    "Despite assumptions about climate, Calgary actually sits closer to the
+     top of the globe than Yangon."
+
+"Closer to the top of the globe" means north. Swap in any two names and the
+answer is unchanged — the item measures paraphrase decoding, not spatial
+knowledge. That is the whole explanation for the saturation, and it also
+explains why a knowledge graph could never help on this task: coordinates add
+nothing when the answer is already in the sentence.
+
+The rebuilt prompt forbids every form of directional cue on Levels 1–5 —
+compass words, map metaphors, clock bearings, sun references, pole and equator
+references, quadrant language. The description introduces the two places and
+stops:
+
+    "Reykjavik is Iceland's coastal capital. Vientiane sits on the Mekong
+     in Laos."
+
+Now the answer requires knowing where they are, which is exactly the knowledge
+a coordinate graph supplies.
+
+**Level 6 is the one exception.** A two-hop chain cannot be stated without
+directional language, and that level tests composition rather than recall. The
+validator exempts it.
+
+**Consequence to be aware of:** rows built this way are not directly comparable
+with the 96 rows already in the corpus, which use the old cue-based design.
+Either replace the old cardinal rows, or keep both and report the contrast —
+a collapse in accuracy when the cue is removed is itself a finding about what
+the original task measured.
+
+### Two checks now enforce this
+
+- **Direction cues** — any of ~50 forbidden phrases in a Level 1–5 cardinal
+  description is a failure.
+- **Template reuse** — the previous batch built 144 rows from 48 sentence
+  frames, each reused three times, and 16 explanations reused nine times each.
+  That is 48 items shown three times, not 144 items. Below 75% distinct frames
+  is a failure.
