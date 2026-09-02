@@ -15,8 +15,10 @@ entire apparent deficit was a formatting failure. Two changes address it:
 
   * the synthesis step is given a tight length budget, so it cannot spend its
     whole token allowance on prose and get truncated before the answer line;
-  * if synthesis still yields nothing parseable, a short extraction call asks
-    only for the label.
+  * if synthesis still yields nothing parseable, an extraction call asks only
+    for the label -- with enough tokens to actually reach it. The first version
+    capped that call at 24 tokens and it failed on 7 of the 7 rows it fired on,
+    truncated before it could answer.
 """
 from __future__ import annotations
 
@@ -26,7 +28,11 @@ from .base import Context, Strategy, StrategyResult, register
 
 N_THOUGHTS = 3
 THOUGHT_CHARS = 500          # how much of each thought is carried into synthesis
-EXTRACT_TOKENS = 24          # an extraction reply is a label, not an essay
+# The extraction call needs room to REACH its answer, not just to state it.
+# This model opens with reasoning prose, so a tight budget truncates it before
+# any ANSWER: line appears. Set to 24 in the first attempt, the rescue failed on
+# 7 of 7 rows it fired on; the call was being cut off mid-thought.
+EXTRACT_TOKENS = 256
 
 
 @register
@@ -66,12 +72,17 @@ class GraphOfThought(Strategy):
                   f"{', '.join(ctx.labels)}>\n")
 
     def _extract_prompt(self, ex: Example, ctx: Context, synthesis: str) -> str:
-        """Last resort: ask only for the label, with almost no room to ramble."""
+        """Last resort: ask only for the label.
+
+        Given enough tokens to reach an answer, but told plainly not to spend
+        them explaining. Constraining the budget instead of the instruction is
+        what broke the first version.
+        """
         return (f"An analysis of a spatial relation concluded:\n\n"
                 f"{synthesis.strip()[:800]}\n\n"
                 f"Which single label does that conclusion support?\n"
-                f"Allowed answers: {', '.join(ctx.labels)}\n"
-                f"Reply with one line only, in exactly this form:\n"
+                f"Allowed answers: {', '.join(ctx.labels)}\n\n"
+                f"Do not explain. Answer with one line, in exactly this form:\n"
                 f"ANSWER: <label>\n")
 
     def run(self, ex: Example, ctx: Context) -> StrategyResult:

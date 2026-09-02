@@ -209,7 +209,7 @@ def test_got_fallback_rescues_unparseable_synthesis():
 
     def rambling(prompt, seed, max_new_tokens=None):
         budgets.append(max_new_tokens)
-        if "Reply with one line only" in prompt:
+        if "Do not explain" in prompt:      # the extraction call
             return "ANSWER: left_of"
         return "I considered the arrangement but will not conclude."
 
@@ -219,7 +219,9 @@ def test_got_fallback_rescues_unparseable_synthesis():
     assert res.prediction == "left_of"
     assert res.parse_rule.startswith("recovered_")
     assert res.n_calls == 5                 # 3 thoughts + synthesis + extraction
-    assert budgets[-1] == 24                # extraction gets a small budget
+    assert budgets[-1] == 256               # room to reach the answer, not
+                                            # just to state it: 24 truncated
+                                            # the model mid-thought
 
     def clean(prompt, seed, max_new_tokens=None):
         return "Done.\nANSWER: right_of"
