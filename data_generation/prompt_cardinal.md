@@ -172,6 +172,10 @@ C. Every `explanation` must also be distinct and must state the actual reason �
 
 D. Prefer well-known cities over obscure ones. The task is to test whether the model KNOWS the geography, so the places must be ones a knowledgeable person could reasonably be expected to place.
 
+E. THE DIRECTION MUST BE UNAMBIGUOUS. Each of the eight labels covers a 45-degree sector, so a pair whose true bearing lands near a sector edge has no single defensible answer — a careful geographer could call it either way, and grading a model on it measures nothing. Pick pairs that sit well inside their sector. Concretely: for `north_of`/`south_of`/`east_of`/`west_of` the offset along the other axis must be small relative to the offset along the named axis; for the four diagonals the two offsets must be roughly comparable. Chicago and Taipei are almost exactly on the north/northeast line — never choose a pair like that.
+
+F. NO NEAR-ANTIPODAL PAIRS. Two places on opposite sides of the globe have no well-defined compass direction between them: the bearing flips depending on which way you travel. Keep both places within roughly a third of the globe of each other — same continent, neighbouring continents, or across one ocean, never across the Pacific AND the pole. Perth to Caracas, Asuncion to Manila, and Hanoi to Lima are all unusable for this reason.
+
 1. The label describes A with respect to B, in that order.
 2. Do not reuse any (source_entity, target_entity) pair listed at the bottom.
 3. Do not use the same pair twice in your own output.

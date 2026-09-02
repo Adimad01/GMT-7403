@@ -471,6 +471,53 @@ def main() -> int:
         else:
             ok("every description establishes an observer viewpoint")
 
+    # --- cardinal ground truth --------------------------------------------
+    # A well-formed row can still be unusable: a bearing that lands on a sector
+    # boundary has no defensible answer, and two near-antipodal places have no
+    # compass direction at all. Neither is visible to any of the checks above.
+    if rel == "cardinal":
+        from check_cardinal_truth import COORDS, bearing, key, sector, separation
+        false_rows, unstable, borderline, skipped = [], [], [], 0
+        for i, r in enumerate(rows):
+            s, t = key(r["source_entity"]), key(r["target_entity"])
+            if s not in COORDS or t not in COORDS:
+                skipped += 1
+                continue
+            ps, pt = COORDS[s], COORDS[t]
+            got, margin = sector(bearing(pt, ps))
+            sep = separation(ps, pt)
+            tag = (i + 2, f'{r["source_entity"]} -> {r["target_entity"]}')
+            if got != r["relation_label"].strip().lower():
+                false_rows.append(tag + (got,))
+            elif sep > 140:
+                unstable.append(tag + (sep,))
+            elif margin < 5.0:
+                borderline.append(tag + (margin,))
+
+        if skipped:
+            warn(f"{skipped} row(s) use places outside the coordinate table — "
+                 f"their truth was not checked (run with --geocode)")
+        if false_rows:
+            ln, who, got = false_rows[0]
+            bad(f"{len(false_rows)} row(s) state the wrong direction, "
+                f"e.g. line {ln} {who} is actually {got}")
+        else:
+            ok("every checkable row's label matches its true bearing")
+        if unstable:
+            ln, who, sep = unstable[0]
+            bad(f"{len(unstable)} row(s) pair near-antipodal places, where no "
+                f"single compass direction is well defined, e.g. line {ln} "
+                f"{who} ({sep:.0f} deg apart)")
+        else:
+            ok("no near-antipodal pairs")
+        if borderline:
+            ln, who, m = borderline[0]
+            bad(f"{len(borderline)} row(s) sit within 5 deg of a sector "
+                f"boundary, so the 'correct' label is a coin flip, e.g. line "
+                f"{ln} {who} ({m:.1f} deg from the boundary)")
+        else:
+            ok("every bearing sits comfortably inside its 45-degree sector")
+
     # --- geocoding --------------------------------------------------------
     if args.geocode:
         print("\n  --- geocoding (Nominatim, 1 req/sec) ---")
