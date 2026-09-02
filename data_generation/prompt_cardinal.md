@@ -113,9 +113,9 @@ Header row exactly as below, then 144 data rows.
 
 Columns:
   source_entity     the subject place (A)
-  source_geometry   one of: point, line, polygon
+  source_geometry   one of: Point, LineString, Polygon, MultiPolygon
   target_entity     the object place (B)
-  target_geometry   one of: point, line, polygon
+  target_geometry   one of: Point, LineString, Polygon, MultiPolygon
   corpus            the natural-language description (the model sees ONLY this
                     plus the two names — the answer must be derivable from it)
   via_entity        Level 6 ONLY: the intermediate place C. Leave EMPTY for

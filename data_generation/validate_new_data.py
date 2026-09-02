@@ -158,10 +158,15 @@ def main() -> int:
     else:
         ok(f"ambiguity levels: all within Level 1-{len(LV)}")
 
+    # Accept both the plain vocabulary and the GeoJSON type names -- the
+    # distinction carries no meaning downstream and rejecting it wastes a
+    # regeneration round.
+    GEOM_OK = {"point", "line", "polygon", "linestring", "multipolygon",
+               "multilinestring", "multipoint"}
     badgeom = Counter(g for r in rows for g in
                       (r["source_geometry"].strip().lower(),
                        r["target_geometry"].strip().lower())
-                      if g not in {"point", "line", "polygon"})
+                      if g not in GEOM_OK)
     if badgeom:
         warn(f"unexpected geometry values: {dict(badgeom)}")
     else:
