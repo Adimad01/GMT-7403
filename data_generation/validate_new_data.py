@@ -26,7 +26,11 @@ from collections import Counter, defaultdict
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
-LV = ["Level 1", "Level 2", "Level 3", "Level 4", "Level 5"]
+LV = ["Level 1", "Level 2", "Level 3", "Level 4", "Level 5", "Level 6"]
+HOP_LEVEL = "Level 6"          # multi-hop: relation inferred through via_entity
+# Relations whose 2-hop composition is NOT logically forced. A touches C and
+# C touches B implies nothing about A and B, so such a chain is unusable.
+NON_COMPOSABLE = {"touches", "crosses", "overlaps"}
 
 LABELS = {
     "topological": ["contains", "within", "touches", "crosses",
@@ -49,6 +53,7 @@ INVERSE = {
 COLUMNS = ["source_entity", "source_geometry", "target_entity", "target_geometry",
            "corpus", "relation_type", "relation_label", "explanation",
            "ambiguity_level"]
+OPTIONAL = ["via_entity"]        # required on Level 6, empty elsewhere
 
 # Words that give the answer away if they appear in the description the model sees.
 GIVEAWAY = {
@@ -113,8 +118,8 @@ def main() -> int:
     # --- blanks -----------------------------------------------------------
     holes = defaultdict(int)
     for r in rows:
-        for c in COLUMNS:
-            if not str(r.get(c, "")).strip():
+        for c in COLUMNS:                     # via_entity excluded: see the
+            if not str(r.get(c, "")).strip():  # multi-hop check below
                 holes[c] += 1
     if holes:
         bad("blank cells: " + ", ".join(f"{k}={v}" for k, v in holes.items()))
@@ -134,7 +139,7 @@ def main() -> int:
     if badlv:
         bad(f"unknown ambiguity levels: {dict(badlv)}")
     else:
-        ok("ambiguity levels: all Level 1-5")
+        ok(f"ambiguity levels: all within Level 1-{len(LV)}")
 
     badgeom = Counter(g for r in rows for g in
                       (r["source_geometry"].strip().lower(),
@@ -206,6 +211,61 @@ def main() -> int:
     else:
         ok("descriptions never contain the label or an obvious synonym")
 
+    # --- multi-hop rows ---------------------------------------------------
+    hop = [r for r in rows if r["ambiguity_level"].strip() == HOP_LEVEL]
+    flat = [r for r in rows if r["ambiguity_level"].strip() != HOP_LEVEL]
+    if "via_entity" not in rows[0]:
+        if hop:
+            bad(f"{len(hop)} Level 6 row(s) but no via_entity column")
+        else:
+            warn("no via_entity column and no Level 6 rows — multi-hop absent")
+    else:
+        no_via = [r for r in hop if not r["via_entity"].strip()]
+        if no_via:
+            bad(f"{len(no_via)} Level 6 row(s) have an empty via_entity — the "
+                f"intermediate place must be named, e.g. "
+                f"{no_via[0]['source_entity'][:30]}")
+        elif hop:
+            ok(f"multi-hop: all {len(hop)} Level 6 rows name an intermediate place")
+
+        stray = [r for r in flat if r["via_entity"].strip()]
+        if stray:
+            warn(f"{len(stray)} row(s) below Level 6 set via_entity — it is "
+                 f"ignored outside multi-hop rows")
+
+        # C must be a third place, not one of the endpoints
+        degenerate = [r for r in hop
+                      if r["via_entity"].strip().lower() in
+                      (r["source_entity"].strip().lower(),
+                       r["target_entity"].strip().lower())]
+        if degenerate:
+            bad(f"{len(degenerate)} Level 6 row(s) use an endpoint as the "
+                f"intermediate — that is not a chain")
+        elif hop:
+            ok("multi-hop: every intermediate is a distinct third place")
+
+    # compositions that are not logically forced
+    if rel == "topological" and hop:
+        unforced = [r for r in hop
+                    if r["relation_label"].strip().lower() in NON_COMPOSABLE]
+        if unforced:
+            bad(f"{len(unforced)} Level 6 row(s) use a label whose two-hop "
+                f"composition is NOT forced "
+                f"({', '.join(sorted({r['relation_label'] for r in unforced}))}). "
+                f"A touches C and C touches B implies nothing about A and B.")
+        else:
+            ok("multi-hop: all compositions are logically forced")
+
+    # Level 6 should stay plainly worded — otherwise indirection and inference
+    # depth are confounded and the level measures neither cleanly.
+    if hop:
+        ornate = [r for r in hop if any(w in r["corpus"].lower() for w in
+                  ("o'clock", "port arm", "starboard", "manga", "arabic script",
+                   "wedding ring"))]
+        if ornate:
+            warn(f"{len(ornate)} Level 6 row(s) also use oblique Level 1-5 "
+                 f"phrasing — that confounds wording with inference depth")
+
     # --- text sanity ------------------------------------------------------
     short = [r for r in rows if len(r["corpus"].strip()) < 40]
     if short:
@@ -230,8 +290,10 @@ def main() -> int:
         sys.path.insert(0, str(REPO / "src"))
         import urllib.parse
         import urllib.request
-        names = sorted({r[c].strip() for r in rows
-                        for c in ("source_entity", "target_entity")})
+        cols = ["source_entity", "target_entity"]
+        if "via_entity" in rows[0]:
+            cols.append("via_entity")     # part of the reasoning chain
+        names = sorted({r[c].strip() for r in rows for c in cols if r.get(c, "").strip()})
         print(f"  checking {len(names)} distinct places "
               f"(~{len(names) * 1.1 / 60:.0f} min)...")
         failed, suspicious = [], []

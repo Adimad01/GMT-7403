@@ -8,11 +8,29 @@ fund both a well-powered evaluation and a usable fine-tuning split.
 
 ## How much is needed
 
-| relation | have | add | why |
-|---|---:|---:|---|
-| relative | 65 pairs | **+150** | eval is 20 facts, power ~0.04; the corpus is the hard cap |
-| cardinal | 96 pairs | **+120 harder** | 97–100% accuracy — saturated, so easy items add nothing |
-| topological | 455 pairs | **+175** | enough for eval already; this funds a training split |
+| relation | have | add | of which multi-hop | why |
+|---|---:|---:|---:|---|
+| relative | 65 pairs | **+180** | 30 | eval is 20 facts, power ~0.04; the corpus is the hard cap |
+| cardinal | 96 pairs | **+144 harder** | 24 | 97–100% accuracy — saturated, so easy items add nothing |
+| topological | 455 pairs | **+210** | 35 | enough for eval already; this funds a training split |
+
+## Level 6 — multi-hop
+
+Levels 1–5 vary how obliquely the relation is *worded*. **Level 6 varies
+inferential depth instead**: the A–B relation is never stated, only two links
+through an intermediate place `C`, named in the new `via_entity` column.
+
+Its wording stays plain deliberately. A row that is both obscurely phrased and
+multi-hop cannot tell you which caused the difficulty.
+
+Level 6 matters more than the others for this project: it is the case where a
+knowledge graph should demonstrably help, because the KG supplies the
+intermediate link the model would otherwise have to know.
+
+Only logically forced compositions are allowed. `A within C` + `C within B`
+gives `A within B`; `A touches C` + `C touches B` gives **nothing**, so
+`touches`, `crosses` and `overlaps` cannot be chained and the validator rejects
+them at Level 6.
 
 ## Workflow
 
