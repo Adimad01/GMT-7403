@@ -429,7 +429,7 @@ def main() -> int:
     def _frame(r):
         t = r["corpus"]
         for n in (r.get("source_entity", ""), r.get("target_entity", ""),
-                  r.get("via_entity", "")):
+                  r.get("via_entity", ""), r.get("observer_entity", "")):
             if n:
                 t = t.replace(n, "@")
         return _re.sub(r"\s+", " ", t).strip().lower()
@@ -517,6 +517,48 @@ def main() -> int:
                 f"{ln} {who} ({m:.1f} deg from the boundary)")
         else:
             ok("every bearing sits comfortably inside its 45-degree sector")
+
+    # --- relative ground truth ---------------------------------------------
+    # 'left' has no meaning without an observer, so the row must carry one and
+    # the label must fall out of that frame. The ambiguity level is checkable
+    # too: it is set by how far the sight line is turned from north.
+    if rel == "relative":
+        if "observer_entity" not in rows[0]:
+            bad("no observer_entity column — a relative row without a stated "
+                "observer has no determinate answer")
+        else:
+            from check_relative_truth import check as rcheck, rotation_level
+            from check_cardinal_truth import key as ckey, COORDS
+            wrong, offlevel, skipped = [], [], 0
+            for i, r in enumerate(rows):
+                o = r["observer_entity"]
+                a, b = r["source_entity"], r["target_entity"]
+                if any(ckey(x) not in COORDS for x in (o, a, b)):
+                    skipped += 1
+                    continue
+                probs = rcheck(o, a, b, r["relation_label"].strip().lower())
+                if probs:
+                    wrong.append((i + 2, a, b, o, probs[0]))
+                elif r["ambiguity_level"].strip() != HOP_LEVEL:
+                    want = rotation_level(o, b)
+                    if f"Level {want}" != r["ambiguity_level"].strip():
+                        offlevel.append((i + 2, r["ambiguity_level"].strip(), want))
+            if skipped:
+                warn(f"{skipped} row(s) use places outside the coordinate table — "
+                     f"their frame was not checked")
+            if wrong:
+                ln, a, b, o, why = wrong[0]
+                bad(f"{len(wrong)} row(s) do not hold in the stated frame, "
+                    f"e.g. line {ln} ({a} / {b} seen from {o}): {why}")
+            else:
+                ok("every row's label follows from its stated observer frame")
+            if offlevel:
+                ln, got, want = offlevel[0]
+                bad(f"{len(offlevel)} row(s) are filed at the wrong ambiguity "
+                    f"level, e.g. line {ln} says {got} but the sight line "
+                    f"rotation puts it at Level {want}")
+            else:
+                ok("ambiguity levels match the frame rotation from north")
 
     # --- geocoding --------------------------------------------------------
     if args.geocode:
