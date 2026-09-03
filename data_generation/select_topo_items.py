@@ -80,9 +80,12 @@ def main() -> int:
 
     # --- Level 6 -----------------------------------------------------------
     contains = defaultdict(list)     # A -> [B] where A contains B
+    disjoint = defaultdict(list)     # A -> [B] where A is disjoint from B
     for r in rels:
         if r["label"] == "contains":
             contains[r["subject"]].append(r["object"])
+        elif r["label"] == "disjoint":
+            disjoint[r["subject"]].append(r["object"])
 
     for label in HOP_LABELS:
         cands = []
@@ -96,8 +99,7 @@ def main() -> int:
         else:                        # A within B, B disjoint C  =>  A disjoint C
             for b, mids in contains.items():
                 for a in mids:
-                    for c in [x["object"] for x in rels
-                              if x["subject"] == b and x["label"] == "disjoint"]:
+                    for c in disjoint.get(b, ()):
                         if lookup.get((a, c)) != "disjoint":
                             continue
                         cands.append((a, b, c))

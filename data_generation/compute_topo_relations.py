@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import json
 import math
+import re
 import sys
 from pathlib import Path
 
@@ -130,7 +131,26 @@ def relate(a, b) -> tuple[str | None, dict]:
     return ("disjoint", info)
 
 
-def difficulty(label: str, info: dict) -> int:
+def name_overlap(a: str, b: str) -> float:
+    """Share of distinctive words the two names have in common.
+
+    'equals' needs a difficulty measure that geometry cannot give. Two objects
+    either coincide or they do not, so every genuine pair scores identically on
+    any geometric scale and lands in one level. What actually varies is whether
+    a reader can see that the two names denote the same thing: 'City of
+    Philadelphia' and 'Philadelphia County' announce it, 'Borough of Brooklyn'
+    and 'Kings County' do not. That is the difficulty, and it is measurable.
+    """
+    stop = {"city", "county", "and", "of", "the", "borough", "parish",
+            "district", "consolidated", "state"}
+    wa = {w for w in re.findall(r"[a-z]+", a.lower()) if w not in stop}
+    wb = {w for w in re.findall(r"[a-z]+", b.lower()) if w not in stop}
+    if not wa or not wb:
+        return 0.0
+    return len(wa & wb) / min(len(wa), len(wb))
+
+
+def difficulty(label: str, info: dict, subject: str = "", obj: str = "") -> int:
     """Ambiguity level 1-5. Extreme configurations are easy, marginal ones hard."""
     def band(x, cuts):                       # cuts high -> low, level 1 -> 5
         for i, c in enumerate(cuts, start=1):
@@ -150,7 +170,8 @@ def difficulty(label: str, info: dict) -> int:
     if label == "crosses":
         return band(info.get("inside_fraction", 0.0), [0.6, 0.3, 0.12, 0.04])
     if label == "equals":
-        return band(info.get("jaccard", 0.0), [0.999, 0.995, 0.99, 0.98])
+        # shared name -> obvious; nothing shared -> needs real knowledge
+        return band(name_overlap(subject, obj), [0.99, 0.6, 0.3, 0.01])
     return 3
 
 
@@ -174,7 +195,7 @@ def main() -> int:
             if not lab:
                 continue
             out.append({"subject": a, "object": b, "label": lab,
-                        "level": difficulty(lab, info),
+                        "level": difficulty(lab, info, a, b),
                         "info": {k: round(v, 6) for k, v in info.items()
                                  if isinstance(v, (int, float))}})
         if (i + 1) % 25 == 0:

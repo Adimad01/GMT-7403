@@ -83,11 +83,11 @@ def main() -> int:
         got, info = relate(geoms[a][0], geoms[b][0])
         if got != lab:
             probs.append(f"geometry gives {got}, not {lab}")
-        elif lvl != 6 and difficulty(lab, info) != lvl:
-            probs.append(f"measurements put this at Level {difficulty(lab, info)}")
+        elif lvl != 6 and difficulty(lab, info, a, b) != lvl:
+            probs.append(f"measurements put this at Level "
+                         f"{difficulty(lab, info, a, b)}")
 
         if lvl == 6:
-            first = "contains" if lab in ("contains", "disjoint") else "within"
             g1, _ = relate(geoms[a][0], geoms[via][0])
             g2, _ = relate(geoms[via][0], geoms[b][0])
             want1 = "contains" if lab == "contains" else "within"

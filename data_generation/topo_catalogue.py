@@ -108,8 +108,10 @@ RIVERS = [
 PHYSICAL = [
     "Sahara", "Kalahari Desert", "Namib Desert", "Gobi Desert",
     "Atacama Desert", "Mojave Desert", "Sonoran Desert", "Amazon Rainforest",
-    "Alps", "Pyrenees", "Carpathian Mountains", "Andes", "Himalayas",
-    "Rocky Mountains", "Appalachian Mountains", "Ural Mountains",
+    # Mountain ranges are mapped inconsistently: several are single nodes,
+    # and "Andes" matches a town in Colombia before the cordillera.
+    "Alps", "Pyrenees", "Carpathian Mountains", "Himalayas",
+    "Rocky Mountains", "Ural Mountains",
     "Atlas Mountains", "Scandinavian Mountains", "Black Forest",
 ]
 
@@ -119,15 +121,31 @@ ISLANDS = [
     "Hokkaido", "Honshu", "Java", "Borneo", "Long Island", "Manhattan Island",
 ]
 
+# Consolidated city-counties: one government, one outline, two names. These are
+# the only reliable source of a genuine 'equals' -- two differently named OSM
+# objects almost never share a boundary otherwise.
+CONSOLIDATED = [
+    "City and County of San Francisco", "City and County of Denver",
+    "City and County of Honolulu", "Nashville-Davidson", "Davidson County",
+    "Marion County, Indiana", "Consolidated City of Indianapolis",
+    "Jefferson County, Kentucky", "Louisville",
+    "Duval County", "Jacksonville",
+    "Orleans Parish", "Suffolk County, New York",
+    "San Francisco County", "Denver County, Colorado",
+    "Honolulu County", "District of Columbia", "Washington, D.C.",
+    "Baltimore City", "St. Louis City",
+]
+
 ALL = (COUNTRIES + US_STATES + CITIES + COUNTIES + BOROUGHS + PARKS
-       + WATER + RIVERS + PHYSICAL + ISLANDS)
+       + WATER + RIVERS + PHYSICAL + ISLANDS + CONSOLIDATED)
 
 # What each name is, so the resolver never has to infer it from spelling.
 KIND = {}
 for _grp, _kind in ((COUNTRIES, "admin"), (US_STATES, "admin"),
                     (CITIES, "city"), (COUNTIES, "admin"), (BOROUGHS, "admin"),
                     (PARKS, "park"), (WATER, "lake"), (RIVERS, "river"),
-                    (PHYSICAL, "physical"), (ISLANDS, "island")):
+                    (PHYSICAL, "physical"), (ISLANDS, "island"),
+                    (CONSOLIDATED, "admin")):
     for _n in _grp:
         KIND[_n] = _kind
 for _n in ("Mediterranean Sea", "Baltic Sea", "Black Sea", "Red Sea",

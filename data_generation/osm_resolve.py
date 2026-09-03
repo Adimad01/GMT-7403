@@ -88,23 +88,34 @@ KIND_ACCEPT = {
 
 
 def requirements(name: str, kind: str | None = None) -> tuple[str, list[tuple[str, str | None]]]:
-    """(query string, acceptable class/type pairs in preference order)."""
+    """(query strings to try in order, acceptable class/type pairs).
+
+    The full name is always tried first. Stripping the type prefix helps for
+    "State of Colorado", but it is destructive for names where the prefix is
+    part of the proper noun: "District of Columbia" reduces to "Columbia",
+    which matches the country Colombia and produced a row asserting the two
+    were the same place.
+    """
     if kind:
-        q = re.sub(r"^(State|Commonwealth|Province|City|Town|Municipality|"
-                   r"Village|Borough|County|District|Canton) of\s+", "",
-                   name.strip(), flags=re.I)
-        return q, KIND_ACCEPT.get(kind, DEFAULT_ACCEPT)
+        full = name.strip()
+        stripped = re.sub(r"^(State|Commonwealth|Province|City|Town|Municipality|"
+                          r"Village|Borough|County|District|Canton) of\s+", "",
+                          full, flags=re.I)
+        queries = [full] if stripped == full else [full, stripped]
+        return queries, KIND_ACCEPT.get(kind, DEFAULT_ACCEPT)
     for pat, accept in PREFIX_RULES:
         m = pat.match(name.strip())
         if m:
             q = m.group(2) if m.lastindex and m.lastindex >= 2 else m.group(1)
             if pat.pattern.startswith("^(.+?)"):
                 q = m.group(1) + " " + m.group(2)
-            return q.strip(), accept
+            q = q.strip()
+            return ([name.strip()] if q == name.strip()
+                    else [name.strip(), q]), accept
     for pat, accept in KEYWORD_RULES:
         if pat.search(name):
-            return name.strip(), accept
-    return name.strip(), DEFAULT_ACCEPT
+            return [name.strip()], accept
+    return [name.strip()], DEFAULT_ACCEPT
 
 
 def norm(text: str) -> str:
@@ -153,7 +164,15 @@ def importance(cand: dict) -> float:
 def resolve(name: str, want_polygon: bool = True, pause: float = 1.1,
             simplify: float = 0.005, timeout: int = 90,
             kind: str | None = None) -> dict | None:
-    q, accept = requirements(name, kind)
+    queries, accept = requirements(name, kind)
+    for q in queries:
+        hit = _try(q, accept, want_polygon, simplify, timeout, pause)
+        if hit:
+            return hit
+    return None
+
+
+def _try(q, accept, want_polygon, simplify, timeout, pause):
     params = {"q": q, "format": "json", "limit": 12, "addressdetails": 1,
               "extratags": 1, "namedetails": 1}
     if want_polygon:

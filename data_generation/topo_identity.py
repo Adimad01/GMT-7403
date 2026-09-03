@@ -348,3 +348,29 @@ IDENTITY.update({
  "Long Island": "Long Island is the longest island in the contiguous United States",
  "Manhattan Island": "Manhattan Island is bounded by three tidal waterways",
 })
+
+# ---- consolidated city-counties (the 'equals' candidates) ----
+IDENTITY.update({
+ "City and County of San Francisco": "San Francisco's government merged its city and county functions in 1856",
+ "City and County of Denver": "Denver's consolidated government was created by a state amendment in 1902",
+ "City and County of Honolulu": "Honolulu's consolidated government covers an entire island",
+ "Nashville-Davidson": "Nashville's metropolitan government was among the first of its kind in 1963",
+ "Davidson County": "Davidson County was named for a Revolutionary War officer",
+ "Marion County, Indiana": "Marion County was named for a general nicknamed the Swamp Fox",
+ "Consolidated City of Indianapolis": "Indianapolis merged its administration with the surrounding county in 1970",
+ "Jefferson County, Kentucky": "Jefferson County was established in 1780 and named for a future president",
+ "Louisville": "Louisville was named in honour of a French king who backed the American revolution",
+ "Duval County": "Duval County was named for a territorial governor of Florida",
+ "Jacksonville": "Jacksonville consolidated with its county in 1968, creating a vast municipal area",
+ "Orleans Parish": "Orleans Parish keeps the French term for a county used nowhere else in the country",
+ "Suffolk County, New York": "Suffolk County occupies the eastern end of a long glacial island",
+ "San Francisco County": "San Francisco County is the smallest county by area in its state",
+ "Denver County, Colorado": "Denver County has boundaries that have been redrawn to take in an airport",
+ "Honolulu County": "Honolulu County includes a chain of uninhabited northwestern islets",
+ "District of Columbia": "the District of Columbia was ceded by Maryland to host a federal capital",
+ "Washington, D.C.": "Washington was laid out by Pierre L'Enfant in 1791",
+ "Baltimore City": "Baltimore separated from its surrounding county in 1851",
+ "St. Louis City": "St. Louis separated from its surrounding county in 1877, a split still debated",
+ "Borough of Brooklyn": "Brooklyn was an independent city until 1898",
+ "Kings County, New York": "Kings County is the most populous county in its state",
+})
