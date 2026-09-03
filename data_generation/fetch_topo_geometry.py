@@ -9,11 +9,12 @@ from __future__ import annotations
 
 import json
 import sys
+import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from osm_resolve import resolve                       # noqa: E402
-from topo_catalogue import ALL                        # noqa: E402
+from osm_resolve import LookupFailed, resolve         # noqa: E402
+from topo_catalogue import ALL, KIND                  # noqa: E402
 
 OUT = Path(__file__).resolve().parents[1] / "data" / "topological" / "osm" / "geometry.json"
 
@@ -25,7 +26,22 @@ def main() -> int:
     print(f"  {len(cache)} cached, {len(todo)} to fetch", flush=True)
 
     for i, name in enumerate(todo, 1):
-        r = resolve(name)
+        # Large outlines time out at fine simplification, so each retry asks for
+        # a coarser polygon. A name is only written off once every attempt has
+        # completed and still found nothing of the right kind.
+        r, failed = None, False
+        for attempt, simp in enumerate((0.005, 0.02, 0.05)):
+            try:
+                r = resolve(name, simplify=simp, timeout=90 + 30 * attempt,
+                            kind=KIND.get(name))
+                failed = False
+                break
+            except LookupFailed as exc:
+                failed = True
+                print(f"    retry {attempt+1} for {name}: {exc}", flush=True)
+                time.sleep(3)
+        if failed:
+            print(f"    GAVE UP on {name} after 3 attempts", flush=True)
         if r and r.get("geojson"):
             cache[name] = {"osm_type": r.get("osm_type"), "osm_id": r.get("osm_id"),
                            "class": r.get("class"), "type": r.get("type"),

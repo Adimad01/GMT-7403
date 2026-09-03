@@ -21,10 +21,20 @@ from __future__ import annotations
 import json
 import re
 import time
+import unicodedata
 import urllib.parse
 import urllib.request
 
 UA = "spatial-eval-datacheck/1.0 (research; contact via repository)"
+
+
+class LookupFailed(RuntimeError):
+    """The query did not complete. Distinct from 'this place does not exist'.
+
+    Collapsing the two is how a first pass recorded Mexico and California as
+    unresolvable: their outlines are large, the request timed out, and the
+    timeout was written down as a fact about the place.
+    """
 ENDPOINT = "https://nominatim.openstreetmap.org/search?"
 
 # name pattern -> acceptable (class, type) combinations, best first
@@ -57,9 +67,33 @@ KEYWORD_RULES = [
 DEFAULT_ACCEPT = [("boundary", "administrative"), ("place", None),
                   ("natural", None), ("waterway", None)]
 
+# When the caller knows what kind of object it wants, guessing from the name is
+# unnecessary and unreliable: "Rhone" is both a river and a French departement,
+# and the departement outranks the river on importance.
+KIND_ACCEPT = {
+    "admin": [("boundary", "administrative")],
+    "city": [("boundary", "administrative"), ("place", None)],
+    "river": [("waterway", None), ("natural", "water"), ("water", None)],
+    "lake": [("natural", "water"), ("water", None), ("waterway", None),
+             ("place", None)],
+    "sea": [("natural", None), ("place", "sea"), ("water", None),
+            ("waterway", None)],
+    "park": [("leisure", None), ("boundary", "protected_area"),
+             ("landuse", None), ("natural", None)],
+    "island": [("place", None), ("natural", None),
+               ("boundary", "administrative")],
+    "physical": [("natural", None), ("place", None), ("landuse", None),
+                 ("boundary", None)],
+}
 
-def requirements(name: str) -> tuple[str, list[tuple[str, str | None]]]:
+
+def requirements(name: str, kind: str | None = None) -> tuple[str, list[tuple[str, str | None]]]:
     """(query string, acceptable class/type pairs in preference order)."""
+    if kind:
+        q = re.sub(r"^(State|Commonwealth|Province|City|Town|Municipality|"
+                   r"Village|Borough|County|District|Canton) of\s+", "",
+                   name.strip(), flags=re.I)
+        return q, KIND_ACCEPT.get(kind, DEFAULT_ACCEPT)
     for pat, accept in PREFIX_RULES:
         m = pat.match(name.strip())
         if m:
@@ -73,6 +107,40 @@ def requirements(name: str) -> tuple[str, list[tuple[str, str | None]]]:
     return name.strip(), DEFAULT_ACCEPT
 
 
+def norm(text: str) -> str:
+    """Accent-folded, punctuation-free, lowercase form for name comparison."""
+    t = unicodedata.normalize("NFKD", text or "")
+    t = "".join(c for c in t if not unicodedata.combining(c))
+    t = re.sub(r"[^\w\s]", " ", t.lower())
+    return re.sub(r"\s+", " ", t).strip()
+
+
+def names_of(cand: dict) -> set[str]:
+    """Every name the candidate goes by, normalised."""
+    out = set()
+    nd = cand.get("namedetails") or {}
+    for k, v in nd.items():
+        if k == "name" or k.startswith(("name:", "official_name", "alt_name",
+                                        "short_name", "int_name")):
+            if v:
+                out.add(norm(v))
+    head = (cand.get("display_name") or "").split(",")[0]
+    if head:
+        out.add(norm(head))
+    return out
+
+
+def bears_name(cand: dict, query: str) -> bool:
+    """Does this candidate actually carry the name that was asked for?
+
+    Nominatim matches fuzzily, so a search for Sahara returns New York State
+    and a search for Lagos returns Laos. Both outrank the intended place on
+    importance, so ranking by importance alone picks them. Importance may only
+    break ties among candidates that genuinely bear the name.
+    """
+    return norm(query.split(",")[0]) in names_of(cand)
+
+
 def acceptable(cand: dict, accept: list[tuple[str, str | None]]) -> bool:
     return any(cand.get("class") == cls and (typ is None or cand.get("type") == typ)
                for cls, typ in accept)
@@ -83,10 +151,11 @@ def importance(cand: dict) -> float:
 
 
 def resolve(name: str, want_polygon: bool = True, pause: float = 1.1,
-            simplify: float = 0.005) -> dict | None:
-    q, accept = requirements(name)
+            simplify: float = 0.005, timeout: int = 90,
+            kind: str | None = None) -> dict | None:
+    q, accept = requirements(name, kind)
     params = {"q": q, "format": "json", "limit": 12, "addressdetails": 1,
-              "extratags": 1}
+              "extratags": 1, "namedetails": 1}
     if want_polygon:
         params["polygon_geojson"] = 1
         # full-detail national outlines run to megabytes; simplifying keeps the
@@ -96,16 +165,16 @@ def resolve(name: str, want_polygon: bool = True, pause: float = 1.1,
                                  headers={"User-Agent": UA})
     time.sleep(pause)
     try:
-        cands = json.loads(urllib.request.urlopen(req, timeout=30).read())
-    except Exception:
-        return None
+        cands = json.loads(urllib.request.urlopen(req, timeout=timeout).read())
+    except Exception as exc:
+        raise LookupFailed(f"{name}: {exc}") from exc
     if not cands:
         return None
     # The class list decides which candidates are the right KIND of thing; among
     # those, Nominatim's own importance decides which one is meant. Ranking by
     # class order instead would prefer a pond in Denmark that happens to match a
     # narrower class over the Scottish loch everyone means.
-    fit = [c for c in cands if acceptable(c, accept)]
+    fit = [c for c in cands if acceptable(c, accept) and bears_name(c, q)]
     if not fit:
-        return None                    # nothing of the requested kind
+        return None            # nothing of the right kind that bears the name
     return max(fit, key=importance)

@@ -122,6 +122,18 @@ ISLANDS = [
 ALL = (COUNTRIES + US_STATES + CITIES + COUNTIES + BOROUGHS + PARKS
        + WATER + RIVERS + PHYSICAL + ISLANDS)
 
+# What each name is, so the resolver never has to infer it from spelling.
+KIND = {}
+for _grp, _kind in ((COUNTRIES, "admin"), (US_STATES, "admin"),
+                    (CITIES, "city"), (COUNTIES, "admin"), (BOROUGHS, "admin"),
+                    (PARKS, "park"), (WATER, "lake"), (RIVERS, "river"),
+                    (PHYSICAL, "physical"), (ISLANDS, "island")):
+    for _n in _grp:
+        KIND[_n] = _kind
+for _n in ("Mediterranean Sea", "Baltic Sea", "Black Sea", "Red Sea",
+           "Caspian Sea", "North Sea", "Adriatic Sea", "Aegean Sea"):
+    KIND[_n] = "sea"
+
 if __name__ == "__main__":
     from collections import Counter
     groups = dict(countries=COUNTRIES, states=US_STATES, cities=CITIES,

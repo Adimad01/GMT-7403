@@ -34,22 +34,38 @@ EPS = 0.01          # degrees, ~1 km: vertex noise and simplification slack
 SLIVER = 0.02       # intersection below this fraction of the smaller area is noise
 
 
+USABLE = {"Polygon", "MultiPolygon", "LineString", "MultiLineString"}
+
+
 def load():
+    """Geometries that can carry a topological relation, and what was dropped.
+
+    A point has no interior or boundary to speak of, so it cannot stand in a
+    DE-9IM relation worth testing. Several catalogue names resolve to one --
+    OSM maps some mountain ranges as a single node, and 'Andes' matches a town
+    in Colombia before it matches anything in the cordillera.
+    """
     raw = json.loads(GEOM.read_text())
-    geoms = {}
+    geoms, dropped = {}, []
     for name, rec in raw.items():
         if not rec:
+            dropped.append((name, "unresolved"))
+            continue
+        gt = rec["geojson"].get("type")
+        if gt not in USABLE:
+            dropped.append((name, f"geometry is a {gt}"))
             continue
         try:
             g = shape(rec["geojson"])
             if not g.is_valid:
                 g = g.buffer(0)
             if g.is_empty:
+                dropped.append((name, "empty geometry"))
                 continue
             geoms[name] = (g, rec)
-        except Exception:
-            continue
-    return geoms
+        except Exception as exc:
+            dropped.append((name, f"unreadable: {exc}"))
+    return geoms, dropped
 
 
 def area_km2(g) -> float:
@@ -139,9 +155,11 @@ def difficulty(label: str, info: dict) -> int:
 
 
 def main() -> int:
-    geoms = load()
+    geoms, dropped = load()
     names = sorted(geoms)
-    print(f"  {len(names)} geometries loaded", flush=True)
+    print(f"  {len(names)} usable geometries, {len(dropped)} dropped", flush=True)
+    for n, why in dropped[:8]:
+        print(f"    dropped {n}: {why}", flush=True)
 
     out = []
     for i, a in enumerate(names):
