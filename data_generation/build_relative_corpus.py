@@ -48,6 +48,10 @@ OPEN_A = [
  "Moored off {v} and facing {b} over the water",
  "Waiting on the platform at {v}, facing {b}",
  "Set up above {v} and looking dead at {b}",
+ "Halted on the ridge road above {v}, facing {b}",
+ "Anchored off {v} with the bow facing {b}",
+ "On the roof of the tallest block in {v}, looking at {b}",
+ "Stationed at the airfield outside {v} and facing {b}",
 ]
 CLOSE_A = [
  ", an observer also has {a} in view.",
@@ -62,6 +66,8 @@ CLOSE_A = [
  ", an astronomer sweeps past {a} on the same pass.",
  ", a cartographer marks {a} in the same quadrant.",
  ", the signaller has {a} inside the same spread.",
+ ", the surveyor's assistant logs {a} in the same arc.",
+ ", a passenger notices {a} through the same window.",
 ]
 OPEN_B = [
  "From the waterfront at {v}, with the line of sight running to {b}",
@@ -74,6 +80,10 @@ OPEN_B = [
  "Approaching {v} from seaward and facing {b}",
  "Driving out of {v} on the road that runs at {b}",
  "From the lighthouse at {v}, its beam facing {b}",
+ "From the pier at {v}, the sight line held on {b}",
+ "From the signal tower at {v}, looking toward {b}",
+ "As you look out from {v} down the axis to {b}",
+ "From the escarpment above {v}, facing {b}",
 ]
 CLOSE_B = [
  ", {a} lies in the same field of view.",
@@ -88,6 +98,8 @@ CLOSE_B = [
  ", {a} stands within the same sweep.",
  ", {a} turns up in the same forward view.",
  ", {a} is held in the same frame.",
+ ", {a} lies inside the same sweep of view.",
+ ", {a} appears within the same span of horizon.",
 ]
 
 PATTERNS = ([a + b for a in OPEN_A for b in CLOSE_A]
@@ -100,6 +112,12 @@ HOP_PATTERNS = {
   "As you pan clockwise from {v}, the order in which the three come up is {a}, then {c}, and then {b}.",
   "Viewed from {v} with the eye travelling clockwise, {a} appears before {c}, and {c} before {b}.",
   "From the vantage at {v}, a clockwise sweep passes {a}, goes on to {c}, and ends at {b}.",
+  "From the parapet at {v}, turning clockwise, {a} comes up first, then {c}, and {b} last.",
+  "Standing in {v}, a clockwise scan of the skyline meets {a}, afterwards {c}, and finally {b}.",
+  "As you rotate clockwise on the spot in {v}, {a} appears before {c}, and {c} before {b}.",
+  "Viewed from {v}, moving the eye clockwise picks out {a}, then {c}, and only then {b}.",
+  "From the lookout at {v}, a clockwise arc reaches {a} before {c}, and {c} before {b}.",
+  "Looking out from {v} and swinging clockwise, {a} comes before {c}, and {c} comes before {b}.",
  ],
  "right_of": [
   "Standing in {v} and sweeping the view clockwise, {b} is met first, then {c}, and finally {a}.",
@@ -107,6 +125,12 @@ HOP_PATTERNS = {
   "As you pan clockwise from {v}, the three come up in the order {b}, then {c}, and then {a}.",
   "Viewed from {v} with the eye travelling clockwise, {b} shows up before {c}, and {c} before {a}.",
   "From the vantage at {v}, a clockwise sweep takes in {b}, continues to {c}, and finishes at {a}.",
+  "From the parapet at {v}, turning clockwise, {b} comes up first, then {c}, and {a} last.",
+  "Standing in {v}, a clockwise scan of the skyline meets {b}, afterwards {c}, and finally {a}.",
+  "As you rotate clockwise on the spot in {v}, {b} appears before {c}, and {c} before {a}.",
+  "Viewed from {v}, moving the eye clockwise picks out {b}, then {c}, and only then {a}.",
+  "From the lookout at {v}, a clockwise arc reaches {b} before {c}, and {c} before {a}.",
+  "Looking out from {v} and swinging clockwise, {b} comes before {c}, and {c} comes before {a}.",
  ],
  "in_front_of": [
   "Standing in {v} and looking down one line of sight, {a} is reached first, then {c}, and finally {b}.",
@@ -114,6 +138,12 @@ HOP_PATTERNS = {
   "As you sight from {v} down one axis, distance grows from {a} to {c}, and on to {b}.",
   "Viewed from {v} along one bearing, {a} stands closest, {c} lies past it, and {b} further still.",
   "From the tower at {v}, all three sit on one line: {a} nearest, then {c}, and {b} last.",
+  "From the parapet at {v}, along one bearing, {a} is nearest, {c} beyond it, and {b} beyond that.",
+  "Standing in {v} and sighting down a single line, {a} lies nearer than {c}, and {c} nearer than {b}.",
+  "As you look from {v} along one axis, {a} is met first, {c} next, and {b} furthest out.",
+  "Viewed from {v} on one bearing, {a} holds the near ground, and {c} stands between it and {b}.",
+  "From the lookout at {v}, {a} is closer than {c}, and {c} is closer than {b}.",
+  "Looking out from {v} down a single sight line, {a} precedes {c}, and {c} precedes {b}.",
  ],
  "behind": [
   "Standing in {v} and looking down one line of sight, {b} is reached first, then {c}, and finally {a}.",
@@ -121,6 +151,12 @@ HOP_PATTERNS = {
   "As you sight from {v} down one axis, distance grows from {b} to {c}, and on to {a}.",
   "Viewed from {v} along one bearing, {b} stands closest, {c} lies past it, and {a} further still.",
   "From the tower at {v}, all three sit on one line: {b} nearest, then {c}, and {a} last.",
+  "From the parapet at {v}, along one bearing, {b} is nearest, {c} beyond it, and {a} beyond that.",
+  "Standing in {v} and sighting down a single line, {b} lies nearer than {c}, and {c} nearer than {a}.",
+  "As you look from {v} along one axis, {b} is met first, {c} next, and {a} furthest out.",
+  "Viewed from {v} on one bearing, {b} holds the near ground, and {c} stands between it and {a}.",
+  "From the lookout at {v}, {b} is closer than {c}, and {c} is closer than {a}.",
+  "Looking out from {v} down a single sight line, {b} precedes {c}, and {c} precedes {a}.",
  ],
 }
 
