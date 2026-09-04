@@ -24,7 +24,8 @@ def rd(p: Path) -> list[dict]:
 
 SPEC = {
     "relative": dict(
-        n_per_cell=6,
+        # 11 per cell x 29 cells = 319 rows -> 29 train / 290 eval.
+        n_per_cell=11,
         # next_to does NOT compose: A beside C and C beside B leaves A and B
         # possibly far apart.
         hop_labels=["left_of", "right_of", "in_front_of", "behind"],
@@ -61,7 +62,8 @@ SPEC = {
              "direction explicitly — 'left' is meaningless without one."),
 
     "cardinal": dict(
-        n_per_cell=3,
+        # 7 per cell x 48 cells = 336 rows -> 48 train / 288 eval.
+        n_per_cell=7,
         hop_labels=["north_of", "south_of", "east_of", "west_of",
                     "northeast_of", "northwest_of", "southeast_of", "southwest_of"],
         labels=["north_of", "south_of", "east_of", "west_of",
@@ -220,23 +222,116 @@ SPEC = {
         ]),
 
     "topological": dict(
-        n_per_cell=5,
-        # Only these three are reachable by a forced composition that involves
-        # real spatial reasoning. touches/crosses/overlaps compose to nothing,
-        # and 'equals' is only reachable by chaining synonyms, which is a naming
-        # trick rather than an inference.
+        # 9 per cell x 38 cells = 342 rows -> 38 train / 304 eval. At 116 eval
+        # rows the smallest detectable difference between two strategies is 17
+        # percentage points; at 304 it is about 11. Prompting effects are
+        # usually 5-15 points, which is why the first run found nothing.
+        n_per_cell=9,
+        # Only these three compose in a way that is logically forced.
+        # touches/crosses/overlaps compose to nothing, and equals is reachable
+        # only by chaining synonyms, which is a naming trick.
         hop_labels=["contains", "within", "disjoint"],
         labels=["contains", "within", "touches", "crosses",
                 "disjoint", "overlaps", "equals"],
         what="TOPOLOGICAL RELATION — how the areas of two places relate (DE-9IM style)",
         levels=[
-            "Very well-known places, relation stated plainly: 'California fully envelops "
-            "Los Angeles'.",
-            "Well-known but needing a moment: a country completely encircling a microstate.",
-            "Requires specific knowledge: municipal limits versus an enclave's borders.",
-            "Unusual geopolitical cases: enclaves, exclaves, condominiums, disputed zones.",
-            "Large natural or geomorphic features rather than administrative ones: oceans, "
-            "trenches, deserts, mountain ranges, river basins.",
+            "An extreme, unmistakable configuration. A country against one of its "
+            "cities; two places on opposite sides of the world; two countries "
+            "sharing a long, famous border.",
+            "Still clear, but the reader has to place both correctly — two "
+            "mid-sized units rather than one vast and one tiny.",
+            "Needs specific knowledge: a metropolitan boundary against a county, "
+            "a national park against a state line, a river against a country it "
+            "only clips.",
+            "A marginal configuration. The two are of comparable size, or share "
+            "only a short stretch of border, or overlap in a small fraction of "
+            "their area. The answer is defensible but not obvious.",
+            "Genuinely difficult: enclaves and exclaves, condominiums, two units "
+            "of almost identical extent, a feature that barely enters another.",
+        ],
+        extra_rules=[
+            "THE HEADLINE RULE: the description must NOT state the relation, in "
+            "any words. It introduces the two places and stops. The reader must "
+            "supply the relation from knowing where these places are.",
+            "This is why the dataset is being rebuilt. The previous version "
+            "wrote 'The State of California fully envelops the City of Los "
+            "Angeles' — 'fully envelops' IS the answer, and the reader never "
+            "needs to know what either place is. 67% of the old contains items "
+            "leaked this way and the task was saturated.",
+            "FORBIDDEN in every Level 1-5 description: envelops, encloses, "
+            "encircles, surrounds, bounding, inside, within, nested, engulfs, "
+            "encompasses, contained; shares no ground, separate from, detached, "
+            "apart from, never meet, isolated; shares a border, abuts, adjoins, "
+            "common boundary, flush against; partially, spills into, extends "
+            "into, straddles, overlaps; passes through, traverses, runs through, "
+            "cuts across, bisects; identical, synonymous, coextensive, the same "
+            "as. The list is not exhaustive — the rule is the intent behind it.",
+            "Also forbidden, because each hands over an answer by implication: "
+            "naming one place's parent ('the French capital', 'a city in "
+            "Colorado') gives contains and within away; mentioning a neighbour "
+            "('on the German border') gives touches away; quoting an area or "
+            "population ('covers 270,000 square kilometres') gives away the size "
+            "ratio, which is exactly how the ambiguity level is graded.",
+            "What a description MAY contain: history, culture, economy, physical "
+            "character. Enough to identify the place to a reader who knows "
+            "geography, and useless to one who does not.",
+            "EVERY PLACE MUST BE A REAL OPENSTREETMAP OBJECT WITH A BOUNDARY. "
+            "Every row is checked against actual OSM polygons and the relation "
+            "is recomputed; a row whose places do not resolve is discarded "
+            "whatever it says. Use countries, first-level divisions, counties, "
+            "municipalities, named national parks, named lakes, seas, rivers, "
+            "islands, deserts and forests.",
+            "BANNED ENTITY TYPES, all of which appeared in the previous version "
+            "and none of which has a boundary: vernacular regions (Rust Belt, "
+            "American Midwest, Sahel Region, the Levant); jurisdictional zones "
+            "(Falkland Islands EEZ, German Sovereign Territory); abstractions "
+            "(Abstract Geodetic Prime Meridian, Physical River Thames Current, "
+            "Vennbahn Railway Legal Footprint); summits and points (Mount "
+            "Everest Summit, Denali Summit); and interiors of buildings. "
+            "Mountain ranges are mapped inconsistently — prefer deserts, "
+            "forests and islands.",
+            "Use the full official name so it resolves unambiguously: 'State of "
+            "Colorado', 'City of Philadelphia', 'Philadelphia County', 'Lake "
+            "Huron', 'River Thames'. One name per place throughout — do not "
+            "write Africa in one row and African Mainland in another.",
+            "NEVER send a pair together with its mirror. 'A contains B' and 'B "
+            "within A' are one fact stated twice; putting one in training and "
+            "the other in evaluation hands the model its answer. The previous "
+            "version had 88 such mirrors.",
+            "EQUALS IS CAPPED. Two differently named objects almost never share "
+            "a boundary. The only reliable sources are consolidated "
+            "city-counties (City and County of Denver = Denver County; City of "
+            "Philadelphia = Philadelphia County; Borough of Brooklyn = Kings "
+            "County) and a handful of similar cases. Send at most 12 equals "
+            "rows in total and do not invent others to fill the grid — a short "
+            "cell is fine, a fabricated one is not.",
+        ],
+        exemplars=[
+            'State of Colorado,Polygon,City of Denver,Polygon,"Colorado takes its '
+            'name from a Spanish word for red. Denver sits exactly a mile above sea '
+            'level.",,topological,contains,"A first-level division against one of '
+            'its municipalities; the size ratio is enormous, so the configuration '
+            'is unmistakable.",Level 1',
+            'City of Seattle,Polygon,State of Washington,Polygon,"Seattle grew rich '
+            'outfitting the Klondike gold rush. Washington is named after the first '
+            'US president.",,topological,within,"The reader must place a city inside '
+            'the correct state without being told which state it is.",Level 2',
+            'Portugal,Polygon,Spain,Polygon,"Portugal ended a long dictatorship in '
+            'the Carnation Revolution of 1974. Spain returned to constitutional '
+            'monarchy after 1975.",,topological,touches,"Two countries sharing a '
+            'single long land border and nothing else.",Level 1',
+            'River Thames,Line,United Kingdom,Polygon,"The Thames froze hard enough '
+            'for frost fairs in past centuries. The United Kingdom left the European '
+            'Union in 2020.",,topological,within,"A watercourse lying entirely inside '
+            'one state, so the line never leaves the polygon.",Level 2',
+            'Sahara,Polygon,Egypt,Polygon,"The Sahara is the largest hot desert on '
+            'earth. Egypt nationalised its great shipping canal in '
+            '1956.",,topological,overlaps,"A physical region and a state that share '
+            'a large area while neither contains the other.",Level 3',
+            'Iceland,Polygon,Madagascar,Polygon,"Iceland runs almost entirely on '
+            'geothermal and hydroelectric power. Madagascar\'s wildlife is '
+            'overwhelmingly found nowhere else.",,topological,disjoint,"Two islands '
+            'in different hemispheres with no contact of any kind.",Level 1',
         ],
         hop_rule=(
             "Only some compositions are logically FORCED. Use these, and no others:\n"
@@ -244,13 +339,17 @@ SPEC = {
             "  A contains C + C contains B  => A contains B\n"
             "  A within C   + C disjoint B  => A disjoint from B\n"
             "NEVER chain 'touches' with 'touches' — A touches C and C touches B implies "
-            "NOTHING about A and B. The same applies to crosses and overlaps. If the "
-            "composition is not forced, the item is unusable."),
+            "NOTHING about A and B. The same applies to crosses and overlaps. Plain "
+            "disjoint is not transitive either, which is why the disjoint chain routes "
+            "through a containment step. If the composition is not forced, the item is "
+            "unusable."),
         hop_example=(
-            "The Vatican Museums sit entirely inside the walls of Vatican City, and "
-            "Vatican City in turn lies wholly inside the municipal boundary of Rome. "
-            "(A=Vatican Museums, C=Vatican City, B=Rome — all three named, both links "
-            "stated, and C is a real third place rather than a synonym.)"),
+            "Level 6 is the ONE place a relational phrase is allowed, because without "
+            "it there is no chain to compose: 'The Vatican Museums sit entirely inside "
+            "the walls of Vatican City, and Vatican City in turn lies wholly inside the "
+            "municipal boundary of Rome.' (A=Vatican Museums, C=Vatican City, B=Rome — "
+            "all three named, both links stated, and C is a real third place rather "
+            "than a synonym.)"),
         note="Label meanings: contains = A fully encloses B. within = A is fully inside "
              "B. touches = share a boundary but interiors do not overlap. crosses = they "
              "cut through each other. disjoint = no contact at all. overlaps = partial "
@@ -379,9 +478,11 @@ Allowed labels (use these exact strings): {', '.join(spec['labels'])}
 
 ## The six ambiguity levels
 
-Levels 1-5 describe HOW HARD THE WORDING is, not how uncertain the geography
-is: the correct answer is always unambiguous, only the phrasing gets harder.
-Level 6 is different in kind — it adds an inference step instead.
+Levels 1-5 grade HOW HARD THE GEOGRAPHY is. The correct answer is always
+unambiguous; what changes is how much a reader must know, and how far the
+configuration sits from the obvious case. The wording never carries the
+answer — see the headline rule below. Level 6 is different in kind: it adds
+an inference step instead.
 
 {levels_md}
 

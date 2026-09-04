@@ -1,12 +1,12 @@
-# TASK: generate 174 new spatial-relation examples (relative)
+# TASK: generate 319 new spatial-relation examples (relative)
 
 You are extending a research dataset used to test how well language models
-reason about space. I need 174 NEW rows, 6 per cell:
+reason about space. I need 319 NEW rows, 11 per cell:
 
   Levels 1-5: all 5 labels x 5 levels = 25 cells
   Level 6   : only 4 labels (left_of, right_of, in_front_of, behind) = 4 cells
 
-  total 29 cells x 6 = 174 rows, of which 24 are multi-hop.
+  total 29 cells x 11 = 319 rows, of which 44 are multi-hop.
 
 The Level 6 grid is deliberately smaller: the remaining labels have no forced
 two-hop composition, so multi-hop rows for them would have no determinate
@@ -22,9 +22,11 @@ Every description MUST state the observer's viewpoint or facing direction explic
 
 ## The six ambiguity levels
 
-Levels 1-5 describe HOW HARD THE WORDING is, not how uncertain the geography
-is: the correct answer is always unambiguous, only the phrasing gets harder.
-Level 6 is different in kind — it adds an inference step instead.
+Levels 1-5 grade HOW HARD THE GEOGRAPHY is. The correct answer is always
+unambiguous; what changes is how much a reader must know, and how far the
+configuration sits from the obvious case. The wording never carries the
+answer — see the headline rule below. Level 6 is different in kind: it adds
+an inference step instead.
 
 - **Level 1** — Plain but non-literal wording. Nautical or aviation terms: 'port arm', 'starboard side', 'off the bow'.
 - **Level 2** — Clock-face bearings from a stated facing direction: 'towards the 9 o'clock mark', 'at 3 o'clock'.
@@ -109,7 +111,7 @@ on the right object, do not use it.
 ## Output format
 
 Return ONLY valid CSV. No prose, no markdown fences, no commentary.
-Header row exactly as below, then 174 data rows.
+Header row exactly as below, then 319 data rows.
 
 Columns:
   source_entity     the subject place (A)
@@ -163,96 +165,176 @@ source_entity,source_geometry,target_entity,target_geometry,corpus,via_entity,re
 
 Note these predate the `via_entity` column, so it is empty in all of them.
 
-Statue of Liberty,Point,Ellis Island,Polygon,"Approaching Ellis Island on a ferry, the Statue of Liberty passes by the port bow of the ship.",,relative_direction,left_of,"'Port bow' is a universally recognized nautical term mapping to the left orientation.",Level 1
-The Wedding at Cana Painting,Polygon,Mona Lisa Painting,Polygon,"Looking straight at the Mona Lisa, the massive painting of The Wedding at Cana occupies the wall aligned with your beating heart.",,relative_direction,left_of,"Anatomically, the human heart is positioned on the left, establishing the spatial vector.",Level 2
-Pacific Ocean,Polygon,North America,Polygon,"On a standard English-language map, the vast ocean occupies the margin where the strike of a typewriter begins relative to the continent.",,relative_direction,left_of,"An English typewriter begins striking on the starting margin, dictating this spatial orientation.",Level 3
-Statue of Liberty,Polygon,Ellis Island,Polygon,"Sailing into the harbor, the Statue of Liberty is situated towards the port bow, matching the arm where a wristwatch is traditionally fastened.",,relative_direction,left_of,"The port bow and the arm bearing a wristwatch both universally translate to the port-oriented geometric direction.",Level 4
-Port Wingtip,Point,Starboard Wingtip,Point,"Facing the nose of the approaching aircraft, the wingtip emitting the flashing red navigation light is positioned strictly on that specific geometric vector.",,relative_direction,left_of,"International aviation standards dictate the red navigation light is mounted exclusively on the port-oriented wing.",Level 5
-Bellagio Fountains,Polygon,Las Vegas Strip,LineString,"Driving up the Las Vegas Strip in a standard American car, the fountains will erupt out the passenger window.",,relative_direction,right_of,"In an American left-hand drive car, the passenger window implies the rightward direction.",Level 1
-London Eye,Polygon,Thames River,LineString,"Looking downstream along the Thames River, the massive wheel of the London Eye sits towards your 3 o'clock mark.",,relative_direction,right_of,"The '3 o'clock mark' from an observer's forward-facing perspective establishes the rightward direction.",Level 2
-Supreme Court Building,Polygon,United States Capitol,Polygon,"Standing on the plaza and facing the United States Capitol head-on, the Supreme Court Building sits off toward the arm you would normally extend to greet someone with a firm handshake.",,relative_direction,right_of,"The hand used for a customary handshake maps by convention to the starboard-oriented spatial vector.",Level 3
-Atlantic Ocean,Polygon,North American Continent,Polygon,"Viewing a standard world map, the ocean is positioned on the margin matching the high treble keys of a grand piano relative to the landmass.",,relative_direction,right_of,"The treble keys on a piano dictate a strictly starboard-oriented geometric mapping.",Level 4
-Gas Pedal,Polygon,Clutch Pedal,Polygon,"Operating a standard automobile, the gas pedal is engineered specifically to be depressed by the foot belonging to the globally dominant writing arm.",,relative_direction,right_of,"The globally dominant writing arm corresponds to the starboard-oriented limb, which operates the gas pedal.",Level 5
-Orchestra Pit,Polygon,Main Theatrical Stage,Polygon,"From the perspective of the audience, the orchestra pit sits directly ahead of the stage.",,relative_direction,in_front_of,"'Directly ahead' from an observer's viewpoint implies the forward/front position.",Level 1
-Great Pyramid of Giza,Polygon,Great Sphinx,Polygon,"Approaching the Great Pyramid from the Sphinx, the massive structure sits completely blocking your advancing footsteps.",,relative_direction,in_front_of,"An object 'blocking your advancing footsteps' must physically be located in the front position.",Level 2
-Lincoln Memorial Reflecting Pool,Polygon,Washington Monument,Polygon,"Marching straight towards the obelisk from the memorial steps, the long pool of water completely blocks your advancing path.",,relative_direction,in_front_of,"An object blocking an advancing path is situated directly in the forward position.",Level 3
-Washington Monument,Polygon,Lincoln Memorial,Polygon,"Standing on the memorial steps gazing at the Capitol, the towering obelisk dominates the exact vector pointing straight out from the bridge of your nose.",,relative_direction,in_front_of,"The vector extending from the bridge of the nose translates to the advancing 12 o'clock geometric plane.",Level 4
-Great Pyramid Entrance,Polygon,King's Chamber,Polygon,"Approaching the monument, the ancient entrance sits precisely at your 12 o'clock, completely intercepting your advancing footsteps.",,relative_direction,in_front_of,"An object intercepting advancing footsteps occupies the primary 12 o'clock spatial trajectory.",Level 5
-Golden Gate Bridge,LineString,Downtown San Francisco,Polygon,"Driving away from Downtown San Francisco, the massive bridge fades away in your rearview mirror.",,relative_direction,behind,"The 'rearview mirror' strictly indicates that an object is located behind the observer's forward motion.",Level 1
-St Patrick's Main Doors,LineString,St Patrick's Altar,Polygon,"As you face the altar inside St. Patrick's Cathedral, the main entrance doors are located completely out of view at your 6 o'clock.",,relative_direction,behind,"The '6 o'clock' position strictly dictates the area in the rear or behind the observer.",Level 2
-Ellis Island,Point,Statue of Liberty,Point,"Gazing out from the Statue of Liberty toward the open mouth of the harbor, Ellis Island falls at the steady six o'clock position directly at the observer's back.",,relative_direction,behind,"The six o'clock reading and being at one's back both resolve to the rearward vector.",Level 3
-Golden Gate Bridge,LineString,Fleeing Vehicle,Polygon,"Driving away from the bay towards the mainland, the suspension cables fade completely into the blind spot of the tailgate.",,relative_direction,behind,"A tailgate blind spot perfectly describes the trailing, 6 o'clock spatial geometry.",Level 4
-Mount Vesuvius,Polygon,Fleeing Pompeii Citizens,MultiPolygon,"Sprinting desperately for the safety of the boats, the citizens felt the intense heat of the eruption exclusively upon the heels of their sandals.",,relative_direction,behind,"The heels of fleeing individuals face the receding 6 o'clock spatial geometry.",Level 5
-Petronas Tower 1,Polygon,Petronas Tower 2,Polygon,"The two massive skyscrapers were built bordering one another in the financial district.",,relative_direction,next_to,"The term 'bordering one another' is a clear substitute for adjacent proximity.",Level 1
-New York Public Library,Polygon,Bryant Park,Polygon,"The New York Public Library and Bryant Park are positioned within a short stone's throw of one another.",,relative_direction,next_to,"The vernacular expression 'stone's throw' maps to immediate geometric adjacency.",Level 2
-Canada,Polygon,United States,Polygon,"The two massive North American nations lie geographically flush against one another for thousands of miles.",,relative_direction,next_to,"The vernacular 'flush against one another' implies direct, unbroken adjacency.",Level 3
-Vatican City,Polygon,City of Rome,Polygon,"The sovereign enclave and the Italian capital sit within immediate whispering distance, sharing a single contiguous masonry wall.",,relative_direction,next_to,"Whispering distance and a contiguous masonry wall dictate immediate spatial proximity.",Level 4
-Big Ben Clock Tower,Polygon,Palace of Westminster,Polygon,"The massive clock tower is physically grafted onto the masonry of the main parliamentary structure, sharing identical foundation coordinates.",,relative_direction,next_to,"Physical grafting and shared masonry dictate immediate geometric proximity.",Level 5
+City of Athens,Polygon,City of Helsinki,Polygon,"Standing in Ankara and facing Helsinki squarely, a navigator notes Athens on the same segment of chart.",,relative_direction,left_of,"From Ankara the sight line to Helsinki runs 11 degrees off north; Athens sits -91 degrees from that line at 0.35 times the distance.",Level 1
+City of Calgary,Polygon,City of Caracas,Polygon,"Standing in Bogota and facing Caracas squarely, an astronomer sweeps past Calgary on the same pass.",,relative_direction,left_of,"From Bogota the sight line to Caracas runs 51 degrees off north; Calgary sits -79 degrees from that line at 6.23 times the distance.",Level 2
+City of Cape Town,Polygon,City of Dakar,Polygon,"Working in Cairo with the instrument facing Dakar, a surveyor picks up Cape Town in the same sweep.",,relative_direction,left_of,"From Cairo the sight line to Dakar runs 98 degrees off north; Cape Town sits -70 degrees from that line at 1.38 times the distance.",Level 3
+City of La Paz,Polygon,City of Mexico City,Polygon,"Working in Halifax with the instrument facing Mexico City, the pilot keeps La Paz in the same window.",,relative_direction,left_of,"From Halifax the sight line to Mexico City runs 119 degrees off north; La Paz sits -56 degrees from that line at 1.58 times the distance.",Level 4
+City of Manila,Polygon,City of Perth,Polygon,"Posted in Kolkata and looking steadily at Perth, an observer also has Manila in view.",,relative_direction,left_of,"From Kolkata the sight line to Perth runs 153 degrees off north; Manila sits -55 degrees from that line at 0.53 times the distance.",Level 5
+City of Nairobi,Polygon,City of Paris,Polygon,"Posted in Madrid and looking steadily at Paris, a geographer takes in Nairobi at the same moment.",,relative_direction,right_of,"From Madrid the sight line to Paris runs 25 degrees off north; Nairobi sits +103 degrees from that line at 5.88 times the distance.",Level 1
+City of Rio De Janeiro,Polygon,City of Panama City,Polygon,"Posted in Montevideo and looking steadily at Panama City, a walker takes in Rio De Janeiro without turning.",,relative_direction,right_of,"From Montevideo the sight line to Panama City runs 31 degrees off north; Rio De Janeiro sits +78 degrees from that line at 0.34 times the distance.",Level 2
+City of Tunis,Polygon,City of Tashkent,Polygon,"Sitting in the tower at Stockholm and facing Tashkent, an observer also has Tunis in view.",,relative_direction,right_of,"From Stockholm the sight line to Tashkent runs 97 degrees off north; Tunis sits +100 degrees from that line at 0.64 times the distance.",Level 3
+City of Quito,Polygon,City of Sao Paulo,Polygon,"Sitting in the tower at Caracas and facing Sao Paulo, the controller sees Quito on the same display.",,relative_direction,right_of,"From Caracas the sight line to Sao Paulo runs 150 degrees off north; Quito sits +78 degrees from that line at 0.40 times the distance.",Level 4
+City of Ankara,Polygon,City of Abu Dhabi,Polygon,"Camped outside Baku and facing Abu Dhabi across the plain, an observer also has Ankara in view.",,relative_direction,right_of,"From Baku the sight line to Abu Dhabi runs 165 degrees off north; Ankara sits +108 degrees from that line at 0.79 times the distance.",Level 5
+City of Yerevan,Polygon,City of Minsk,Polygon,"Camped outside Dubai and facing Minsk across the plain, the pilot keeps Yerevan in the same window.",,relative_direction,in_front_of,"From Dubai the sight line to Minsk runs 28 degrees off north; Yerevan sits -0 degrees from that line at 0.49 times the distance.",Level 1
+City of Prague,Polygon,City of Edinburgh,Polygon,"Camped outside Bucharest and facing Edinburgh across the plain, the controller sees Prague on the same display.",,relative_direction,in_front_of,"From Bucharest the sight line to Edinburgh runs 48 degrees off north; Prague sits -3 degrees from that line at 0.45 times the distance.",Level 2
+City of Tashkent,Polygon,City of Bangkok,Polygon,"Looking out from Kyiv with the gaze locked on Bangkok, an observer also has Tashkent in view.",,relative_direction,in_front_of,"From Kyiv the sight line to Bangkok runs 97 degrees off north; Tashkent sits -3 degrees from that line at 0.42 times the distance.",Level 3
+City of Vienna,Polygon,City of Tunis,Polygon,"Looking out from Riga with the gaze locked on Tunis, the controller sees Vienna on the same display.",,relative_direction,in_front_of,"From Riga the sight line to Tunis runs 149 degrees off north; Vienna sits +1 degrees from that line at 0.45 times the distance.",Level 4
+City of Miami,Polygon,City of Panama City,Polygon,"Flying over Toronto and facing Panama City on the present heading, an observer also has Miami in view.",,relative_direction,in_front_of,"From Toronto the sight line to Panama City runs 180 degrees off north; Miami sits +2 degrees from that line at 0.52 times the distance.",Level 5
+City of Almaty,Polygon,City of Dhaka,Polygon,"Flying over Jakarta and facing Dhaka on the present heading, the operator catches Almaty in the identical sector.",,relative_direction,behind,"From Jakarta the sight line to Dhaka runs 28 degrees off north; Almaty sits +2 degrees from that line at 1.66 times the distance.",Level 1
+City of Munich,Polygon,City of New York,Polygon,"Flying over Atlanta and facing New York on the present heading, the controller sees Munich on the same display.",,relative_direction,behind,"From Atlanta the sight line to New York runs 47 degrees off north; Munich sits -2 degrees from that line at 6.41 times the distance.",Level 2
+City of Miami,Polygon,City of Houston,Polygon,"Moored off San Diego and facing Houston over the water, a geographer takes in Miami at the same moment.",,relative_direction,behind,"From San Diego the sight line to Houston runs 93 degrees off north; Miami sits -1 degrees from that line at 1.74 times the distance.",Level 3
+City of Hong Kong,Polygon,City of Shanghai,Polygon,"Moored off Seoul and facing Shanghai over the water, the pilot keeps Hong Kong in the same window.",,relative_direction,behind,"From Seoul the sight line to Shanghai runs 143 degrees off north; Hong Kong sits +2 degrees from that line at 2.41 times the distance.",Level 4
+City of Harare,Polygon,City of Naples,Polygon,"Waiting on the platform at Venice, facing Naples, a navigator notes Harare on the same segment of chart.",,relative_direction,behind,"From Venice the sight line to Naples runs 162 degrees off north; Harare sits -2 degrees from that line at 13.64 times the distance.",Level 5
+City of Tallinn,Polygon,City of St Petersburg,Polygon,"Waiting on the platform at Doha, facing St Petersburg, a walker takes in Tallinn without turning.",,relative_direction,next_to,"From Doha the sight line to St Petersburg runs 17 degrees off north; Tallinn sits -4 degrees from that line at 1.03 times the distance.",Level 1
+City of Sarajevo,Polygon,City of Bratislava,Polygon,"Set up above Chengdu and looking dead at Bratislava, an observer also has Sarajevo in view.",,relative_direction,next_to,"From Chengdu the sight line to Bratislava runs 47 degrees off north; Sarajevo sits -5 degrees from that line at 1.01 times the distance.",Level 2
+City of Cleveland,Polygon,City of Windsor,Polygon,"Set up above Portland and looking dead at Windsor, the pilot keeps Cleveland in the same window.",,relative_direction,next_to,"From Portland the sight line to Windsor runs 82 degrees off north; Cleveland sits +1 degrees from that line at 1.04 times the distance.",Level 3
+City of Recife,Polygon,City of Fortaleza,Polygon,"Set up above Turin and looking dead at Fortaleza, the controller sees Recife on the same display.",,relative_direction,next_to,"From Turin the sight line to Fortaleza runs 127 degrees off north; Recife sits -6 degrees from that line at 1.03 times the distance.",Level 4
+City of Montevideo,Polygon,City of Buenos Aires,Polygon,"From the waterfront at Kingston, with the line of sight running to Buenos Aires, Montevideo enters the same panorama.",,relative_direction,next_to,"From Kingston the sight line to Buenos Aires runs 162 degrees off north; Montevideo sits -2 degrees from that line at 1.02 times the distance.",Level 5
 
 ## Entity pairs already used — do not repeat these
 
-Administration Offices | Public Gallery
-Alcatraz Dock | Ferry Bow
-Alcatraz Island | Departing Ferry
-Alcatraz Island | Fisherman's Wharf
-Alcatraz Island | Golden Gate Bridge
-Atlantic Ocean | North American Continent
-Bellagio Fountains | Las Vegas Strip
-Big Ben Clock Tower | Palace of Westminster
-Big Ben | Palace of Westminster
-Brooklyn Bridge | One World Trade Center
-Canada | United States
-Clutch Pedal | Gas Pedal
-Colosseum | Roman Forum
-Ellis Island | Statue of Liberty
-First Officer Seat | Captain Seat
-Gas Pedal | Clutch Pedal
-Golden Gate Bridge | Downtown San Francisco
-Golden Gate Bridge | Fleeing Vehicle
-Great Pyramid Entrance | King's Chamber
-Great Pyramid of Giza | Great Sphinx
-Great Sphinx | Pyramid of Khafre
-Green Park | Buckingham Palace
-Griffith Observatory | Hollywood Sign
-Lincoln Memorial Reflecting Pool | Washington Monument
-London Eye | Thames River
-Louvre Museum | Tuileries Garden
-Louvre Pyramid | Tuileries Garden
-Mona Lisa Portrait | Louvre Viewers
-Mount Rushmore Visitor Deck | Mount Rushmore Faces
-Mount Vesuvius | Fleeing Citizens
-Mount Vesuvius | Fleeing Pompeii Citizens
-New York Public Library | Bryant Park
-New York Stock Exchange | Federal Hall
-Oncoming Traffic | Driver Vehicle
-Orchestra Pit | Main Theatrical Stage
-Pacific Ocean | North America
-Pacific Ocean | North American Continent
-Passing Lane | Slow Lane
-Performers Stage | Sydney Opera House Audience
-Petronas Tower 1 | Petronas Tower 2
-Port Wingtip | Starboard Wingtip
-Reflection Pool | Taj Mahal
-Richelieu Wing | Louvre Pyramid
-River Seine | Eiffel Tower
-Rose Garden | Oval Office
-San Gabriel Mountains | Griffith Observatory
-Security Gate | Main Mansion
-St Patrick's Main Doors | St Patrick's Altar
-Stage Curtain | Theater Audience
-State of California | State of Nevada
-State of Nevada | State of California
-Statue of Liberty | Ellis Island
-Supreme Court Building | Library of Congress
-Supreme Court Building | United States Capitol
-Taj Mahal Minarets | Taj Mahal Dome
-The Wedding at Cana Painting | Mona Lisa Painting
-Titanic Iceberg | RMS Titanic
-United States Capitol | Supreme Court Building
-United States | Canada
-Ural Mountains | European Plain
-Vatican City | City of Rome
-Vietnam Veterans Memorial | Lincoln Memorial
-Washington Monument | Capitol Building
-Washington Monument | Lincoln Memorial
-West Wing | White House Residence
+City of Accra | City of Algiers
+City of Accra | City of Baku
+City of Algiers | City of Addis Ababa
+City of Almaty | City of Dhaka
+City of Almaty | City of Singapore
+City of Ankara | City of Abu Dhabi
+City of Asuncion | City of Sao Paulo
+City of Athens | City of Amsterdam
+City of Athens | City of Helsinki
+City of Atlanta | City of Amsterdam
+City of Atlanta | City of Lagos
+City of Baghdad | City of Ankara
+City of Baghdad | City of Hong Kong
+City of Belgrade | City of Dublin
+City of Berlin | City of Beijing
+City of Bogota | City of Denver
+City of Boston | City of Harare
+City of Brussels | City of Bangkok
+City of Buenos Aires | City of Lima
+City of Cairo | City of Tunis
+City of Calgary | City of Caracas
+City of Cape Town | City of Bucharest
+City of Cape Town | City of Dakar
+City of Caracas | City of Amman
+City of Cardiff | City of Birmingham
+City of Casablanca | City of Amman
+City of Chennai | City of Belgrade
+City of Chennai | City of Riga
+City of Chicago | City of Bogota
+City of Cleveland | City of Windsor
+City of Colombo | City of Beirut
+City of Copenhagen | City of Bucharest
+City of Copenhagen | City of Oslo
+City of Dallas | City of Denver
+City of Detroit | City of Cleveland
+City of Dushanbe | City of Islamabad
+City of Edinburgh | City of Kampala
+City of Faro | City of Porto
+City of Genoa | City of Turin
+City of Gothenburg | City of Malmo
+City of Guayaquil | City of Quito
+City of Halifax | City of Beirut
+City of Halifax | City of Lisbon
+City of Hanoi | City of Jakarta
+City of Harare | City of Naples
+City of Havana | City of Luanda
+City of Ho Chi Minh City | City of Phnom Penh
+City of Hong Kong | City of Shanghai
+City of Houston | City of Quito
+City of Islamabad | City of Kabul
+City of Istanbul | City of Kolkata
+City of Istanbul | City of Riyadh
+City of Jerusalem | City of Beijing
+City of Johannesburg | City of Nairobi
+City of Johannesburg | City of Windhoek
+City of Kabul | City of Dushanbe
+City of Kampala | City of Dakar
+City of Kampala | City of Maputo
+City of Karachi | City of Budapest
+City of Karachi | City of Khartoum
+City of Kathmandu | City of Maputo
+City of Khartoum | City of Cairo
+City of Kyiv | City of Dubai
+City of Kyiv | City of Khartoum
+City of La Paz | City of Mexico City
+City of Lima | City of Boston
+City of Lima | City of Phoenix
+City of Lisbon | City of Santiago
+City of Los Angeles | City of Mexico City
+City of Luanda | City of Budapest
+City of Madrid | City of Brussels
+City of Manila | City of Dhaka
+City of Manila | City of Perth
+City of Maputo | City of Delhi
+City of Maputo | City of Paris
+City of Marseille | City of Berlin
+City of Melbourne | City of Auckland
+City of Miami | City of Houston
+City of Miami | City of Panama City
+City of Miami | City of Seattle
+City of Milan | City of Oslo
+City of Minsk | City of Delhi
+City of Montevideo | City of Buenos Aires
+City of Montevideo | City of La Paz
+City of Montreal | City of Vancouver
+City of Mumbai | City of Helsinki
+City of Mumbai | City of London
+City of Mumbai | City of Pune
+City of Munich | City of Dakar
+City of Munich | City of New York
+City of Nairobi | City of Paris
+City of Naples | City of Baku
+City of Naples | City of Moscow
+City of New York | City of Chicago
+City of Nice | City of Genoa
+City of Odesa | City of Chisinau
+City of Panama City | City of Lima
+City of Phoenix | City of Bogota
+City of Prague | City of Edinburgh
+City of Prague | City of Madrid
+City of Quebec City | City of Ottawa
+City of Quito | City of Sao Paulo
+City of Recife | City of Fortaleza
+City of Riga | City of New York
+City of Rio De Janeiro | City of Curitiba
+City of Rio De Janeiro | City of Panama City
+City of Riyadh | City of Vilnius
+City of Rome | City of Kathmandu
+City of Rome | City of Luanda
+City of Sarajevo | City of Bratislava
+City of Seoul | City of Melbourne
+City of Singapore | City of Kuala Lumpur
+City of Singapore | City of Sydney
+City of Stockholm | City of Naples
+City of Stockholm | City of Warsaw
+City of Tallinn | City of St Petersburg
+City of Tashkent | City of Bangkok
+City of Tbilisi | City of Marseille
+City of Tehran | City of Addis Ababa
+City of Tehran | City of Shanghai
+City of Tijuana | City of Los Angeles
+City of Tijuana | City of San Diego
+City of Toronto | City of San Francisco
+City of Tripoli | City of Sofia
+City of Tunis | City of Tashkent
+City of Valparaiso | City of Santiago
+City of Vancouver | City of Winnipeg
+City of Venice | City of Jerusalem
+City of Venice | City of Yerevan
+City of Vienna | City of Karachi
+City of Vienna | City of Tunis
+City of Vilnius | City of Valencia
+City of Warsaw | City of Lyon
+City of Warsaw | City of San Diego
+City of Washington | City of Havana
+City of Wellington | City of Brisbane
+City of Windhoek | City of Prague
+City of Windhoek | City of Tripoli
+City of Windsor | City of Detroit
+City of Winnipeg | City of Valencia
+City of Yerevan | City of Minsk
+City of Zagreb | City of Baghdad
+City of Zagreb | City of Kolkata
+City of Zurich | City of Damascus
+City of Zurich | City of Sao Paulo

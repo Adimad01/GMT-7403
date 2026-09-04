@@ -186,7 +186,7 @@ def _try(q, accept, want_polygon, simplify, timeout, pause):
     try:
         cands = json.loads(urllib.request.urlopen(req, timeout=timeout).read())
     except Exception as exc:
-        raise LookupFailed(f"{name}: {exc}") from exc
+        raise LookupFailed(f"{q}: {exc}") from exc
     if not cands:
         return None
     # The class list decides which candidates are the right KIND of thing; among

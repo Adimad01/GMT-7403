@@ -1,12 +1,12 @@
-# TASK: generate 190 new spatial-relation examples (topological)
+# TASK: generate 342 new spatial-relation examples (topological)
 
 You are extending a research dataset used to test how well language models
-reason about space. I need 190 NEW rows, 5 per cell:
+reason about space. I need 342 NEW rows, 9 per cell:
 
   Levels 1-5: all 7 labels x 5 levels = 35 cells
   Level 6   : only 3 labels (contains, within, disjoint) = 3 cells
 
-  total 38 cells x 5 = 190 rows, of which 15 are multi-hop.
+  total 38 cells x 9 = 342 rows, of which 27 are multi-hop.
 
 The Level 6 grid is deliberately smaller: the remaining labels have no forced
 two-hop composition, so multi-hop rows for them would have no determinate
@@ -22,15 +22,17 @@ Label meanings: contains = A fully encloses B. within = A is fully inside B. tou
 
 ## The six ambiguity levels
 
-Levels 1-5 describe HOW HARD THE WORDING is, not how uncertain the geography
-is: the correct answer is always unambiguous, only the phrasing gets harder.
-Level 6 is different in kind — it adds an inference step instead.
+Levels 1-5 grade HOW HARD THE GEOGRAPHY is. The correct answer is always
+unambiguous; what changes is how much a reader must know, and how far the
+configuration sits from the obvious case. The wording never carries the
+answer — see the headline rule below. Level 6 is different in kind: it adds
+an inference step instead.
 
-- **Level 1** — Very well-known places, relation stated plainly: 'California fully envelops Los Angeles'.
-- **Level 2** — Well-known but needing a moment: a country completely encircling a microstate.
-- **Level 3** — Requires specific knowledge: municipal limits versus an enclave's borders.
-- **Level 4** — Unusual geopolitical cases: enclaves, exclaves, condominiums, disputed zones.
-- **Level 5** — Large natural or geomorphic features rather than administrative ones: oceans, trenches, deserts, mountain ranges, river basins.
+- **Level 1** — An extreme, unmistakable configuration. A country against one of its cities; two places on opposite sides of the world; two countries sharing a long, famous border.
+- **Level 2** — Still clear, but the reader has to place both correctly — two mid-sized units rather than one vast and one tiny.
+- **Level 3** — Needs specific knowledge: a metropolitan boundary against a county, a national park against a state line, a river against a country it only clips.
+- **Level 4** — A marginal configuration. The two are of comparable size, or share only a short stretch of border, or overlap in a small fraction of their area. The answer is defensible but not obvious.
+- **Level 5** — Genuinely difficult: enclaves and exclaves, condominiums, two units of almost identical extent, a feature that barely enters another.
 - **Level 6 — MULTI-HOP** — the relation between A and B is NOT stated. The
   description states two links through an intermediate place C, and the reader
   must compose them.
@@ -47,7 +49,7 @@ Only some compositions are logically FORCED. Use these, and no others:
   A within C   + C within B    => A within B
   A contains C + C contains B  => A contains B
   A within C   + C disjoint B  => A disjoint from B
-NEVER chain 'touches' with 'touches' — A touches C and C touches B implies NOTHING about A and B. The same applies to crosses and overlaps. If the composition is not forced, the item is unusable.
+NEVER chain 'touches' with 'touches' — A touches C and C touches B implies NOTHING about A and B. The same applies to crosses and overlaps. Plain disjoint is not transitive either, which is why the disjoint chain routes through a containment step. If the composition is not forced, the item is unusable.
 
   THREE RULES THAT DECIDE WHETHER THE ROW IS USABLE:
 
@@ -78,7 +80,7 @@ NEVER chain 'touches' with 'touches' — A touches C and C touches B implies NOT
   chain and gets geocoded too.
 
   Example of the style wanted:
-    "The Vatican Museums sit entirely inside the walls of Vatican City, and Vatican City in turn lies wholly inside the municipal boundary of Rome. (A=Vatican Museums, C=Vatican City, B=Rome — all three named, both links stated, and C is a real third place rather than a synonym.)"
+    "Level 6 is the ONE place a relational phrase is allowed, because without it there is no chain to compose: 'The Vatican Museums sit entirely inside the walls of Vatican City, and Vatican City in turn lies wholly inside the municipal boundary of Rome.' (A=Vatican Museums, C=Vatican City, B=Rome — all three named, both links stated, and C is a real third place rather than a synonym.)"
 
 
 ## HARD REQUIREMENT: every place must be findable in OpenStreetMap
@@ -111,7 +113,7 @@ on the right object, do not use it.
 ## Output format
 
 Return ONLY valid CSV. No prose, no markdown fences, no commentary.
-Header row exactly as below, then 190 data rows.
+Header row exactly as below, then 342 data rows.
 
 Columns:
   source_entity     the subject place (A)
@@ -131,6 +133,26 @@ Columns:
 source_entity,source_geometry,target_entity,target_geometry,corpus,via_entity,relation_type,relation_label,explanation,ambiguity_level
 
 ## Additional rules
+
+A. THE HEADLINE RULE: the description must NOT state the relation, in any words. It introduces the two places and stops. The reader must supply the relation from knowing where these places are.
+
+B. This is why the dataset is being rebuilt. The previous version wrote 'The State of California fully envelops the City of Los Angeles' — 'fully envelops' IS the answer, and the reader never needs to know what either place is. 67% of the old contains items leaked this way and the task was saturated.
+
+C. FORBIDDEN in every Level 1-5 description: envelops, encloses, encircles, surrounds, bounding, inside, within, nested, engulfs, encompasses, contained; shares no ground, separate from, detached, apart from, never meet, isolated; shares a border, abuts, adjoins, common boundary, flush against; partially, spills into, extends into, straddles, overlaps; passes through, traverses, runs through, cuts across, bisects; identical, synonymous, coextensive, the same as. The list is not exhaustive — the rule is the intent behind it.
+
+D. Also forbidden, because each hands over an answer by implication: naming one place's parent ('the French capital', 'a city in Colorado') gives contains and within away; mentioning a neighbour ('on the German border') gives touches away; quoting an area or population ('covers 270,000 square kilometres') gives away the size ratio, which is exactly how the ambiguity level is graded.
+
+E. What a description MAY contain: history, culture, economy, physical character. Enough to identify the place to a reader who knows geography, and useless to one who does not.
+
+F. EVERY PLACE MUST BE A REAL OPENSTREETMAP OBJECT WITH A BOUNDARY. Every row is checked against actual OSM polygons and the relation is recomputed; a row whose places do not resolve is discarded whatever it says. Use countries, first-level divisions, counties, municipalities, named national parks, named lakes, seas, rivers, islands, deserts and forests.
+
+G. BANNED ENTITY TYPES, all of which appeared in the previous version and none of which has a boundary: vernacular regions (Rust Belt, American Midwest, Sahel Region, the Levant); jurisdictional zones (Falkland Islands EEZ, German Sovereign Territory); abstractions (Abstract Geodetic Prime Meridian, Physical River Thames Current, Vennbahn Railway Legal Footprint); summits and points (Mount Everest Summit, Denali Summit); and interiors of buildings. Mountain ranges are mapped inconsistently — prefer deserts, forests and islands.
+
+H. Use the full official name so it resolves unambiguously: 'State of Colorado', 'City of Philadelphia', 'Philadelphia County', 'Lake Huron', 'River Thames'. One name per place throughout — do not write Africa in one row and African Mainland in another.
+
+I. NEVER send a pair together with its mirror. 'A contains B' and 'B within A' are one fact stated twice; putting one in training and the other in evaluation hands the model its answer. The previous version had 88 such mirrors.
+
+J. EQUALS IS CAPPED. Two differently named objects almost never share a boundary. The only reliable sources are consolidated city-counties (City and County of Denver = Denver County; City of Philadelphia = Philadelphia County; Borough of Brooklyn = Kings County) and a handful of similar cases. Send at most 12 equals rows in total and do not invent others to fill the grid — a short cell is fine, a fabricated one is not.
 
 1. The label describes A with respect to B, in that order.
 2. Do not reuse any (source_entity, target_entity) pair listed at the bottom.
@@ -163,43 +185,16 @@ source_entity,source_geometry,target_entity,target_geometry,corpus,via_entity,re
 
 ## Worked examples — match this style
 
-Note these predate the `via_entity` column, so it is empty in all of them.
+These are hand-written in the style wanted, one per level.
+The rows already in the corpus use an older design that this
+prompt forbids, so they are deliberately not shown.
 
-Poland,Polygon,City of Warsaw,Polygon,"The European nation entirely bounds its capital municipality.",,topological,contains,"Poland fully encloses City of Warsaw.",Level 1
-State of Georgia,Polygon,Fulton County,Polygon,"The southern state completely encompasses the jurisdiction housing its capital.",,topological,contains,"State of Georgia fully encloses Fulton County.",Level 2
-Switzerland,Polygon,Campione d'Italia,Polygon,"The Swiss cantons completely encircle the tiny Italian exclave situated near the waters of Lake Lugano.",,topological,contains,"A sovereign nation acting as the geographic container for a tiny foreign exclave.",Level 3
-France,Polygon,Llivia,Polygon,"The French republic entirely isolates the Spanish municipal enclave from its home country.",,topological,contains,"France fully encloses Llivia.",Level 4
-Republic of Chile,Polygon,Easter Island Landmass,Polygon,"The sovereign maritime claims of the Andean nation completely wrap the isolated volcanic rock located deep in the southeastern Pacific.",,topological,contains,"A national maritime claim completely bounding a remote, isolated island polygon.",Level 5
-City of Springfield,Polygon,State of Illinois,Polygon,"The municipal footprint is perfectly surrounded by the midwestern state limits.",,topological,within,"A city polygon completely enveloped by a state polygon.",Level 1
-Eiffel Tower,Point,City of Paris,Polygon,"The iconic iron structure stands strictly confined inside the municipal limits of the French capital.",,topological,within,"A geometric point representing a landmark is located entirely inside a city polygon.",Level 2
-Denali Wilderness Area,Polygon,State of Alaska,Polygon,"The highly restricted core of the federal preserve is completely bounded by the massive frontier state.",,topological,within,"A specialized wilderness area completely enveloped by a massive state polygon.",Level 3
-Busingen am Hochrhein,Polygon,Swiss Canton of Schaffhausen,Polygon,"The German municipal exclave operates entirely locked inside the Swiss regional borders, utilizing Swiss public services and currency.",,topological,within,"A foreign municipal exclave completely trapped by a host nation's regional canton.",Level 4
-Kingdom of Lesotho,Polygon,South African Borders,Polygon,"The independent kingdom sits strictly confined by the surrounding borders of the massive host nation, unable to access the ocean.",,topological,within,"An independent nation polygon completely confined by another nation's polygon.",Level 5
-France,Polygon,Spain,Polygon,"France and Spain sit side by side on the European continent, separated by the Pyrenees mountain range.",,topological,touches,"Two national polygons sharing a physical border.",Level 1
-Vatican City,Polygon,City of Rome,Polygon,"The ancient masonry walls that define the Vatican stand right at the municipal edge of the Italian capital.",,topological,touches,"A sovereign microstate polygon meeting a city municipal polygon at a physical wall.",Level 2
-Hoover Dam Concrete Face,Polygon,Lake Mead Water Volume,Polygon,"The massive, rigid, concave concrete face of the dam sits flush against the dynamic, fluid body of the massive reservoir.",,topological,touches,"A physical 3D structural polygon flush against a fluid environmental polygon.",Level 3
-Republic of Botswana,Polygon,Republic of Zambia,Polygon,"Near the Kazungula Bridge, the sovereign territories converge at a highly specific 150-meter micro-boundary precisely in the middle of the Zambezi River.",,topological,touches,"Two massive national polygons that meet at an incredibly tiny, almost microscopic linear boundary.",Level 4
-Atacama Desert,Polygon,Andes Mountains,Polygon,"The extremely arid coastal strip meets the edge of the towering South American peaks.",,topological,touches,"Atacama Desert shares a boundary with Andes Mountains.",Level 5
-Trans-Alaska Pipeline,LineString,State of Alaska,Polygon,"The massive oil tube runs from the northern freezing slope straight down through the territory to the southern shipping port.",,topological,crosses,"An infrastructure line intersecting the interior of a state polygon.",Level 1
-Arctic Circle,LineString,Canada,Polygon,"The global latitude line slices the freezing northern tundra regions of the massive North American nation.",,topological,crosses,"A global latitude line traversing a national polygon.",Level 2
-Route 66,LineString,Continental Divide,LineString,"The historic highway drives directly over the massive hydrological spine of North America.",,topological,crosses,"A highway line intersecting a major geographical line.",Level 3
-Tropic of Cancer,LineString,Nile River,LineString,"The planetary latitudinal line intersects the northward flowing waters of the ancient African river.",,topological,crosses,"A global latitudinal line intersecting a major river line.",Level 4
-Artificial Panama Canal Trench,LineString,Continental Divide Geological Ridge,LineString,"The engineered maritime shortcut brutally pierces the massive, natural hydrological spine separating the watersheds of the Americas.",,topological,crosses,"An artificial canal line intersecting a massive geological ridge line.",Level 5
-Argentina,Polygon,Norway,Polygon,"The South American nation of Argentina is completely isolated geographically from the Scandinavian nation of Norway.",,topological,disjoint,"Countries separated by oceans and hemispheres.",Level 1
-Rocky Mountains,Polygon,Andes Mountains,Polygon,"The towering peaks of the North American range share absolutely no geographic coordinates with the South American peaks.",,topological,disjoint,"Two mountain range polygons separated by vast hemispheric distances.",Level 2
-Campione d'Italia,Polygon,Mainland Italy,Polygon,"The small municipality is totally isolated from the Italian peninsula, completely enclosed by the Swiss canton of Ticino.",,topological,disjoint,"A municipal exclave totally cut off from its sovereign nation.",Level 3
-Gotthard Base Tunnel,LineString,Swiss Alps Surface,Polygon,"The multi-billion dollar transit tube runs exclusively through deep subterranean bedrock without interacting with the towering mountain peaks above.",,topological,disjoint,"A deep subterranean line separated from complex geological surface polygons.",Level 4
-Kingdom of Lesotho,Polygon,Indian Ocean Maritime Boundary,Polygon,"As a landlocked nation entirely surrounded by South African territory, Lesotho is completely cut off from the physical coastline of the Indian Ocean Maritime Boundary.",,topological,disjoint,"Two distinct geographical polygons separated entirely by an intervening sovereign landmass, ensuring zero shared boundaries or interiors.",Level 5
-Amazon Rainforest,Polygon,Brazil,Polygon,"The Amazon Rainforest sprawls over much of northwestern Brazil but also extends its reach deep into neighboring countries like Peru and Colombia.",,topological,overlaps,"Two large polygons that share a significant interior area while both retaining exclusive external areas.",Level 1
-Falkland Islands EEZ,Polygon,Argentine Sea,Polygon,"The projected maritime boundaries clash and mutually share a vast swath of the turbulent South Atlantic ocean.",,topological,overlaps,"Two abstract legal maritime polygons intersecting across a vast ocean.",Level 2
-Kashmir Region,Polygon,Indian Territorial Claim,Polygon,"The intensely disputed military zones heavily share the exact same regional mapping on the subcontinent.",,topological,overlaps,"A contested regional polygon heavily sharing coordinates with a national claim.",Level 3
-Hala'ib Triangle,Polygon,Egyptian Territorial Claim,Polygon,"The contested desert boundary shares a significant geographic zone with the southern sovereign claims made by Cairo, leading to dual administration.",,topological,overlaps,"A contested geographic polygon partially intersecting with a national claim polygon.",Level 4
-Kalahari Desert,Polygon,Republic of Namibia,Polygon,"The southern African dry region blankets the eastern edges of the coastal desert nation.",,topological,overlaps,"Kalahari Desert partially overlaps Republic of Namibia.",Level 5
-Borough of Manhattan,Polygon,New York County,Polygon,"The island borough of Manhattan and New York County share an identical jurisdictional map.",,topological,equals,"A borough and a county with perfectly matching boundaries.",Level 1
-City of Roanoke,Polygon,Independent City of Roanoke,Polygon,"The star city projects the exact identical footprint as its standalone municipal entity.",,topological,equals,"City of Roanoke has the same area as Independent City of Roanoke.",Level 2
-Independent City of St. Louis,Polygon,St. Louis County Municipal Boundary,Polygon,"Operating entirely independently, the municipal limits represent the exact same geographical footprint as the county equivalent.",,topological,equals,"Two distinct levels of civic administration mapping to an identical footprint.",Level 3
-Geographic South Pole,Point,90 Degrees South Latitude,Point,"The physical metallic marker designating the Geographic South Pole on the Antarctic ice sheet is continuously repositioned to remain perfectly synonymous with the absolute mathematical coordinate of 90 degrees south latitude.",,topological,equals,"A physical infrastructure point geometry that is constantly updated to perfectly match an abstract mathematical point geometry.",Level 4
-Independent City of St. Louis,Polygon,St. Louis County Municipal Boundary,Polygon,"Because it operates entirely independently, the municipal limits represent the exact same geographical footprint as its county-level equivalent.",,topological,equals,"Two distinct levels of civic administration mapping to a perfectly identical topological footprint.",Level 5
+State of Colorado,Polygon,City of Denver,Polygon,"Colorado takes its name from a Spanish word for red. Denver sits exactly a mile above sea level.",,topological,contains,"A first-level division against one of its municipalities; the size ratio is enormous, so the configuration is unmistakable.",Level 1
+City of Seattle,Polygon,State of Washington,Polygon,"Seattle grew rich outfitting the Klondike gold rush. Washington is named after the first US president.",,topological,within,"The reader must place a city inside the correct state without being told which state it is.",Level 2
+Portugal,Polygon,Spain,Polygon,"Portugal ended a long dictatorship in the Carnation Revolution of 1974. Spain returned to constitutional monarchy after 1975.",,topological,touches,"Two countries sharing a single long land border and nothing else.",Level 1
+River Thames,Line,United Kingdom,Polygon,"The Thames froze hard enough for frost fairs in past centuries. The United Kingdom left the European Union in 2020.",,topological,within,"A watercourse lying entirely inside one state, so the line never leaves the polygon.",Level 2
+Sahara,Polygon,Egypt,Polygon,"The Sahara is the largest hot desert on earth. Egypt nationalised its great shipping canal in 1956.",,topological,overlaps,"A physical region and a state that share a large area while neither contains the other.",Level 3
+Iceland,Polygon,Madagascar,Polygon,"Iceland runs almost entirely on geothermal and hydroelectric power. Madagascar's wildlife is overwhelmingly found nowhere else.",,topological,disjoint,"Two islands in different hemispheres with no contact of any kind.",Level 1
 
 ## Entity pairs already used — do not repeat these
 

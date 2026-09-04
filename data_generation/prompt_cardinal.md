@@ -1,12 +1,12 @@
-# TASK: generate 144 new spatial-relation examples (cardinal)
+# TASK: generate 336 new spatial-relation examples (cardinal)
 
 You are extending a research dataset used to test how well language models
-reason about space. I need 144 NEW rows, 3 per cell:
+reason about space. I need 336 NEW rows, 7 per cell:
 
   Levels 1-5: all 8 labels x 5 levels = 40 cells
   Level 6   : only 8 labels (north_of, south_of, east_of, west_of, northeast_of, northwest_of, southeast_of, southwest_of) = 8 cells
 
-  total 48 cells x 3 = 144 rows, of which 24 are multi-hop.
+  total 48 cells x 7 = 336 rows, of which 56 are multi-hop.
 
 The Level 6 grid is deliberately smaller: the remaining labels have no forced
 two-hop composition, so multi-hop rows for them would have no determinate
@@ -56,9 +56,11 @@ Level 6 is the single exception, explained under that level.
 
 ## The six ambiguity levels
 
-Levels 1-5 describe HOW HARD THE WORDING is, not how uncertain the geography
-is: the correct answer is always unambiguous, only the phrasing gets harder.
-Level 6 is different in kind — it adds an inference step instead.
+Levels 1-5 grade HOW HARD THE GEOGRAPHY is. The correct answer is always
+unambiguous; what changes is how much a reader must know, and how far the
+configuration sits from the obvious case. The wording never carries the
+answer — see the headline rule below. Level 6 is different in kind: it adds
+an inference step instead.
 
 - **Level 1** — Both places are globally famous and the bearing matches everyone's mental map. Oslo and Rome; Cairo and Johannesburg.
 - **Level 2** — Still uncontroversial, but needs the reader to place the two countries correctly. Warsaw and Athens; Lima and Caracas.
@@ -143,7 +145,7 @@ on the right object, do not use it.
 ## Output format
 
 Return ONLY valid CSV. No prose, no markdown fences, no commentary.
-Header row exactly as below, then 144 data rows.
+Header row exactly as below, then 336 data rows.
 
 Columns:
   source_entity     the subject place (A)
@@ -220,99 +222,147 @@ City of Kampala,Polygon,City of Cairo,Polygon,"Kampala sits further from the Nor
 
 ## Entity pairs already used — do not repeat these
 
-African Continent | European Mainland
-Aleutian Islands | Hawaiian Archipelago
-Atlantic Ocean | United States
-Australia | India
-Australia | Indonesia
-Big Diomede Island | Little Diomede Island
-Canada | United States
-Canary Islands | Spain
-Chile | Argentina
-City of Boston | City of Philadelphia
-City of Boston | City of Washington D.C.
-City of Detroit | City of Windsor
-City of Edinburgh | City of Dublin
-City of Edmonton | City of Calgary
-City of Lima | City of Atlanta
-City of London | City of Toronto
-City of Los Angeles | City of Phoenix
-City of Los Angeles | City of Reno
-City of Miami | City of Atlanta
-City of Miami | City of New Orleans
-City of Miami | City of Orlando
-City of Miami | City of Seattle
-City of Moscow | City of Paris
-City of New York | City of Chicago
-City of New York | City of Rome
-City of New York | City of Santiago
-City of Paris | City of Montreal
-City of Perth | City of Darwin
-City of Reno | City of Los Angeles
-City of Reykjavik | City of London
-City of Rome | City of New York
-City of San Antonio | City of Austin
-City of San Diego | City of Chicago
-City of San Diego | City of Denver
-City of San Diego | City of Las Vegas
-City of San Diego | City of New York
-City of San Diego | City of Salt Lake City
-City of Seattle | City of Denver
-City of Seattle | City of Las Vegas
-City of Seattle | City of Miami
-City of Seattle | City of Portland
-City of Tokyo | City of Seoul
-City of Venice | City of Boston
-City of Venice | City of Halifax
-City of Vladivostok | City of Beijing
-Cuba | State of Florida
-Cuba | Yucatan Peninsula
-Easter Island | Galapagos Islands
-Falkland Islands | Argentine Mainland
-Falkland Islands | City of Cape Town
-Falkland Islands | City of Lima
-Finland | Germany
-Florida Keys | City of Brownsville
-Florida Keys | State of Louisiana
-Iceland | Republic of Ireland
-Iceland | United Kingdom
-Italy | Switzerland
-Japan | China
-Japan | Philippines
-Japan | Taiwan
-Madagascar | African Mainland
-Madagascar | Mainland Africa
-Mexico | United States
-New Zealand | Australia
-New Zealand | City of Tokyo
-New Zealand | Indonesia
-Norway | Denmark
-Pacific Ocean | United States
-Panama City | City of Colon
-Point Roberts | City of Vancouver
-Portugal | France
-Portugal | Spain
-Scotland | England
-South America | Africa
-Spain | France
-State of Alaska | Contiguous United States
-State of Alaska | State of Colorado
-State of Alaska | State of Hawaii
-State of Alaska | State of Texas
-State of Arizona | State of Utah
-State of California | State of Nevada
-State of Florida | State of Alabama
-State of Florida | State of Mississippi
-State of Hawaii | State of California
-State of Hawaii | State of Oregon
-State of Kansas | State of Missouri
-State of Maine | State of New York
-State of Maine | State of Pennsylvania
-State of Minnesota | State of Iowa
-State of Nevada | State of California
-State of Ohio | State of Indiana
-State of Texas | State of Oklahoma
-State of Washington | State of Colorado
-Svalbard Archipelago | City of Utqiagvik
-Svalbard | Iceland
-Tierra del Fuego | Cape of Good Hope
+City of Abu Dhabi | City of Dushanbe
+City of Abu Dhabi | City of Kathmandu
+City of Abu Dhabi | City of Minsk
+City of Accra | City of Mumbai
+City of Accra | City of Paris
+City of Accra | City of Pune
+City of Addis Ababa | City of Yangon
+City of Amman | City of Algiers
+City of Amsterdam | City of Lagos
+City of Ankara | City of Marseille
+City of Antananarivo | City of London
+City of Antananarivo | City of Mogadishu
+City of Ashgabat | City of Muscat
+City of Asuncion | City of Dublin
+City of Asuncion | City of Faro
+City of Athens | City of Salvador
+City of Atlanta | City of Fortaleza
+City of Atlanta | City of Recife
+City of Beirut | City of Malmo
+City of Beirut | City of Tunis
+City of Belgrade | City of Abu Dhabi
+City of Berlin | City of Luanda
+City of Berlin | City of Madrid
+City of Bishkek | City of Melbourne
+City of Bogota | City of Harare
+City of Bogota | City of Khartoum
+City of Bratislava | City of Windhoek
+City of Brisbane | City of Hanoi
+City of Bucharest | City of Buenos Aires
+City of Budapest | City of Beirut
+City of Buenos Aires | City of San Diego
+City of Cape Town | City of Almaty
+City of Cape Town | City of Cairo
+City of Cape Town | City of Oslo
+City of Cape Town | City of Pune
+City of Casablanca | City of Athens
+City of Casablanca | City of Stockholm
+City of Casablanca | City of Turin
+City of Chennai | City of Karachi
+City of Colombo | City of Addis Ababa
+City of Curitiba | City of Paris
+City of Dakar | City of Milan
+City of Damascus | City of Valencia
+City of Dar es Salaam | City of Edinburgh
+City of Dar es Salaam | City of Islamabad
+City of Delhi | City of Baghdad
+City of Faro | City of La Paz
+City of Fortaleza | City of New York
+City of Genoa | City of Casablanca
+City of Gothenburg | City of Maputo
+City of Guayaquil | City of Caracas
+City of Guayaquil | City of Harare
+City of Halifax | City of Windhoek
+City of Hanoi | City of Sydney
+City of Harare | City of Almaty
+City of Harare | City of Khartoum
+City of Helsinki | City of Athens
+City of Helsinki | City of Cape Town
+City of Hong Kong | City of Beijing
+City of Hong Kong | City of Port Moresby
+City of Islamabad | City of Tehran
+City of Islamabad | City of Windhoek
+City of Jakarta | City of Accra
+City of Jakarta | City of Suva
+City of Johannesburg | City of Helsinki
+City of Kampala | City of Dubai
+City of Kampala | City of Kingston
+City of Kampala | City of Manila
+City of Kampala | City of Singapore
+City of Karachi | City of Cairo
+City of Karachi | City of Cape Town
+City of Khartoum | City of Helsinki
+City of La Paz | City of Salt Lake City
+City of Lagos | City of London
+City of Lagos | City of Pune
+City of Lagos | City of San Juan
+City of London | City of Accra
+City of London | City of Minsk
+City of Luanda | City of Tunis
+City of Lyon | City of Cairo
+City of Lyon | City of Chisinau
+City of Madrid | City of Santiago
+City of Malmo | City of Windhoek
+City of Managua | City of Windhoek
+City of Maputo | City of Riga
+City of Maputo | City of Tallinn
+City of Mexico City | City of Quito
+City of Miami | City of Lima
+City of Minsk | City of Edinburgh
+City of Mogadishu | City of Kuala Lumpur
+City of Montevideo | City of Algiers
+City of Montevideo | City of Calgary
+City of Montevideo | City of Paris
+City of Moscow | City of Perth
+City of Mumbai | City of Maputo
+City of Mumbai | City of Perth
+City of Munich | City of Valparaiso
+City of Nairobi | City of Edinburgh
+City of Nairobi | City of Fortaleza
+City of Naples | City of Dublin
+City of Naples | City of Recife
+City of New York | City of Bogota
+City of Nice | City of Bergen
+City of Nicosia | City of Ashgabat
+City of Oslo | City of Odesa
+City of Oslo | City of Rome
+City of Perth | City of Colombo
+City of Porto | City of Lima
+City of Prague | City of Tripoli
+City of Quito | City of Salt Lake City
+City of Quito | City of Santiago
+City of Quito | City of Toronto
+City of Reno | City of Auckland
+City of Riyadh | City of Kinshasa
+City of Riyadh | City of Warsaw
+City of Salt Lake City | City of Rio de Janeiro
+City of Salvador | City of Lyon
+City of Salvador | City of Windhoek
+City of San Francisco | City of Wellington
+City of Santiago | City of Caracas
+City of Sao Paulo | City of Winnipeg
+City of Sarajevo | City of Asuncion
+City of Sarajevo | City of Harare
+City of Singapore | City of Mogadishu
+City of Suva | City of Pune
+City of Sydney | City of Tashkent
+City of Tbilisi | City of Riyadh
+City of Tokyo | City of Beijing
+City of Tokyo | City of Ho Chi Minh City
+City of Ulaanbaatar | City of Wellington
+City of Valparaiso | City of La Paz
+City of Venice | City of St Petersburg
+City of Vientiane | City of Dubai
+City of Warsaw | City of Cape Town
+City of Warsaw | City of Montevideo
+City of Warsaw | City of Yerevan
+City of Washington | City of Lima
+City of Wellington | City of Ho Chi Minh City
+City of Windhoek | City of Bergen
+City of Windhoek | City of Kinshasa
+City of Windhoek | City of Muscat
+City of Yangon | City of Riyadh
+City of Yerevan | City of Jakarta
+City of Zurich | City of Jerusalem
