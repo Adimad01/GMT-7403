@@ -84,6 +84,8 @@ KIND_ACCEPT = {
                ("boundary", "administrative")],
     "physical": [("natural", None), ("place", None), ("landuse", None),
                  ("boundary", None)],
+    # numbered routes and named highways are relations, not boundaries
+    "route": [("highway", None), ("route", None), ("boundary", None)],
 }
 
 
@@ -99,8 +101,11 @@ def requirements(name: str, kind: str | None = None) -> tuple[str, list[tuple[st
     if kind:
         full = name.strip()
         stripped = re.sub(r"^(State|Commonwealth|Province|City|Town|Municipality|"
-                          r"Village|Borough|County|District|Canton) of\s+", "",
-                          full, flags=re.I)
+                          r"Village|Borough|County|District|Canton|Kingdom|"
+                          r"Republic|Federal Republic|Plurinational State|"
+                          r"Free State|Principality|Grand Duchy|Sultanate|"
+                          r"Islamic Republic|People's Republic|Emirate) of\s+",
+                          "", full, flags=re.I)
         queries = [full] if stripped == full else [full, stripped]
         return queries, KIND_ACCEPT.get(kind, DEFAULT_ACCEPT)
     for pat, accept in PREFIX_RULES:

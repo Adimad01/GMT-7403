@@ -33,6 +33,7 @@ OUT = REPO / "data" / "topological" / "osm" / "relations.json"
 
 EPS = 0.01          # degrees, ~1 km: vertex noise and simplification slack
 SLIVER = 0.02       # intersection below this fraction of the smaller area is noise
+SLIVER_BAND = 3.0   # multiples of the expected noise band along a shared border
 
 
 USABLE = {"Polygon", "MultiPolygon", "LineString", "MultiLineString"}
@@ -77,6 +78,37 @@ def area_km2(g) -> float:
     return g.area * (111.32 ** 2) * max(math.cos(math.radians(lat)), 0.01)
 
 
+def convention_dependent(a, b, label: str | None = None) -> bool:
+    """True when the answer hinges on how OSM models the pair, not on geography.
+
+    A lake is mapped as a polygon with a hole cut for each of its islands, so
+    the island is not inside the lake: they touch. In plain language the island
+    is plainly in the lake. Grading such an item would test knowledge of the
+    data model rather than spatial reasoning, and either answer can be
+    defended, so the pair is not usable either way.
+
+    The signature is that one shape sits inside the other's outer ring while
+    the computed relation is not a containment. Comparing against strict
+    shapely containment instead would fire on every simplified pair, because a
+    simplified city pokes a few metres outside its simplified state.
+    """
+    from shapely.geometry import Polygon as _P
+    def outer(g):
+        if g.geom_type == "Polygon":
+            return _P(g.exterior)
+        if g.geom_type == "MultiPolygon":
+            return unary_union([_P(p.exterior) for p in g.geoms])
+        return None
+    for x, y in ((a, b), (b, a)):
+        ox = outer(x)
+        if ox is None or y.geom_type in ("LineString", "MultiLineString"):
+            continue
+        if ox.contains(y.representative_point()) and label in (
+                "touches", "disjoint", "overlaps"):
+            return True
+    return False
+
+
 def relate(a, b) -> tuple[str | None, dict]:
     """Relation of a with respect to b, plus the measurements behind it."""
     la = a.geom_type in ("LineString", "MultiLineString")
@@ -119,12 +151,23 @@ def relate(a, b) -> tuple[str | None, dict]:
     if ia / aa >= 0.97 and ab > aa:
         info["ratio"] = ab / aa
         return ("within", info)
-    if ia / min(aa, ab) > SLIVER:
+    # Two units that share a border overlap by a sliver once their outlines are
+    # simplified: the error band runs the length of the shared boundary, so its
+    # area grows with that length, not with the size of either shape. Comparing
+    # the intersection against a fixed fraction of the smaller area therefore
+    # calls adjacent cities 'overlaps' and adjacent countries 'touches'. The
+    # comparison has to be against the expected noise instead.
+    shared = a.boundary.intersection(b.boundary)
+    shared_len = shared.length if hasattr(shared, "length") else 0.0
+    lat = a.centroid.y
+    km_per_deg = 111.32 * max(math.cos(math.radians(lat)), 0.01)
+    noise_km2 = shared_len * km_per_deg * EPS * 111.32 * SLIVER_BAND
+    info["shared_len_deg"] = shared_len
+    info["noise_km2"] = noise_km2
+    if ia > noise_km2 and ia / min(aa, ab) > SLIVER:
         info["overlap_fraction"] = ia / min(aa, ab)
         return ("overlaps", info)
-    if a.distance(b) <= EPS:
-        shared = a.boundary.intersection(b.boundary)
-        info["shared_len_deg"] = shared.length if hasattr(shared, "length") else 0.0
+    if a.distance(b) <= EPS or ia > 0:
         info["perimeter_deg"] = min(a.boundary.length, b.boundary.length)
         return ("touches", info)
     info["gap_deg"] = a.distance(b)
@@ -148,6 +191,41 @@ def name_overlap(a: str, b: str) -> float:
     if not wa or not wb:
         return 0.0
     return len(wa & wb) / min(len(wa), len(wb))
+
+
+# The quantity that makes each relation easy when large and hard when small.
+METRIC = {"contains": "ratio", "within": "ratio", "disjoint": "gap_deg",
+          "touches": "touch_share", "overlaps": "overlap_fraction",
+          "crosses": "inside_fraction", "equals": "name_share"}
+
+
+def metric_of(label: str, info: dict, subject: str = "", obj: str = "") -> float:
+    if label == "equals":
+        return name_overlap(subject, obj)
+    if label == "touches":
+        p = info.get("perimeter_deg") or 1.0
+        return info.get("shared_len_deg", 0.0) / p
+    return info.get(METRIC.get(label, ""), 0.0)
+
+
+def assign_levels(records: list[dict]) -> None:
+    """Give each record a level 1-5 by its rank within its own label.
+
+    Fixed thresholds do not transfer between labels: requiring 70% shared area
+    for an easy 'overlaps' left two pairs in the whole catalogue. Cutting on
+    metric VALUES does not work either, because the metrics tie heavily -- many
+    adjacent pairs share an identical boundary fraction, and name overlap for
+    'equals' is almost always exactly 0 or 1. Value cuts then collapse whole
+    bands, which is how 'touches' ended up with 408 rows at Level 4 and none at
+    Level 5.
+
+    Ranking by position splits ties evenly and keeps the levels comparable in
+    meaning: the most extreme fifth of the configurations down to the least.
+    """
+    records.sort(key=lambda r: -r["metric"])
+    n = len(records)
+    for i, r in enumerate(records):
+        r["level"] = min(5, int(i * 5 / n) + 1) if n else 3
 
 
 def difficulty(label: str, info: dict, subject: str = "", obj: str = "") -> int:
@@ -182,7 +260,9 @@ def main() -> int:
     for n, why in dropped[:8]:
         print(f"    dropped {n}: {why}", flush=True)
 
-    out = []
+    # Two passes: measure everything, then rank within each label so the five
+    # levels are equally populated whatever the metric's natural scale.
+    raw = []
     for i, a in enumerate(names):
         ga, _ = geoms[a]
         for b in names:
@@ -192,14 +272,21 @@ def main() -> int:
             if ga.distance(gb) > 60:            # far apart: certainly disjoint, skip
                 continue
             lab, info = relate(ga, gb)
-            if not lab:
+            if not lab or convention_dependent(ga, gb, lab):
                 continue
-            out.append({"subject": a, "object": b, "label": lab,
-                        "level": difficulty(lab, info, a, b),
-                        "info": {k: round(v, 6) for k, v in info.items()
-                                 if isinstance(v, (int, float))}})
+            raw.append({"subject": a, "object": b, "label": lab,
+                        "metric": metric_of(lab, info, a, b)})
         if (i + 1) % 25 == 0:
-            print(f"  {i+1}/{len(names)} subjects, {len(out)} relations", flush=True)
+            print(f"  {i+1}/{len(names)} subjects, {len(raw)} relations", flush=True)
+
+    from collections import defaultdict as _dd
+    by_label = _dd(list)
+    for r in raw:
+        by_label[r["label"]].append(r)
+    for recs in by_label.values():
+        assign_levels(recs)
+    out = [{"subject": r["subject"], "object": r["object"],
+            "label": r["label"], "level": r["level"]} for r in raw]
 
     OUT.write_text(json.dumps(out))
     from collections import Counter

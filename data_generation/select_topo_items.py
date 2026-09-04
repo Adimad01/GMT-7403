@@ -32,13 +32,44 @@ OUT = REPO / "data_generation" / "topo_picks.json"
 LABELS = ["contains", "within", "touches", "crosses", "overlaps", "disjoint", "equals"]
 HOP_LABELS = ["contains", "within", "disjoint"]
 
+import sys as _sys
+_sys.path.insert(0, str(Path(__file__).resolve().parent))
+from topo_identity import IDENTITY, UNTRUSTED          # noqa: E402
+
+
+def usable(name: str) -> bool:
+    """Only places with trustworthy geometry and a description may be used."""
+    return name not in UNTRUSTED and name in IDENTITY
+
+
+_STOP = {"city", "state", "county", "parish", "the", "of", "and", "republic",
+         "kingdom", "federal", "borough", "district", "canton"}
+
+
+def _words(t: str) -> set[str]:
+    import re
+    return {w for w in re.findall(r"[a-z]{4,}", t.lower()) if w not in _STOP}
+
+
+def shares_name(via: str, a: str, b: str) -> bool:
+    """True when the intermediate shares a distinctive word with an endpoint.
+
+    California contains San Diego County contains San Diego is a real nested
+    hierarchy, not a chain of synonyms. But the shared name lets the answer be
+    reached from the wording rather than from the geography, which is the
+    confound Level 6 exists to avoid, so such chains are passed over.
+    """
+    wv = _words(via)
+    return bool(wv & _words(a)) or bool(wv & _words(b))
+
 
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--per-cell", type=int, default=5)
     args = ap.parse_args()
 
-    rels = json.loads(RELS.read_text())
+    rels = [r for r in json.loads(RELS.read_text())
+            if usable(r["subject"]) and usable(r["object"])]
     by_cell: dict[tuple[str, int], list[dict]] = defaultdict(list)
     lookup: dict[tuple[str, str], str] = {}
     for r in rels:
@@ -95,12 +126,16 @@ def main() -> int:
                     for b in contains.get(c, []):
                         if b == a or lookup.get((a, b)) != "contains":
                             continue
+                        if shares_name(c, a, b):
+                            continue
                         cands.append((a, c, b) if label == "contains" else (b, c, a))
         else:                        # A within B, B disjoint C  =>  A disjoint C
             for b, mids in contains.items():
                 for a in mids:
                     for c in disjoint.get(b, ()):
                         if lookup.get((a, c)) != "disjoint":
+                            continue
+                        if shares_name(b, a, c):
                             continue
                         cands.append((a, b, c))
         got = 0

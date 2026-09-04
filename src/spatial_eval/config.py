@@ -26,11 +26,13 @@ LABELS = {
     "relative": ["left_of", "right_of", "in_front_of", "behind", "next_to"],
 }
 
-# Column names differ between the topological files and the other two; the rest
-# of the code reads through these maps rather than hard-coding names.
+# All three relations now share one schema. Topological used to carry its own
+# column names, left over from a corpus that was replaced; the map is kept
+# because reading through it costs nothing and the next schema change will not
+# need to touch every call site.
 COLUMNS = {
-    "topological": {"label": "spatial_relation", "subject": "place_name_subject",
-                    "object": "place_name_object", "text": "relation_predicate"},
+    "topological": {"label": "relation_label", "subject": "source_entity",
+                    "object": "target_entity", "text": "corpus"},
     "cardinal": {"label": "relation_label", "subject": "source_entity",
                  "object": "target_entity", "text": "corpus"},
     "relative": {"label": "relation_label", "subject": "source_entity",

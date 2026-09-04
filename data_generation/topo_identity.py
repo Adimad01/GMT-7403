@@ -91,7 +91,7 @@ IDENTITY = {
  "Pakistan": "Pakistan was created by partition in 1947",
  "Afghanistan": "Afghanistan has been called the graveyard of empires",
  "Iran": "Iran's revolution replaced its monarchy in 1979",
- "Iraq": "Iraq contains the ruins of some of the earliest cities",
+ "Iraq": "Iraq holds the ruins of some of the earliest cities",
  "Turkey": "Turkey abolished its caliphate in 1924",
  "Syria": "Syria's uprising in 2011 became a prolonged civil war",
  "Jordan": "Jordan has been ruled by the Hashemite family since its founding",
@@ -204,7 +204,7 @@ IDENTITY.update({
  "City of Vancouver": "Vancouver is hemmed between mountains and the sea",
  "City of Calgary": "Calgary holds an annual rodeo drawing a million visitors",
  "City of Cairo": "Cairo has the largest metropolitan population on its continent",
- "City of Nairobi": "Nairobi has a national park within its municipal limits",
+ "City of Nairobi": "Nairobi was founded as a railway depot in 1899",
  "City of Lagos": "Lagos is the most populous city on its continent",
  "City of Accra": "Accra became a colonial seat of administration in 1877",
  "City of Casablanca": "Casablanca's port was largely built under a protectorate",
@@ -276,7 +276,7 @@ IDENTITY.update({
  "Baltic Sea": "the Baltic is among the least saline seas in the world",
  "Black Sea": "the Black Sea has a lifeless layer below two hundred metres",
  "Red Sea": "the Red Sea is one of the warmest and saltiest seas",
- "Caspian Sea": "the Caspian is the largest enclosed body of water on earth",
+ "Caspian Sea": "the Caspian is the largest lake on earth by surface area",
  "North Sea": "the North Sea has yielded oil and gas since the 1970s",
  "Adriatic Sea": "the Adriatic carried the trade of a maritime republic for centuries",
  "Aegean Sea": "the Aegean is scattered with more than a thousand islands",
@@ -374,3 +374,138 @@ IDENTITY.update({
  "Borough of Brooklyn": "Brooklyn was an independent city until 1898",
  "Kings County, New York": "Kings County is the most populous county in its state",
 })
+
+# ---------------------------------------------------------------------------
+# Entities whose OSM geometry does not represent what the name means. Items
+# built on these would be internally consistent and factually wrong, which is
+# worse than having none: the label would agree with my polygon while
+# disagreeing with the world.
+#
+#   Interstates / Route 66  resolve to a signposted fragment, not the route
+#   Amazon Rainforest       resolves to a conservation concession in Peru
+#   Mainland France/Italy   are not OSM objects; the country includes its islands
+#   metropolitan areas      are statistical constructs with no boundary relation
+#   plates, ridges, trench  geological features not mapped as usable polygons
+UNTRUSTED = {
+    "Interstate 10", "Interstate 15", "Interstate 80", "Interstate 90",
+    "Route 66", "San Andreas Fault", "Mid-Atlantic Ridge", "Mariana Trench",
+    "Pacific Plate", "Amazon Rainforest", "Mainland France", "Mainland Italy",
+    "Chicago Metropolitan Area", "New York Metropolitan Area",
+    "Greater London Built-up Area", "Patagonian Desert", "Sahara Desert",
+}
+
+# Ceremonial long forms denote the same object as the short name already
+# described, so they reuse its clause rather than inventing a second one.
+_ALIAS = {
+    "French Republic": "France", "Argentine Republic": "Argentina",
+    "Kingdom of Sweden": "Sweden", "Kingdom of Norway": "Norway",
+    "Kingdom of Denmark": "Denmark", "Kingdom of Spain": "Spain",
+    "Kingdom of Cambodia": "Cambodia", "Federal Republic of Germany": "Germany",
+    "Republic of Poland": "Poland", "Republic of Finland": "Finland",
+    "Republic of Bulgaria": "Bulgaria", "Republic of Austria": "Austria",
+    "Republic of Chile": "Chile", "Republic of Peru": "Peru",
+    "Republic of Colombia": "Colombia", "Republic of Ecuador": "Ecuador",
+    "Republic of Paraguay": "Paraguay", "Republic of Mali": "Mali",
+    "Republic of Chad": "Chad", "Republic of Iraq": "Iraq",
+    "Republic of Namibia": "Namibia",
+    "Plurinational State of Bolivia": "Bolivia",
+}
+for _long, _short in _ALIAS.items():
+    if _short in IDENTITY:
+        IDENTITY[_long] = IDENTITY[_short]
+
+IDENTITY.update({
+ "City of Kyoto": "Kyoto was the imperial seat of Japan for over a thousand years",
+ "Great Britain": "Great Britain is the largest island in Europe",
+ "Republic of Korea": "the Republic of Korea rebuilt itself into an industrial economy after 1953",
+ "City of Berkeley": "Berkeley hosts the oldest campus of California's public university system",
+ "City of Oakland": "Oakland operates one of the busiest container ports on its coast",
+ "City of Somerville": "Somerville is among the most densely settled municipalities in New England",
+ "City of Cambridge": "Cambridge houses two of the most heavily endowed universities in the world",
+ "City of Palo Alto": "Palo Alto is widely regarded as the birthplace of Silicon Valley",
+ "City of Cupertino": "Cupertino is home to a headquarters building shaped like a ring",
+ "City of Redmond": "Redmond grew around a software company founded in 1975",
+ "City of Bellevue": "Bellevue transformed from a commuter suburb into a corporate centre",
+ "City of San Jose": "San Jose was California's first incorporated municipality",
+ "City of Eugene": "Eugene is known for distance running and its timber history",
+ "City of Provo": "Provo sits beneath the Wasatch Front and hosts a large private university",
+ "City of Boise": "Boise is built around a riverside greenbelt trail system",
+ "City of Spokane": "Spokane hosted a world's fair in 1974",
+ "City of Tempe": "Tempe created a recreational lake from a dammed riverbed",
+ "City of Mesa": "Mesa grew rapidly through the late twentieth century",
+ "City of Tucson": "Tucson is ringed by stands of saguaro cactus",
+ "City of Fort Worth": "Fort Worth preserves a historic livestock exchange district",
+ "City of Edina": "Edina opened one of the first indoor shopping malls in the country",
+ "City of Lexington": "Lexington calls itself the horse capital of the world",
+ "City of Louisville": "Louisville hosts an annual thoroughbred race run since 1875",
+ "City of Indianapolis": "Indianapolis holds a motor race staged since 1911",
+ "City of Columbus": "Columbus sits on the fall line of the Chattahoochee",
+ "City of Augusta": "Augusta hosts an invitational golf tournament each spring",
+ "City of Macon": "Macon has a deep history in southern rock and soul music",
+ "City of Baton Rouge": "Baton Rouge anchors a large petrochemical corridor",
+ "City of Lafayette": "Lafayette is the cultural centre of Cajun country",
+ "Fayette County": "Fayette County was named for a French general who served in the American revolution",
+ "Jefferson County": "Jefferson County was established in 1780 and named for a future president",
+ "Marion County": "Marion County was named for a commander nicknamed the Swamp Fox",
+ "King County": "King County was renamed in 1986 to honour a civil rights leader",
+ "Clarke County": "Clarke County was created in 1801 and is among the smallest in its state",
+ "Bibb County": "Bibb County was named for a physician who became a state governor",
+ "Richmond County": "Richmond County was one of the original counties created in 1777",
+ "Muscogee County": "Muscogee County takes its name from a confederacy of indigenous nations",
+ "Lafayette Parish": "Lafayette Parish was carved out of a neighbouring parish in 1823",
+ "East Baton Rouge Parish": "East Baton Rouge Parish is the most populous parish in its state",
+ "Tarrant County": "Tarrant County was named for a militia general and formed in 1849",
+ "Pima County": "Pima County takes its name from an indigenous people of the Sonoran desert",
+ "Teton County": "Teton County has the highest average income of any county in the country",
+ "Mariposa County": "Mariposa County was one of California's original twenty-seven counties",
+ "State of Indiana": "Indiana calls itself the crossroads of America",
+ "State of New Jersey": "New Jersey is the most densely populated state in the country",
+ "State of Oklahoma": "Oklahoma was opened to settlers in a series of land runs",
+ "State of Tennessee": "Tennessee is closely identified with country music",
+ "State of West Virginia": "West Virginia separated from its parent state during the civil war",
+ "State of North Dakota": "North Dakota was transformed by shale oil extraction",
+ "State of South Dakota": "South Dakota holds a mountainside carved with four presidential faces",
+ "State of Hesse": "Hesse is home to the financial centre of Frankfurt",
+ "State of Tyrol": "Tyrol is known for alpine skiing and mountaineering",
+ "State of Salzburg": "Salzburg was the birthplace of Mozart",
+ "Free State of Bavaria": "Bavaria stages an annual festival drawing six million visitors",
+ "Canton of Uri": "Uri was one of the three founding members of the Swiss confederation",
+ "Canton of Schwyz": "Schwyz gave the Swiss confederation its modern name",
+ "Inner Mongolia": "Inner Mongolia is a major source of rare earth minerals",
+ "Essex": "Essex is a ceremonial county with a long North Sea coastline",
+ "Staten Island": "Staten Island is reached by a free passenger ferry",
+ "Nantucket": "Nantucket was once the whaling capital of the world",
+ "Mackinac Island": "Mackinac Island bans motor vehicles and preserves 19th-century architecture",
+ "Kelleys Island": "Kelleys Island displays deep glacial grooves cut into limestone",
+ "Pelee Island": "Pelee Island produces a significant share of its region's wine",
+ "Mercer Island": "Mercer Island is reached only by floating pontoon bridges",
+ "Grand Island": "Grand Island is known for its sandstone cliffs and forested trails",
+ "Antelope Island": "Antelope Island sustains a free-roaming bison herd",
+ "Maui": "Maui is dominated by a dormant volcano called Haleakala",
+ "Oahu": "Oahu holds the state capital and a historic naval base",
+ "Kauai": "Kauai is the oldest major island of its chain and is called the Garden Isle",
+ "North Island": "the North Island holds the great majority of New Zealand's population",
+ "South Island": "the South Island is renowned for its fjords and glaciers",
+ "Lake Washington": "Lake Washington is spanned by floating bridges",
+ "Persian Gulf": "the Persian Gulf is ringed by major petroleum production facilities",
+ "Gulf of Aden": "the Gulf of Aden is a critical approach to the Bab-el-Mandeb strait",
+ "Gulf of Oman": "the Gulf of Oman connects directly to the Arabian Sea",
+ "Mekong River": "the Mekong supports the largest inland fishery in the world",
+ "Platte River": "the Platte is a critical stopover for migrating sandhill cranes",
+ "Arkansas River": "the Arkansas River experiences severe seasonal flow variation",
+})
+
+# A few cities appear only in the cardinal catalogue; reuse those clauses so a
+# place reads the same wherever it turns up.
+try:
+    from city_identity import CITY as _CITY
+    for _n in list(_CITY):
+        # _CITY already absorbed the topological names, so prefixing every key
+        # would manufacture entries like "City of Iraq" and "City of France".
+        # Only names not already known as places in their own right get one.
+        _formal = "City of " + " ".join(w.capitalize() for w in _n.split())
+        if _n in IDENTITY or _n.title() in IDENTITY or _formal in IDENTITY:
+            continue
+        IDENTITY[_formal] = _CITY[_n]
+except Exception:
+    pass

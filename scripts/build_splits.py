@@ -34,6 +34,17 @@ SPEC = {
                                   "8 degrees inside its 45-degree sector, "
                                   "agreeing with the projection-based reading, "
                                   "and reciprocal"),
+    "topological": dict(domain="Topological-Reasoning", demo_levels=range(1, 6),
+                        ground_truth="labels are DE-9IM relations computed from "
+                                     "OpenStreetMap polygons with a tolerance "
+                                     "sized to the simplification error, "
+                                     "excluding pairs whose answer depends on "
+                                     "how OSM models islands in lakes. The "
+                                     "ambiguity level is the pair's rank within "
+                                     "its own label, on the measure that makes "
+                                     "that relation obvious when large: size "
+                                     "ratio for containment, gap for disjoint, "
+                                     "shared boundary for touches"),
     "relative": dict(domain="Relative-Reasoning", demo_levels=range(1, 6),
                      ground_truth="labels are derived from the stated observer "
                                   "frame: the angle of the subject off the "
@@ -77,8 +88,10 @@ def main() -> int:
 
     sizes = {len(v) for v in cells.values()}
     if len(sizes) != 1:
-        print(f"  cells are not a regular grid: sizes {sorted(sizes)}")
-        return 1
+        # 'equals' cannot be filled to the same depth as the rest: genuine
+        # coincident pairs are finite, so its cells are shallower by design.
+        print(f"  ragged grid, cell sizes {sorted(sizes)} — taking one training "
+              f"row per cell and the remainder for evaluation")
 
     train, evalr = [], []
     for k in sorted(cells):
