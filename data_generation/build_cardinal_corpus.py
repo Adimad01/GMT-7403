@@ -130,8 +130,8 @@ def check(a: str, b: str, label: str) -> list[str]:
 
 
 def clause(city: str) -> str | None:
-    c = CITY.get(key(city))
-    return c[0].upper() + c[1:] if c else None
+    """The clause as written, lower-initial; the sentence is capitalised later."""
+    return CITY.get(key(city))
 
 
 def fmt(n: str) -> str:
@@ -175,6 +175,7 @@ def main() -> int:
                 a=fmt(a)[8:], b=fmt(b)[8:], c=fmt(via)[8:])
         else:
             text = JOINERS[flat_n % len(JOINERS)].format(a=clause(a), b=clause(b))
+            text = text[0].upper() + text[1:]
             flat_n += 1
         if text in seen:
             failures.append((lvl, lab, a, b, ["duplicate description"]))

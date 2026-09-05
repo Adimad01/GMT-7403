@@ -1,10 +1,10 @@
 {
   "domain": "Topological-Reasoning",
   "source_csv": "data/topological/eval.csv",
-  "n_rows": 263,
-  "n_unique_facts": 263,
+  "n_rows": 236,
+  "n_unique_facts": 236,
   "duplicate_rows": 0,
-  "manifest_sha256": "9d3a872dcf59748f7b7d1767f739b01d1cd90fb26af606367e13d8994e0fd812",
+  "manifest_sha256": "f9977f12fe3d6fdbbe989be34e9df17decb980c0d850f405954151f06127217e",
   "contract": {
     "every_experiment_must": [
       "evaluate exactly these row_index values, in this order",
@@ -12,12 +12,21 @@
       "verify manifest_sha256 before running"
     ],
     "analysis_note": "every row asserts a distinct fact; no fact_id clustering is needed for this relation",
-    "ground_truth": "labels are DE-9IM relations computed from OpenStreetMap polygons with a tolerance sized to the simplification error, excluding pairs whose answer depends on how OSM models islands in lakes. The ambiguity level is the pair's rank within its own label, on the measure that makes that relation obvious when large: size ratio for containment, gap for disjoint, shared boundary for touches"
+    "ground_truth": "labels are DE-9IM relations computed from OpenStreetMap polygons with a tolerance sized to the simplification error"
   },
   "rows": [
     {
       "row_index": 0,
       "fact_id": "f0000",
+      "subject": "Australia",
+      "target": "City of Melbourne",
+      "label": "contains",
+      "ambiguity_level": "Level 1",
+      "row_sha256": "bc3b9bb02178952f"
+    },
+    {
+      "row_index": 1,
+      "fact_id": "f0001",
       "subject": "Canada",
       "target": "City of Calgary",
       "label": "contains",
@@ -25,22 +34,13 @@
       "row_sha256": "6662aae85cd31a04"
     },
     {
-      "row_index": 1,
-      "fact_id": "f0001",
+      "row_index": 2,
+      "fact_id": "f0002",
       "subject": "France",
       "target": "Bois de Boulogne",
       "label": "contains",
       "ambiguity_level": "Level 1",
-      "row_sha256": "42e0ebca025d80b4"
-    },
-    {
-      "row_index": 2,
-      "fact_id": "f0002",
-      "subject": "French Republic",
-      "target": "City of Lyon",
-      "label": "contains",
-      "ambiguity_level": "Level 1",
-      "row_sha256": "cce1d384bd91dea6"
+      "row_sha256": "19e3e5165a7de129"
     },
     {
       "row_index": 3,
@@ -49,7 +49,7 @@
       "target": "Hyde Park, London",
       "label": "contains",
       "ambiguity_level": "Level 1",
-      "row_sha256": "b0f5eaa1495a2d9f"
+      "row_sha256": "49921700c998c502"
     },
     {
       "row_index": 4,
@@ -58,7 +58,7 @@
       "target": "City of Cupertino",
       "label": "contains",
       "ambiguity_level": "Level 1",
-      "row_sha256": "d01e72aa8c71998b"
+      "row_sha256": "4ad8510854672b37"
     },
     {
       "row_index": 5,
@@ -67,7 +67,7 @@
       "target": "Mackinac Island",
       "label": "contains",
       "ambiguity_level": "Level 1",
-      "row_sha256": "8668c8d2f107ae71"
+      "row_sha256": "21e2678a3b3ad158"
     },
     {
       "row_index": 6,
@@ -76,61 +76,61 @@
       "target": "Antelope Island",
       "label": "contains",
       "ambiguity_level": "Level 1",
-      "row_sha256": "01ce22d1e780e64e"
+      "row_sha256": "7f9c7845ea936612"
     },
     {
       "row_index": 7,
       "fact_id": "f0007",
-      "subject": "India",
-      "target": "City of Delhi",
+      "subject": "Austria",
+      "target": "State of Salzburg",
       "label": "contains",
       "ambiguity_level": "Level 2",
-      "row_sha256": "70efbee31d65d053"
+      "row_sha256": "ef97713a8212f355"
     },
     {
       "row_index": 8,
       "fact_id": "f0008",
-      "subject": "Italy",
-      "target": "City of Milan",
+      "subject": "India",
+      "target": "City of Delhi",
       "label": "contains",
       "ambiguity_level": "Level 2",
-      "row_sha256": "af3b666dcdd9001f"
+      "row_sha256": "2dbacf86f0b3a2ab"
     },
     {
       "row_index": 9,
       "fact_id": "f0009",
-      "subject": "Japan",
-      "target": "City of Osaka",
+      "subject": "Italy",
+      "target": "City of Milan",
       "label": "contains",
       "ambiguity_level": "Level 2",
-      "row_sha256": "c6c25759e7f2fa00"
+      "row_sha256": "6045ece376c459c7"
     },
     {
       "row_index": 10,
       "fact_id": "f0010",
-      "subject": "Kingdom of Norway",
-      "target": "City of Oslo",
+      "subject": "Japan",
+      "target": "City of Osaka",
       "label": "contains",
       "ambiguity_level": "Level 2",
-      "row_sha256": "bd2e801229effe23"
+      "row_sha256": "a948e8ffe57b747f"
     },
     {
       "row_index": 11,
       "fact_id": "f0011",
-      "subject": "Kingdom of Spain",
-      "target": "City of Barcelona",
-      "label": "contains",
-      "ambiguity_level": "Level 2",
-      "row_sha256": "4a86db19d364a636"
-    },
-    {
-      "row_index": 12,
-      "fact_id": "f0012",
       "subject": "Morocco",
       "target": "City of Casablanca",
       "label": "contains",
       "ambiguity_level": "Level 2",
       "row_sha256": "2254b63c18dda98d"
+    },
+    {
+      "row_index": 12,
+      "fact_id": "f0012",
+      "subject": "Norway",
+      "target": "City of Oslo",
+      "label": "contains",
+      "ambiguity_level": "Level 2",
+      "row_sha256": "39440d70c49bfbba"
     },
     {
       "row_index": 13,
@@ -139,52 +139,52 @@
       "target": "City of Lisbon",
       "label": "contains",
       "ambiguity_level": "Level 2",
-      "row_sha256": "5329fe14ec604ab5"
+      "row_sha256": "106081d010eb1bd2"
     },
     {
       "row_index": 14,
       "fact_id": "f0014",
-      "subject": "Belgium",
-      "target": "City of Brussels",
+      "subject": "Alps",
+      "target": "Canton of Uri",
       "label": "contains",
       "ambiguity_level": "Level 3",
-      "row_sha256": "8d83bc600c71fdfe"
+      "row_sha256": "84e47299b54418a6"
     },
     {
       "row_index": 15,
       "fact_id": "f0015",
-      "subject": "Bulgaria",
-      "target": "City of Sofia",
+      "subject": "Belgium",
+      "target": "City of Brussels",
       "label": "contains",
       "ambiguity_level": "Level 3",
-      "row_sha256": "1f1ca2a520c9d81d"
+      "row_sha256": "1f35f8f1125f1dcc"
     },
     {
       "row_index": 16,
       "fact_id": "f0016",
-      "subject": "Czechia",
-      "target": "City of Prague",
+      "subject": "Bulgaria",
+      "target": "City of Sofia",
       "label": "contains",
       "ambiguity_level": "Level 3",
-      "row_sha256": "a4ee040a7301517b"
+      "row_sha256": "876c850c410909cd"
     },
     {
       "row_index": 17,
       "fact_id": "f0017",
-      "subject": "Egypt",
-      "target": "City of Cairo",
+      "subject": "Czechia",
+      "target": "City of Prague",
       "label": "contains",
       "ambiguity_level": "Level 3",
-      "row_sha256": "0f111913cc3602e6"
+      "row_sha256": "093c954408f4ded6"
     },
     {
       "row_index": 18,
       "fact_id": "f0018",
-      "subject": "Federal Republic of Germany",
-      "target": "City of Munich",
+      "subject": "Egypt",
+      "target": "City of Cairo",
       "label": "contains",
       "ambiguity_level": "Level 3",
-      "row_sha256": "a516f31fcc4ee22d"
+      "row_sha256": "5c19dfa1093630f7"
     },
     {
       "row_index": 19,
@@ -193,340 +193,340 @@
       "target": "City of Helsinki",
       "label": "contains",
       "ambiguity_level": "Level 3",
-      "row_sha256": "59bed65791c0ac0c"
+      "row_sha256": "c1e84157a0c0129e"
     },
     {
       "row_index": 20,
       "fact_id": "f0020",
-      "subject": "Ghana",
-      "target": "City of Accra",
+      "subject": "Free State of Bavaria",
+      "target": "City of Munich",
       "label": "contains",
       "ambiguity_level": "Level 3",
-      "row_sha256": "f9ce88cba3cbf596"
+      "row_sha256": "719d49574ebd2578"
     },
     {
       "row_index": 21,
       "fact_id": "f0021",
-      "subject": "Clark County, Nevada",
-      "target": "City of Las Vegas",
-      "label": "contains",
-      "ambiguity_level": "Level 4",
-      "row_sha256": "7944390f79548df3"
-    },
-    {
-      "row_index": 22,
-      "fact_id": "f0022",
       "subject": "Germany",
       "target": "Black Forest",
       "label": "contains",
       "ambiguity_level": "Level 4",
-      "row_sha256": "f1cf4723c48da509"
+      "row_sha256": "b5f7f9a191b4959f"
     },
     {
-      "row_index": 23,
-      "fact_id": "f0023",
+      "row_index": 22,
+      "fact_id": "f0022",
       "subject": "Greece",
       "target": "Crete",
       "label": "contains",
       "ambiguity_level": "Level 4",
-      "row_sha256": "f942a35345a6fb14"
+      "row_sha256": "2aeab30406dc2dc2"
     },
     {
-      "row_index": 24,
-      "fact_id": "f0024",
+      "row_index": 23,
+      "fact_id": "f0023",
       "subject": "Indonesia",
       "target": "Java",
       "label": "contains",
       "ambiguity_level": "Level 4",
-      "row_sha256": "160e2b96ca70a566"
+      "row_sha256": "ececd859f6330360"
     },
     {
-      "row_index": 25,
-      "fact_id": "f0025",
-      "subject": "King County",
-      "target": "City of Bellevue",
-      "label": "contains",
-      "ambiguity_level": "Level 4",
-      "row_sha256": "ca1e4065424f4b66"
-    },
-    {
-      "row_index": 26,
-      "fact_id": "f0026",
-      "subject": "King County, Washington",
-      "target": "City of Redmond",
-      "label": "contains",
-      "ambiguity_level": "Level 4",
-      "row_sha256": "32a82a2cec246417"
-    },
-    {
-      "row_index": 27,
-      "fact_id": "f0027",
+      "row_index": 24,
+      "fact_id": "f0024",
       "subject": "Maricopa County",
       "target": "City of Mesa",
       "label": "contains",
       "ambiguity_level": "Level 4",
-      "row_sha256": "fbef20c5455f897f"
+      "row_sha256": "6f6483adbf5f2311"
+    },
+    {
+      "row_index": 25,
+      "fact_id": "f0025",
+      "subject": "Namibia",
+      "target": "Namib Desert",
+      "label": "contains",
+      "ambiguity_level": "Level 4",
+      "row_sha256": "ec22051a3f674996"
+    },
+    {
+      "row_index": 26,
+      "fact_id": "f0026",
+      "subject": "Pima County",
+      "target": "City of Tucson",
+      "label": "contains",
+      "ambiguity_level": "Level 4",
+      "row_sha256": "3116a3ee62a7a67f"
+    },
+    {
+      "row_index": 27,
+      "fact_id": "f0027",
+      "subject": "Santa Clara County",
+      "target": "City of Palo Alto",
+      "label": "contains",
+      "ambiguity_level": "Level 4",
+      "row_sha256": "f60a5980b0c30886"
     },
     {
       "row_index": 28,
       "fact_id": "f0028",
-      "subject": "Cambodia",
-      "target": "Mekong River",
+      "subject": "Brazil",
+      "target": "Amazon River",
       "label": "contains",
       "ambiguity_level": "Level 5",
-      "row_sha256": "6636e81559fa1749"
+      "row_sha256": "3e3e2b18d501c3a7"
     },
     {
       "row_index": 29,
       "fact_id": "f0029",
-      "subject": "China",
-      "target": "Inner Mongolia",
+      "subject": "Cambodia",
+      "target": "Mekong River",
       "label": "contains",
       "ambiguity_level": "Level 5",
-      "row_sha256": "2cf6ac3b971457b7"
+      "row_sha256": "01b80ce8acd2c5fe"
     },
     {
       "row_index": 30,
       "fact_id": "f0030",
-      "subject": "City and County of Honolulu",
-      "target": "Oahu",
+      "subject": "China",
+      "target": "Inner Mongolia",
       "label": "contains",
       "ambiguity_level": "Level 5",
-      "row_sha256": "85f8c0d221163e4c"
+      "row_sha256": "82b781de86560f99"
     },
     {
       "row_index": 31,
       "fact_id": "f0031",
-      "subject": "Cook County",
-      "target": "City of Chicago",
-      "label": "contains",
-      "ambiguity_level": "Level 5",
-      "row_sha256": "11037b93a230cbe9"
-    },
-    {
-      "row_index": 32,
-      "fact_id": "f0032",
-      "subject": "East Baton Rouge Parish",
-      "target": "City of Baton Rouge",
-      "label": "contains",
-      "ambiguity_level": "Level 5",
-      "row_sha256": "78c8d377c009ef43"
-    },
-    {
-      "row_index": 33,
-      "fact_id": "f0033",
       "subject": "Harris County",
       "target": "City of Houston",
       "label": "contains",
       "ambiguity_level": "Level 5",
-      "row_sha256": "e5e7463844695e69"
+      "row_sha256": "b6e7060535420d10"
+    },
+    {
+      "row_index": 32,
+      "fact_id": "f0032",
+      "subject": "Jefferson County",
+      "target": "Louisville",
+      "label": "contains",
+      "ambiguity_level": "Level 5",
+      "row_sha256": "fdc52b4ebb201ee2"
+    },
+    {
+      "row_index": 33,
+      "fact_id": "f0033",
+      "subject": "Lafayette Parish",
+      "target": "City of Lafayette",
+      "label": "contains",
+      "ambiguity_level": "Level 5",
+      "row_sha256": "10e78155c64450cc"
     },
     {
       "row_index": 34,
       "fact_id": "f0034",
-      "subject": "Jefferson County",
-      "target": "City of Louisville",
+      "subject": "Los Angeles County",
+      "target": "City of Los Angeles",
       "label": "contains",
       "ambiguity_level": "Level 5",
-      "row_sha256": "da74da8e7139033f"
+      "row_sha256": "f87dac239b2ae8a5"
     },
     {
       "row_index": 35,
       "fact_id": "f0035",
-      "subject": "State of New York",
-      "target": "Central Park",
-      "label": "contains",
-      "ambiguity_level": "Level 6",
-      "row_sha256": "ad20a3f498d0e242"
-    },
-    {
-      "row_index": 36,
-      "fact_id": "f0036",
       "subject": "State of Texas",
       "target": "City of Houston",
       "label": "contains",
       "ambiguity_level": "Level 6",
-      "row_sha256": "ec06c7ed634531cd"
+      "row_sha256": "11ecb7b3a48178b9"
+    },
+    {
+      "row_index": 36,
+      "fact_id": "f0036",
+      "subject": "State of Arizona",
+      "target": "City of Tucson",
+      "label": "contains",
+      "ambiguity_level": "Level 6",
+      "row_sha256": "1bcfe70d5394ba25"
     },
     {
       "row_index": 37,
       "fact_id": "f0037",
-      "subject": "State of Washington",
-      "target": "City of Bellevue",
+      "subject": "State of California",
+      "target": "City of San Jose",
       "label": "contains",
       "ambiguity_level": "Level 6",
-      "row_sha256": "106ac53fef54fb7c"
+      "row_sha256": "0a7473a0fe551035"
     },
     {
       "row_index": 38,
       "fact_id": "f0038",
-      "subject": "Japan",
-      "target": "City of Kyoto",
+      "subject": "State of Washington",
+      "target": "City of Seattle",
       "label": "contains",
       "ambiguity_level": "Level 6",
-      "row_sha256": "b089f48b5bd64951"
+      "row_sha256": "27f9b174e796dc45"
     },
     {
       "row_index": 39,
       "fact_id": "f0039",
-      "subject": "State of Arizona",
-      "target": "City of Mesa",
+      "subject": "Germany",
+      "target": "City of Munich",
       "label": "contains",
       "ambiguity_level": "Level 6",
-      "row_sha256": "acbda74f1578c7ab"
+      "row_sha256": "5f42dcc9da728208"
     },
     {
       "row_index": 40,
       "fact_id": "f0040",
-      "subject": "State of Hawaii",
-      "target": "Oahu",
+      "subject": "United States",
+      "target": "City of Chicago",
       "label": "contains",
       "ambiguity_level": "Level 6",
-      "row_sha256": "034ba21aaf321f4b"
+      "row_sha256": "c0739f7f8eaf7f96"
     },
     {
       "row_index": 41,
       "fact_id": "f0041",
-      "subject": "State of Illinois",
-      "target": "City of Chicago",
+      "subject": "United States",
+      "target": "Louisville",
       "label": "contains",
       "ambiguity_level": "Level 6",
-      "row_sha256": "b2350d6906497ca5"
+      "row_sha256": "81a826a1094881ea"
     },
     {
       "row_index": 42,
       "fact_id": "f0042",
-      "subject": "Oder",
-      "target": "Poland",
-      "label": "crosses",
-      "ambiguity_level": "Level 1",
-      "row_sha256": "ed52d1bf2d4d8a44"
-    },
-    {
-      "row_index": 43,
-      "fact_id": "f0043",
-      "subject": "Oder",
-      "target": "Republic of Poland",
-      "label": "crosses",
-      "ambiguity_level": "Level 1",
-      "row_sha256": "503389c995a52f43"
-    },
-    {
-      "row_index": 44,
-      "fact_id": "f0044",
-      "subject": "Ebro",
-      "target": "Kingdom of Spain",
-      "label": "crosses",
-      "ambiguity_level": "Level 1",
-      "row_sha256": "f736e46406cbe850"
-    },
-    {
-      "row_index": 45,
-      "fact_id": "f0045",
       "subject": "Ganges",
       "target": "India",
       "label": "crosses",
       "ambiguity_level": "Level 1",
-      "row_sha256": "ff359cc0c7ca850c"
+      "row_sha256": "8435a18bec1de28a"
+    },
+    {
+      "row_index": 43,
+      "fact_id": "f0043",
+      "subject": "Mali",
+      "target": "Niger River",
+      "label": "crosses",
+      "ambiguity_level": "Level 1",
+      "row_sha256": "7e80699799e735cb"
+    },
+    {
+      "row_index": 44,
+      "fact_id": "f0044",
+      "subject": "Oder",
+      "target": "Poland",
+      "label": "crosses",
+      "ambiguity_level": "Level 1",
+      "row_sha256": "1e56e13a7c70c520"
+    },
+    {
+      "row_index": 45,
+      "fact_id": "f0045",
+      "subject": "Orange River",
+      "target": "South Africa",
+      "label": "crosses",
+      "ambiguity_level": "Level 1",
+      "row_sha256": "1bfcc20761033bd3"
     },
     {
       "row_index": 46,
       "fact_id": "f0046",
-      "subject": "Great Britain",
-      "target": "River Thames",
+      "subject": "Rio Grande",
+      "target": "State of Texas",
       "label": "crosses",
       "ambiguity_level": "Level 1",
-      "row_sha256": "7fb94c4ea7b57f3b"
+      "row_sha256": "bc202f6b1d68aff5"
     },
     {
       "row_index": 47,
       "fact_id": "f0047",
-      "subject": "Indus",
-      "target": "Pakistan",
+      "subject": "Ebro",
+      "target": "Spain",
       "label": "crosses",
       "ambiguity_level": "Level 1",
-      "row_sha256": "9dd31d8225019250"
+      "row_sha256": "9123e4d88a1b77ba"
     },
     {
       "row_index": 48,
       "fact_id": "f0048",
-      "subject": "Iraq",
-      "target": "Tigris",
+      "subject": "Great Britain",
+      "target": "River Thames",
       "label": "crosses",
       "ambiguity_level": "Level 1",
-      "row_sha256": "ec21290ee2e1f27e"
+      "row_sha256": "5ede6adb84671137"
     },
     {
       "row_index": 49,
       "fact_id": "f0049",
-      "subject": "Laos",
-      "target": "Mekong",
+      "subject": "Arkansas River",
+      "target": "State of Kansas",
       "label": "crosses",
       "ambiguity_level": "Level 2",
-      "row_sha256": "0cf8f3f65f9ca241"
+      "row_sha256": "373a15f36bcc8a52"
     },
     {
       "row_index": 50,
       "fact_id": "f0050",
-      "subject": "Netherlands",
-      "target": "Rhine",
+      "subject": "Euphrates",
+      "target": "Turkey",
       "label": "crosses",
       "ambiguity_level": "Level 2",
-      "row_sha256": "3abb1f5c19f45ccf"
+      "row_sha256": "05e543d48957bb03"
     },
     {
       "row_index": 51,
       "fact_id": "f0051",
-      "subject": "Colorado River",
-      "target": "State of Arizona",
+      "subject": "Laos",
+      "target": "Mekong",
       "label": "crosses",
       "ambiguity_level": "Level 2",
-      "row_sha256": "b140b69cf1e49b5f"
+      "row_sha256": "f527bef17bb2a921"
     },
     {
       "row_index": 52,
       "fact_id": "f0052",
-      "subject": "Columbia River",
-      "target": "State of Washington",
+      "subject": "Netherlands",
+      "target": "Rhine",
       "label": "crosses",
       "ambiguity_level": "Level 2",
-      "row_sha256": "be51cc64a74500fc"
+      "row_sha256": "b58d74ccff50cb6e"
     },
     {
       "row_index": 53,
       "fact_id": "f0053",
-      "subject": "Danube",
-      "target": "Romania",
+      "subject": "Niger River",
+      "target": "Nigeria",
       "label": "crosses",
       "ambiguity_level": "Level 2",
-      "row_sha256": "7fffb98bfca92ff0"
+      "row_sha256": "be693f87684d391d"
     },
     {
       "row_index": 54,
       "fact_id": "f0054",
-      "subject": "Euphrates",
-      "target": "Republic of Iraq",
+      "subject": "Limpopo",
+      "target": "Mozambique",
       "label": "crosses",
       "ambiguity_level": "Level 2",
-      "row_sha256": "c296fbb22cc891c5"
+      "row_sha256": "f8e1abbb8d49f794"
     },
     {
       "row_index": 55,
       "fact_id": "f0055",
-      "subject": "Mozambique",
-      "target": "Zambezi",
+      "subject": "State of Alabama",
+      "target": "Yellow River",
       "label": "crosses",
       "ambiguity_level": "Level 2",
-      "row_sha256": "72cc2c494bd7e650"
+      "row_sha256": "8dedb5928b6c850e"
     },
     {
       "row_index": 56,
       "fact_id": "f0056",
-      "subject": "Alps",
-      "target": "Rhone",
+      "subject": "Lesotho",
+      "target": "Orange River",
       "label": "crosses",
       "ambiguity_level": "Level 3",
-      "row_sha256": "d558cd9aae962459"
+      "row_sha256": "b32143ff6361d7d9"
     },
     {
       "row_index": 57,
@@ -535,61 +535,61 @@
       "target": "Ganges",
       "label": "crosses",
       "ambiguity_level": "Level 3",
-      "row_sha256": "6b2c42f24aab811b"
+      "row_sha256": "f9d14c520c82724b"
     },
     {
       "row_index": 58,
       "fact_id": "f0058",
-      "subject": "Colorado River",
-      "target": "Grand Canyon National Park",
+      "subject": "Arkansas River",
+      "target": "State of Colorado",
       "label": "crosses",
       "ambiguity_level": "Level 3",
-      "row_sha256": "b999241d43660a78"
+      "row_sha256": "c4a7ccc3f0ddf489"
     },
     {
       "row_index": 59,
       "fact_id": "f0059",
-      "subject": "Mississippi River",
-      "target": "State of Louisiana",
+      "subject": "Colorado River",
+      "target": "Grand Canyon National Park",
       "label": "crosses",
       "ambiguity_level": "Level 3",
-      "row_sha256": "7cade1fb412b258c"
+      "row_sha256": "87c8300ad8e3bccb"
     },
     {
       "row_index": 60,
       "fact_id": "f0060",
-      "subject": "Missouri River",
-      "target": "State of North Dakota",
+      "subject": "Arkansas River",
+      "target": "State of Oklahoma",
       "label": "crosses",
       "ambiguity_level": "Level 3",
-      "row_sha256": "07a78c36968094e2"
+      "row_sha256": "aac532e256627df9"
     },
     {
       "row_index": 61,
       "fact_id": "f0061",
-      "subject": "Rio Grande",
-      "target": "State of New Mexico",
+      "subject": "Botswana",
+      "target": "Limpopo",
       "label": "crosses",
       "ambiguity_level": "Level 3",
-      "row_sha256": "b8949eaf7e23156c"
+      "row_sha256": "f37a3aa8b2bf0dd3"
     },
     {
       "row_index": 62,
       "fact_id": "f0062",
-      "subject": "Zambezi",
-      "target": "Zimbabwe",
+      "subject": "Missouri River",
+      "target": "State of Missouri",
       "label": "crosses",
       "ambiguity_level": "Level 3",
-      "row_sha256": "5b5127b7173b3c8b"
+      "row_sha256": "22a0a6debf24ca55"
     },
     {
       "row_index": 63,
       "fact_id": "f0063",
-      "subject": "Lake Geneva",
-      "target": "Rhone",
+      "subject": "Cambodia",
+      "target": "Mekong",
       "label": "crosses",
       "ambiguity_level": "Level 4",
-      "row_sha256": "0030d1681b916ae9"
+      "row_sha256": "b913430bd5ca6671"
     },
     {
       "row_index": 64,
@@ -598,25 +598,25 @@
       "target": "Zambezi",
       "label": "crosses",
       "ambiguity_level": "Level 4",
-      "row_sha256": "f405ba04d3867333"
+      "row_sha256": "e55f4c2266c158d7"
     },
     {
       "row_index": 65,
       "fact_id": "f0065",
-      "subject": "Danube",
-      "target": "Republic of Bulgaria",
+      "subject": "Czechia",
+      "target": "Oder",
       "label": "crosses",
       "ambiguity_level": "Level 4",
-      "row_sha256": "6dd69e999feb8c12"
+      "row_sha256": "7cb9b593445dee25"
     },
     {
       "row_index": 66,
       "fact_id": "f0066",
-      "subject": "Limpopo",
-      "target": "Zimbabwe",
+      "subject": "India",
+      "target": "Indus",
       "label": "crosses",
       "ambiguity_level": "Level 4",
-      "row_sha256": "fd82c275fcd3086d"
+      "row_sha256": "ea1d99057d6f6649"
     },
     {
       "row_index": 67,
@@ -625,1073 +625,839 @@
       "target": "Niger River",
       "label": "crosses",
       "ambiguity_level": "Level 4",
-      "row_sha256": "ad8335603b029bcd"
+      "row_sha256": "e7a4b0cd96595e0c"
     },
     {
       "row_index": 68,
       "fact_id": "f0068",
-      "subject": "Rhine",
-      "target": "Switzerland",
+      "subject": "Bulgaria",
+      "target": "Danube",
       "label": "crosses",
       "ambiguity_level": "Level 4",
-      "row_sha256": "add1214d593c8ce4"
+      "row_sha256": "6b3e97378de7d110"
     },
     {
       "row_index": 69,
       "fact_id": "f0069",
-      "subject": "Rio Grande",
-      "target": "State of Colorado",
+      "subject": "Lake Geneva",
+      "target": "Rhone",
       "label": "crosses",
       "ambiguity_level": "Level 4",
-      "row_sha256": "f3a9d084d5818b34"
+      "row_sha256": "db8b5e32f7902f9b"
     },
     {
       "row_index": 70,
       "fact_id": "f0070",
-      "subject": "City of Warsaw",
+      "subject": "Carpathian Mountains",
       "target": "Vistula",
       "label": "crosses",
       "ambiguity_level": "Level 5",
-      "row_sha256": "9eea84549219023f"
+      "row_sha256": "9d67bfb5dbc50b58"
     },
     {
       "row_index": 71,
       "fact_id": "f0071",
-      "subject": "Andorra",
-      "target": "Pyrenees",
+      "subject": "City of Warsaw",
+      "target": "Vistula",
       "label": "crosses",
       "ambiguity_level": "Level 5",
-      "row_sha256": "9e1722bdfbfc51ab"
+      "row_sha256": "39ced1ef8381265e"
     },
     {
       "row_index": 72,
       "fact_id": "f0072",
-      "subject": "Essex",
-      "target": "River Thames",
+      "subject": "Andorra",
+      "target": "Pyrenees",
       "label": "crosses",
       "ambiguity_level": "Level 5",
-      "row_sha256": "e2acc45778a2ec4a"
+      "row_sha256": "fcc7ae0ed0df8d42"
     },
     {
       "row_index": 73,
       "fact_id": "f0073",
-      "subject": "Carpathian Mountains",
-      "target": "Vistula",
+      "subject": "City of Paris",
+      "target": "Seine",
       "label": "crosses",
       "ambiguity_level": "Level 5",
-      "row_sha256": "eafd2c34528630a7"
+      "row_sha256": "ebb3967e4d7b21ff"
     },
     {
       "row_index": 74,
       "fact_id": "f0074",
-      "subject": "Colorado River",
-      "target": "State of Nevada",
+      "subject": "Essex",
+      "target": "River Thames",
       "label": "crosses",
       "ambiguity_level": "Level 5",
-      "row_sha256": "9936eeb697b2f66c"
+      "row_sha256": "f2dbbf495a15f49c"
     },
     {
       "row_index": 75,
       "fact_id": "f0075",
-      "subject": "Lake Constance",
-      "target": "Rhine",
-      "label": "crosses",
-      "ambiguity_level": "Level 5",
-      "row_sha256": "8fa045fd64861a8b"
-    },
-    {
-      "row_index": 76,
-      "fact_id": "f0076",
       "subject": "Mekong",
       "target": "Vietnam",
       "label": "crosses",
       "ambiguity_level": "Level 5",
-      "row_sha256": "b9cea0a5cef0d35e"
+      "row_sha256": "fd3510e18627aeac"
+    },
+    {
+      "row_index": 76,
+      "fact_id": "f0076",
+      "subject": "Namibia",
+      "target": "Orange River",
+      "label": "crosses",
+      "ambiguity_level": "Level 5",
+      "row_sha256": "ec2c995350cf88b0"
     },
     {
       "row_index": 77,
       "fact_id": "f0077",
-      "subject": "City of Amsterdam",
-      "target": "City of Reno",
+      "subject": "Bhutan",
+      "target": "Cyprus",
       "label": "disjoint",
       "ambiguity_level": "Level 1",
-      "row_sha256": "0edecb6940c7f19c"
+      "row_sha256": "da5912c3ea3932dc"
     },
     {
       "row_index": 78,
       "fact_id": "f0078",
-      "subject": "City of Athens",
-      "target": "City of Vancouver",
+      "subject": "Congo River",
+      "target": "Greenland",
       "label": "disjoint",
       "ambiguity_level": "Level 1",
-      "row_sha256": "35b7a96ecb935e5a"
+      "row_sha256": "cc41a48dc89e98dd"
     },
     {
       "row_index": 79,
       "fact_id": "f0079",
-      "subject": "City of Atlanta",
-      "target": "Greenland",
+      "subject": "Fayette County",
+      "target": "State of Alaska",
       "label": "disjoint",
       "ambiguity_level": "Level 1",
-      "row_sha256": "e4bb2b84c9133316"
+      "row_sha256": "90cf643697dfd105"
     },
     {
       "row_index": 80,
       "fact_id": "f0080",
-      "subject": "City of Augusta",
-      "target": "Republic of Paraguay",
+      "subject": "Iceland",
+      "target": "State of Maine",
       "label": "disjoint",
       "ambiguity_level": "Level 1",
-      "row_sha256": "13d2127e9e592b2d"
+      "row_sha256": "72032e72a55aed43"
     },
     {
       "row_index": 81,
       "fact_id": "f0081",
-      "subject": "City of Berlin",
-      "target": "Republic of Ecuador",
+      "subject": "Madagascar",
+      "target": "Nepal",
       "label": "disjoint",
       "ambiguity_level": "Level 1",
-      "row_sha256": "09c2863fd991af7a"
+      "row_sha256": "df805793c7a27d92"
     },
     {
       "row_index": 82,
       "fact_id": "f0082",
-      "subject": "City of Denver",
-      "target": "Honolulu County",
+      "subject": "Mariposa County",
+      "target": "Suffolk County, New York",
       "label": "disjoint",
       "ambiguity_level": "Level 1",
-      "row_sha256": "16652aafcc5f547e"
+      "row_sha256": "b069f1f71c62abc2"
     },
     {
       "row_index": 83,
       "fact_id": "f0083",
-      "subject": "City of Fort Worth",
-      "target": "Maui",
+      "subject": "Suffolk County, New York",
+      "target": "Yosemite National Park",
       "label": "disjoint",
       "ambiguity_level": "Level 1",
-      "row_sha256": "653a470e018c33ac"
+      "row_sha256": "f544ac281447f5bf"
     },
     {
       "row_index": 84,
       "fact_id": "f0084",
-      "subject": "City of Lexington",
-      "target": "City of San Francisco",
+      "subject": "Bhutan",
+      "target": "Republic of Korea",
       "label": "disjoint",
       "ambiguity_level": "Level 2",
-      "row_sha256": "39cf3d4de40d6783"
+      "row_sha256": "106c4aab7f2bcae2"
     },
     {
       "row_index": 85,
       "fact_id": "f0085",
-      "subject": "City of Madrid",
-      "target": "Congo River",
+      "subject": "Bibb County",
+      "target": "City of Boise",
       "label": "disjoint",
       "ambiguity_level": "Level 2",
-      "row_sha256": "271f63386c48fa7d"
+      "row_sha256": "fc7c1a6d52f04eef"
     },
     {
       "row_index": 86,
       "fact_id": "f0086",
-      "subject": "City of Marseille",
-      "target": "Nigeria",
+      "subject": "Canton of Schwyz",
+      "target": "Ghana",
       "label": "disjoint",
       "ambiguity_level": "Level 2",
-      "row_sha256": "025bb8bd661ec4b0"
+      "row_sha256": "ec3cd33d0b879f91"
     },
     {
       "row_index": 87,
       "fact_id": "f0087",
-      "subject": "City of Naples",
-      "target": "Iceland",
+      "subject": "City of Amsterdam",
+      "target": "City of Calgary",
       "label": "disjoint",
       "ambiguity_level": "Level 2",
-      "row_sha256": "520434d5ff250739"
+      "row_sha256": "0e7e78ee8e4a7e15"
     },
     {
       "row_index": 88,
       "fact_id": "f0088",
-      "subject": "City of New Orleans",
-      "target": "City of San Jose",
+      "subject": "City of Athens",
+      "target": "City of Eugene",
       "label": "disjoint",
       "ambiguity_level": "Level 2",
-      "row_sha256": "11f84ddec1255fd7"
+      "row_sha256": "68a8ec91ab7d5dd2"
     },
     {
       "row_index": 89,
       "fact_id": "f0089",
-      "subject": "City of Phoenix",
-      "target": "City of Rome",
+      "subject": "City of Atlanta",
+      "target": "City of Los Angeles",
       "label": "disjoint",
       "ambiguity_level": "Level 2",
-      "row_sha256": "04499e645835fd78"
+      "row_sha256": "149e424b4b036958"
     },
     {
       "row_index": 90,
       "fact_id": "f0090",
-      "subject": "City of Somerville",
-      "target": "Duval County",
+      "subject": "City of Augusta",
+      "target": "City of Provo",
       "label": "disjoint",
       "ambiguity_level": "Level 2",
-      "row_sha256": "2caae658966b261e"
+      "row_sha256": "fd03dcddaf2cc98d"
     },
     {
       "row_index": 91,
       "fact_id": "f0091",
-      "subject": "City of Sydney",
-      "target": "South Island",
+      "subject": "City of Cape Town",
+      "target": "Madagascar",
       "label": "disjoint",
       "ambiguity_level": "Level 3",
-      "row_sha256": "8fde349bd4f6441c"
+      "row_sha256": "831f054bbbdb8cdc"
     },
     {
       "row_index": 92,
       "fact_id": "f0092",
-      "subject": "City of Venice",
-      "target": "Cyprus",
+      "subject": "City of Houston",
+      "target": "City of Montreal",
       "label": "disjoint",
       "ambiguity_level": "Level 3",
-      "row_sha256": "0eeacbc2deb92078"
+      "row_sha256": "bdceb5ff3ca411be"
     },
     {
       "row_index": 93,
       "fact_id": "f0093",
-      "subject": "City of Vienna",
-      "target": "Isle of Man",
+      "subject": "City of Lisbon",
+      "target": "City of Milan",
       "label": "disjoint",
       "ambiguity_level": "Level 3",
-      "row_sha256": "ab8f7eb9379823d5"
+      "row_sha256": "8b8d39b5e868ff9d"
     },
     {
       "row_index": 94,
       "fact_id": "f0094",
-      "subject": "City of Zurich",
-      "target": "Republic of Chad",
+      "subject": "City of Macon",
+      "target": "City of Sofia",
       "label": "disjoint",
       "ambiguity_level": "Level 3",
-      "row_sha256": "49290a2179be010d"
+      "row_sha256": "ae73f9a330a5437a"
     },
     {
       "row_index": 95,
       "fact_id": "f0095",
-      "subject": "Clarke County",
-      "target": "Panama",
+      "subject": "City of Madrid",
+      "target": "City of Naples",
       "label": "disjoint",
       "ambiguity_level": "Level 3",
-      "row_sha256": "b10fb5153bcf3d78"
+      "row_sha256": "2f6bdf116271cd95"
     },
     {
       "row_index": 96,
       "fact_id": "f0096",
-      "subject": "Corsica",
-      "target": "Loch Ness",
+      "subject": "City of Marseille",
+      "target": "Iceland",
       "label": "disjoint",
       "ambiguity_level": "Level 3",
-      "row_sha256": "4ab8f5acbfcee69d"
+      "row_sha256": "f48c8af728d81423"
     },
     {
       "row_index": 97,
       "fact_id": "f0097",
-      "subject": "Davidson County",
-      "target": "Guatemala",
+      "subject": "City of Melbourne",
+      "target": "North Island",
       "label": "disjoint",
       "ambiguity_level": "Level 3",
-      "row_sha256": "3a6a3f2627012016"
+      "row_sha256": "b2260dcb60ed51d7"
     },
     {
       "row_index": 98,
       "fact_id": "f0098",
-      "subject": "District of Columbia",
-      "target": "Jacksonville",
+      "subject": "Corsica",
+      "target": "Isle of Wight",
       "label": "disjoint",
       "ambiguity_level": "Level 4",
-      "row_sha256": "0b0485f92dded123"
+      "row_sha256": "e15d219e3d5a531e"
     },
     {
       "row_index": 99,
       "fact_id": "f0099",
-      "subject": "Fayette County",
-      "target": "Nantucket",
+      "subject": "Eswatini",
+      "target": "Namib Desert",
       "label": "disjoint",
       "ambiguity_level": "Level 4",
-      "row_sha256": "7adfd37b6efe8170"
+      "row_sha256": "ce663101927adf2c"
     },
     {
       "row_index": 100,
       "fact_id": "f0100",
-      "subject": "Great Salt Lake",
-      "target": "Tarrant County",
+      "subject": "Inner Mongolia",
+      "target": "Nepal",
       "label": "disjoint",
       "ambiguity_level": "Level 4",
-      "row_sha256": "4482dec6d9d7168f"
+      "row_sha256": "bd4452daf261f5d5"
     },
     {
       "row_index": 101,
       "fact_id": "f0101",
-      "subject": "Kingdom of Denmark",
-      "target": "Loire",
+      "subject": "Jacksonville",
+      "target": "Kelleys Island",
       "label": "disjoint",
       "ambiguity_level": "Level 4",
-      "row_sha256": "a0fc56b5ffb8bc1a"
+      "row_sha256": "213d36b3a95b3a7a"
     },
     {
       "row_index": 102,
       "fact_id": "f0102",
-      "subject": "Kingdom of Sweden",
-      "target": "San Marino",
+      "subject": "Jefferson County",
+      "target": "Nantucket",
       "label": "disjoint",
       "ambiguity_level": "Level 4",
-      "row_sha256": "d1575f79cabf6338"
+      "row_sha256": "be9e132730d90d55"
     },
     {
       "row_index": 103,
       "fact_id": "f0103",
-      "subject": "Luxembourg",
-      "target": "Republic of Finland",
+      "subject": "Loire",
+      "target": "Sicily",
       "label": "disjoint",
       "ambiguity_level": "Level 4",
-      "row_sha256": "6a50b9d00510fd3a"
+      "row_sha256": "a10947f397248332"
     },
     {
       "row_index": 104,
       "fact_id": "f0104",
-      "subject": "Madagascar",
-      "target": "Serengeti National Park",
+      "subject": "Louisville",
+      "target": "Philadelphia County",
       "label": "disjoint",
       "ambiguity_level": "Level 4",
-      "row_sha256": "3ea522089061dad2"
+      "row_sha256": "aa65d41ed2f39fc4"
     },
     {
       "row_index": 105,
       "fact_id": "f0105",
-      "subject": "Marion County",
-      "target": "Muscogee County",
+      "subject": "Kauai",
+      "target": "Maui",
       "label": "disjoint",
       "ambiguity_level": "Level 5",
-      "row_sha256": "11096bfccfb62fab"
+      "row_sha256": "ab67fcf18589a325"
     },
     {
       "row_index": 106,
       "fact_id": "f0106",
-      "subject": "Marion County, Indiana",
-      "target": "Nashville-Davidson",
+      "subject": "Antelope Island",
+      "target": "Mariposa County",
       "label": "disjoint",
       "ambiguity_level": "Level 5",
-      "row_sha256": "6572ace3dac97a97"
+      "row_sha256": "c9b783261a64e2f5"
     },
     {
       "row_index": 107,
       "fact_id": "f0107",
-      "subject": "Mariposa County",
-      "target": "Orange County, California",
+      "subject": "Argentina",
+      "target": "Parana River",
       "label": "disjoint",
       "ambiguity_level": "Level 5",
-      "row_sha256": "2e3afffa7a1af425"
+      "row_sha256": "dab5541b8abbf15a"
     },
     {
       "row_index": 108,
       "fact_id": "f0108",
-      "subject": "Orleans Parish",
-      "target": "Richmond County",
+      "subject": "City of Bangkok",
+      "target": "Mekong River",
       "label": "disjoint",
       "ambiguity_level": "Level 5",
-      "row_sha256": "3671a18b2951dd08"
+      "row_sha256": "20bcd1f97b56ee23"
     },
     {
       "row_index": 109,
       "fact_id": "f0109",
-      "subject": "Parana River",
-      "target": "Uruguay",
+      "subject": "City of Berkeley",
+      "target": "Yosemite National Park",
       "label": "disjoint",
       "ambiguity_level": "Level 5",
-      "row_sha256": "bb88a9364e69f26b"
+      "row_sha256": "24ace9123beae296"
     },
     {
       "row_index": 110,
       "fact_id": "f0110",
-      "subject": "Pelee Island",
-      "target": "Philadelphia County",
+      "subject": "City of Melbourne",
+      "target": "Tasmania",
       "label": "disjoint",
       "ambiguity_level": "Level 5",
-      "row_sha256": "c380457199a8e018"
+      "row_sha256": "baccdb2edfd82cea"
     },
     {
       "row_index": 111,
       "fact_id": "f0111",
-      "subject": "Richmond County, New York",
-      "target": "State of Maine",
+      "subject": "Ecuador",
+      "target": "Panama",
       "label": "disjoint",
       "ambiguity_level": "Level 5",
-      "row_sha256": "8151e736d75162af"
+      "row_sha256": "acbc8040e7f628a4"
     },
     {
       "row_index": 112,
       "fact_id": "f0112",
-      "subject": "Yangtze",
-      "target": "Lake Baikal",
+      "subject": "Amazon River",
+      "target": "Bibb County",
       "label": "disjoint",
       "ambiguity_level": "Level 6",
-      "row_sha256": "6384a56a812d26b8"
+      "row_sha256": "e6a3614d0d5f0c94"
     },
     {
       "row_index": 113,
       "fact_id": "f0113",
-      "subject": "Sardinia",
-      "target": "Senegal",
+      "subject": "City of Helsinki",
+      "target": "Black Forest",
       "label": "disjoint",
       "ambiguity_level": "Level 6",
-      "row_sha256": "606aba22038ff838"
+      "row_sha256": "a85cbcb2b671b0c9"
     },
     {
       "row_index": 114,
       "fact_id": "f0114",
-      "subject": "Teton County",
-      "target": "State of Alaska",
+      "subject": "City of Accra",
+      "target": "Canton of Schwyz",
       "label": "disjoint",
       "ambiguity_level": "Level 6",
-      "row_sha256": "f1062f5438aa540c"
+      "row_sha256": "41da28cbb4dd4616"
     },
     {
       "row_index": 115,
       "fact_id": "f0115",
-      "subject": "State of Tyrol",
-      "target": "Sicily",
+      "subject": "Crete",
+      "target": "Canton of Uri",
       "label": "disjoint",
       "ambiguity_level": "Level 6",
-      "row_sha256": "3620da554af78df6"
+      "row_sha256": "ad5f1b9d45464902"
     },
     {
       "row_index": 116,
       "fact_id": "f0116",
-      "subject": "Amazon River",
-      "target": "State of Virginia",
+      "subject": "City of Kyoto",
+      "target": "Bangladesh",
       "label": "disjoint",
       "ambiguity_level": "Level 6",
-      "row_sha256": "54634d59e0abda3d"
+      "row_sha256": "d3873829ea7f712e"
     },
     {
       "row_index": 117,
       "fact_id": "f0117",
-      "subject": "City of Cairo",
-      "target": "Nepal",
+      "subject": "City of Dublin",
+      "target": "Chad",
       "label": "disjoint",
       "ambiguity_level": "Level 6",
-      "row_sha256": "ffed847bc9f6b6e1"
+      "row_sha256": "2d9af452d271247c"
     },
     {
       "row_index": 118,
       "fact_id": "f0118",
-      "subject": "City of Accra",
-      "target": "Vatican City",
+      "subject": "City of Casablanca",
+      "target": "City of Barcelona",
       "label": "disjoint",
       "ambiguity_level": "Level 6",
-      "row_sha256": "b61aa1c25cfba7bc"
+      "row_sha256": "1861c681bc8bdd43"
     },
     {
       "row_index": 119,
       "fact_id": "f0119",
-      "subject": "Bronx County, New York",
-      "target": "The Bronx",
-      "label": "equals",
-      "ambiguity_level": "Level 1",
-      "row_sha256": "156c08e594a733cd"
-    },
-    {
-      "row_index": 120,
-      "fact_id": "f0120",
-      "subject": "Bolivia",
-      "target": "Plurinational State of Bolivia",
-      "label": "equals",
-      "ambiguity_level": "Level 1",
-      "row_sha256": "e5ad942a594432fa"
-    },
-    {
-      "row_index": 121,
-      "fact_id": "f0121",
       "subject": "Borough of Queens",
       "target": "Queens County, New York",
       "label": "equals",
       "ambiguity_level": "Level 1",
-      "row_sha256": "61d5733c325ba56b"
+      "row_sha256": "e3fd9ae089a37092"
     },
     {
-      "row_index": 122,
-      "fact_id": "f0122",
-      "subject": "Cambodia",
-      "target": "Kingdom of Cambodia",
+      "row_index": 120,
+      "fact_id": "f0120",
+      "subject": "Bronx County, New York",
+      "target": "The Bronx",
       "label": "equals",
       "ambiguity_level": "Level 1",
-      "row_sha256": "1977605729ce39af"
+      "row_sha256": "a02d846fd2b0d09f"
     },
     {
-      "row_index": 123,
-      "fact_id": "f0123",
-      "subject": "Chad",
-      "target": "Republic of Chad",
-      "label": "equals",
-      "ambiguity_level": "Level 1",
-      "row_sha256": "845ce96e25e01d7b"
-    },
-    {
-      "row_index": 124,
-      "fact_id": "f0124",
-      "subject": "Chile",
-      "target": "Republic of Chile",
-      "label": "equals",
-      "ambiguity_level": "Level 1",
-      "row_sha256": "2d41b3efe7416e52"
-    },
-    {
-      "row_index": 125,
-      "fact_id": "f0125",
-      "subject": "City and County of Denver",
-      "target": "City of Denver",
-      "label": "equals",
-      "ambiguity_level": "Level 1",
-      "row_sha256": "dcc5af70182cecbe"
-    },
-    {
-      "row_index": 126,
-      "fact_id": "f0126",
-      "subject": "Kingdom of Norway",
-      "target": "Norway",
-      "label": "equals",
-      "ambiguity_level": "Level 2",
-      "row_sha256": "e2bd58e4851ce1c7"
-    },
-    {
-      "row_index": 127,
-      "fact_id": "f0127",
-      "subject": "Kingdom of Sweden",
-      "target": "Sweden",
-      "label": "equals",
-      "ambiguity_level": "Level 2",
-      "row_sha256": "d5351c65fad0c058"
-    },
-    {
-      "row_index": 128,
-      "fact_id": "f0128",
-      "subject": "Denmark",
-      "target": "Kingdom of Denmark",
-      "label": "equals",
-      "ambiguity_level": "Level 2",
-      "row_sha256": "2dc83aebb900d75e"
-    },
-    {
-      "row_index": 129,
-      "fact_id": "f0129",
-      "subject": "Ecuador",
-      "target": "Republic of Ecuador",
-      "label": "equals",
-      "ambiguity_level": "Level 2",
-      "row_sha256": "7139c76223e64f23"
-    },
-    {
-      "row_index": 130,
-      "fact_id": "f0130",
-      "subject": "Federal Republic of Germany",
-      "target": "Germany",
-      "label": "equals",
-      "ambiguity_level": "Level 2",
-      "row_sha256": "1651c7443b5c0f57"
-    },
-    {
-      "row_index": 131,
-      "fact_id": "f0131",
-      "subject": "Finland",
-      "target": "Republic of Finland",
-      "label": "equals",
-      "ambiguity_level": "Level 2",
-      "row_sha256": "50ed92e686b3d076"
-    },
-    {
-      "row_index": 132,
-      "fact_id": "f0132",
-      "subject": "Honolulu County",
-      "target": "City and County of Honolulu",
-      "label": "equals",
-      "ambiguity_level": "Level 2",
-      "row_sha256": "c16c144f0ea09019"
-    },
-    {
-      "row_index": 133,
-      "fact_id": "f0133",
-      "subject": "Mali",
-      "target": "Republic of Mali",
-      "label": "equals",
-      "ambiguity_level": "Level 3",
-      "row_sha256": "0637be7b5f2a6e9a"
-    },
-    {
-      "row_index": 134,
-      "fact_id": "f0134",
-      "subject": "Marion County",
-      "target": "Marion County, Indiana",
-      "label": "equals",
-      "ambiguity_level": "Level 3",
-      "row_sha256": "7f4a1d90760e0e9f"
-    },
-    {
-      "row_index": 135,
-      "fact_id": "f0135",
-      "subject": "Namibia",
-      "target": "Republic of Namibia",
-      "label": "equals",
-      "ambiguity_level": "Level 3",
-      "row_sha256": "c7725ce3bd03692a"
-    },
-    {
-      "row_index": 136,
-      "fact_id": "f0136",
-      "subject": "Orleans Parish",
-      "target": "City of New Orleans",
-      "label": "equals",
-      "ambiguity_level": "Level 3",
-      "row_sha256": "8dab501d53b21e68"
-    },
-    {
-      "row_index": 137,
-      "fact_id": "f0137",
-      "subject": "Paraguay",
-      "target": "Republic of Paraguay",
-      "label": "equals",
-      "ambiguity_level": "Level 3",
-      "row_sha256": "07cc332a381e3c08"
-    },
-    {
-      "row_index": 138,
-      "fact_id": "f0138",
-      "subject": "Peru",
-      "target": "Republic of Peru",
-      "label": "equals",
-      "ambiguity_level": "Level 3",
-      "row_sha256": "c4b6ac2a25547a62"
-    },
-    {
-      "row_index": 139,
-      "fact_id": "f0139",
-      "subject": "Philadelphia County",
-      "target": "City of Philadelphia",
-      "label": "equals",
-      "ambiguity_level": "Level 3",
-      "row_sha256": "6f201300171e9cbd"
-    },
-    {
-      "row_index": 140,
-      "fact_id": "f0140",
+      "row_index": 121,
+      "fact_id": "f0121",
       "subject": "Borough of Brooklyn",
       "target": "Kings County, New York",
       "label": "equals",
       "ambiguity_level": "Level 4",
-      "row_sha256": "042697a078ce7666"
+      "row_sha256": "fc3e92c3c37cdda5"
     },
     {
-      "row_index": 141,
-      "fact_id": "f0141",
-      "subject": "Borough of Manhattan",
-      "target": "New York County, New York",
+      "row_index": 122,
+      "fact_id": "f0122",
+      "subject": "City of Athens",
+      "target": "Clarke County",
       "label": "equals",
-      "ambiguity_level": "Level 4",
-      "row_sha256": "57d0bf6f1276267f"
+      "ambiguity_level": "Level 5",
+      "row_sha256": "b0014325c7e01596"
     },
     {
-      "row_index": 142,
-      "fact_id": "f0142",
-      "subject": "Republic of Poland",
-      "target": "Poland",
-      "label": "equals",
-      "ambiguity_level": "Level 4",
-      "row_sha256": "2f98272c9f08b6f2"
-    },
-    {
-      "row_index": 143,
-      "fact_id": "f0143",
-      "subject": "Spain",
-      "target": "Kingdom of Spain",
-      "label": "equals",
-      "ambiguity_level": "Level 4",
-      "row_sha256": "a20fe43a7425f630"
-    },
-    {
-      "row_index": 144,
-      "fact_id": "f0144",
-      "subject": "Republic of Iraq",
-      "target": "Iraq",
-      "label": "equals",
-      "ambiguity_level": "Level 4",
-      "row_sha256": "77360acc0d77844f"
-    },
-    {
-      "row_index": 145,
-      "fact_id": "f0145",
+      "row_index": 123,
+      "fact_id": "f0123",
       "subject": "City of Augusta",
       "target": "Richmond County",
       "label": "equals",
       "ambiguity_level": "Level 5",
-      "row_sha256": "413f7847ab244c03"
+      "row_sha256": "c5c42b7b815c4878"
     },
     {
-      "row_index": 146,
-      "fact_id": "f0146",
-      "subject": "City of Columbus",
-      "target": "Muscogee County",
-      "label": "equals",
-      "ambiguity_level": "Level 5",
-      "row_sha256": "62f9e47f5e095a78"
-    },
-    {
-      "row_index": 147,
-      "fact_id": "f0147",
-      "subject": "City of Lexington",
-      "target": "Fayette County",
-      "label": "equals",
-      "ambiguity_level": "Level 5",
-      "row_sha256": "4cb74d9d614875f3"
-    },
-    {
-      "row_index": 148,
-      "fact_id": "f0148",
-      "subject": "Richmond County, New York",
-      "target": "Staten Island",
-      "label": "equals",
-      "ambiguity_level": "Level 5",
-      "row_sha256": "c60a704115e97671"
-    },
-    {
-      "row_index": 149,
-      "fact_id": "f0149",
-      "subject": "Borough of Staten Island",
-      "target": "Richmond County, New York",
-      "label": "equals",
-      "ambiguity_level": "Level 5",
-      "row_sha256": "ceb3f1a1c2c0a7ce"
-    },
-    {
-      "row_index": 150,
-      "fact_id": "f0150",
-      "subject": "France",
-      "target": "French Republic",
-      "label": "equals",
-      "ambiguity_level": "Level 5",
-      "row_sha256": "4dd31f1dc928f683"
-    },
-    {
-      "row_index": 151,
-      "fact_id": "f0151",
-      "subject": "Lake Victoria",
-      "target": "Uganda",
-      "label": "overlaps",
-      "ambiguity_level": "Level 1",
-      "row_sha256": "e3f5f4c49b7ab3d5"
-    },
-    {
-      "row_index": 152,
-      "fact_id": "f0152",
-      "subject": "Teton County",
-      "target": "Yellowstone National Park",
-      "label": "overlaps",
-      "ambiguity_level": "Level 1",
-      "row_sha256": "7d76cdd7ec1eafdd"
-    },
-    {
-      "row_index": 153,
-      "fact_id": "f0153",
-      "subject": "Aegean Sea",
-      "target": "Greece",
-      "label": "overlaps",
-      "ambiguity_level": "Level 1",
-      "row_sha256": "94bfced650cdbbb7"
-    },
-    {
-      "row_index": 154,
-      "fact_id": "f0154",
+      "row_index": 124,
+      "fact_id": "f0124",
       "subject": "Borneo",
       "target": "Indonesia",
       "label": "overlaps",
       "ambiguity_level": "Level 1",
-      "row_sha256": "f63fa0dc10d6bc20"
+      "row_sha256": "dfc95395bb155324"
     },
     {
-      "row_index": 155,
-      "fact_id": "f0155",
+      "row_index": 125,
+      "fact_id": "f0125",
+      "subject": "Lake Victoria",
+      "target": "Uganda",
+      "label": "overlaps",
+      "ambiguity_level": "Level 1",
+      "row_sha256": "c03b8fe4c6df8df6"
+    },
+    {
+      "row_index": 126,
+      "fact_id": "f0126",
+      "subject": "Aegean Sea",
+      "target": "Greece",
+      "label": "overlaps",
+      "ambiguity_level": "Level 1",
+      "row_sha256": "2bc5b5b2bb670322"
+    },
+    {
+      "row_index": 127,
+      "fact_id": "f0127",
+      "subject": "Lake Tanganyika",
+      "target": "Tanzania",
+      "label": "overlaps",
+      "ambiguity_level": "Level 1",
+      "row_sha256": "a809c7f468ae0b9d"
+    },
+    {
+      "row_index": 128,
+      "fact_id": "f0128",
       "subject": "City of Seattle",
       "target": "Lake Washington",
       "label": "overlaps",
       "ambiguity_level": "Level 1",
-      "row_sha256": "9b346e485be23f2e"
+      "row_sha256": "d634386f3ebedf96"
     },
     {
-      "row_index": 156,
-      "fact_id": "f0156",
-      "subject": "Himalayas",
-      "target": "India",
+      "row_index": 129,
+      "fact_id": "f0129",
+      "subject": "Teton County",
+      "target": "Yellowstone National Park",
       "label": "overlaps",
       "ambiguity_level": "Level 1",
-      "row_sha256": "01e330da17d47605"
+      "row_sha256": "a2addb1b1bd418dd"
     },
     {
-      "row_index": 157,
-      "fact_id": "f0157",
+      "row_index": 130,
+      "fact_id": "f0130",
       "subject": "Lake Huron",
       "target": "State of Michigan",
       "label": "overlaps",
       "ambiguity_level": "Level 1",
-      "row_sha256": "08d71ec6d2f3bda7"
+      "row_sha256": "436418d04bfdd0f8"
     },
     {
-      "row_index": 158,
-      "fact_id": "f0158",
-      "subject": "Grand Canyon National Park",
-      "target": "Mojave Desert",
-      "label": "overlaps",
-      "ambiguity_level": "Level 2",
-      "row_sha256": "a559576a2fc21d61"
-    },
-    {
-      "row_index": 159,
-      "fact_id": "f0159",
-      "subject": "Los Angeles County",
-      "target": "Mojave Desert",
-      "label": "overlaps",
-      "ambiguity_level": "Level 2",
-      "row_sha256": "e25b00eb7ad4d7d2"
-    },
-    {
-      "row_index": 160,
-      "fact_id": "f0160",
-      "subject": "Carpathian Mountains",
-      "target": "Serbia",
-      "label": "overlaps",
-      "ambiguity_level": "Level 2",
-      "row_sha256": "abbeba27377eb7f2"
-    },
-    {
-      "row_index": 161,
-      "fact_id": "f0161",
+      "row_index": 131,
+      "fact_id": "f0131",
       "subject": "Iran",
       "target": "Persian Gulf",
       "label": "overlaps",
       "ambiguity_level": "Level 2",
-      "row_sha256": "4b88320624eb2485"
+      "row_sha256": "f32d3af9feea1ed4"
     },
     {
-      "row_index": 162,
-      "fact_id": "f0162",
-      "subject": "Netherlands",
-      "target": "North Sea",
-      "label": "overlaps",
-      "ambiguity_level": "Level 2",
-      "row_sha256": "1b352e9ce2795393"
-    },
-    {
-      "row_index": 163,
-      "fact_id": "f0163",
+      "row_index": 132,
+      "fact_id": "f0132",
       "subject": "Red Sea",
       "target": "Saudi Arabia",
       "label": "overlaps",
       "ambiguity_level": "Level 2",
-      "row_sha256": "a3c786a2204d186c"
+      "row_sha256": "dd9aa88a7ccbef3b"
     },
     {
-      "row_index": 164,
-      "fact_id": "f0164",
-      "subject": "Mojave Desert",
-      "target": "State of Nevada",
+      "row_index": 133,
+      "fact_id": "f0133",
+      "subject": "Everglades National Park",
+      "target": "Miami-Dade County",
       "label": "overlaps",
       "ambiguity_level": "Level 2",
-      "row_sha256": "7d2d609927fa08a6"
+      "row_sha256": "4299eeb6b19b744c"
     },
     {
-      "row_index": 165,
-      "fact_id": "f0165",
+      "row_index": 134,
+      "fact_id": "f0134",
+      "subject": "Netherlands",
+      "target": "North Sea",
+      "label": "overlaps",
+      "ambiguity_level": "Level 2",
+      "row_sha256": "dedcbbe3fad320a9"
+    },
+    {
+      "row_index": 135,
+      "fact_id": "f0135",
+      "subject": "Grand Canyon National Park",
+      "target": "Mojave Desert",
+      "label": "overlaps",
+      "ambiguity_level": "Level 2",
+      "row_sha256": "e5f3c66af743e579"
+    },
+    {
+      "row_index": 136,
+      "fact_id": "f0136",
+      "subject": "Los Angeles County",
+      "target": "Mojave Desert",
+      "label": "overlaps",
+      "ambiguity_level": "Level 2",
+      "row_sha256": "73dc7f4a0f00c4e7"
+    },
+    {
+      "row_index": 137,
+      "fact_id": "f0137",
+      "subject": "Canada",
+      "target": "Lake Superior",
+      "label": "overlaps",
+      "ambiguity_level": "Level 2",
+      "row_sha256": "4959be19a02dded9"
+    },
+    {
+      "row_index": 138,
+      "fact_id": "f0138",
+      "subject": "Black Sea",
+      "target": "State of Georgia",
+      "label": "overlaps",
+      "ambiguity_level": "Level 3",
+      "row_sha256": "13687e84c93bfe21"
+    },
+    {
+      "row_index": 139,
+      "fact_id": "f0139",
       "subject": "Gulf of Oman",
       "target": "Oman",
       "label": "overlaps",
       "ambiguity_level": "Level 3",
-      "row_sha256": "42ef9df1a764d1bf"
+      "row_sha256": "7a3ae279c6dfb099"
     },
     {
-      "row_index": 166,
-      "fact_id": "f0166",
+      "row_index": 140,
+      "fact_id": "f0140",
       "subject": "Lake Superior",
       "target": "State of Minnesota",
       "label": "overlaps",
       "ambiguity_level": "Level 3",
-      "row_sha256": "49d1cd85d173afa2"
+      "row_sha256": "f89880cbaa13bfba"
     },
     {
-      "row_index": 167,
-      "fact_id": "f0167",
-      "subject": "Austria",
-      "target": "Lake Constance",
-      "label": "overlaps",
-      "ambiguity_level": "Level 3",
-      "row_sha256": "db8b54d8c3e306fe"
-    },
-    {
-      "row_index": 168,
-      "fact_id": "f0168",
-      "subject": "Lake Constance",
-      "target": "Republic of Austria",
-      "label": "overlaps",
-      "ambiguity_level": "Level 3",
-      "row_sha256": "fddbc436c941438a"
-    },
-    {
-      "row_index": 169,
-      "fact_id": "f0169",
+      "row_index": 141,
+      "fact_id": "f0141",
       "subject": "Gulf of Oman",
       "target": "Iran",
       "label": "overlaps",
       "ambiguity_level": "Level 3",
-      "row_sha256": "bbfd48d7d2bf9d1d"
+      "row_sha256": "9c93e53076c18c5f"
     },
     {
-      "row_index": 170,
-      "fact_id": "f0170",
-      "subject": "North Sea",
-      "target": "United Kingdom",
+      "row_index": 142,
+      "fact_id": "f0142",
+      "subject": "Persian Gulf",
+      "target": "Saudi Arabia",
       "label": "overlaps",
       "ambiguity_level": "Level 3",
-      "row_sha256": "6ee0937f3ba86b01"
+      "row_sha256": "f3c4b6816f539724"
     },
     {
-      "row_index": 171,
-      "fact_id": "f0171",
+      "row_index": 143,
+      "fact_id": "f0143",
+      "subject": "Austria",
+      "target": "Lake Constance",
+      "label": "overlaps",
+      "ambiguity_level": "Level 3",
+      "row_sha256": "32f5a57a78e6227f"
+    },
+    {
+      "row_index": 144,
+      "fact_id": "f0144",
       "subject": "Carpathian Mountains",
-      "target": "Czechia",
+      "target": "Hungary",
       "label": "overlaps",
       "ambiguity_level": "Level 3",
-      "row_sha256": "5a48b94e0da60024"
+      "row_sha256": "62d021dab6058e62"
     },
     {
-      "row_index": 172,
-      "fact_id": "f0172",
-      "subject": "Lake Erie",
-      "target": "State of Pennsylvania",
-      "label": "overlaps",
-      "ambiguity_level": "Level 4",
-      "row_sha256": "4bdb3c69edb91277"
-    },
-    {
-      "row_index": 173,
-      "fact_id": "f0173",
-      "subject": "Aegean Sea",
-      "target": "Turkey",
-      "label": "overlaps",
-      "ambiguity_level": "Level 4",
-      "row_sha256": "e8900627f0db1906"
-    },
-    {
-      "row_index": 174,
-      "fact_id": "f0174",
+      "row_index": 145,
+      "fact_id": "f0145",
       "subject": "Gulf of Aden",
       "target": "Yemen",
       "label": "overlaps",
       "ambiguity_level": "Level 4",
-      "row_sha256": "5689620e49758108"
+      "row_sha256": "e1b1285e807fca03"
     },
     {
-      "row_index": 175,
-      "fact_id": "f0175",
+      "row_index": 146,
+      "fact_id": "f0146",
+      "subject": "Egypt",
+      "target": "Red Sea",
+      "label": "overlaps",
+      "ambiguity_level": "Level 4",
+      "row_sha256": "e975789a2fc76730"
+    },
+    {
+      "row_index": 147,
+      "fact_id": "f0147",
       "subject": "Kenya",
       "target": "Lake Victoria",
       "label": "overlaps",
       "ambiguity_level": "Level 4",
-      "row_sha256": "9f7bfb5b0821efdb"
+      "row_sha256": "d3097d8e4c495f3f"
     },
     {
-      "row_index": 176,
-      "fact_id": "f0176",
-      "subject": "Lake Michigan",
-      "target": "State of Illinois",
+      "row_index": 148,
+      "fact_id": "f0148",
+      "subject": "City of Cleveland",
+      "target": "Lake Erie",
       "label": "overlaps",
       "ambiguity_level": "Level 4",
-      "row_sha256": "3a1afca04b29d0c0"
+      "row_sha256": "3f18ecd9cfb01377"
     },
     {
-      "row_index": 177,
-      "fact_id": "f0177",
-      "subject": "State of Montana",
-      "target": "Yellowstone National Park",
+      "row_index": 149,
+      "fact_id": "f0149",
+      "subject": "Denmark",
+      "target": "North Sea",
       "label": "overlaps",
       "ambiguity_level": "Level 4",
-      "row_sha256": "fd7071377cfafee7"
+      "row_sha256": "b61945f985d869f5"
     },
     {
-      "row_index": 178,
-      "fact_id": "f0178",
-      "subject": "Alps",
-      "target": "Free State of Bavaria",
+      "row_index": 150,
+      "fact_id": "f0150",
+      "subject": "Lake Erie",
+      "target": "State of Pennsylvania",
       "label": "overlaps",
       "ambiguity_level": "Level 4",
-      "row_sha256": "ea2c0e7a7820882a"
+      "row_sha256": "e2766907a344cf83"
     },
     {
-      "row_index": 179,
-      "fact_id": "f0179",
+      "row_index": 151,
+      "fact_id": "f0151",
+      "subject": "Aegean Sea",
+      "target": "Turkey",
+      "label": "overlaps",
+      "ambiguity_level": "Level 4",
+      "row_sha256": "eaf91560e31206a9"
+    },
+    {
+      "row_index": 152,
+      "fact_id": "f0152",
+      "subject": "City of Tokyo",
+      "target": "Honshu",
+      "label": "overlaps",
+      "ambiguity_level": "Level 5",
+      "row_sha256": "6670209ee8b1e20f"
+    },
+    {
+      "row_index": 153,
+      "fact_id": "f0153",
       "subject": "City of Toronto",
       "target": "Lake Ontario",
       "label": "overlaps",
       "ambiguity_level": "Level 5",
-      "row_sha256": "bc0d6f6b69264ef0"
+      "row_sha256": "cf5ad497df2a2171"
     },
     {
-      "row_index": 180,
-      "fact_id": "f0180",
+      "row_index": 154,
+      "fact_id": "f0154",
       "subject": "Death Valley National Park",
       "target": "State of Nevada",
       "label": "overlaps",
       "ambiguity_level": "Level 5",
-      "row_sha256": "49f6fe3057cc71e4"
+      "row_sha256": "46924ae038daf872"
     },
     {
-      "row_index": 181,
-      "fact_id": "f0181",
-      "subject": "Alps",
-      "target": "Monaco",
+      "row_index": 155,
+      "fact_id": "f0155",
+      "subject": "Caspian Sea",
+      "target": "Iran",
       "label": "overlaps",
       "ambiguity_level": "Level 5",
-      "row_sha256": "53fbecb5300ebb11"
+      "row_sha256": "fd2c69e52d7ec9e7"
     },
     {
-      "row_index": 182,
-      "fact_id": "f0182",
-      "subject": "Black Sea",
-      "target": "Bulgaria",
-      "label": "overlaps",
-      "ambiguity_level": "Level 5",
-      "row_sha256": "ddf1fce50068fbe6"
-    },
-    {
-      "row_index": 183,
-      "fact_id": "f0183",
+      "row_index": 156,
+      "fact_id": "f0156",
       "subject": "Red Sea",
       "target": "Sudan",
       "label": "overlaps",
       "ambiguity_level": "Level 5",
-      "row_sha256": "9375c8a25d9666ae"
+      "row_sha256": "c325d6fdd9802de6"
     },
     {
-      "row_index": 184,
-      "fact_id": "f0184",
+      "row_index": 157,
+      "fact_id": "f0157",
       "subject": "Black Sea",
-      "target": "Republic of Bulgaria",
+      "target": "Bulgaria",
       "label": "overlaps",
       "ambiguity_level": "Level 5",
-      "row_sha256": "152c1993b45b0909"
+      "row_sha256": "ce8b988536e38723"
     },
     {
-      "row_index": 185,
-      "fact_id": "f0185",
-      "subject": "Belgium",
-      "target": "North Sea",
+      "row_index": 158,
+      "fact_id": "f0158",
+      "subject": "Black Sea",
+      "target": "Romania",
       "label": "overlaps",
       "ambiguity_level": "Level 5",
-      "row_sha256": "048c15f1ee0759ac"
+      "row_sha256": "8540a3214478ea3d"
     },
     {
-      "row_index": 186,
-      "fact_id": "f0186",
+      "row_index": 159,
+      "fact_id": "f0159",
+      "subject": "Afghanistan",
+      "target": "Pakistan",
+      "label": "touches",
+      "ambiguity_level": "Level 1",
+      "row_sha256": "b85fe1954a642cc8"
+    },
+    {
+      "row_index": 160,
+      "fact_id": "f0160",
       "subject": "Algeria",
       "target": "Tunisia",
       "label": "touches",
@@ -1699,8 +1465,8 @@
       "row_sha256": "7503b00920df98a8"
     },
     {
-      "row_index": 187,
-      "fact_id": "f0187",
+      "row_index": 161,
+      "fact_id": "f0161",
       "subject": "Argentina",
       "target": "Chile",
       "label": "touches",
@@ -1708,679 +1474,670 @@
       "row_sha256": "eb291e9508709b9a"
     },
     {
-      "row_index": 188,
-      "fact_id": "f0188",
-      "subject": "Argentine Republic",
-      "target": "Paraguay",
-      "label": "touches",
-      "ambiguity_level": "Level 1",
-      "row_sha256": "8a11e9f95ada7771"
-    },
-    {
-      "row_index": 189,
-      "fact_id": "f0189",
-      "subject": "Botswana",
-      "target": "Republic of Namibia",
-      "label": "touches",
-      "ambiguity_level": "Level 1",
-      "row_sha256": "a112f4293ea6a7c4"
-    },
-    {
-      "row_index": 190,
-      "fact_id": "f0190",
-      "subject": "Bronx County, New York",
-      "target": "Queens County, New York",
-      "label": "touches",
-      "ambiguity_level": "Level 1",
-      "row_sha256": "91d834c4497f18db"
-    },
-    {
-      "row_index": 191,
-      "fact_id": "f0191",
-      "subject": "City of Seattle",
-      "target": "Mercer Island",
-      "label": "touches",
-      "ambiguity_level": "Level 1",
-      "row_sha256": "b0b6c33a74566042"
-    },
-    {
-      "row_index": 192,
-      "fact_id": "f0192",
+      "row_index": 162,
+      "fact_id": "f0162",
       "subject": "Croatia",
       "target": "Slovenia",
       "label": "touches",
       "ambiguity_level": "Level 1",
-      "row_sha256": "4a422b6cec4dccda"
+      "row_sha256": "095a5c0866782f11"
     },
     {
-      "row_index": 193,
-      "fact_id": "f0193",
+      "row_index": 163,
+      "fact_id": "f0163",
+      "subject": "Ecuador",
+      "target": "Peru",
+      "label": "touches",
+      "ambiguity_level": "Level 1",
+      "row_sha256": "95153b9e3358d24b"
+    },
+    {
+      "row_index": 164,
+      "fact_id": "f0164",
+      "subject": "Guatemala",
+      "target": "Mexico",
+      "label": "touches",
+      "ambiguity_level": "Level 1",
+      "row_sha256": "ca0e3fa985a66949"
+    },
+    {
+      "row_index": 165,
+      "fact_id": "f0165",
+      "subject": "Iran",
+      "target": "Iraq",
+      "label": "touches",
+      "ambiguity_level": "Level 1",
+      "row_sha256": "01205a95604855d6"
+    },
+    {
+      "row_index": 166,
+      "fact_id": "f0166",
       "subject": "Chad",
       "target": "Libya",
       "label": "touches",
       "ambiguity_level": "Level 2",
-      "row_sha256": "b7fa371a0ee1c058"
+      "row_sha256": "2796731ee3e6739f"
     },
     {
-      "row_index": 194,
-      "fact_id": "f0194",
-      "subject": "City and County of San Francisco",
+      "row_index": 167,
+      "fact_id": "f0167",
+      "subject": "Romania",
+      "target": "Serbia",
+      "label": "touches",
+      "ambiguity_level": "Level 2",
+      "row_sha256": "e0a8022f25bbe096"
+    },
+    {
+      "row_index": 168,
+      "fact_id": "f0168",
+      "subject": "Algeria",
+      "target": "Mali",
+      "label": "touches",
+      "ambiguity_level": "Level 2",
+      "row_sha256": "808bd2fb3de50121"
+    },
+    {
+      "row_index": 169,
+      "fact_id": "f0169",
+      "subject": "Angola",
+      "target": "Namibia",
+      "label": "touches",
+      "ambiguity_level": "Level 2",
+      "row_sha256": "bb9127032365f32c"
+    },
+    {
+      "row_index": 170,
+      "fact_id": "f0170",
+      "subject": "Bolivia",
+      "target": "Paraguay",
+      "label": "touches",
+      "ambiguity_level": "Level 2",
+      "row_sha256": "7efb4ea8c961f670"
+    },
+    {
+      "row_index": 171,
+      "fact_id": "f0171",
+      "subject": "Botswana",
+      "target": "Zimbabwe",
+      "label": "touches",
+      "ambiguity_level": "Level 2",
+      "row_sha256": "54c61bb92b23aa40"
+    },
+    {
+      "row_index": 172,
+      "fact_id": "f0172",
+      "subject": "City of San Francisco",
       "target": "Marin County",
       "label": "touches",
       "ambiguity_level": "Level 2",
-      "row_sha256": "3ff47dad5fa1ff0f"
+      "row_sha256": "ecee5056e7a67ab8"
     },
     {
-      "row_index": 195,
-      "fact_id": "f0195",
-      "subject": "City of Berkeley",
-      "target": "City of Oakland",
-      "label": "touches",
-      "ambiguity_level": "Level 2",
-      "row_sha256": "727e5a8fe87eb7fb"
-    },
-    {
-      "row_index": 196,
-      "fact_id": "f0196",
-      "subject": "Colombia",
-      "target": "Ecuador",
-      "label": "touches",
-      "ambiguity_level": "Level 2",
-      "row_sha256": "ebd7eee1e37ec3a4"
-    },
-    {
-      "row_index": 197,
-      "fact_id": "f0197",
-      "subject": "Eswatini",
-      "target": "Mozambique",
-      "label": "touches",
-      "ambiguity_level": "Level 2",
-      "row_sha256": "d9b0f7e7766f4393"
-    },
-    {
-      "row_index": 198,
-      "fact_id": "f0198",
-      "subject": "Ethiopia",
-      "target": "Kenya",
-      "label": "touches",
-      "ambiguity_level": "Level 2",
-      "row_sha256": "6900d96aed9e4e3d"
-    },
-    {
-      "row_index": 199,
-      "fact_id": "f0199",
-      "subject": "Free State of Bavaria",
-      "target": "State of Hesse",
-      "label": "touches",
-      "ambiguity_level": "Level 2",
-      "row_sha256": "b37c84041e1438c3"
-    },
-    {
-      "row_index": 200,
-      "fact_id": "f0200",
-      "subject": "Iran",
-      "target": "Turkey",
+      "row_index": 173,
+      "fact_id": "f0173",
+      "subject": "Borough of Queens",
+      "target": "State of New Jersey",
       "label": "touches",
       "ambiguity_level": "Level 3",
-      "row_sha256": "952c54c5aa6edac1"
+      "row_sha256": "0ad48863e8156e57"
     },
     {
-      "row_index": 201,
-      "fact_id": "f0201",
-      "subject": "Iraq",
-      "target": "Saudi Arabia",
+      "row_index": 174,
+      "fact_id": "f0174",
+      "subject": "Malaysia",
+      "target": "Thailand",
       "label": "touches",
       "ambiguity_level": "Level 3",
-      "row_sha256": "1cc96575c76b84e8"
+      "row_sha256": "36e76d35cdb7e8e4"
     },
     {
-      "row_index": 202,
-      "fact_id": "f0202",
-      "subject": "Jordan",
-      "target": "Syria",
-      "label": "touches",
-      "ambiguity_level": "Level 3",
-      "row_sha256": "2ca6f0b5453cdee8"
-    },
-    {
-      "row_index": 203,
-      "fact_id": "f0203",
+      "row_index": 175,
+      "fact_id": "f0175",
       "subject": "Mali",
-      "target": "Niger",
+      "target": "Senegal",
       "label": "touches",
       "ambiguity_level": "Level 3",
-      "row_sha256": "f0f2dc8d121f341e"
+      "row_sha256": "9c0407a4df7d8364"
     },
     {
-      "row_index": 204,
-      "fact_id": "f0204",
-      "subject": "Mexico",
-      "target": "State of New Mexico",
-      "label": "touches",
-      "ambiguity_level": "Level 3",
-      "row_sha256": "bc7ed67a52aadbe7"
-    },
-    {
-      "row_index": 205,
-      "fact_id": "f0205",
+      "row_index": 176,
+      "fact_id": "f0176",
       "subject": "Oman",
       "target": "Yemen",
       "label": "touches",
       "ambiguity_level": "Level 3",
-      "row_sha256": "3e36329e55846c00"
+      "row_sha256": "8930b00794aa7ff5"
     },
     {
-      "row_index": 206,
-      "fact_id": "f0206",
-      "subject": "Plurinational State of Bolivia",
-      "target": "Republic of Chile",
+      "row_index": 177,
+      "fact_id": "f0177",
+      "subject": "State of Kansas",
+      "target": "State of Missouri",
       "label": "touches",
       "ambiguity_level": "Level 3",
-      "row_sha256": "8efd01184fc352bb"
+      "row_sha256": "126ac099183de210"
     },
     {
-      "row_index": 207,
-      "fact_id": "f0207",
+      "row_index": 178,
+      "fact_id": "f0178",
+      "subject": "Queens County, New York",
+      "target": "State of New Jersey",
+      "label": "touches",
+      "ambiguity_level": "Level 3",
+      "row_sha256": "1f2049dbe5f5fb01"
+    },
+    {
+      "row_index": 179,
+      "fact_id": "f0179",
+      "subject": "Borough of Brooklyn",
+      "target": "Richmond County, New York",
+      "label": "touches",
+      "ambiguity_level": "Level 3",
+      "row_sha256": "b9d2348b5d813702"
+    },
+    {
+      "row_index": 180,
+      "fact_id": "f0180",
       "subject": "Black Sea",
       "target": "Danube",
       "label": "touches",
       "ambiguity_level": "Level 4",
-      "row_sha256": "53769b77a509ae88"
+      "row_sha256": "c7144494aada487a"
     },
     {
-      "row_index": 208,
-      "fact_id": "f0208",
-      "subject": "Carpathian Mountains",
-      "target": "Republic of Austria",
-      "label": "touches",
-      "ambiguity_level": "Level 4",
-      "row_sha256": "8bed59a5b280bcf8"
-    },
-    {
-      "row_index": 209,
-      "fact_id": "f0209",
+      "row_index": 181,
+      "fact_id": "f0181",
       "subject": "Caspian Sea",
       "target": "Volga",
       "label": "touches",
       "ambiguity_level": "Level 4",
-      "row_sha256": "eb83f4e95c7edc74"
+      "row_sha256": "ba1713acd9803d38"
     },
     {
-      "row_index": 210,
-      "fact_id": "f0210",
-      "subject": "City of Columbus",
-      "target": "State of Alabama",
+      "row_index": 182,
+      "fact_id": "f0182",
+      "subject": "Elbe",
+      "target": "North Sea",
       "label": "touches",
       "ambiguity_level": "Level 4",
-      "row_sha256": "c7014ed0ecac33f7"
+      "row_sha256": "c4d86b41980fb375"
     },
     {
-      "row_index": 211,
-      "fact_id": "f0211",
-      "subject": "City of Minneapolis",
-      "target": "Mississippi River",
+      "row_index": 183,
+      "fact_id": "f0183",
+      "subject": "Gulf of Aden",
+      "target": "Red Sea",
       "label": "touches",
       "ambiguity_level": "Level 4",
-      "row_sha256": "b2f2e74d8efb5f7f"
+      "row_sha256": "3cdca50ab6809549"
     },
     {
-      "row_index": 212,
-      "fact_id": "f0212",
-      "subject": "City of Philadelphia",
-      "target": "State of New Jersey",
+      "row_index": 184,
+      "fact_id": "f0184",
+      "subject": "Aegean Sea",
+      "target": "Crete",
       "label": "touches",
       "ambiguity_level": "Level 4",
-      "row_sha256": "506cf6d9f9456816"
+      "row_sha256": "4222bc839cc7fdd6"
     },
     {
-      "row_index": 213,
-      "fact_id": "f0213",
-      "subject": "City of Portland",
-      "target": "Columbia River",
+      "row_index": 185,
+      "fact_id": "f0185",
+      "subject": "Black Forest",
+      "target": "Rhine",
       "label": "touches",
       "ambiguity_level": "Level 4",
-      "row_sha256": "38e92766f64972c3"
+      "row_sha256": "0fd79e7f996dc63f"
     },
     {
-      "row_index": 214,
-      "fact_id": "f0214",
+      "row_index": 186,
+      "fact_id": "f0186",
+      "subject": "Botswana",
+      "target": "Zambezi",
+      "label": "touches",
+      "ambiguity_level": "Level 4",
+      "row_sha256": "12a63871348e69ef"
+    },
+    {
+      "row_index": 187,
+      "fact_id": "f0187",
       "subject": "Lake Huron",
       "target": "Lake Michigan",
       "label": "touches",
       "ambiguity_level": "Level 5",
-      "row_sha256": "29014991ad1122b8"
+      "row_sha256": "4dc803e823799fdd"
+    },
+    {
+      "row_index": 188,
+      "fact_id": "f0188",
+      "subject": "Kruger National Park",
+      "target": "Limpopo",
+      "label": "touches",
+      "ambiguity_level": "Level 5",
+      "row_sha256": "5b924762fe489cc0"
+    },
+    {
+      "row_index": 189,
+      "fact_id": "f0189",
+      "subject": "Lake Erie",
+      "target": "Wayne County, Michigan",
+      "label": "touches",
+      "ambiguity_level": "Level 5",
+      "row_sha256": "0ef3b10c75dcfe60"
+    },
+    {
+      "row_index": 190,
+      "fact_id": "f0190",
+      "subject": "Long Island",
+      "target": "The Bronx",
+      "label": "touches",
+      "ambiguity_level": "Level 5",
+      "row_sha256": "b1c4f1cc54158b0e"
+    },
+    {
+      "row_index": 191,
+      "fact_id": "f0191",
+      "subject": "Muscogee County",
+      "target": "State of Alabama",
+      "label": "touches",
+      "ambiguity_level": "Level 5",
+      "row_sha256": "06b55cd961fdfc13"
+    },
+    {
+      "row_index": 192,
+      "fact_id": "f0192",
+      "subject": "State of Idaho",
+      "target": "Yellowstone National Park",
+      "label": "touches",
+      "ambiguity_level": "Level 5",
+      "row_sha256": "e9960066cf267902"
+    },
+    {
+      "row_index": 193,
+      "fact_id": "f0193",
+      "subject": "Iraq",
+      "target": "Persian Gulf",
+      "label": "touches",
+      "ambiguity_level": "Level 5",
+      "row_sha256": "a554fd33ebc8bec0"
+    },
+    {
+      "row_index": 194,
+      "fact_id": "f0194",
+      "subject": "City of Amsterdam",
+      "target": "United States",
+      "label": "within",
+      "ambiguity_level": "Level 1",
+      "row_sha256": "a8dad87aefc18670"
+    },
+    {
+      "row_index": 195,
+      "fact_id": "f0195",
+      "subject": "City of Athens",
+      "target": "United States",
+      "label": "within",
+      "ambiguity_level": "Level 1",
+      "row_sha256": "8b4ab17cf3871a64"
+    },
+    {
+      "row_index": 196,
+      "fact_id": "f0196",
+      "subject": "City of Atlanta",
+      "target": "United States",
+      "label": "within",
+      "ambiguity_level": "Level 1",
+      "row_sha256": "0bbb9cd151b74ffe"
+    },
+    {
+      "row_index": 197,
+      "fact_id": "f0197",
+      "subject": "City of Austin",
+      "target": "United States",
+      "label": "within",
+      "ambiguity_level": "Level 1",
+      "row_sha256": "8d83bff507e0c52a"
+    },
+    {
+      "row_index": 198,
+      "fact_id": "f0198",
+      "subject": "City of Berkeley",
+      "target": "United States",
+      "label": "within",
+      "ambiguity_level": "Level 1",
+      "row_sha256": "8be6636e71cc750c"
+    },
+    {
+      "row_index": 199,
+      "fact_id": "f0199",
+      "subject": "City of Berlin",
+      "target": "United States",
+      "label": "within",
+      "ambiguity_level": "Level 1",
+      "row_sha256": "984faaa891721fa3"
+    },
+    {
+      "row_index": 200,
+      "fact_id": "f0200",
+      "subject": "City of Cleveland",
+      "target": "United States",
+      "label": "within",
+      "ambiguity_level": "Level 1",
+      "row_sha256": "761d34ce5f880c63"
+    },
+    {
+      "row_index": 201,
+      "fact_id": "f0201",
+      "subject": "City of Naples",
+      "target": "Italy",
+      "label": "within",
+      "ambiguity_level": "Level 2",
+      "row_sha256": "3aa81fb56ee36430"
+    },
+    {
+      "row_index": 202,
+      "fact_id": "f0202",
+      "subject": "Loch Ness",
+      "target": "Great Britain",
+      "label": "within",
+      "ambiguity_level": "Level 2",
+      "row_sha256": "39d93349410a6cf9"
+    },
+    {
+      "row_index": 203,
+      "fact_id": "f0203",
+      "subject": "Loch Ness",
+      "target": "United Kingdom",
+      "label": "within",
+      "ambiguity_level": "Level 2",
+      "row_sha256": "69dfcfb81815e948"
+    },
+    {
+      "row_index": 204,
+      "fact_id": "f0204",
+      "subject": "Antelope Island",
+      "target": "State of Utah",
+      "label": "within",
+      "ambiguity_level": "Level 2",
+      "row_sha256": "cff192b743928e10"
+    },
+    {
+      "row_index": 205,
+      "fact_id": "f0205",
+      "subject": "City of Berkeley",
+      "target": "State of California",
+      "label": "within",
+      "ambiguity_level": "Level 2",
+      "row_sha256": "2fa2b93148320a60"
+    },
+    {
+      "row_index": 206,
+      "fact_id": "f0206",
+      "subject": "City of Sydney",
+      "target": "Australia",
+      "label": "within",
+      "ambiguity_level": "Level 2",
+      "row_sha256": "30023dbafb18269e"
+    },
+    {
+      "row_index": 207,
+      "fact_id": "f0207",
+      "subject": "Lake Washington",
+      "target": "State of Washington",
+      "label": "within",
+      "ambiguity_level": "Level 2",
+      "row_sha256": "2c89169b9c98552c"
+    },
+    {
+      "row_index": 208,
+      "fact_id": "f0208",
+      "subject": "City of Bangkok",
+      "target": "Thailand",
+      "label": "within",
+      "ambiguity_level": "Level 3",
+      "row_sha256": "b30c7f9f31ad27c7"
+    },
+    {
+      "row_index": 209,
+      "fact_id": "f0209",
+      "subject": "Philadelphia County",
+      "target": "State of Pennsylvania",
+      "label": "within",
+      "ambiguity_level": "Level 3",
+      "row_sha256": "300e63d402e65bad"
+    },
+    {
+      "row_index": 210,
+      "fact_id": "f0210",
+      "subject": "Tarrant County",
+      "target": "State of Texas",
+      "label": "within",
+      "ambiguity_level": "Level 3",
+      "row_sha256": "3d214f1532890536"
+    },
+    {
+      "row_index": 211,
+      "fact_id": "f0211",
+      "subject": "City of Madrid",
+      "target": "Spain",
+      "label": "within",
+      "ambiguity_level": "Level 3",
+      "row_sha256": "af8859d743a1449a"
+    },
+    {
+      "row_index": 212,
+      "fact_id": "f0212",
+      "subject": "City of Reno",
+      "target": "State of Nevada",
+      "label": "within",
+      "ambiguity_level": "Level 3",
+      "row_sha256": "90330d04514eebff"
+    },
+    {
+      "row_index": 213,
+      "fact_id": "f0213",
+      "subject": "City of Vienna",
+      "target": "Austria",
+      "label": "within",
+      "ambiguity_level": "Level 3",
+      "row_sha256": "171135eaa538cb69"
+    },
+    {
+      "row_index": 214,
+      "fact_id": "f0214",
+      "subject": "City of Zurich",
+      "target": "Switzerland",
+      "label": "within",
+      "ambiguity_level": "Level 3",
+      "row_sha256": "bbc29e603a907b4b"
     },
     {
       "row_index": 215,
       "fact_id": "f0215",
-      "subject": "Long Island",
-      "target": "New York County, New York",
-      "label": "touches",
-      "ambiguity_level": "Level 5",
-      "row_sha256": "1ca7a107fb881763"
+      "subject": "City of Miami",
+      "target": "Miami-Dade County",
+      "label": "within",
+      "ambiguity_level": "Level 4",
+      "row_sha256": "9f0b50a1fc1bf941"
     },
     {
       "row_index": 216,
       "fact_id": "f0216",
-      "subject": "Missouri River",
-      "target": "State of Illinois",
-      "label": "touches",
-      "ambiguity_level": "Level 5",
-      "row_sha256": "8ac242703932d319"
+      "subject": "Jacksonville",
+      "target": "State of Florida",
+      "label": "within",
+      "ambiguity_level": "Level 4",
+      "row_sha256": "38a1380a02cfa449"
     },
     {
       "row_index": 217,
       "fact_id": "f0217",
-      "subject": "North Sea",
-      "target": "Elbe",
-      "label": "touches",
-      "ambiguity_level": "Level 5",
-      "row_sha256": "1cca8fef2d83bf6b"
+      "subject": "Kruger National Park",
+      "target": "South Africa",
+      "label": "within",
+      "ambiguity_level": "Level 4",
+      "row_sha256": "cf3869641547a728"
     },
     {
       "row_index": 218,
       "fact_id": "f0218",
-      "subject": "Persian Gulf",
-      "target": "Republic of Iraq",
-      "label": "touches",
-      "ambiguity_level": "Level 5",
-      "row_sha256": "d6befe6d16003c79"
+      "subject": "Central Park",
+      "target": "New York County, New York",
+      "label": "within",
+      "ambiguity_level": "Level 4",
+      "row_sha256": "a7a6ab9333813530"
     },
     {
       "row_index": 219,
       "fact_id": "f0219",
-      "subject": "Red Sea",
-      "target": "Gulf of Aden",
-      "label": "touches",
-      "ambiguity_level": "Level 5",
-      "row_sha256": "75e1c3b6e00d7db4"
+      "subject": "City of Bellevue",
+      "target": "King County",
+      "label": "within",
+      "ambiguity_level": "Level 4",
+      "row_sha256": "9b0f588e5f7fb4a1"
     },
     {
       "row_index": 220,
       "fact_id": "f0220",
-      "subject": "State of Missouri",
-      "target": "State of Oklahoma",
-      "label": "touches",
-      "ambiguity_level": "Level 5",
-      "row_sha256": "5fd0a5da4972e00a"
+      "subject": "City of Cupertino",
+      "target": "Santa Clara County",
+      "label": "within",
+      "ambiguity_level": "Level 4",
+      "row_sha256": "2b1f3da8aa6972d4"
     },
     {
       "row_index": 221,
       "fact_id": "f0221",
-      "subject": "City of Macon",
-      "target": "France",
+      "subject": "City of Tokyo",
+      "target": "Japan",
       "label": "within",
-      "ambiguity_level": "Level 1",
-      "row_sha256": "ce82c9c601710bf9"
+      "ambiguity_level": "Level 4",
+      "row_sha256": "e9ce6d95a4a87968"
     },
     {
       "row_index": 222,
       "fact_id": "f0222",
-      "subject": "City of Montreal",
-      "target": "Canada",
+      "subject": "Platte River",
+      "target": "State of Nebraska",
       "label": "within",
-      "ambiguity_level": "Level 1",
-      "row_sha256": "79e448675d741249"
+      "ambiguity_level": "Level 5",
+      "row_sha256": "a4553e1c9adb6dcc"
     },
     {
       "row_index": 223,
       "fact_id": "f0223",
-      "subject": "Hyde Park, London",
-      "target": "United Kingdom",
+      "subject": "Vistula",
+      "target": "Poland",
       "label": "within",
-      "ambiguity_level": "Level 1",
-      "row_sha256": "c284aa8731cd6732"
+      "ambiguity_level": "Level 5",
+      "row_sha256": "d0b305c0346cf3fb"
     },
     {
       "row_index": 224,
       "fact_id": "f0224",
-      "subject": "City of Toronto",
-      "target": "Canada",
+      "subject": "City of Indianapolis",
+      "target": "Marion County",
       "label": "within",
-      "ambiguity_level": "Level 1",
-      "row_sha256": "d717aa03deff737d"
+      "ambiguity_level": "Level 5",
+      "row_sha256": "390b9a35243b1dd0"
     },
     {
       "row_index": 225,
       "fact_id": "f0225",
-      "subject": "City of Macon",
-      "target": "French Republic",
+      "subject": "Clark County, Nevada",
+      "target": "Mojave Desert",
       "label": "within",
-      "ambiguity_level": "Level 1",
-      "row_sha256": "8cf68559e43eac93"
+      "ambiguity_level": "Level 5",
+      "row_sha256": "54d1585c41881b19"
     },
     {
       "row_index": 226,
       "fact_id": "f0226",
-      "subject": "Borough of Brooklyn",
-      "target": "United States",
+      "subject": "Kings County, New York",
+      "target": "State of New York",
       "label": "within",
-      "ambiguity_level": "Level 1",
-      "row_sha256": "43278cbca3f8055c"
+      "ambiguity_level": "Level 5",
+      "row_sha256": "f18b09b352563722"
     },
     {
       "row_index": 227,
       "fact_id": "f0227",
-      "subject": "Borough of Queens",
-      "target": "United States",
+      "subject": "Manhattan Island",
+      "target": "Borough of Manhattan",
       "label": "within",
-      "ambiguity_level": "Level 1",
-      "row_sha256": "b6136e3d5a3f31ec"
+      "ambiguity_level": "Level 5",
+      "row_sha256": "2de1f20e49893773"
     },
     {
       "row_index": 228,
       "fact_id": "f0228",
-      "subject": "City of Edina",
-      "target": "State of Minnesota",
+      "subject": "Maui",
+      "target": "State of Hawaii",
       "label": "within",
-      "ambiguity_level": "Level 2",
-      "row_sha256": "6628098c5bd13e8a"
+      "ambiguity_level": "Level 5",
+      "row_sha256": "113e5b43a1ad8182"
     },
     {
       "row_index": 229,
       "fact_id": "f0229",
-      "subject": "City of Eugene",
-      "target": "State of Oregon",
+      "subject": "City of Las Vegas",
+      "target": "United States",
       "label": "within",
-      "ambiguity_level": "Level 2",
-      "row_sha256": "a33c060f666c431a"
+      "ambiguity_level": "Level 6",
+      "row_sha256": "2bfa36f345f2775a"
     },
     {
       "row_index": 230,
       "fact_id": "f0230",
-      "subject": "City of Miami",
-      "target": "State of Florida",
+      "subject": "City of Houston",
+      "target": "United States",
       "label": "within",
-      "ambiguity_level": "Level 2",
-      "row_sha256": "307bd0a90a04e894"
+      "ambiguity_level": "Level 6",
+      "row_sha256": "fab901c9dab12107"
     },
     {
       "row_index": 231,
       "fact_id": "f0231",
-      "subject": "City of Provo",
-      "target": "State of Utah",
+      "subject": "Oahu",
+      "target": "United States",
       "label": "within",
-      "ambiguity_level": "Level 2",
-      "row_sha256": "f26e6ad62b52ac06"
+      "ambiguity_level": "Level 6",
+      "row_sha256": "fbac52973f7d128c"
     },
     {
       "row_index": 232,
       "fact_id": "f0232",
       "subject": "City of Tempe",
-      "target": "State of Arizona",
+      "target": "United States",
       "label": "within",
-      "ambiguity_level": "Level 2",
-      "row_sha256": "87907ddd5e830425"
+      "ambiguity_level": "Level 6",
+      "row_sha256": "a2ff5590cf088f4b"
     },
     {
       "row_index": 233,
       "fact_id": "f0233",
-      "subject": "Grand Island",
-      "target": "State of Nebraska",
+      "subject": "Manhattan Island",
+      "target": "United States",
       "label": "within",
-      "ambiguity_level": "Level 2",
-      "row_sha256": "606daf97d8530ade"
+      "ambiguity_level": "Level 6",
+      "row_sha256": "7bc0258a10b1798e"
     },
     {
       "row_index": 234,
       "fact_id": "f0234",
-      "subject": "Kelleys Island",
-      "target": "State of Ohio",
+      "subject": "City of Tucson",
+      "target": "United States",
       "label": "within",
-      "ambiguity_level": "Level 2",
-      "row_sha256": "803f11c92ed0ee14"
+      "ambiguity_level": "Level 6",
+      "row_sha256": "e803e4ea59d8ceee"
     },
     {
       "row_index": 235,
       "fact_id": "f0235",
-      "subject": "City of Austin",
-      "target": "State of Texas",
-      "label": "within",
-      "ambiguity_level": "Level 3",
-      "row_sha256": "114009083f3b58da"
-    },
-    {
-      "row_index": 236,
-      "fact_id": "f0236",
-      "subject": "City of Bangkok",
-      "target": "Thailand",
-      "label": "within",
-      "ambiguity_level": "Level 3",
-      "row_sha256": "ae14e580ee298201"
-    },
-    {
-      "row_index": 237,
-      "fact_id": "f0237",
-      "subject": "City of Boise",
-      "target": "State of Idaho",
-      "label": "within",
-      "ambiguity_level": "Level 3",
-      "row_sha256": "8f006366ad633a8a"
-    },
-    {
-      "row_index": 238,
-      "fact_id": "f0238",
-      "subject": "City of Budapest",
-      "target": "Hungary",
-      "label": "within",
-      "ambiguity_level": "Level 3",
-      "row_sha256": "1351ab2684933137"
-    },
-    {
-      "row_index": 239,
-      "fact_id": "f0239",
-      "subject": "City of Cape Town",
-      "target": "South Africa",
-      "label": "within",
-      "ambiguity_level": "Level 3",
-      "row_sha256": "2db14f36090b7474"
-    },
-    {
-      "row_index": 240,
-      "fact_id": "f0240",
-      "subject": "City of Dublin",
-      "target": "Ireland",
-      "label": "within",
-      "ambiguity_level": "Level 3",
-      "row_sha256": "755d0d61f9077416"
-    },
-    {
-      "row_index": 241,
-      "fact_id": "f0241",
-      "subject": "City of Kyoto",
-      "target": "Honshu",
-      "label": "within",
-      "ambiguity_level": "Level 3",
-      "row_sha256": "239d2690c0261751"
-    },
-    {
-      "row_index": 242,
-      "fact_id": "f0242",
-      "subject": "City of Indianapolis",
-      "target": "State of Indiana",
-      "label": "within",
-      "ambiguity_level": "Level 4",
-      "row_sha256": "2de297d7522104dc"
-    },
-    {
-      "row_index": 243,
-      "fact_id": "f0243",
       "subject": "City of Palo Alto",
-      "target": "Santa Clara County",
-      "label": "within",
-      "ambiguity_level": "Level 4",
-      "row_sha256": "13248a184b47bb19"
-    },
-    {
-      "row_index": 244,
-      "fact_id": "f0244",
-      "subject": "City of Tucson",
-      "target": "Pima County",
-      "label": "within",
-      "ambiguity_level": "Level 4",
-      "row_sha256": "f2d7c69b361b7940"
-    },
-    {
-      "row_index": 245,
-      "fact_id": "f0245",
-      "subject": "Glacier National Park",
-      "target": "State of Montana",
-      "label": "within",
-      "ambiguity_level": "Level 4",
-      "row_sha256": "fe74131c9094471d"
-    },
-    {
-      "row_index": 246,
-      "fact_id": "f0246",
-      "subject": "Kauai",
-      "target": "State of Hawaii",
-      "label": "within",
-      "ambiguity_level": "Level 4",
-      "row_sha256": "16b1fc6786bed22b"
-    },
-    {
-      "row_index": 247,
-      "fact_id": "f0247",
-      "subject": "Manhattan Island",
-      "target": "State of New York",
-      "label": "within",
-      "ambiguity_level": "Level 4",
-      "row_sha256": "7f718f778c6f13ec"
-    },
-    {
-      "row_index": 248,
-      "fact_id": "f0248",
-      "subject": "Namib Desert",
-      "target": "Namibia",
-      "label": "within",
-      "ambiguity_level": "Level 4",
-      "row_sha256": "fc502bafae029d8c"
-    },
-    {
-      "row_index": 249,
-      "fact_id": "f0249",
-      "subject": "City of Detroit",
-      "target": "Wayne County, Michigan",
-      "label": "within",
-      "ambiguity_level": "Level 5",
-      "row_sha256": "24e12ad16e71630d"
-    },
-    {
-      "row_index": 250,
-      "fact_id": "f0250",
-      "subject": "City of Lafayette",
-      "target": "Lafayette Parish",
-      "label": "within",
-      "ambiguity_level": "Level 5",
-      "row_sha256": "d6d4648868a0aefd"
-    },
-    {
-      "row_index": 251,
-      "fact_id": "f0251",
-      "subject": "City of Los Angeles",
-      "target": "Los Angeles County",
-      "label": "within",
-      "ambiguity_level": "Level 5",
-      "row_sha256": "76fb7812a5c21907"
-    },
-    {
-      "row_index": 252,
-      "fact_id": "f0252",
-      "subject": "City of San Diego",
-      "target": "San Diego County",
-      "label": "within",
-      "ambiguity_level": "Level 5",
-      "row_sha256": "2cc2c824d25d1295"
-    },
-    {
-      "row_index": 253,
-      "fact_id": "f0253",
-      "subject": "Louisville",
-      "target": "Jefferson County, Kentucky",
-      "label": "within",
-      "ambiguity_level": "Level 5",
-      "row_sha256": "0197f5eb156e13a1"
-    },
-    {
-      "row_index": 254,
-      "fact_id": "f0254",
-      "subject": "Nile",
-      "target": "Sudan",
-      "label": "within",
-      "ambiguity_level": "Level 5",
-      "row_sha256": "3e5b882f0d11dcaa"
-    },
-    {
-      "row_index": 255,
-      "fact_id": "f0255",
-      "subject": "North Island",
-      "target": "New Zealand",
-      "label": "within",
-      "ambiguity_level": "Level 5",
-      "row_sha256": "6e9ad0ce612ec3d0"
-    },
-    {
-      "row_index": 256,
-      "fact_id": "f0256",
-      "subject": "City of Munich",
-      "target": "Germany",
-      "label": "within",
-      "ambiguity_level": "Level 6",
-      "row_sha256": "aae847f8beb0ccc4"
-    },
-    {
-      "row_index": 257,
-      "fact_id": "f0257",
-      "subject": "City of Las Vegas",
-      "target": "Mojave Desert",
-      "label": "within",
-      "ambiguity_level": "Level 6",
-      "row_sha256": "46dd9d52a21c16e4"
-    },
-    {
-      "row_index": 258,
-      "fact_id": "f0258",
-      "subject": "City of Tucson",
-      "target": "State of Arizona",
-      "label": "within",
-      "ambiguity_level": "Level 6",
-      "row_sha256": "b61144f9a14ba111"
-    },
-    {
-      "row_index": 259,
-      "fact_id": "f0259",
-      "subject": "City of San Jose",
-      "target": "State of California",
-      "label": "within",
-      "ambiguity_level": "Level 6",
-      "row_sha256": "58bc98682e688405"
-    },
-    {
-      "row_index": 260,
-      "fact_id": "f0260",
-      "subject": "City of Redmond",
-      "target": "State of Washington",
-      "label": "within",
-      "ambiguity_level": "Level 6",
-      "row_sha256": "bfc65e2374ce27ba"
-    },
-    {
-      "row_index": 261,
-      "fact_id": "f0261",
-      "subject": "Loch Ness",
-      "target": "United Kingdom",
-      "label": "within",
-      "ambiguity_level": "Level 6",
-      "row_sha256": "a660cc05a6e45cdc"
-    },
-    {
-      "row_index": 262,
-      "fact_id": "f0262",
-      "subject": "Nashville-Davidson",
       "target": "United States",
       "label": "within",
       "ambiguity_level": "Level 6",
-      "row_sha256": "31ea2e05615dd4f3"
+      "row_sha256": "aac0c15bcd244a25"
     }
   ]
 }

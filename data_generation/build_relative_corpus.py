@@ -102,8 +102,20 @@ CLOSE_B = [
  ", {a} appears within the same span of horizon.",
 ]
 
-PATTERNS = ([a + b for a in OPEN_A for b in CLOSE_A]
-            + [a + b for a in OPEN_B for b in CLOSE_B])
+# A third axis of neutral context. None of these says anything about where the
+# subject lies -- they describe conditions, not geometry -- so they multiply the
+# available frames without touching what the item asks.
+CONTEXT = [
+    "",
+    ", the air clear enough to see a long way",
+    ", with nothing interrupting the line",
+    ", early on a settled morning",
+    ", the instrument levelled and checked",
+    ", after the haze had lifted",
+]
+
+PATTERNS = ([a + c + b for a in OPEN_A for c in CONTEXT for b in CLOSE_A]
+            + [a + c + b for a in OPEN_B for c in CONTEXT for b in CLOSE_B])
 
 HOP_PATTERNS = {
  "left_of": [

@@ -77,8 +77,21 @@ def main() -> int:
         return obs_load[v] * 3 + sum(city_load[c] for c in parts)
 
     # --- Levels 1-5 --------------------------------------------------------
+    # A pair can qualify at several levels depending on where the observer
+    # stands, and each pair may be used once. Filling cells in label order lets
+    # an abundant cell take pairs that a scarce one had no alternative to, which
+    # is how next_to Level 5 ended up with nothing. Scarcest cells choose first.
+    supply: dict[tuple[str, int], int] = {}
     for label in LABELS:
+        source = wide if label == "next_to" else idx
         for level in range(1, 6):
+            n = sum(1 for v, cell in source.items()
+                    for (a, b), (g, _) in cell.items()
+                    if g == label and rotation_level(v, b) == level)
+            supply[(label, level)] = n
+    order = sorted(supply, key=lambda k: supply[k])
+
+    for label, level in order:
             cands = []
             source = wide if label == "next_to" else idx
             for v, cell in source.items():

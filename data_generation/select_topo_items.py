@@ -37,9 +37,33 @@ _sys.path.insert(0, str(Path(__file__).resolve().parent))
 from topo_identity import IDENTITY, UNTRUSTED          # noqa: E402
 
 
+# Several catalogue names denote one OSM object -- "Mali" and "Republic of
+# Mali" carry the same osm_id. Left alone they behave as two entities, so the
+# pair-uniqueness check passes while the corpus states the same fact twice
+# under different wording. One name per object is chosen and the rest dropped.
+def _canonical_names() -> set[str]:
+    import json as _json
+    geom = _json.loads(
+        (REPO / "data" / "topological" / "osm" / "geometry.json").read_text())
+    by_id: dict[tuple, list[str]] = {}
+    for name, rec in geom.items():
+        if not rec:
+            continue
+        by_id.setdefault((rec.get("osm_type"), rec.get("osm_id")), []).append(name)
+    keep = set()
+    for names in by_id.values():
+        # prefer the shortest name, and a plain one over a ceremonial form
+        keep.add(sorted(names, key=lambda n: (len(n), n))[0])
+    return keep
+
+
+CANONICAL = _canonical_names()
+
+
 def usable(name: str) -> bool:
-    """Only places with trustworthy geometry and a description may be used."""
-    return name not in UNTRUSTED and name in IDENTITY
+    """Only places with trustworthy geometry, a description, and no alias."""
+    return (name not in UNTRUSTED and name in IDENTITY
+            and name in CANONICAL)
 
 
 _STOP = {"city", "state", "county", "parish", "the", "of", "and", "republic",

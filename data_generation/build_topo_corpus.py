@@ -84,8 +84,13 @@ HOP_TEXT = {
 
 
 def clause(name: str) -> str | None:
-    c = IDENTITY.get(name)
-    return c[0].upper() + c[1:] if c else None
+    """The clause as written, lower-initial.
+
+    Capitalising here put a stray capital mid-sentence once the joiner placed
+    the clause after an opening phrase. The sentence is capitalised as a whole
+    instead, after assembly.
+    """
+    return IDENTITY.get(name)
 
 
 def geom_type(g) -> str:
@@ -149,6 +154,7 @@ def main() -> int:
             text = HOP_TEXT[lab][i % len(HOP_TEXT[lab])].format(a=a, b=b, c=via)
         else:
             text = JOINERS[i % len(JOINERS)].format(a=clause(a), b=clause(b))
+            text = text[0].upper() + text[1:]
         if text in seen_text:
             failures.append((lab, lvl, a, b, ["duplicate description"]))
             continue
