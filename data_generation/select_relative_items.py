@@ -25,10 +25,17 @@ HOP_LABELS = ["left_of", "right_of", "in_front_of", "behind"]
 MARGIN = 12.0
 
 
-def build_index(names):
-    """observer -> {(subject, target): (label, margin)} for sound triples."""
+def build_index(names, observers=None):
+    """observer -> {(subject, target): (label, margin)} for sound triples.
+
+    Every city can be a subject or a target, but the observer pool is capped.
+    The triple count grows with the cube of the catalogue, and at 500 cities the
+    full enumeration is 125 million combinations -- more memory than the result
+    is worth, when a few hundred viewpoints already give far more candidates
+    than any cell can use.
+    """
     idx = {}
-    for v in names:
+    for v in (observers if observers is not None else names):
         pv = COORDS[v]
         near = [n for n in names if n != v and 3.0 <= separation(pv, COORDS[n]) <= 70.0]
         cell = {}
@@ -46,6 +53,9 @@ def build_index(names):
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--per-cell", type=int, default=5)
+    ap.add_argument("--max-observers", type=int, default=260,
+                    help="cap the observer pool; subjects and targets still "
+                         "range over every city")
     ap.add_argument("--out", default="data_generation/relative_picks.json")
     args = ap.parse_args()
 
@@ -54,9 +64,20 @@ def main() -> int:
     # also the one label whose difficulty does not come from frame rotation, so
     # widening its pool costs nothing and buys the variety the others get for
     # free.
-    names = famous()
-    idx = build_index(names)
-    wide = build_index(sorted(COORDS))
+    import random as _random
+    # Relative grades difficulty by how far the sight line is turned from
+    # north, not by how well known the places are, so there is no reason to
+    # restrict it to the recognisable subset the way cardinal does. Every city
+    # in the table is eligible.
+    names = sorted(COORDS)
+    allc = names
+    rng = _random.Random(20260903)
+    obs = names if len(names) <= args.max_observers else rng.sample(
+        sorted(names), args.max_observers)
+    obs_wide = allc if len(allc) <= args.max_observers else rng.sample(
+        allc, args.max_observers)
+    idx = build_index(names, obs)
+    wide = build_index(allc, obs_wide)
 
     used_pairs: set[tuple[str, str]] = set()
     obs_load, city_load = Counter(), Counter()
@@ -117,6 +138,12 @@ def main() -> int:
                 print(f"  SHORT: {label} L{level} got {chosen}/{args.per_cell}")
 
     # --- Level 6: A | B | C under one observer -----------------------------
+    # Chains are gathered from every viewpoint, with a cap on how many any one
+    # can contribute. Stopping once a global total was reached meant the first
+    # few observers supplied everything: one city ended up as the viewpoint for
+    # all 140 Level 6 left/right rows, which a model could exploit without
+    # doing any reasoning.
+    PER_OBSERVER = 12
     for label in HOP_LABELS:
         cands = []
         for v, cell in idx.items():
@@ -124,15 +151,19 @@ def main() -> int:
             bymid = {}
             for a, b in same:
                 bymid.setdefault(b, []).append(a)
+            taken = 0
             for (b, c) in same:
+                if taken >= PER_OBSERVER:
+                    break
                 for a in bymid.get(b, []):
                     if a == c or cell.get((a, c), (None,))[0] != label:
                         continue
                     if (a, c) in used_pairs:
                         continue
                     cands.append((v, a, c, b))
-            if len(cands) > 4000:
-                break
+                    taken += 1
+                    if taken >= PER_OBSERVER:
+                        break
         chosen = 0
         while chosen < args.per_cell and cands:
             cands.sort(key=lambda t: cost(t[0], t[1], t[2], t[3]))
