@@ -13,6 +13,10 @@ them properly, because resume only skips what is still recorded.
 
     python3 scripts/purge_smoke_rows.py --limit 3 --seeds 1          # report
     python3 scripts/purge_smoke_rows.py --limit 3 --seeds 1 --apply  # delete
+
+A cell written within the last few minutes is left alone, since the runner may
+still be appending to it. With the job stopped that caution is unnecessary and
+--force skips it.
 """
 from __future__ import annotations
 
@@ -34,6 +38,10 @@ def main() -> int:
                     help="the seeds the smoke test wrote (default: 1)")
     ap.add_argument("--apply", action="store_true",
                     help="actually rewrite the files; otherwise just report")
+    ap.add_argument("--force", action="store_true",
+                    help="rewrite even recently written files. Only pass this "
+                         "with the runner stopped: a cell being appended to "
+                         "would lose whatever it wrote after the read")
     args = ap.parse_args()
 
     if not RESULTS.exists():
@@ -49,7 +57,7 @@ def main() -> int:
         if pred.parent.name not in seeds:
             continue
         age = time.time() - pred.stat().st_mtime
-        if age < BUSY_SECONDS:
+        if age < BUSY_SECONDS and not args.force:
             # A cell still being written must not be rewritten underneath the
             # runner; it is reported instead so it can be handled once idle.
             busy += 1
@@ -83,8 +91,8 @@ def main() -> int:
     print(f"\n  {len(touched)} cell(s) affected, {total_removed} row(s) "
           f"{'removed' if args.apply else 'to remove'}")
     if busy:
-        print(f"  {busy} cell(s) skipped as possibly in progress — rerun this "
-              f"once the job has finished")
+        print(f"  {busy} cell(s) skipped as possibly in progress. Rerun once "
+              f"the job has finished, or pass --force if it is already stopped")
     if not args.apply and total_removed:
         print("  rerun with --apply to delete them, then rerun the normal "
               "run command; resume will recompute exactly these rows")
