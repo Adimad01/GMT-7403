@@ -100,6 +100,19 @@ def cmd_run(args) -> int:
     print(f"\n  {len(cells)} cells: {len(relations)} relations x "
           f"{len(strategies)} strategies x {len(seeds)} seeds\n")
 
+    if len(seeds) > 1:
+        # Extra seeds re-measure the same rows; report.py collapses them to one
+        # verdict per row before testing, so they add no statistical power.
+        # Power comes from the number of evaluation rows. What a second seed
+        # buys is a stability check, at a cost that scales with the whole run.
+        print(f"  NOTE: {len(seeds)} seeds re-run every row {len(seeds)} times.")
+        print( "        Seeds are pooled by majority vote before any test, so")
+        print( "        they do not increase the sample size or the power of a")
+        print( "        comparison -- the eval set size does that. They measure")
+        print( "        whether a result is stable against sampling noise.")
+        print(f"        Dropping to one seed cuts this run to about "
+              f"{100 / len(seeds):.0f}% of its length.\n")
+
     failures = []
     for i, (rel, strat, seed) in enumerate(cells, 1):
         print(f"  [{i}/{len(cells)}] {rel} / {strat} / seed {seed}")
