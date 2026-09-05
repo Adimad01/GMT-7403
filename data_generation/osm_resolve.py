@@ -79,6 +79,7 @@ KIND_ACCEPT = {
     "sea": [("natural", None), ("place", "sea"), ("water", None),
             ("waterway", None)],
     "park": [("leisure", None), ("boundary", "protected_area"),
+             ("boundary", "national_park"), ("boundary", "aboriginal_lands"),
              ("landuse", None), ("natural", None)],
     "island": [("place", None), ("natural", None),
                ("boundary", "administrative")],
@@ -86,6 +87,11 @@ KIND_ACCEPT = {
                  ("boundary", None)],
     # numbered routes and named highways are relations, not boundaries
     "route": [("highway", None), ("route", None), ("boundary", None)],
+    # For a name that gives no clue what it is, accept any kind of place rather
+    # than assuming an administrative boundary.
+    "broad": [("boundary", "administrative"), ("place", None), ("natural", None),
+              ("landuse", None), ("leisure", None), ("waterway", None),
+              ("water", None)],
 }
 
 
@@ -146,6 +152,36 @@ def names_of(cand: dict) -> set[str]:
     return out
 
 
+# OSM often records the full formal title where the query uses the everyday
+# name: "Autonomous Community of the Basque Country" for Basque Country,
+# "Prefecture of Kyoto" for Kyoto Prefecture. Stripping these qualifiers before
+# comparing keeps the check strict about WHICH place while tolerant about how
+# formally it is styled. The list is deliberately short -- anything vaguer
+# would start matching Sahara to Western Sahara.
+_QUALIFIER = re.compile(
+    r"^(autonomous\s+(community|region|province)\s+of\s+(the\s+)?|"
+    r"(state|province|prefecture|region|department|canton|county|district|"
+    r"governorate|oblast|republic|kingdom|federation)\s+of\s+(the\s+)?|"
+    r"the\s+)", re.I)
+
+
+# The same qualifier can trail the name instead: OSM styles the Kyoto region
+# "Kyoto Prefecture" where the query says "Prefecture of Kyoto".
+_QUALIFIER_TAIL = re.compile(
+    r"\s+(prefecture|province|region|oblast|governorate|department|canton|"
+    r"county|district|state)$", re.I)
+
+
+def _bare(name: str) -> str:
+    prev = None
+    out = name
+    while prev != out:
+        prev = out
+        out = _QUALIFIER.sub("", out).strip()
+        out = _QUALIFIER_TAIL.sub("", out).strip()
+    return out
+
+
 def bears_name(cand: dict, query: str) -> bool:
     """Does this candidate actually carry the name that was asked for?
 
@@ -154,7 +190,12 @@ def bears_name(cand: dict, query: str) -> bool:
     importance, so ranking by importance alone picks them. Importance may only
     break ties among candidates that genuinely bear the name.
     """
-    return norm(query.split(",")[0]) in names_of(cand)
+    want = norm(query.split(",")[0])
+    variants = names_of(cand)
+    if want in variants:
+        return True
+    bare_want = norm(_bare(query.split(",")[0]))
+    return any(norm(_bare(v)) == bare_want for v in variants if v)
 
 
 def acceptable(cand: dict, accept: list[tuple[str, str | None]]) -> bool:
@@ -201,4 +242,12 @@ def _try(q, accept, want_polygon, simplify, timeout, pause):
     fit = [c for c in cands if acceptable(c, accept) and bears_name(c, q)]
     if not fit:
         return None            # nothing of the right kind that bears the name
+    if want_polygon:
+        # A node carries no outline. Where OSM holds the same place as both a
+        # node and a relation -- common for deserts and mountain ranges -- the
+        # node usually scores higher on importance and would win, leaving a
+        # Point that no topological test can use.
+        shaped = [c for c in fit if c.get("osm_type") in ("relation", "way")]
+        if shaped:
+            fit = shaped
     return max(fit, key=importance)

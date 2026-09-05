@@ -31,25 +31,45 @@ from osm_resolve import LookupFailed, resolve       # noqa: E402
 GEOM = REPO / "data" / "topological" / "osm" / "geometry.json"
 
 # Words that put the answer in the description instead of the geography.
+# Each pattern has to catch a positional claim without catching ordinary prose.
+# "neighbourhood" is not a claim about neighbours, and "scattered across the
+# landscape" is not a claim about being across a border from something.
 LEAKS = [
-    (r"\b(north|south|east|west|northern|southern|eastern|western)\b", "direction"),
-    (r"\b(capital of|city in|town in|located in|situated in|part of)\b", "parentage"),
-    (r"\bborder\w*\b|\badjacent\b|\bneighbou?r\w*\b|\bacross the\b", "neighbours"),
-    (r"\bsquare (kilometres|kilometers|miles)\b|\blargest\b|\bsmallest\b", "size"),
-    (r"\b(latitude|longitude|equator|pole)\b", "coordinates"),
+    (r"\b(north|south|east|west)(ern|ward|erly)?\s+(of|from|coast|shore|edge|"
+     r"end|tip|bank|side)\b", "direction"),
+    (r"\bin the (north|south|east|west)\b", "direction"),
+    (r"\b(capital of|city in|town in|located in|situated in|lies in|sits in)\b",
+     "parentage"),
+    (r"\bborders?\s+(on|with|the)\b|\bbordering\b|\badjacent to\b|"
+     r"\bneighbou?ring\b|\bacross the (border|strait|channel|frontier|bay|"
+     r"gulf|sound)\b", "neighbours"),
+    (r"\bsquare (kilometres|kilometers|miles)\b|\b\d+[,\d]*\s*(km2|sq km)\b",
+     "size"),
+    (r"\b(latitude|longitude|equator|the pole|arctic circle|tropic of)\b",
+     "coordinates"),
 ]
 
+# Order matters. "Crater Lake National Park" contains the word Lake, and asking
+# OSM for a lake by that name rejects the nature reserve it actually is; the
+# same happened to Salt Lake County and Glacier Bay National Park. The most
+# specific kind has to be tested first.
 KIND_GUESS = [
+    (re.compile(r"National Park|National Forest|Nature Reserve|"
+                r"Conservation Area|Protected Area|National Monument", re.I), "park"),
+    (re.compile(r"County$|County,|Parish$|Parish,|Prefecture|Province|"
+                r"^Canton of |^State of |^Province of |Territory$|"
+                r"^Republic|^Kingdom|^Federal Republic", re.I), "admin"),
     (re.compile(r"\b(River|Creek|Canal)\b", re.I), "river"),
-    (re.compile(r"\b(Lake|Loch|Reservoir)\b", re.I), "lake"),
+    (re.compile(r"\b(Lake|Loch|Lough|Reservoir)\b", re.I), "lake"),
     (re.compile(r"\b(Sea|Gulf|Bay|Strait|Ocean|Sound)\b", re.I), "sea"),
-    (re.compile(r"National Park|Nature Reserve|Protected Area", re.I), "park"),
-    (re.compile(r"\b(Island|Isle|Archipelago|Peninsula)\b", re.I), "island"),
-    (re.compile(r"\b(Desert|Forest|Mountains|Range|Massif)\b", re.I), "physical"),
-    (re.compile(r"County|Parish|Province|District|Canton|Prefecture|"
-                r"^State of |^Republic|^Kingdom", re.I), "admin"),
+    (re.compile(r"\b(Island|Islands|Isle|Archipelago|Peninsula)\b", re.I), "island"),
+    (re.compile(r"\b(Desert|Forest|Mountains|Range|Massif|Alps)\b", re.I), "physical"),
 ]
 
+# Anything unmatched could be an island, a region or a natural feature, so the
+# fallback accepts all of them rather than insisting on an administrative
+# boundary -- which is what discarded Sumatra, Sulawesi, Tahiti and Hispaniola.
+BROAD = "broad"
 
 def guess_kind(name: str, default: str) -> str:
     for pat, k in KIND_GUESS:
@@ -68,6 +88,8 @@ def main() -> int:
     ap.add_argument("--kind", choices=["topological", "cities"], required=True)
     ap.add_argument("--dry-run", action="store_true",
                     help="screen the clauses without geocoding")
+    ap.add_argument("--coords-out",
+                    help="cities: write name,lat,lon here for the coordinate table")
     args = ap.parse_args()
 
     entries = []
@@ -80,7 +102,7 @@ def main() -> int:
             entries.append((name, clause))
     print(f"  {len(entries)} places parsed from {Path(args.file).name}")
 
-    default_kind = "city" if args.kind == "cities" else "admin"
+    default_kind = "city" if args.kind == "cities" else BROAD
     leaky, kept, rejected = [], [], []
 
     for name, clause in entries:
@@ -110,12 +132,20 @@ def main() -> int:
                 break
             except LookupFailed:
                 time.sleep(3)
-        if rec and rec.get("geojson") and rec["geojson"].get("type") in (
-                "Polygon", "MultiPolygon", "LineString", "MultiLineString"):
+        # Cardinal and relative work from a single coordinate, so a city that
+        # OSM holds only as a node is perfectly usable. Requiring a polygon
+        # there was a topological rule applied where it does not belong, and it
+        # threw away most of the African and Central Asian cities.
+        ok_geom = (rec and rec.get("geojson") and (
+            args.kind == "cities"
+            or rec["geojson"].get("type") in ("Polygon", "MultiPolygon",
+                                              "LineString", "MultiLineString")))
+        if ok_geom:
             cache[name] = {"osm_type": rec.get("osm_type"), "osm_id": rec.get("osm_id"),
                            "class": rec.get("class"), "type": rec.get("type"),
                            "display_name": rec.get("display_name"),
                            "importance": rec.get("importance"),
+                           "lat": rec.get("lat"), "lon": rec.get("lon"),
                            "geojson": rec["geojson"]}
             kept.append((name, clause))
         else:
@@ -127,6 +157,14 @@ def main() -> int:
                   flush=True)
 
     GEOM.write_text(json.dumps(cache))
+    if args.kind == "cities" and args.coords_out:
+        lines = []
+        for name, _ in kept:
+            rec = cache.get(name)
+            if rec and rec.get("lat") is not None:
+                lines.append(f"{name},{rec['lat']},{rec['lon']}")
+        Path(args.coords_out).write_text("\n".join(lines), encoding="utf-8")
+        print(f"  coordinates for {len(lines)} cities -> {args.coords_out}")
     out = REPO / "data_generation" / f"accepted_{args.kind}.txt"
     out.write_text("\n".join(f"{n} | {c}" for n, c in kept), encoding="utf-8")
     rej = REPO / "data_generation" / f"rejected_{args.kind}.txt"
