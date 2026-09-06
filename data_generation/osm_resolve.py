@@ -72,7 +72,11 @@ DEFAULT_ACCEPT = [("boundary", "administrative"), ("place", None),
 # and the departement outranks the river on importance.
 KIND_ACCEPT = {
     "admin": [("boundary", "administrative")],
-    "city": [("boundary", "administrative"), ("place", None)],
+    # Some capitals are mapped as the island or atoll they occupy rather than
+    # as a settlement -- Tarawa is natural/atoll -- and excluding those let an
+    # unrelated Nigerian village of the same name win instead.
+    "city": [("boundary", "administrative"), ("place", None),
+             ("natural", "atoll"), ("natural", "island")],
     "river": [("waterway", None), ("natural", "water"), ("water", None)],
     "lake": [("natural", "water"), ("water", None), ("waterway", None),
              ("place", None)],
@@ -141,11 +145,17 @@ def names_of(cand: dict) -> set[str]:
     """Every name the candidate goes by, normalised."""
     out = set()
     nd = cand.get("namedetails") or {}
-    for k, v in nd.items():
-        if k == "name" or k.startswith(("name:", "official_name", "alt_name",
-                                        "short_name", "int_name")):
-            if v:
-                out.add(norm(v))
+    # Only the place's own name, its English and international forms, and any
+    # declared alternates. Every other language was also being compared, which
+    # is how Kolonia matched Köln through its Polish exonym and Tanga matched
+    # Tonga. A translation into an unrelated language is not evidence that this
+    # is the place that was asked for.
+    for k in ("name", "name:en", "official_name", "official_name:en",
+              "int_name", "alt_name", "short_name"):
+        v = nd.get(k)
+        if v:
+            for part in str(v).split(";"):
+                out.add(norm(part))
     head = (cand.get("display_name") or "").split(",")[0]
     if head:
         out.add(norm(head))
@@ -172,13 +182,14 @@ _QUALIFIER_TAIL = re.compile(
     r"county|district|state)$", re.I)
 
 
-def _bare(name: str) -> str:
+def _bare(name: str, drop_tail: bool = True) -> str:
     prev = None
     out = name
     while prev != out:
         prev = out
         out = _QUALIFIER.sub("", out).strip()
-        out = _QUALIFIER_TAIL.sub("", out).strip()
+        if drop_tail:
+            out = _QUALIFIER_TAIL.sub("", out).strip()
     return out
 
 
@@ -190,12 +201,25 @@ def bears_name(cand: dict, query: str) -> bool:
     importance, so ranking by importance alone picks them. Importance may only
     break ties among candidates that genuinely bear the name.
     """
-    want = norm(query.split(",")[0])
+    head = query.split(",")[0]
+    want = norm(head)
     variants = names_of(cand)
     if want in variants:
         return True
-    bare_want = norm(_bare(query.split(",")[0]))
-    return any(norm(_bare(v)) == bare_want for v in variants if v)
+
+    # A leading qualifier only restyles a title -- "Autonomous Community of the
+    # Basque Country" is the Basque Country -- so it can always come off both
+    # sides. A trailing type word names a different object: Medina County is
+    # not Medina. That may only be dropped from the candidate when the query
+    # carries one too, which is what reconciles "Prefecture of Kyoto" with
+    # "Kyoto Prefecture".
+    # The qualifier may sit at either end of the query -- "Prefecture of Kyoto"
+    # and "Salt Lake County" both carry one -- so look for it anywhere before
+    # deciding whether candidates may have theirs removed.
+    named = bool(_QUALIFIER.search(head) or _QUALIFIER_TAIL.search(head))
+    bare_want = norm(_bare(head, drop_tail=named))
+    return any(norm(_bare(v, drop_tail=named)) == bare_want
+               for v in variants if v)
 
 
 def acceptable(cand: dict, accept: list[tuple[str, str | None]]) -> bool:
