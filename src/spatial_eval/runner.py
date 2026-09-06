@@ -63,6 +63,65 @@ def _load_done(path: Path) -> dict[int, dict]:
     return done
 
 
+LEDGER = Path(__file__).resolve().parents[2] / "experiments" / "ledger.jsonl"
+
+
+def _git_commit() -> str | None:
+    """The revision the code was at, so a result can be traced to its source."""
+    import subprocess
+    try:
+        out = subprocess.run(["git", "rev-parse", "--short", "HEAD"],
+                             cwd=LEDGER.parents[1], capture_output=True,
+                             text=True, timeout=5)
+        return out.stdout.strip() or None
+    except Exception:
+        return None
+
+
+def _record(summary: dict, final: dict) -> None:
+    """Append one line to the permanent experiment ledger.
+
+    results/ and logs/ are both ignored by git and have been deleted outright
+    several times in the course of this work, taking every trace of what had
+    been run with them. The ledger lives outside both, is committed, and is only
+    ever appended to, so the history of what ran -- against which data, at which
+    revision, with what outcome -- survives anything done to the results.
+    """
+    try:
+        LEDGER.parent.mkdir(parents=True, exist_ok=True)
+        ok = [r for r in final.values() if r.get("status") == "ok"]
+        by_level: dict[str, list[int]] = {}
+        for r in ok:
+            by_level.setdefault(r.get("ambiguity_level", "?"), []).append(
+                bool(r.get("correct")))
+        rec = {
+            "finished_at": summary["finished_at"],
+            "git_commit": _git_commit(),
+            "run_id": summary["run_id"],
+            "relation": summary["relation"],
+            "strategy": summary["strategy"],
+            "seed": summary["seed"],
+            "model_id": (summary.get("model") or {}).get("model_id"),
+            "backend": (summary.get("model") or {}).get("backend"),
+            "eval_manifest_sha256": summary["eval_manifest_sha256"],
+            "fewshot_manifest_sha256": summary["fewshot_manifest_sha256"],
+            "n_examples": summary["n_examples"],
+            "n_completed": summary["n_completed"],
+            "n_failed": summary["n_failed"],
+            "n_unparsed": summary["n_unparsed"],
+            "accuracy": (round(sum(r.get("correct", False) for r in ok) / len(ok), 4)
+                         if ok else None),
+            "accuracy_by_level": {k: round(sum(v) / len(v), 4)
+                                  for k, v in sorted(by_level.items())},
+            "elapsed_seconds": summary["elapsed_seconds"],
+        }
+        with LEDGER.open("a", encoding="utf-8") as fh:
+            fh.write(json.dumps(rec) + "\n")
+    except Exception as exc:                              # noqa: BLE001
+        # Losing the ledger entry must never lose the run it describes.
+        log.warning("could not append to the experiment ledger: %s", exc)
+
+
 def run_cell(cfg: RunConfig, backend: Backend | None = None,
              save_traces: bool = False) -> dict:
     """Execute one cell. Returns its summary dict."""
@@ -202,6 +261,7 @@ def run_cell(cfg: RunConfig, backend: Backend | None = None,
         "finished_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
     }
     (out_dir / "run.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
+    _record(summary, final)
     log.info("%s | done: %d ok, %d failed, %d unparsed, %.1fs",
              cfg.run_id, summary["n_completed"], summary["n_failed"],
              summary["n_unparsed"], elapsed)
