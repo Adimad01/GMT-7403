@@ -275,7 +275,19 @@ def main() -> int:
             warn(f"{len(old_mirror)} pair(s) mirror an existing corpus pair, "
                  f"e.g. {old_mirror[:2]}")
 
-    # --- the answer must not be stated in the text ------------------------
+    # --- the description must paraphrase the relation, never name it -------
+    #
+    # The task is to recover a formal predicate from vernacular wording, so the
+    # description has to express the relation -- "sits just above it on the
+    # map" for north_of, "share no ground at all" for disjoint. What it may not
+    # contain is the predicate itself, or a synonym so close that matching the
+    # string answers the item without interpreting it.
+    #
+    # An earlier version of this file had the test the other way round and
+    # failed any row whose description mentioned the relation at all. That
+    # graded the corpus against a different experiment: it produced items that
+    # named two places and said nothing else, which measures whether the model
+    # knows where places are rather than whether it can read a paraphrase.
     leaks = []
     for r in rows:
         lab = r["relation_label"].strip().lower()
@@ -285,10 +297,34 @@ def main() -> int:
                 leaks.append((r["source_entity"][:26], lab, phrase))
                 break
     if leaks:
-        bad(f"{len(leaks)} row(s) state the answer in the description, "
-            f"e.g. {leaks[0][0]} says '{leaks[0][2]}' for {leaks[0][1]}")
+        bad(f"{len(leaks)} row(s) name the predicate outright, which can be "
+            f"answered by string match, e.g. {leaks[0][0]} says "
+            f"'{leaks[0][2]}' for {leaks[0][1]}")
     else:
-        ok("descriptions never contain the label or an obvious synonym")
+        ok("no description names its own predicate")
+
+    # A description carrying no relational wording at all is the opposite
+    # failure: nothing to interpret, so the item tests recall of where places
+    # are instead of the reading of a spatial expression.
+    RELATIONAL = re.compile(
+        r"\b(above|below|beneath|under|over|inside|within|outside|beyond|"
+        r"encircl\w*|enclos\w*|surround\w*|envelop\w*|contain\w*|span\w*|"
+        r"straddl\w*|border\w*|abut\w*|adjoin\w*|meet\w*|touch\w*|"
+        r"overlap\w*|share\w*|separat\w*|apart|distant|beside|alongside|"
+        r"next|adjacent|near|far|left|right|front|behind|ahead|past|between|"
+        r"cross\w*|traverse\w*|through|into|toward\w*|upward|downward|"
+        r"higher|lower|further|closer|nearer|beyond|flank\w*|hem\w*|"
+        r"north\w*|south\w*|east\w*|west\w*|top|bottom|edge|corner|"
+        r"up|down|across|along|around|within|amid|encompass\w*|sits?|lies?|"
+        r"stands?|rests?|occupies|reach\w*|extend\w*|stretch\w*|run\w*)\b",
+        re.I)
+    silent = [r for r in rows if not RELATIONAL.search(r["corpus"])]
+    if silent:
+        bad(f"{len(silent)} row(s) carry no spatial wording at all, so there is "
+            f"nothing to interpret, e.g. {silent[0]['source_entity']!r}: "
+            f"\"{silent[0]['corpus'][:70]}...\"")
+    else:
+        ok("every description expresses the relation in some form")
 
     # --- multi-hop rows ---------------------------------------------------
     hop = [r for r in rows if r["ambiguity_level"].strip() == HOP_LEVEL]
@@ -403,24 +439,11 @@ def main() -> int:
             warn(f"{len(ornate)} Level 6 row(s) also use oblique Level 1-5 "
                  f"phrasing — that confounds wording with inference depth")
 
-    # --- cardinal: the description must not encode the bearing -------------
-    # Level 6 is exempt: a chain cannot be stated without directional language,
-    # and that level tests composition rather than knowledge.
-    if rel == "cardinal":
-        flat = [r for r in rows if r["ambiguity_level"].strip() != HOP_LEVEL]
-        leaked = []
-        for r in flat:
-            hit = bearing_cue(r["corpus"])
-            if hit:
-                leaked.append((r, hit))
-        if leaked:
-            bad(f"{len(leaked)}/{len(flat)} Level 1-5 rows encode the bearing in "
-                f"the description, so the answer needs no geographic knowledge. "
-                f"e.g. {leaked[0][0]['source_entity']!r} uses \"{leaked[0][1]}\": "
-                f"\"{leaked[0][0]['corpus'][:64]}...\"")
-        else:
-            ok(f"cardinal: no Level 1-5 description encodes the bearing — the "
-               f"answer requires knowing where the places are")
+    # The bearing-cue detector is deliberately not applied any more. It was
+    # written to reject exactly the phrasing this corpus now needs -- "toward
+    # the top of the map", "closer to the pole" -- because an earlier reading of
+    # the task treated those as leaks. They are the stimulus. bearing_cue() is
+    # kept only for the report below, which counts how oblique the wording is.
 
     # --- template reuse ----------------------------------------------------
     # 144 rows built from 48 frames is 48 items shown three times, not 144.
