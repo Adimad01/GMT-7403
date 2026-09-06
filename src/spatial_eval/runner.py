@@ -81,6 +81,28 @@ def run_cell(cfg: RunConfig, backend: Backend | None = None,
     if cfg.strategy == "few_shot":
         demos, demo_hash = load_demos(cfg.relation)
 
+    # Resume matches rows by index, which is only meaningful while the data
+    # behind those indices is unchanged. After the corpus is regenerated the
+    # same index refers to a different item, so predictions kept from before
+    # would be scored against text they never saw. run.json records the
+    # manifest hash the results were produced under; a mismatch means they
+    # describe a corpus that no longer exists.
+    prior = out_dir / "run.json"
+    if cfg.resume and prior.exists():
+        try:
+            was = json.loads(prior.read_text(encoding="utf-8"))
+            old = was.get("eval_manifest_sha256")
+        except Exception:
+            old = None
+        if old and old != eval_hash:
+            raise RuntimeError(
+                f"{cfg.run_id}: results in {out_dir} were produced against eval "
+                f"manifest {old[:12]}, but the data now hashes to "
+                f"{eval_hash[:12]}. Row indices no longer refer to the same "
+                f"items, so resuming would mix answers to different questions. "
+                f"Delete this directory (or all of results/) and start the cell "
+                f"again.")
+
     done = _load_done(pred_path) if cfg.resume else {}
     todo = [e for e in examples
             if done.get(e.row_index, {}).get("status") != "ok"]
