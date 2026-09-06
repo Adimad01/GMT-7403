@@ -93,8 +93,11 @@ def main() -> int:
             drop(f"predicate not one of the {args.relation} labels"); continue
         if not lvl.isdigit() or not 1 <= int(lvl) <= 5:
             drop("level is not 1-5"); continue
+        # Whole words only. A plain substring test rejects "slices across" for
+        # the predicate crosses, because "across" contains "cross ".
         low = text.lower()
-        if any(b in low for b in BANNED.get(pred, [])):
+        if any(re.search(r"\b" + re.escape(b.strip()) + r"\b", low)
+               for b in BANNED.get(pred, [])):
             drop("names its own predicate"); continue
         if "{A}" not in text or "{B}" not in text:
             drop("missing {A} or {B}"); continue
