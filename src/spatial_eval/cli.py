@@ -12,7 +12,9 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
+import time
 from pathlib import Path
 
 from .config import (LABELS, LOGS_DIR, RELATIONS, RESULTS_DIR, ModelConfig,
@@ -80,8 +82,69 @@ def cmd_list(args) -> int:
     return 0
 
 
+def _live(pid: int, started: float) -> bool:
+    """Is that pid still the process that took the lock?
+
+    A pid alone is not enough: they are recycled, and a stale lock naming a
+    number the system has since reissued would block every future run. The
+    start time is compared as well, so only the original process matches.
+    """
+    try:
+        os.kill(pid, 0)
+    except (ProcessLookupError, PermissionError):
+        return False
+    except OSError:
+        return False
+    try:
+        with open(f"/proc/{pid}/stat", encoding="utf-8") as fh:
+            # field 22 is start time in clock ticks since boot
+            ticks = float(fh.read().rsplit(")", 1)[1].split()[19])
+        return abs(ticks - started) < 1.0
+    except Exception:
+        return True          # cannot verify; assume it is live and refuse
+
+
+def _take_lock() -> Path | None:
+    """Refuse to start a second runner over the same results directory.
+
+    Two processes appending to the same predictions.jsonl interleave their
+    writes and duplicate rows, and the damage is not obvious until the numbers
+    are analysed.
+    """
+    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+    lock = RESULTS_DIR / ".run.lock"
+    if lock.exists():
+        try:
+            rec = json.loads(lock.read_text(encoding="utf-8"))
+        except Exception:
+            rec = {}
+        pid, started = rec.get("pid"), rec.get("started", -1.0)
+        if pid and _live(int(pid), float(started)):
+            print(f"\n  A run is already in progress (pid {pid}, started "
+                  f"{rec.get('when', 'unknown')}).")
+            print( "  Two runners writing the same results would interleave "
+                   "their output.")
+            print(f"  Watch it with:  tail -f {rec.get('log', '~/run.log')}")
+            print( "  Or stop it with: pkill -f 'spatial_eval.cli run'\n")
+            return None
+        print(f"  clearing a stale lock from pid {pid}\n")
+    try:
+        with open(f"/proc/{os.getpid()}/stat", encoding="utf-8") as fh:
+            ticks = float(fh.read().rsplit(")", 1)[1].split()[19])
+    except Exception:
+        ticks = -1.0
+    lock.write_text(json.dumps({
+        "pid": os.getpid(), "started": ticks,
+        "when": time.strftime("%Y-%m-%d %H:%M:%S"),
+        "log": str(LOGS_DIR / "run.log")}), encoding="utf-8")
+    return lock
+
+
 def cmd_run(args) -> int:
     env_guards()
+    lock = _take_lock()
+    if lock is None:
+        return 2
     # An explicit -r/-s always narrows the grid, including alongside --all:
     # `--all -s got` reads as "every relation, this one strategy", and used to
     # silently queue all five instead. Resume made that harmless but confusing.
@@ -95,6 +158,9 @@ def cmd_run(args) -> int:
     # Build the backend once: loading a 20B model takes minutes, and every cell
     # in this process can share it.
     backend = build_backend(model_cfg)
+
+    import atexit
+    atexit.register(lambda: lock.exists() and lock.unlink())
 
     cells = [(r, s, sd) for r in relations for s in strategies for sd in seeds]
     print(f"\n  {len(cells)} cells: {len(relations)} relations x "
