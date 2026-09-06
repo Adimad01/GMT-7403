@@ -47,7 +47,7 @@ def test_every_strategy_sees_identical_examples():
             assert again == base, rel
 
 
-def test_demos_are_pinned_stable_and_label_matched():
+def test_demos_are_pinned_stable_and_do_not_reveal_the_answer():
     for rel in RELATIONS:
         d1, h1 = load_demos(rel)
         d2, h2 = load_demos(rel)
@@ -58,8 +58,13 @@ def test_demos_are_pinned_stable_and_label_matched():
             (DATA_DIR / rel / "fewshot_manifest.json").read_text())["shots"]
         assert all(len(v) == shots for v in d1.values()), rel
         ex = {e.key: e for e in load_examples(rel)[0]}
+        # Demonstrations must not hand over the answer. Selecting them all with
+        # the eval row's own label let the model reply by copying, which held
+        # few-shot near ceiling with no response to the ambiguity level at all.
         for key, demos in d1.items():
-            assert all(dm.label == ex[key].label for dm in demos), rel
+            matching = sum(dm.label == ex[key].label for dm in demos)
+            assert matching <= 1, (rel, key, matching)
+            assert len({dm.label for dm in demos}) >= 2, (rel, key)
 
 
 def test_prompt_seed_deterministic_and_order_independent():

@@ -128,22 +128,44 @@ def main() -> int:
                         "row_sha256": row_hash(r)})
     man_sha = hashlib.sha256("".join(e["row_sha256"] for e in entries).encode()).hexdigest()
 
-    # Three demonstrations per eval row, same label, drawn from the training
-    # pool. Seeding from the row index keeps the draw identical across every
-    # arm, so a difference between strategies cannot come from different demos.
+    # Three demonstrations per eval row, drawn from the training pool across
+    # the whole label set. Seeding from the row index keeps the draw identical
+    # across every arm, so a difference between strategies cannot come from
+    # different demos.
+    #
+    # They deliberately do NOT all share the eval row's label. Selecting them
+    # that way put the answer in the prompt: three examples labelled 'contains'
+    # followed by a fourth question can be answered 'contains' without reading
+    # anything. Measured, it held few-shot at 89-100% with no response to the
+    # ambiguity level at all, Level 5 scoring higher than Level 1. What a
+    # demonstration is for is showing the shape of the task, not its answer.
     import random
-    by_label: dict[str, list[int]] = defaultdict(list)
-    for i, r in enumerate(train):
-        by_label[r["relation_label"]].append(i)
+    pool = list(range(len(train)))
+    if len(pool) < SHOTS:
+        print(f"  only {len(pool)} training rows — cannot draw {SHOTS} demos")
+        return 1
     demos = {}
     for i, r in enumerate(evalr):
-        pool = by_label.get(r["relation_label"], [])
-        if len(pool) < SHOTS:
-            print(f"  only {len(pool)} training rows for {r['relation_label']} "
-                  f"— cannot draw {SHOTS} demos")
-            return 1
         rng = random.Random(f"{DEMO_SEED}:{args.relation}:{i}")
-        demos[str(i)] = sorted(rng.sample(pool, SHOTS))
+        picked = rng.sample(pool, SHOTS)
+        # Two conditions. At most one demonstration may carry the eval row's
+        # own label, or the answer is in the prompt. And the demonstrations must
+        # not all share a label with each other either: three examples labelled
+        # 'touches' in front of a question whose answer is 'crosses' does not
+        # give the answer away, but it does push toward a wrong one.
+        def acceptable(sel):
+            labs = [train[j]["relation_label"] for j in sel]
+            return (labs.count(r["relation_label"]) <= 1
+                    and len(set(labs)) >= 2)
+
+        tries = 0
+        while not acceptable(picked) and tries < 60:
+            picked = rng.sample(pool, SHOTS)
+            tries += 1
+        if not acceptable(picked):
+            print(f"  could not draw varied demos for eval row {i}")
+            return 1
+        demos[str(i)] = sorted(picked)
     demo_sha = hashlib.sha256(json.dumps(demos, sort_keys=True).encode()).hexdigest()
 
     print(f"  {args.relation}: train {len(train)}, eval {len(evalr)}, "
@@ -173,17 +195,16 @@ def main() -> int:
     (data / "fewshot_manifest.json").write_text(json.dumps({
         "domain": spec["domain"], "shots": SHOTS,
         "train_csv": f"data/{args.relation}/train.csv", "train_rows": len(train),
-        "selection_rule": f"{SHOTS} training rows carrying the eval row's "
-                          f"label, drawn by an RNG seeded from base seed "
-                          f"{DEMO_SEED}, the relation and the row index, so "
-                          f"every arm sees the same demonstrations.",
+        "selection_rule": f"{SHOTS} training rows drawn from across the label "
+                          f"set by an RNG seeded from base seed {DEMO_SEED}, "
+                          f"the relation and the row index, so every arm sees "
+                          f"the same demonstrations. At most one may carry the "
+                          f"eval row's own label.",
         "eval_manifest_sha256": man_sha, "demo_map_sha256": demo_sha,
-        "warning": "demos are label-conditioned by design: they reveal the "
-                   "answer class. Few-shot numbers are a leakage-aware probe, "
-                   "comparable to zero-shot, NOT across labels. The pool is "
-                   "also the fine-tuning set, so a fine-tuned model's few-shot "
-                   "result is optimistic and must be reported separately from "
-                   "the base model's.",
+        "warning": "the demo pool is also the fine-tuning set, so a fine-tuned "
+                   "model's few-shot result is optimistic and must be reported "
+                   "separately from the base model's. For the base model the "
+                   "demonstrations are unseen text and the comparison is clean.",
         "contract": ["every few-shot arm must use exactly these demo indices"],
         "demos": demos}, indent=2) + "\n", encoding="utf-8")
     for stale in ("eval_indices.json",):

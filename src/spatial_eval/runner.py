@@ -94,6 +94,15 @@ def run_cell(cfg: RunConfig, backend: Backend | None = None,
             old = was.get("eval_manifest_sha256")
         except Exception:
             old = None
+        old_demo = was.get("fewshot_manifest_sha256") if 'was' in dir() else None
+        if (cfg.strategy == "few_shot" and old_demo and demo_hash
+                and old_demo != demo_hash):
+            raise RuntimeError(
+                f"{cfg.run_id}: results in {out_dir} used few-shot "
+                f"demonstrations {old_demo[:12]}, but the demo map now hashes "
+                f"to {demo_hash[:12]}. The prompts have changed, so resuming "
+                f"would mix answers given under different demonstrations. "
+                f"Delete this directory and run the cell again.")
         if old and old != eval_hash:
             raise RuntimeError(
                 f"{cfg.run_id}: results in {out_dir} were produced against eval "
