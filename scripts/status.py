@@ -42,6 +42,37 @@ def _start_ticks(pid: int) -> int | None:
         return None
 
 
+def _processes(pattern: str) -> list[tuple[int, str]]:
+    """Pids whose command line matches, each with that command line.
+
+    pgrep -a prints the command alongside the pid on Linux but not on BSD or
+    macOS, where the same flag yields bare pids -- so a filter reading the
+    command from pgrep's own output matches nothing there, silently. The
+    command is read from ps instead, which behaves the same everywhere.
+    """
+    try:
+        out = subprocess.run(["pgrep", "-f", pattern],
+                             capture_output=True, text=True, timeout=5).stdout
+    except Exception:
+        return []
+    found = []
+    for pid_s in out.split():
+        if not pid_s.isdigit():
+            continue
+        pid = int(pid_s)
+        if pid == os.getpid():
+            continue
+        try:
+            cmd = subprocess.run(["ps", "-p", pid_s, "-o", "command="],
+                                 capture_output=True, text=True,
+                                 timeout=5).stdout.strip()
+        except Exception:
+            continue
+        if cmd:
+            found.append((pid, cmd))
+    return found
+
+
 def runner_pid() -> tuple[int | None, str]:
     """The pid of the evaluation process, from the lock it holds."""
     if LOCK.exists():
@@ -68,15 +99,9 @@ def runner_pid() -> tuple[int | None, str]:
     # No usable lock: fall back to the process table. Match only real
     # interpreters -- any shell whose command line merely mentions the module
     # would otherwise count as a running experiment.
-    try:
-        out = subprocess.run(["pgrep", "-af", "spatial_eval"],
-                             capture_output=True, text=True, timeout=5).stdout
-    except Exception:
-        return None, "indéterminé"
-    for line in out.strip().splitlines():
-        pid_s, _, cmd = line.partition(" ")
+    for pid, cmd in _processes("spatial_eval"):
         if "python" in cmd and "spatial_eval.cli" in cmd and " run" in cmd:
-            return int(pid_s), "table des processus"
+            return pid, "table des processus"
     return None, "aucun"
 
 
@@ -92,6 +117,20 @@ def expected_rows(relation: str) -> int | None:
         return len(json.loads(man.read_text(encoding="utf-8"))["rows"])
     except Exception:
         return None
+
+
+def supervisor_pid() -> int | None:
+    """The watchdog that restarts the runner after a crash.
+
+    Worth checking separately. If it has died while the runner lives, every
+    reading here still looks healthy -- right up to the next crash, which
+    then goes unrestarted. That silent gap is the failure that cost a run
+    thirty-five hours.
+    """
+    for pid, cmd in _processes("run_supervised"):
+        if "run_supervised.sh" in cmd:
+            return pid
+    return None
 
 
 def cell_progress() -> list[dict]:
@@ -161,10 +200,15 @@ def main() -> int:
                                      f"aucun processus, dernière écriture il y a "
                                      f"{age_min:.0f} min")
 
+    sup = supervisor_pid()
+
     bar = "─" * 68
     print(bar)
     print(f"  {verdict}    {detail}")
     print(f"  {'':<10}source : {source}")
+    print(f"  {'':<10}superviseur : "
+          + (f"pid {sup}, relance automatique active" if sup else
+             "ABSENT — aucune relance automatique en cas de plantage"))
     print(bar)
 
     cells = cell_progress()
@@ -197,6 +241,11 @@ def main() -> int:
         tail = RUN_LOG.read_text(encoding="utf-8", errors="replace").splitlines()
         print(f"\n  dernière ligne du journal ({age_min:.0f} min) :")
         print(f"    {tail[-1][:100] if tail else '(vide)'}")
+
+    if verdict == "EN COURS" and not sup:
+        print("\n  Le calcul avance, mais rien ne le relancera s'il meurt.")
+        print("  Démarrer le superviseur (il refusera de doubler le run en cours) :")
+        print("    cd ~ && setsid nohup bash scripts/run_supervised.sh < /dev/null &")
 
     if verdict != "EN COURS":
         print("\n  Relancer — la reprise conserve tout ce qui est déjà calculé :")
