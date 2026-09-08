@@ -130,12 +130,21 @@ def main() -> int:
     # to use is not enough -- the surplus has to be re-rendered, or it lands in
     # the wrong half.
     def to_shape(r):
-        """The row's wording with its own places replaced by named slots."""
+        """The row's wording with its own places replaced by named slots.
+
+        The qualifier has to go into the slot with the name. Replacing only
+        the short form leaves 'City of ' welded into the shape, and the next
+        row rendered from it inherits the claim: a donor sentence about the
+        City of Paris produced "City of Snowdonia National Park", asserting a
+        national park is a city. The full name is therefore matched first,
+        the bare form after, for wordings that never carried the qualifier.
+        """
         t = r["corpus"]
         for col, slot in (("source_entity", "{A}"), ("target_entity", "{B}"),
                           ("via_entity", "{C}"), ("observer_entity", "{V}")):
             v = (r.get(col) or "").strip()
             if v:
+                t = t.replace(v, slot)
                 t = t.replace(short(v), slot)
         return t
 
