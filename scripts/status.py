@@ -19,6 +19,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[1]
 RUN_LOG = REPO / "logs" / "run.log"
 RESULTS = REPO / "results"
+DATA = REPO / "data"
 LOCK = RESULTS / ".run.lock"
 
 # ToT and GoT log every ten rows and spend about a minute on each, so a quiet
@@ -79,39 +80,65 @@ def runner_pid() -> tuple[int | None, str]:
     return None, "aucun"
 
 
+def expected_rows(relation: str) -> int | None:
+    """How many rows a cell of this relation is meant to cover.
+
+    Taken from the pinned eval manifest rather than run.json, because
+    run.json is only written once a cell finishes -- so the cell currently
+    running, the one you most want to see, has no run.json at all.
+    """
+    man = DATA / relation / "eval_manifest.json"
+    try:
+        return len(json.loads(man.read_text(encoding="utf-8"))["rows"])
+    except Exception:
+        return None
+
+
 def cell_progress() -> list[dict]:
     """Per-cell counts read from the results on disk, not from the log.
 
     The log says what was announced; these files say what was kept.
     """
     cells = []
-    for rj in sorted(RESULTS.glob("*/*/seed*/run.json")) if RESULTS.exists() else []:
-        try:
-            meta = json.loads(rj.read_text(encoding="utf-8"))
-        except Exception:
-            continue
-        total = meta.get("n_examples") or 0
+    # Keyed on predictions.jsonl: it exists from the first row written,
+    # whereas run.json appears only at the end.
+    for preds in sorted(RESULTS.glob("*/*/seed*/predictions.jsonl")):
+        d = preds.parent
+        relation, strategy, seed = d.parent.parent.name, d.parent.name, d.name
+        rid = f"{relation}__{strategy}__{seed}"
+
+        total = None
+        run_json = d / "run.json"
+        if run_json.exists():
+            try:
+                meta = json.loads(run_json.read_text(encoding="utf-8"))
+                total = meta.get("n_examples")
+                rid = meta.get("run_id", rid)
+            except Exception:
+                pass
+        if not total:
+            total = expected_rows(relation)
+
         seen: set[int] = set()
         ok = corr = 0
-        preds = rj.parent / "predictions.jsonl"
-        if preds.exists():
-            for line in preds.read_text(encoding="utf-8").splitlines():
-                if not line.strip():
-                    continue
-                try:
-                    r = json.loads(line)
-                except json.JSONDecodeError:
-                    continue
-                seen.add(r.get("row_index", -1))
-                if r.get("status") == "ok":
-                    ok += 1
-                    corr += bool(r.get("correct"))
+        for line in preds.read_text(encoding="utf-8",
+                                    errors="replace").splitlines():
+            if not line.strip():
+                continue
+            try:
+                r = json.loads(line)
+            except json.JSONDecodeError:
+                continue        # the final line can be half-written mid-run
+            seen.add(r.get("row_index", -1))
+            if r.get("status") == "ok":
+                ok += 1
+                corr += bool(r.get("correct"))
+
         # A cell is finished when every row has been attempted. Rows that
-        # failed still count as attempted -- demanding that they all succeed
+        # failed were still attempted, and demanding that they all succeed
         # would leave a finished cell looking permanently unfinished.
         cells.append({
-            "id": meta.get("run_id", rj.parent.name),
-            "seen": len(seen), "total": total, "ok": ok,
+            "id": rid, "seen": len(seen), "total": total, "ok": ok,
             "acc": corr / ok if ok else 0.0,
             "done": bool(total) and len(seen) >= total,
         })
