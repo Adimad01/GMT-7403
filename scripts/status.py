@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import json
 import os
+import statistics
 import subprocess
 import time
 from pathlib import Path
@@ -26,7 +27,16 @@ LOCK = RESULTS / ".run.lock"
 # quarter of an hour is ordinary. Past that, something is wrong.
 QUIET_OK_MIN = 20
 
-CELLS = 15          # three relations x five strategies, one seed
+# The grid the runner walks, in its order: relations outer, strategies inner,
+# sorted as available() sorts them.
+RELATIONS = ("topological", "cardinal", "relative")
+STRATEGIES = ("cot", "few_shot", "got", "tot", "zero_shot")
+CELLS = len(RELATIONS) * len(STRATEGIES)
+
+# ToT and GoT issue four model calls per row against one for the rest, so a
+# single average over all strategies would badly misestimate whichever is
+# left. Used only as a fallback when a strategy has no measured rows yet.
+MULTI_CALL = {"tot", "got"}
 
 
 def _start_ticks(pid: int) -> int | None:
@@ -184,6 +194,99 @@ def cell_progress() -> list[dict]:
     return cells
 
 
+def per_row_seconds() -> dict[str, float]:
+    """Median seconds per row for each strategy, measured from the rows.
+
+    Taken from the rows themselves rather than a cell's total elapsed time,
+    which counts only what a session ran and is skewed by every resume.
+    """
+    samples: dict[str, list[float]] = {}
+    for preds in RESULTS.glob("*/*/seed*/predictions.jsonl"):
+        strat = preds.parent.parent.name
+        for line in preds.read_text(encoding="utf-8",
+                                    errors="replace").splitlines():
+            if '"seconds"' not in line:
+                continue
+            try:
+                r = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if isinstance(r.get("seconds"), (int, float)):
+                samples.setdefault(strat, []).append(r["seconds"])
+    return {k: statistics.median(v) for k, v in samples.items() if v}
+
+
+def human(seconds: float) -> str:
+    if seconds < 90:
+        return f"{seconds:.0f} s"
+    if seconds < 5400:
+        return f"{seconds / 60:.0f} min"
+    return f"{seconds / 3600:.1f} h"
+
+
+def remaining(cells: list[dict]) -> None:
+    """The grid, and what is left to compute."""
+    by_id = {c["id"]: c for c in cells}
+    rate = per_row_seconds()
+    single = [v for k, v in rate.items() if k not in MULTI_CALL]
+    multi = [v for k, v in rate.items() if k in MULTI_CALL]
+
+    def rate_for(strat: str) -> float | None:
+        if strat in rate:
+            return rate[strat]
+        pool = multi if strat in MULTI_CALL else single
+        return statistics.median(pool) if pool else None
+
+    print("\n  grille")
+    head = "".join(f"{s:>11}" for s in STRATEGIES)
+    print(f"    {'':<13}{head}")
+    todo, guessed = [], False
+    for rel in RELATIONS:
+        marks = []
+        for strat in STRATEGIES:
+            c = by_id.get(f"{rel}__{strat}__seed1")
+            total = c["total"] if c else expected_rows(rel)
+            seen = c["seen"] if c else 0
+            if c and c["done"]:
+                marks.append(f"{c['acc'] * 100:>10.1f}%")
+            elif seen:
+                marks.append(f"{seen / total * 100:>10.0f}%" if total else f"{seen:>11}")
+            else:
+                marks.append(f"{'·':>11}")
+            if not (c and c["done"]) and total:
+                left = total - seen
+                r = rate_for(strat)
+                if r is None:
+                    guessed = True
+                todo.append((f"{rel}__{strat}", left, (left * r) if r else None,
+                             strat not in rate))
+        print(f"    {rel:<13}" + "".join(marks))
+
+    if not todo:
+        print("\n  tout est calculé.")
+        return
+
+    print(f"\n  reste {len(todo)} cellule(s)")
+    total_s = 0.0
+    any_unknown = False
+    for name, left, secs, inferred in todo:
+        if secs is None:
+            any_unknown = True
+            print(f"    {name:<30}{left:>5} lignes          —")
+            continue
+        total_s += secs
+        note = "  (cadence déduite)" if inferred else ""
+        print(f"    {name:<30}{left:>5} lignes   {human(secs):>8}{note}")
+
+    if total_s:
+        print(f"\n    total estimé   {human(total_s)}"
+              + ("  au moins" if any_unknown else ""))
+        end = time.localtime(time.time() + total_s)
+        print(f"    fin prévue     {time.strftime('%a %d %b %H:%M', end)}")
+        print("    (cadence mesurée sur les lignes déjà calculées ; "
+              "une reprise ou un arrêt décale d'autant)")
+
+
 def main() -> int:
     pid, source = runner_pid()
     age_min = (time.time() - RUN_LOG.stat().st_mtime) / 60 if RUN_LOG.exists() else None
@@ -215,27 +318,27 @@ def main() -> int:
     done = [c for c in cells if c["done"]]
     running = [c for c in cells if not c["done"] and c["seen"]]
 
-    print(f"\n  cellules terminées : {len(done)}/{CELLS}")
-    for c in done or []:
-        missed = c["total"] - c["ok"]
-        note = f"  ({missed} échecs)" if missed else ""
-        print(f"    {c['id']:<32}{c['ok']:>5}/{c['total']:<5}"
-              f"{c['acc'] * 100:>7.1f} %{note}")
-    if not done:
-        print("    (aucune)")
+    # The grid below carries each finished cell's accuracy, so listing them
+    # again here would only repeat it. Failures do not appear there, and are
+    # the one thing worth interrupting for.
+    broken = [c for c in done if c["ok"] < c["total"]]
+    if broken:
+        print("\n  lignes en échec :")
+        for c in broken:
+            print(f"    {c['id']:<32}{c['total'] - c['ok']} sur {c['total']}")
 
     if running:
         width = 30
         print("\n  cellule en cours :")
         for c in running:
-            filled = round(width * c["seen"] / c["total"]) if c["total"] else 0
-            print(f"    {c['id']:<32}[{'#' * filled}{'.' * (width - filled)}] "
-                  f"{c['seen']}/{c['total']}  ({c['seen'] / c['total'] * 100:.0f} %)"
-                  if c["total"] else f"    {c['id']:<32}{c['seen']} lignes")
+            if c["total"]:
+                filled = round(width * c["seen"] / c["total"])
+                print(f"    {c['id']:<32}[{'#' * filled}{'.' * (width - filled)}] "
+                      f"{c['seen']}/{c['total']}  ({c['seen'] / c['total'] * 100:.0f} %)")
+            else:
+                print(f"    {c['id']:<32}{c['seen']} lignes")
 
-    remaining = CELLS - len(done)
-    if remaining:
-        print(f"\n  reste {remaining} cellule(s) sur {CELLS}")
+    remaining(cells)
 
     if RUN_LOG.exists():
         tail = RUN_LOG.read_text(encoding="utf-8", errors="replace").splitlines()
