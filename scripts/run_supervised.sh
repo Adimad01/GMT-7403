@@ -50,14 +50,31 @@ failcnt=$(cat /sys/fs/cgroup/memory/memory.failcnt 2>/dev/null)"
 
 MAX_RESTARTS=${MAX_RESTARTS:-50}
 PAUSE=${PAUSE:-30}
+
+# Cheapest strategies first. The default order walks relations outer and
+# strategies alphabetically, which puts two five-hour GoT cells ahead of every
+# remaining single-call cell -- and while the server is being culled without
+# warning, a finished cell is banked for good whereas a five-hour cell stopped
+# at eighty percent is worth nothing until it completes. This order buys a
+# comparison across all three relations in a couple of hours, and leaves the
+# expensive arms for last. Override with PASSES="..." to change it.
+PASSES=${PASSES:-"zero_shot cot few_shot tot got"}
 attempt=0
 
 while :; do
     attempt=$((attempt + 1))
     echo "=== attempt ${attempt} at $(date '+%Y-%m-%d %H:%M:%S') ==="
     mem_state
-    python3 -m spatial_eval.cli run --all
-    status=$?
+    status=0
+    for strategy in ${PASSES}; do
+        echo "--- pass: ${strategy} at $(date '+%H:%M:%S') ---"
+        python3 -m spatial_eval.cli run --all -s "${strategy}"
+        status=$?
+        # Stop at the first failure so the retry restarts from a known state.
+        # Re-running the passes that already succeeded costs almost nothing:
+        # resume never recomputes a finished row.
+        [ "${status}" -ne 0 ] && break
+    done
     # A process killed outright leaves no traceback, so record the state that
     # usually explains it: 137 is SIGKILL, which on this host means the memory
     # killer far more often than anything else.
