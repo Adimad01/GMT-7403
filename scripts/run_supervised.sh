@@ -28,6 +28,26 @@ SUP_LOG="logs/supervisor-$(date '+%Y%m%d-%H%M%S').log"
 exec >>"${SUP_LOG}" 2>&1
 echo "supervisor log: ${SUP_LOG}" >&2
 
+# Inside a container, `free` reports the host: this node shows 2 TB while the
+# cgroup that actually kills us may allow a few dozen GB. Report the limit we
+# are held to, and the kernel's own count of how often it has enforced it.
+mem_state() {
+    if [ -r /sys/fs/cgroup/memory.max ]; then
+        echo "    cgroup limit=$(cat /sys/fs/cgroup/memory.max) \
+current=$(cat /sys/fs/cgroup/memory.current 2>/dev/null) \
+peak=$(cat /sys/fs/cgroup/memory.peak 2>/dev/null)"
+        sed 's/^/    events /' /sys/fs/cgroup/memory.events 2>/dev/null
+    elif [ -r /sys/fs/cgroup/memory/memory.limit_in_bytes ]; then
+        echo "    cgroup limit=$(cat /sys/fs/cgroup/memory/memory.limit_in_bytes) \
+usage=$(cat /sys/fs/cgroup/memory/memory.usage_in_bytes 2>/dev/null) \
+failcnt=$(cat /sys/fs/cgroup/memory/memory.failcnt 2>/dev/null)"
+    else
+        echo "    no cgroup memory accounting readable"
+    fi
+    # When the container itself is replaced, pid 1 is younger than the run.
+    echo "    container pid 1 started $(ps -o lstart= -p 1 2>/dev/null | tr -s ' ')"
+}
+
 MAX_RESTARTS=${MAX_RESTARTS:-50}
 PAUSE=${PAUSE:-30}
 attempt=0
@@ -35,7 +55,7 @@ attempt=0
 while :; do
     attempt=$((attempt + 1))
     echo "=== attempt ${attempt} at $(date '+%Y-%m-%d %H:%M:%S') ==="
-    free -g 2>/dev/null | head -2 || true
+    mem_state
     python3 -m spatial_eval.cli run --all
     status=$?
     # A process killed outright leaves no traceback, so record the state that
@@ -44,7 +64,7 @@ while :; do
     if [ "${status}" -ne 0 ]; then
         echo "--- exit ${status} at $(date '+%Y-%m-%d %H:%M:%S') ---"
         [ "${status}" -eq 137 ] && echo "    (137 = SIGKILL, typically out of memory)"
-        free -g 2>/dev/null | head -2 || true
+        mem_state
         dmesg 2>/dev/null | tail -5 || echo "    dmesg unavailable in this container"
     fi
 
