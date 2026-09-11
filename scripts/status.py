@@ -190,6 +190,7 @@ def cell_progress() -> list[dict]:
             "id": rid, "seen": len(seen), "total": total, "ok": ok,
             "acc": corr / ok if ok else 0.0,
             "done": bool(total) and len(seen) >= total,
+            "touched": preds.stat().st_mtime,
         })
     return cells
 
@@ -329,8 +330,14 @@ def main() -> int:
 
     if running:
         width = 30
-        print("\n  cellule en cours :")
-        for c in running:
+        # Only one cell is ever being written. The others are part-finished
+        # from an earlier session and wait for their pass to come round --
+        # listing them all as "in progress" reads as several at once.
+        active = max(running, key=lambda c: c["touched"]) if pid else None
+        print()
+        for c in sorted(running, key=lambda c: -c["touched"]):
+            here = c is active
+            print("  cellule en cours :" if here else "  reprise en attente :")
             if c["total"]:
                 filled = round(width * c["seen"] / c["total"])
                 print(f"    {c['id']:<32}[{'#' * filled}{'.' * (width - filled)}] "
