@@ -81,7 +81,15 @@ class RunConfig:
         are the comparison, and resume would otherwise treat one as a partial
         copy of the other and skip the work.
         """
-        return "_lora" if self.model.adapter else ""
+        if not self.model.adapter:
+            return ""
+        # Which adapter answered has to be in the path, or a cross-family run
+        # -- the cardinal adapter on the relative eval set, say -- would land
+        # on the relative adapter's results and resume would call the work
+        # already done. The plain "_lora" is kept when the adapter matches its
+        # own family, so the paths already written stay where they are.
+        name = Path(self.model.adapter).name
+        return "_lora" if name == self.relation else f"_lora-{name}"
 
     @property
     def run_id(self) -> str:
