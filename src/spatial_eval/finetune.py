@@ -151,13 +151,35 @@ def train(cfg: FinetuneConfig) -> dict:
 
     opt = torch.optim.AdamW(
         [p for p in model.parameters() if p.requires_grad], lr=cfg.lr)
-    loader = DataLoader(encoded, batch_size=cfg.batch_size, shuffle=True,
-                        collate_fn=collate,
-                        generator=torch.Generator().manual_seed(cfg.seed))
-    steps_per_epoch = math.ceil(len(loader) / cfg.grad_accum)
+    def epoch_loader(epoch: int) -> DataLoader:
+        """This epoch's batches, in an order that depends only on the epoch.
+
+        Seeding one generator for the whole run makes each epoch's order
+        depend on how many epochs preceded it. After an interruption the
+        loader is rebuilt from scratch, so epoch 2 would be replayed in
+        epoch 1's order -- and skipping the batches already done would skip
+        the wrong ones, training twice on some rows and never on others.
+        """
+        return DataLoader(
+            encoded, batch_size=cfg.batch_size, shuffle=True,
+            collate_fn=collate,
+            generator=torch.Generator().manual_seed(cfg.seed * 1000 + epoch))
+
+    n_batches_total = math.ceil(len(encoded) / cfg.batch_size)
+    steps_per_epoch = math.ceil(n_batches_total / cfg.grad_accum)
+
+    opt_path = cfg.out_dir / "optimizer.pt"
+    if resume and opt_path.exists():
+        # Without this the moments restart at zero on every resume, and on a
+        # server interrupted hourly the optimiser would spend the whole run
+        # warming up. Only the adapter's parameters are in it: a few tens of
+        # megabytes, not the base model's.
+        opt.load_state_dict(torch.load(opt_path, map_location=model.device))
+        log.info("restored optimiser state from %s", opt_path)
 
     def checkpoint(st):
         model.save_pretrained(cfg.out_dir)
+        torch.save(opt.state_dict(), opt_path)
         st["config"] = {**asdict(cfg), "exclude_levels": list(cfg.exclude_levels)}
         st["n_train_rows"] = len(examples)
         st["base_model"] = cfg.base_model
@@ -165,11 +187,15 @@ def train(cfg: FinetuneConfig) -> dict:
 
     model.train()
     started = time.time()
-    for epoch in range(state["epoch"], cfg.epochs):
+    resume_epoch, resume_at = state["epoch"], state["seen_in_epoch"]
+    for epoch in range(resume_epoch, cfg.epochs):
+        loader = epoch_loader(epoch)
         running, n_batches = 0.0, 0
         for i, batch in enumerate(loader):
             # Batches already done in this epoch before an interruption.
-            if epoch == state["epoch"] and i < state["seen_in_epoch"]:
+            # Compared against the values read at startup, not the running
+            # state, which this loop rewrites as each epoch completes.
+            if epoch == resume_epoch and i < resume_at:
                 continue
             batch = {k: v.to(model.device) for k, v in batch.items()}
             loss = model(**batch).loss / cfg.grad_accum
