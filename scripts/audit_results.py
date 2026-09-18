@@ -428,7 +428,13 @@ def main() -> int:
                     rws = [r for r in rws
                            if r.get("ambiguity_level") not in dropped]
                 ok = [r for r in rws if r.get("status") == "ok"]
+                # run.json appears only when a cell finishes, so its absence
+                # means this arm is still running. Reporting a part-finished
+                # cell beside complete ones invites reading a number that is
+                # not yet a number: the transfer run was shown at 59 percent
+                # on 132 of 250 rows, next to arms measured on all of theirs.
                 ft[(rel, strat, var)] = {
+                    "partial": meta is None,
                     "ok": ok, "k": sum(1 for r in ok if r.get("correct")),
                     "n": len(ok),
                     "correct_by_row": {r["row_index"]: bool(r.get("correct"))
@@ -445,6 +451,11 @@ def main() -> int:
         for (rel, strat, var), f in sorted(ft.items()):
             b = cells.get((rel, strat))
             if not b or not b["n"]:
+                continue
+            if f["partial"]:
+                print(f"\n  {rel} / {strat}{var}")
+                print(f"    EN COURS — {f['n']} lignes sur {b['n']}, "
+                      f"résultat non interprétable")
                 continue
             lo_b, hi_b = wilson(b["k"], b["n"])
             lo_f, hi_f = wilson(f["k"], f["n"])
@@ -487,7 +498,7 @@ def main() -> int:
         print(f"    {'':<34}" + "".join(f"{l[-1]:>16}" for l in levels))
         for (rel, strat, var), f in sorted(ft.items()):
             b = cells.get((rel, strat))
-            if not b:
+            if not b or f["partial"]:
                 continue
             line = f"    {rel + '/' + strat + var:<34}"
             for lv in levels:
