@@ -130,7 +130,24 @@ def run_cell(cfg: RunConfig, backend: Backend | None = None,
     pred_path = out_dir / "predictions.jsonl"
     trace_path = out_dir / "traces.jsonl"
 
-    examples, eval_hash = load_examples(cfg.relation, limit=cfg.limit)
+    examples, eval_hash = load_examples(cfg.relation, limit=cfg.limit,
+                                        row_indices=cfg.rows)
+
+    # A subset run writes the same predictions file as a full one. Letting it
+    # land on a finished cell would replace a complete result with a handful
+    # of rows -- and this project has already lost a run that way once, to a
+    # three-row smoke test. Send subsets to their own seed.
+    if (cfg.rows or cfg.limit) and (out_dir / "run.json").exists():
+        try:
+            prior_n = json.loads((out_dir / "run.json").read_text(
+                encoding="utf-8")).get("n_completed", 0)
+        except Exception:
+            prior_n = 0
+        if prior_n > len(examples):
+            raise RuntimeError(
+                f"{cfg.run_id}: {out_dir} already holds a run of {prior_n} rows; "
+                f"this one would write {len(examples)} over it. Use a different "
+                f"seed for a subset, e.g. --seeds 99.")
     labels = labels_for(cfg.relation)
 
     strategy_cls = get_strategy(cfg.strategy)

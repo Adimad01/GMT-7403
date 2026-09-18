@@ -78,7 +78,9 @@ def load_eval_manifest(relation: str) -> dict:
     return manifest
 
 
-def load_examples(relation: str, limit: int | None = None) -> tuple[list[Example], str]:
+def load_examples(relation: str, limit: int | None = None,
+                  row_indices: tuple[int, ...] | None = None,
+                  ) -> tuple[list[Example], str]:
     """Return the pinned evaluation examples and the manifest hash.
 
     No filtering happens here, deliberately. An earlier version of this project
@@ -117,6 +119,19 @@ def load_examples(relation: str, limit: int | None = None) -> tuple[list[Example
                 "manifest was frozen; regenerate it and rerun every arm.")
         examples.append(ex)
 
+    if row_indices is not None:
+        # Named rows, for inspecting particular answers. Order follows the
+        # manifest, not the order they were asked for, so the result reads
+        # the same however the request was written. Not called `rows`: that
+        # name already holds the CSV lines in this function, and shadowing it
+        # turned the selection into a set of dicts.
+        wanted = set(row_indices)
+        found = {e.row_index for e in examples} & wanted
+        if missing := wanted - found:
+            raise ManifestError(
+                f"{relation}: row_index {sorted(missing)} not in the eval set "
+                f"(it holds {len(examples)} rows)")
+        examples = [e for e in examples if e.row_index in wanted]
     if limit is not None:
         examples = examples[:limit]
     return examples, manifest["manifest_sha256"]

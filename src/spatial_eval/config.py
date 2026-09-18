@@ -66,6 +66,7 @@ class RunConfig:
     seed: int = 1
     model: ModelConfig = field(default_factory=ModelConfig)
     limit: int | None = None            # debugging: evaluate only the first N rows
+    rows: tuple[int, ...] | None = None  # inspect these eval rows and no others
     resume: bool = True
 
     @property

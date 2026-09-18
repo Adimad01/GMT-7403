@@ -183,6 +183,7 @@ def cmd_run(args) -> int:
     for i, (rel, strat, seed) in enumerate(cells, 1):
         print(f"  [{i}/{len(cells)}] {rel} / {strat} / seed {seed}")
         cfg = RunConfig(relation=rel, strategy=strat, seed=seed, model=model_cfg,
+                        rows=tuple(args.rows) if args.rows else None,
                         limit=args.limit, resume=not args.no_resume)
         try:
             summary = run_cell(cfg, backend=backend, save_traces=args.save_traces)
@@ -334,6 +335,10 @@ def build_parser() -> argparse.ArgumentParser:
                    help="every relation x strategy (the default; -r/-s narrow it)")
     r.add_argument("--seeds", type=int, nargs="+", default=[1])
     r.add_argument("--limit", type=int, help="evaluate only the first N rows (debug)")
+    r.add_argument("--rows", type=int, nargs="+", metavar="N",
+                   help="evaluate only these eval row_index values, for "
+                        "inspecting particular answers; pair with --save-traces "
+                        "and a spare --seeds so it cannot overwrite a real run")
     r.add_argument("--no-resume", action="store_true",
                    help="recompute rows that already succeeded")
     r.add_argument("--retry-failed", action="store_true",
