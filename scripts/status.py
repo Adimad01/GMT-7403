@@ -268,8 +268,8 @@ def human(seconds: float) -> str:
     return f"{seconds / 3600:.1f} h"
 
 
-def remaining(cells: list[dict]) -> None:
-    """The grid, and what is left to compute."""
+def remaining(cells: list[dict]) -> bool:
+    """The grid and what is left. True when work remains."""
     by_id = {c["id"]: c for c in cells}
     rate = per_row_seconds()
     single = [v for k, v in rate.items() if k not in MULTI_CALL]
@@ -325,8 +325,9 @@ def remaining(cells: list[dict]) -> None:
                 print(f"      {var.lstrip('_'):<16}" + "".join(row))
 
     if not todo:
-        print("\n  tout est calculé.")
-        return
+        print("\n  les 15 cellules de référence sont calculées "
+              "(voir coverage.py pour le reste du plan).")
+        return False
 
     print(f"\n  reste {len(todo)} cellule(s)")
     total_s = 0.0
@@ -347,6 +348,7 @@ def remaining(cells: list[dict]) -> None:
         print(f"    fin prévue     {time.strftime('%a %d %b %H:%M', end)}")
         print("    (cadence mesurée sur les lignes déjà calculées ; "
               "une reprise ou un arrêt décale d'autant)")
+    return True
 
 
 def adapters() -> None:
@@ -378,6 +380,17 @@ def adapters() -> None:
               + (f"   [{len(snaps)} instantanés]" if snaps else ""))
 
 
+def pending(cells: list[dict]) -> bool:
+    """Whether any reference cell still has rows to compute."""
+    by_id = {c["id"]: c for c in cells}
+    for rel in RELATIONS:
+        for strat in STRATEGIES:
+            c = by_id.get(f"{rel}__{strat}__seed1")
+            if not c or not c["done"]:
+                return True
+    return False
+
+
 def main() -> int:
     pid, source = runner_pid()
     age_min = (time.time() - RUN_LOG.stat().st_mtime) / 60 if RUN_LOG.exists() else None
@@ -399,10 +412,15 @@ def main() -> int:
                                      f"{age_min:.0f} min")
     elif pid:
         verdict, detail = "EN COURS", f"pid {pid}, journal absent"
-    else:
+    elif pending(cell_progress()):
         verdict, detail = "ARRÊTÉ", ("aucun processus" if age_min is None else
                                      f"aucun processus, dernière écriture il y a "
                                      f"{age_min:.0f} min")
+    else:
+        # No process and nothing outstanding is a finished run, not a stopped
+        # one. Printing ARRÊTÉ here sent the reader hunting for a failure that
+        # had not happened, moments after five cells completed normally.
+        verdict, detail = "TERMINÉ", "rien à calculer"
 
     sup = supervisor_pid()
 
@@ -410,9 +428,12 @@ def main() -> int:
     print(bar)
     print(f"  {verdict}    {detail}")
     print(f"  {'':<10}source : {source}")
-    print(f"  {'':<10}superviseur : "
-          + (f"pid {sup}, relance automatique active" if sup else
-             "ABSENT — aucune relance automatique en cas de plantage"))
+    # Only worth saying while something is running: with nothing to restart,
+    # a missing watchdog is not a problem to report.
+    if verdict != "TERMINÉ":
+        print(f"  {'':<10}superviseur : "
+              + (f"pid {sup}, relance automatique active" if sup else
+                 "ABSENT — aucune relance automatique en cas de plantage"))
     print(bar)
 
     cells = cell_progress()
@@ -459,7 +480,12 @@ def main() -> int:
         print("  Démarrer le superviseur (il refusera de doubler le run en cours) :")
         print("    cd ~ && setsid nohup bash scripts/run_supervised.sh < /dev/null &")
 
-    if verdict != "EN COURS":
+    if verdict == "TERMINÉ":
+        # Nothing is running and nothing is left to run: that is finished, not
+        # stopped. Printing the alarm and a relaunch command here sent the
+        # reader looking for a failure that had not happened.
+        pass
+    elif verdict != "EN COURS":
         print("\n  Relancer — la reprise conserve tout ce qui est déjà calculé :")
         print("    cd ~ && git pull --rebase origin main && \\")
         print("      setsid nohup bash scripts/run_supervised.sh < /dev/null &")
