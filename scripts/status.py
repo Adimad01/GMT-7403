@@ -155,6 +155,10 @@ def cell_progress() -> list[dict]:
         d = preds.parent
         relation, strategy, seed = d.parent.parent.name, d.parent.name, d.name
         rid = f"{relation}__{strategy}__{seed}"
+        # "seed1_lora", "seed1_lora-cardinal" -> the arm's variant. The grid
+        # showed only seed1, so every fine-tuned result was invisible here
+        # even while the audit was reporting it.
+        variant = seed[len("seed1"):] if seed.startswith("seed1") else ""
 
         total = None
         run_json = d / "run.json"
@@ -187,7 +191,9 @@ def cell_progress() -> list[dict]:
         # failed were still attempted, and demanding that they all succeed
         # would leave a finished cell looking permanently unfinished.
         cells.append({
-            "id": rid, "seen": len(seen), "total": total, "ok": ok,
+            "id": rid, "variant": variant,
+            "relation": relation, "strategy": strategy,
+            "seen": len(seen), "total": total, "ok": ok,
             "acc": corr / ok if ok else 0.0,
             "done": bool(total) and len(seen) >= total,
             "touched": preds.stat().st_mtime,
@@ -238,9 +244,13 @@ def remaining(cells: list[dict]) -> None:
         pool = multi if strat in MULTI_CALL else single
         return statistics.median(pool) if pool else None
 
-    print("\n  grille")
+    # Every level counted, level 6 included -- so these differ from
+    # audit_results.py, which excludes it. This is a progress view; the audit
+    # is where a number is meant to be read.
+    print("\n  grille   (tous niveaux ; l'audit exclut le niveau 6)")
     head = "".join(f"{s:>11}" for s in STRATEGIES)
-    print(f"    {'':<13}{head}")
+    print(f"    {'':<18}{head}")
+    variants = sorted({c["variant"] for c in cells if c["variant"]})
     todo, guessed = [], False
     for rel in RELATIONS:
         marks = []
@@ -261,7 +271,21 @@ def remaining(cells: list[dict]) -> None:
                     guessed = True
                 todo.append((f"{rel}__{strat}", left, (left * r) if r else None,
                              strat not in rate))
-        print(f"    {rel:<13}" + "".join(marks))
+        print(f"    {rel:<18}" + "".join(marks))
+        # Fine-tuned arms sit under their family, so base and adapted scores
+        # for the same cell read down a single column.
+        for var in variants:
+            row = []
+            for strat in STRATEGIES:
+                c = by_id.get(f"{rel}__{strat}__seed1{var}")
+                if c and c["done"]:
+                    row.append(f"{c['acc'] * 100:>10.1f}%")
+                elif c and c["total"]:
+                    row.append(f"{c['seen'] / c['total'] * 100:>10.0f}%")
+                else:
+                    row.append(f"{'·':>11}")
+            if any("·" not in x for x in row):
+                print(f"      {var.lstrip('_'):<16}" + "".join(row))
 
     if not todo:
         print("\n  tout est calculé.")
