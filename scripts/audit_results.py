@@ -337,6 +337,13 @@ def main() -> int:
     print("=" * 74)
     print("  COMPARAISONS APPARIÉES   (McNemar, mêmes lignes)")
     print("=" * 74)
+
+    # Every strategy is compared against zero-shot in every relation, so this
+    # is a family of tests, not one. Reading each at p<0.05 would expect about
+    # one false positive per run by construction. Holm holds the chance of any
+    # false positive across the family at 5 percent, and it is what decides
+    # the verdict printed here -- the raw p is shown beside it, not instead.
+    tests = []
     for rel in relations:
         base = cells.get((rel, "zero_shot"))
         if not base:
@@ -347,14 +354,48 @@ def main() -> int:
             c = cells.get((rel, strat))
             if not c:
                 continue
-            gained, lost, p = mcnemar(c["correct_by_row"], base["correct_by_row"])
-            verdict = ("significatif" if p < 0.05 else
-                       "non significatif" if p < 1 else "identiques")
-            sign = "+" if gained > lost else "−" if lost > gained else "="
-            print(f"  {rel:<12}{strat:<11}vs zero_shot   "
-                  f"{sign}{abs(gained - lost):>3} lignes nettes   "
-                  f"(gagne {gained}, perd {lost})   p={p:.3f}  {verdict}")
-        print()
+            gained, lost, pv = mcnemar(c["correct_by_row"], base["correct_by_row"])
+            tests.append({"rel": rel, "strat": strat, "gained": gained,
+                          "lost": lost, "p": pv})
+
+    m = len(tests)
+    holm_ok = {}
+    still_below = True
+    for i, t in enumerate(sorted(tests, key=lambda x: x["p"])):
+        thr = 0.05 / (m - i)
+        if still_below and t["p"] > thr:
+            still_below = False          # Holm stops at the first failure
+        holm_ok[(t["rel"], t["strat"])] = still_below and t["p"] <= thr
+
+    last = None
+    for t in tests:
+        if last and t["rel"] != last:
+            print()
+        last = t["rel"]
+        survives = holm_ok[(t["rel"], t["strat"])]
+        if survives:
+            verdict = "significatif"
+        elif t["p"] < 0.05:
+            verdict = "tendance (ne survit pas à Holm)"
+        elif t["p"] >= 1:
+            verdict = "identiques"
+        else:
+            verdict = "non significatif"
+        sign = "+" if t["gained"] > t["lost"] else "−" if t["lost"] > t["gained"] else "="
+        print(f"  {t['rel']:<12}{t['strat']:<11}vs zero_shot   "
+              f"{sign}{abs(t['gained'] - t['lost']):>3} lignes nettes   "
+              f"(gagne {t['gained']}, perd {t['lost']})   "
+              f"p={t['p']:.3f}  {verdict}")
+    print()
+    n_raw = sum(1 for t in tests if t["p"] < 0.05)
+    n_holm = sum(holm_ok.values())
+    print(f"  {m} comparaisons. {n_raw} sous p<0.05 brut, {n_holm} après "
+          f"correction de Holm.")
+    if n_raw and not n_holm:
+        print("  Aucun effet de stratégie n'est établi. Les tendances "
+              "ci-dessus demandent")
+        print("  d'être posées en hypothèse avant mesure, sur une seconde graine.")
+    print()
 
     # ---- verdict ------------------------------------------------------
     print("=" * 74)
