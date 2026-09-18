@@ -81,13 +81,25 @@ def load(relation: str, strategy: str) -> tuple[list[dict], dict | None]:
     return rows, meta
 
 
-def expected_rows(relation: str) -> int | None:
+def manifest(relation: str) -> dict | None:
     try:
-        man = json.loads((DATA / relation / "eval_manifest.json")
-                         .read_text(encoding="utf-8"))
-        return len(man["rows"])
+        return json.loads((DATA / relation / "eval_manifest.json")
+                          .read_text(encoding="utf-8"))
     except Exception:
         return None
+
+
+def demo_manifest_hash(relation: str) -> str | None:
+    try:
+        return json.loads((DATA / relation / "fewshot_manifest.json")
+                          .read_text(encoding="utf-8")).get("demo_map_sha256")
+    except Exception:
+        return None
+
+
+def expected_rows(relation: str) -> int | None:
+    man = manifest(relation)
+    return len(man["rows"]) if man else None
 
 
 def main() -> int:
@@ -106,7 +118,14 @@ def main() -> int:
     print("  INTÉGRITÉ")
     print("=" * 74)
     for rel in relations:
-        want = expected_rows(rel)
+        man = manifest(rel)
+        want = len(man["rows"]) if man else None
+        # The pinned label for each row. Comparing cells only against each
+        # other would pass happily if every one of them had been scored
+        # against the same wrong data.
+        gold_of = {r["row_index"]: r["label"] for r in man["rows"]} if man else {}
+        disk_hash = man.get("manifest_sha256") if man else None
+        disk_demo = demo_manifest_hash(rel)
         hashes, demo_hashes = set(), set()
         for strat in STRATEGIES:
             rows, meta = load(rel, strat)
@@ -154,6 +173,36 @@ def main() -> int:
                     problems.append(
                         f"{rel}/{strat}: {len(unparsed)} réponses non analysées "
                         f"({len(unparsed)/len(rows)*100:.1f} %) comptées comme fausses")
+            # Scored against the labels the manifest pins, not whatever the
+            # CSV happened to hold when the cell ran.
+            bad_gold = [r["row_index"] for r in rows
+                        if r.get("row_index") in gold_of
+                        and r.get("gold") != gold_of[r["row_index"]]]
+            if bad_gold:
+                flags.append(f"{len(bad_gold)} étiquettes divergentes")
+                problems.append(
+                    f"{rel}/{strat}: {len(bad_gold)} ligne(s) notée(s) contre une "
+                    f"étiquette absente du manifeste (ex. index {bad_gold[:3]})")
+            if meta and disk_hash and meta.get("eval_manifest_sha256") \
+                    and meta["eval_manifest_sha256"] != disk_hash:
+                flags.append("manifeste obsolète")
+                problems.append(
+                    f"{rel}/{strat}: produit sous un manifeste qui n'est plus "
+                    f"celui du dépôt — les lignes évaluées ne sont plus celles-là")
+            if strat == "few_shot" and meta and disk_demo \
+                    and meta.get("fewshot_manifest_sha256") \
+                    and meta["fewshot_manifest_sha256"] != disk_demo:
+                flags.append("démonstrations obsolètes")
+                problems.append(
+                    f"{rel}/{strat}: démonstrations différentes de celles "
+                    f"actuellement épinglées")
+            # Recompute rather than trust the summary that reports itself.
+            if meta and meta.get("n_completed") is not None \
+                    and meta["n_completed"] != len(ok):
+                flags.append("total incohérent")
+                problems.append(
+                    f"{rel}/{strat}: run.json annonce {meta['n_completed']} "
+                    f"lignes réussies, le fichier en contient {len(ok)}")
             if med_calls is not None and med_calls != EXPECTED_CALLS[strat]:
                 flags.append(f"{med_calls} appels au lieu de {EXPECTED_CALLS[strat]}")
                 problems.append(f"{rel}/{strat}: médiane {med_calls} appels, "
