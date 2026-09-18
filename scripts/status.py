@@ -21,6 +21,7 @@ REPO = Path(__file__).resolve().parents[1]
 RUN_LOG = REPO / "logs" / "run.log"
 RESULTS = REPO / "results"
 DATA = REPO / "data"
+ADAPTERS = REPO / "adapters"
 LOCK = RESULTS / ".run.lock"
 
 # ToT and GoT log every ten rows and spend about a minute on each, so a quiet
@@ -348,6 +349,35 @@ def remaining(cells: list[dict]) -> None:
               "une reprise ou un arrêt décale d'autant)")
 
 
+def adapters() -> None:
+    """Fine-tuning state, which the results grid cannot show.
+
+    A half-trained adapter produces results that look like any other, so the
+    training state belongs beside the grid rather than in a separate file
+    nobody thinks to open.
+    """
+    states = sorted(ADAPTERS.glob("*/trainer_state.json")) if ADAPTERS.is_dir() else []
+    if not states:
+        return
+    print("\n  adaptateurs")
+    for sp in states:
+        try:
+            st = json.loads(sp.read_text(encoding="utf-8"))
+        except Exception:
+            print(f"    {sp.parent.name:<16}état illisible")
+            continue
+        losses = st.get("losses") or []
+        cfg = st.get("config") or {}
+        snaps = sorted(q.name for q in sp.parent.glob("epoch*"))
+        loss = f"perte {losses[-1]:.4f}" if losses else "perte —"
+        state = "terminé" if st.get("finished") else "INACHEVÉ"
+        print(f"    {sp.parent.name:<14}{st.get('n_train_rows', '?'):>5} lignes   "
+              f"{st.get('epoch', 0)}/{cfg.get('epochs', '?')} époques   "
+              f"{loss:<14}{state:<10}"
+              f"{round(st.get('elapsed_seconds', 0) / 60):>4} min"
+              + (f"   [{len(snaps)} instantanés]" if snaps else ""))
+
+
 def main() -> int:
     pid, source = runner_pid()
     age_min = (time.time() - RUN_LOG.stat().st_mtime) / 60 if RUN_LOG.exists() else None
@@ -416,6 +446,8 @@ def main() -> int:
                 print(f"    {c['id']:<32}{c['seen']} lignes")
 
     remaining(cells)
+
+    adapters()
 
     if RUN_LOG.exists():
         tail = RUN_LOG.read_text(encoding="utf-8", errors="replace").splitlines()
