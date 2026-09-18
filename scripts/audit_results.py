@@ -504,6 +504,40 @@ def main() -> int:
                 print(f"    {t['rel'] + '/' + t['strat']:<34}p={t['p']:.4f}   "
                       f"seuil {thr:.4f}   {verdict}")
 
+        # Within the fine-tuned model: does any strategy beat its zero-shot?
+        # The comparisons above all ask whether fine-tuning beat the base
+        # model for one strategy; none of them asks whether, once the model
+        # has been fine-tuned, reasoning still buys anything. That is the same
+        # question the base-model section answers, asked of the adapted model.
+        within = []
+        for (rel, strat, var), f in sorted(ft.items()):
+            if strat == "zero_shot" or var.startswith("_lora-"):
+                continue
+            base_ft = ft.get((rel, "zero_shot", var))
+            if not base_ft:
+                continue
+            g, l, pv = mcnemar(f["correct_by_row"], base_ft["correct_by_row"])
+            within.append({"rel": rel, "strat": strat, "var": var,
+                           "gained": g, "lost": l, "p": pv,
+                           "delta": f["k"] / f["n"] * 100
+                                    - base_ft["k"] / base_ft["n"] * 100})
+        if within:
+            print("\n  Sur le modèle affiné : chaque stratégie contre son "
+                  "propre zero-shot")
+            m2 = len(within)
+            still = True
+            for i, t in enumerate(sorted(within, key=lambda x: x["p"])):
+                thr = 0.05 / (m2 - i)
+                if still and t["p"] > thr:
+                    still = False
+                verdict = ("significatif" if still and t["p"] <= thr
+                           else "tendance" if t["p"] < 0.05
+                           else "non significatif")
+                sign = "+" if t["gained"] > t["lost"] else "−" if t["lost"] > t["gained"] else "="
+                print(f"    {t['rel']}/{t['strat']}{t['var']:<18}"
+                      f"{t['delta']:+6.1f} pt   {sign}{abs(t['gained'] - t['lost']):>3} "
+                      f"lignes nettes   p={t['p']:.4f}   {verdict}")
+
         # Per level: the base model failed at levels 4 and 5, so a gain
         # concentrated at 1 to 3 has not moved what the analysis identified.
         print("\n  Par niveau d'ambiguïté (exactitude base → fine-tuné) :")
