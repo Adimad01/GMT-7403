@@ -242,8 +242,16 @@ def main() -> int:
             c = cells.get((rel, strat))
             if not c or not c["n"]:
                 continue
-            pred = Counter(r.get("predicted") for r in c["ok"])
+            # An unparsed answer is None, not a label. Counting it among the
+            # labels used made cells look as though the model had invented a
+            # category -- every cell with an unparsed row reported one more
+            # label than exists, and only the two cells with none read right.
+            pred = Counter(r.get("predicted") for r in c["ok"]
+                           if r.get("predicted") is not None)
             gold = Counter(r.get("gold") for r in c["ok"])
+            if not pred:
+                print(f"  {rel:<12}{strat:<11} aucune réponse exploitable")
+                continue
             top, n_top = pred.most_common(1)[0]
             share = n_top / c["n"]
             gold_share = gold[top] / c["n"] if top in gold else 0.0
