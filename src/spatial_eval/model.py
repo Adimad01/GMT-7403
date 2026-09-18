@@ -120,6 +120,13 @@ class HFBackend(Backend):
             except ImportError:
                 log.warning("Mxfp4Config unavailable; loading without dequantize")
         self.model = AutoModelForCausalLM.from_pretrained(cfg.model_id, **kwargs)
+        if cfg.adapter:
+            from peft import PeftModel
+            log.info("attaching LoRA adapter %s", cfg.adapter)
+            self.model = PeftModel.from_pretrained(self.model, cfg.adapter)
+            # Folding the adapter in costs nothing at inference and removes a
+            # layer of indirection from every forward pass.
+            self.model = self.model.merge_and_unload()
         self.model.eval()
 
         self.device = next(self.model.parameters()).device

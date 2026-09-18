@@ -10,6 +10,8 @@ huggingface-hub>=0.34,<1.0 # transformers 4.57 requires >=0.34; pip has been
                            # seen resolving it down to 0.16.4, breaking download
 accelerate>=1.0,<2
 safetensors>=0.4
+peft>=0.11,<1              # LoRA. Only needed to fine-tune or to evaluate an
+                           # adapter; the base-model arms do not import it.
 
 # The evaluation, metrics and reporting code is standard library only, so
 # analysis runs on a machine with no ML stack at all.

@@ -181,3 +181,41 @@ def load_demos(relation: str) -> tuple[dict[str, list[Demo]], str]:
 
 def labels_for(relation: str) -> list[str]:
     return LABELS[relation]
+
+
+def load_train(relation: str, exclude_levels: tuple[str, ...] = ()) -> list[Example]:
+    """The fine-tuning pool for one relation.
+
+    No manifest pins these: train.csv is not scored, so there is nothing to
+    keep comparable across arms. The eval manifest stays the only frozen
+    thing, which is what lets a fine-tuned model be compared to the base one
+    on identical rows.
+
+    row_index here is the position in train.csv and is unrelated to the
+    eval row_index of the same name -- they index different files.
+    """
+    cols = COLUMNS[relation]
+    src = relation_dir(relation) / "train.csv"
+    if not src.exists():
+        raise FileNotFoundError(f"{src} does not exist; run scripts/build_splits.py")
+
+    out: list[Example] = []
+    for i, row in enumerate(_read_csv(src)):
+        level = row.get("ambiguity_level", "").strip()
+        if level in exclude_levels:
+            continue
+        out.append(Example(
+            row_index=i,
+            fact_id=f"train{i:05d}",
+            subject=row[cols["subject"]].strip(),
+            target=row[cols["object"]].strip(),
+            label=row[cols["label"]].strip().lower(),
+            ambiguity_level=level,
+            text=row[cols["text"]].strip(),
+        ))
+    unknown = {e.label for e in out} - set(LABELS[relation])
+    if unknown:
+        raise ManifestError(
+            f"{relation}: train.csv holds labels outside the label set: "
+            f"{sorted(unknown)}")
+    return out

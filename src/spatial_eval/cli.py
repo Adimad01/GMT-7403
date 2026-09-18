@@ -31,6 +31,9 @@ from .strategies import available
 def _add_model_args(p: argparse.ArgumentParser) -> None:
     g = p.add_argument_group("model")
     g.add_argument("--model-id", default=ModelConfig.model_id)
+    g.add_argument("--adapter",
+                   help="path to a LoRA adapter (adapters/<relation>); results "
+                        "are written beside the base run, not over it")
     g.add_argument("--backend", default=ModelConfig.backend,
                    help="hf (default) or mock for a dry run without a GPU")
     g.add_argument("--max-new-tokens", type=int, default=ModelConfig.max_new_tokens)
@@ -41,7 +44,32 @@ def _add_model_args(p: argparse.ArgumentParser) -> None:
 def _model_from(args) -> ModelConfig:
     return ModelConfig(model_id=args.model_id, backend=args.backend,
                        max_new_tokens=args.max_new_tokens,
-                       temperature=args.temperature, dtype=args.dtype)
+                       temperature=args.temperature, dtype=args.dtype,
+                       adapter=getattr(args, "adapter", None))
+
+
+def cmd_finetune(args) -> int:
+    from .finetune import FinetuneConfig, train
+
+    relations = [args.relation] if args.relation else list(RELATIONS)
+    for rel in relations:
+        cfg = FinetuneConfig(
+            relation=rel, base_model=args.model_id, epochs=args.epochs,
+            lr=args.lr, batch_size=args.batch_size, grad_accum=args.grad_accum,
+            lora_r=args.lora_r, lora_alpha=args.lora_alpha,
+            max_len=args.max_len, seed=args.seed,
+            exclude_levels=() if args.include_level_6 else ("Level 6",))
+        print(f"\n  === {rel} ===")
+        state = train(cfg)
+        print(f"  {rel}: {state['n_train_rows']} rows, "
+              f"{state['epoch']} epoch(s), "
+              f"final loss {state['losses'][-1]:.4f}")
+        print(f"  adapter: {cfg.out_dir}")
+    print("\n  Evaluate against the base model with:")
+    for rel in relations:
+        print(f"    python3 -m spatial_eval.cli run -r {rel} -s zero_shot "
+              f"--adapter adapters/{rel}")
+    return 0
 
 
 def cmd_verify(args) -> int:
@@ -326,6 +354,23 @@ def build_parser() -> argparse.ArgumentParser:
     sub = p.add_subparsers(dest="cmd", required=True)
 
     sub.add_parser("verify", help="check data integrity").set_defaults(func=cmd_verify)
+    f = sub.add_parser("finetune", help="train a LoRA adapter for one relation")
+    f.add_argument("-r", "--relation", choices=RELATIONS,
+                   help="default: all three, each into its own adapter")
+    f.add_argument("--epochs", type=int, default=3)
+    f.add_argument("--lr", type=float, default=1e-4)
+    f.add_argument("--batch-size", type=int, default=1)
+    f.add_argument("--grad-accum", type=int, default=8)
+    f.add_argument("--lora-r", type=int, default=16)
+    f.add_argument("--lora-alpha", type=int, default=32)
+    f.add_argument("--max-len", type=int, default=1024)
+    f.add_argument("--seed", type=int, default=1)
+    f.add_argument("--include-level-6", action="store_true",
+                   help="train on level 6 too (the analysis excludes it, so "
+                        "the default does as well)")
+    f.add_argument("--model-id", default=ModelConfig.model_id)
+    f.set_defaults(func=cmd_finetune)
+
     sub.add_parser("list", help="list relations and strategies").set_defaults(func=cmd_list)
 
     r = sub.add_parser("run", help="run experiments")

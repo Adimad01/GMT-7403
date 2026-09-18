@@ -45,6 +45,10 @@ TRAIN_COLUMNS = dict(COLUMNS)
 @dataclass(frozen=True)
 class ModelConfig:
     """Generation settings. Recorded verbatim in every result file."""
+    # Path to a LoRA adapter, or None for the base model. It belongs here so
+    # it is written into run.json: a fine-tuned score that cannot be told from
+    # a base one by reading the result file is a score waiting to be misread.
+    adapter: str | None = None
     model_id: str = "openai/gpt-oss-20b"
     backend: str = "hf"                 # "hf" | "mock" (tests)
     max_new_tokens: int = 1024
@@ -70,12 +74,23 @@ class RunConfig:
     resume: bool = True
 
     @property
+    def variant(self) -> str:
+        """What distinguishes this run's weights from the base model's.
+
+        A fine-tuned arm must not land in the base arm's directory: the two
+        are the comparison, and resume would otherwise treat one as a partial
+        copy of the other and skip the work.
+        """
+        return "_lora" if self.model.adapter else ""
+
+    @property
     def run_id(self) -> str:
-        return f"{self.relation}__{self.strategy}__seed{self.seed}"
+        return f"{self.relation}__{self.strategy}__seed{self.seed}{self.variant}"
 
     @property
     def result_dir(self) -> Path:
-        return RESULTS_DIR / self.relation / self.strategy / f"seed{self.seed}"
+        return (RESULTS_DIR / self.relation / self.strategy
+                / f"seed{self.seed}{self.variant}")
 
 
 def env_guards() -> None:
