@@ -404,41 +404,57 @@ def main() -> int:
     print()
 
     # ---- fine-tuning --------------------------------------------------
+    def variants(rel: str, strat: str) -> list[str]:
+        """Every fine-tuned arm written for this cell.
+
+        Discovered rather than assumed, so a transfer run -- the cardinal
+        adapter answering the relative eval set, written to _lora-cardinal --
+        is reported without the audit needing to know it was going to happen.
+        """
+        d = RESULTS / rel / strat
+        if not d.is_dir():
+            return []
+        return sorted(p.name[len("seed1"):] for p in d.iterdir()
+                      if p.is_dir() and p.name.startswith("seed1_"))
+
     ft = {}
     for rel in relations:
         for strat in STRATEGIES:
-            rws, meta = load(rel, strat, "_lora")
-            if not rws:
-                continue
-            if dropped:
-                rws = [r for r in rws
-                       if r.get("ambiguity_level") not in dropped]
-            ok = [r for r in rws if r.get("status") == "ok"]
-            ft[(rel, strat)] = {
-                "ok": ok, "k": sum(1 for r in ok if r.get("correct")),
-                "n": len(ok),
-                "correct_by_row": {r["row_index"]: bool(r.get("correct"))
-                                   for r in ok},
-                "adapter": (meta or {}).get("model", {}).get("adapter"),
-                "unparsed": sum(1 for r in ok if r.get("predicted") is None),
-            }
+            for var in variants(rel, strat):
+                rws, meta = load(rel, strat, var)
+                if not rws:
+                    continue
+                if dropped:
+                    rws = [r for r in rws
+                           if r.get("ambiguity_level") not in dropped]
+                ok = [r for r in rws if r.get("status") == "ok"]
+                ft[(rel, strat, var)] = {
+                    "ok": ok, "k": sum(1 for r in ok if r.get("correct")),
+                    "n": len(ok),
+                    "correct_by_row": {r["row_index"]: bool(r.get("correct"))
+                                       for r in ok},
+                    "adapter": (meta or {}).get("model", {}).get("adapter"),
+                    "unparsed": sum(1 for r in ok if r.get("predicted") is None),
+                }
 
     if ft:
         print("=" * 74)
         print("  FINE-TUNING   (LoRA, un adaptateur par famille)")
         print("=" * 74)
         ft_tests = []
-        for (rel, strat), f in sorted(ft.items()):
+        for (rel, strat, var), f in sorted(ft.items()):
             b = cells.get((rel, strat))
             if not b or not b["n"]:
                 continue
             lo_b, hi_b = wilson(b["k"], b["n"])
             lo_f, hi_f = wilson(f["k"], f["n"])
             gained, lost, pv = mcnemar(f["correct_by_row"], b["correct_by_row"])
-            ft_tests.append({"rel": rel, "strat": strat, "gained": gained,
+            ft_tests.append({"rel": rel, "strat": f"{strat}{var}", "gained": gained,
                              "lost": lost, "p": pv,
                              "delta": f["k"] / f["n"] * 100 - b["k"] / b["n"] * 100})
-            print(f"\n  {rel} / {strat}   (adaptateur : {f['adapter']})")
+            own = f"adapters/{rel}"
+            tag = "" if f["adapter"] == own else "   ← transfert"
+            print(f"\n  {rel} / {strat}   (adaptateur : {f['adapter']}){tag}")
             print(f"    base      {b['k']/b['n']*100:>5.1f} %  "
                   f"[{lo_b:.1f} – {hi_b:.1f}]   n={b['n']}")
             print(f"    fine-tuné {f['k']/f['n']*100:>5.1f} %  "
@@ -461,19 +477,19 @@ def main() -> int:
                     still = False
                 verdict = ("significatif" if still and t["p"] <= thr
                            else "non significatif")
-                print(f"    {t['rel']:<13}{t['strat']:<11}p={t['p']:.4f}   "
+                print(f"    {t['rel'] + '/' + t['strat']:<34}p={t['p']:.4f}   "
                       f"seuil {thr:.4f}   {verdict}")
 
         # Per level: the base model failed at levels 4 and 5, so a gain
         # concentrated at 1 to 3 has not moved what the analysis identified.
         print("\n  Par niveau d'ambiguïté (exactitude base → fine-tuné) :")
         levels = [f"Level {i}" for i in range(1, 6)]
-        print(f"    {'':<13}" + "".join(f"{l[-1]:>16}" for l in levels))
-        for (rel, strat), f in sorted(ft.items()):
+        print(f"    {'':<34}" + "".join(f"{l[-1]:>16}" for l in levels))
+        for (rel, strat, var), f in sorted(ft.items()):
             b = cells.get((rel, strat))
             if not b:
                 continue
-            line = f"    {rel:<13}"
+            line = f"    {rel + '/' + strat + var:<34}"
             for lv in levels:
                 bs = [r for r in b["ok"] if r.get("ambiguity_level") == lv]
                 fs = [r for r in f["ok"] if r.get("ambiguity_level") == lv]
