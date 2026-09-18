@@ -74,10 +74,23 @@ def main() -> int:
                            for k, v in r["accuracy_by_level"].items())
             print(" " * 20 + lv)
 
-    shas = {r["eval_manifest_sha256"] for r in rows}
-    if len(shas) > 1:
-        print(f"\n  NOTE: these runs span {len(shas)} different versions of the")
-        print("  evaluation data. Only rows sharing a data hash are comparable.")
+    # Each relation pins its own manifest, so three relations always show
+    # three hashes. Counting them together warned about a corpus change on
+    # every complete run -- and a warning that always fires is one nobody
+    # reads when it matters. What matters is two hashes within one relation.
+    by_relation: dict[str, set[str]] = {}
+    for r in rows:
+        sha = r.get("eval_manifest_sha256")
+        if sha:
+            by_relation.setdefault(r.get("relation", "?"), set()).add(sha)
+    drifted = {rel: shas for rel, shas in by_relation.items() if len(shas) > 1}
+    if drifted:
+        print("\n  NOTE: the evaluation data changed under these relations, so "
+              "their rows")
+        print("  are not all comparable:")
+        for rel, shas in sorted(drifted.items()):
+            print(f"    {rel}: {len(shas)} versions "
+                  f"({', '.join(sorted(x[:8] for x in shas))})")
     return 0
 
 
