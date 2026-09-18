@@ -105,10 +105,22 @@ def expected_rows(relation: str) -> int | None:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--relation", choices=RELATIONS)
+    ap.add_argument("--exclude-level", nargs="+", metavar="N", default=["6"],
+                    help="ambiguity levels to leave out of the analysis "
+                         "(default: 6). Level 6 varies composition, not "
+                         "linguistic indirection, and its wording is "
+                         "deliberately plain -- so it moves two variables at "
+                         "once and does not belong on the same scale. Pass "
+                         "--exclude-level none to include everything.")
     ap.add_argument("--verbose", action="store_true",
                     help="per-level accuracy and the confusion detail")
     args = ap.parse_args()
     relations = [args.relation] if args.relation else list(RELATIONS)
+    dropped = set() if args.exclude_level == ["none"] else {
+        f"Level {n}" for n in args.exclude_level}
+    if dropped:
+        print(f"  (niveaux exclus de l'analyse : "
+              f"{', '.join(sorted(dropped))} — lignes conservées sur disque)\n")
 
     problems: list[str] = []
     cells: dict[tuple[str, str], dict] = {}
@@ -129,12 +141,27 @@ def main() -> int:
         hashes, demo_hashes = set(), set()
         for strat in STRATEGIES:
             rows, meta = load(rel, strat)
+            # run.json counts every row the cell ran, so its total must be
+            # checked before any level is filtered out of the analysis.
+            n_ok_all = sum(1 for r in rows if r.get("status") == "ok")
+            if dropped:
+                # The rows stay on disk; only the analysis leaves them out, so
+                # the decision is reversible with a flag rather than a rerun.
+                rows = [r for r in rows
+                        if r.get("ambiguity_level") not in dropped]
             if not rows:
                 problems.append(f"{rel}/{strat}: aucun résultat")
                 continue
             idx = [r.get("row_index") for r in rows]
             dupes = [i for i, n in Counter(idx).items() if n > 1]
-            missing = (set(range(want)) - set(idx)) if want else set()
+            # Rows excluded above are absent by choice, so completeness is
+            # measured against what the manifest holds at the kept levels.
+            if dropped and man:
+                keep = {e["row_index"] for e in man["rows"]
+                        if e.get("ambiguity_level") not in dropped}
+                missing = keep - set(idx)
+            else:
+                missing = (set(range(want)) - set(idx)) if want else set()
             failed = [r for r in rows if r.get("status") != "ok"]
             # A scored-but-unparsed answer counts as wrong. If that is
             # common the number being reported is partly a parser score.
@@ -198,11 +225,11 @@ def main() -> int:
                     f"actuellement épinglées")
             # Recompute rather than trust the summary that reports itself.
             if meta and meta.get("n_completed") is not None \
-                    and meta["n_completed"] != len(ok):
+                    and meta["n_completed"] != n_ok_all:
                 flags.append("total incohérent")
                 problems.append(
                     f"{rel}/{strat}: run.json annonce {meta['n_completed']} "
-                    f"lignes réussies, le fichier en contient {len(ok)}")
+                    f"lignes réussies, le fichier en contient {n_ok_all}")
             if med_calls is not None and med_calls != EXPECTED_CALLS[strat]:
                 flags.append(f"{med_calls} appels au lieu de {EXPECTED_CALLS[strat]}")
                 problems.append(f"{rel}/{strat}: médiane {med_calls} appels, "
