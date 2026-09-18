@@ -60,8 +60,14 @@ def mcnemar(a: dict[int, bool], b: dict[int, bool]) -> tuple[int, int, float]:
     return only_a, only_b, chi2_sf_1df(stat)
 
 
-def load(relation: str, strategy: str) -> tuple[list[dict], dict | None]:
-    d = RESULTS / relation / strategy / "seed1"
+def load(relation: str, strategy: str,
+         variant: str = "") -> tuple[list[dict], dict | None]:
+    """Rows and summary for one cell. `variant` selects a fine-tuned arm.
+
+    A fine-tuned run writes to seed1_lora beside the base arm's seed1, so the
+    two answer the same pinned rows and can be paired row by row.
+    """
+    d = RESULTS / relation / strategy / f"seed1{variant}"
     preds = d / "predictions.jsonl"
     if not preds.exists():
         return [], None
@@ -396,6 +402,89 @@ def main() -> int:
               "ci-dessus demandent")
         print("  d'être posées en hypothèse avant mesure, sur une seconde graine.")
     print()
+
+    # ---- fine-tuning --------------------------------------------------
+    ft = {}
+    for rel in relations:
+        for strat in STRATEGIES:
+            rws, meta = load(rel, strat, "_lora")
+            if not rws:
+                continue
+            if dropped:
+                rws = [r for r in rws
+                       if r.get("ambiguity_level") not in dropped]
+            ok = [r for r in rws if r.get("status") == "ok"]
+            ft[(rel, strat)] = {
+                "ok": ok, "k": sum(1 for r in ok if r.get("correct")),
+                "n": len(ok),
+                "correct_by_row": {r["row_index"]: bool(r.get("correct"))
+                                   for r in ok},
+                "adapter": (meta or {}).get("model", {}).get("adapter"),
+                "unparsed": sum(1 for r in ok if r.get("predicted") is None),
+            }
+
+    if ft:
+        print("=" * 74)
+        print("  FINE-TUNING   (LoRA, un adaptateur par famille)")
+        print("=" * 74)
+        ft_tests = []
+        for (rel, strat), f in sorted(ft.items()):
+            b = cells.get((rel, strat))
+            if not b or not b["n"]:
+                continue
+            lo_b, hi_b = wilson(b["k"], b["n"])
+            lo_f, hi_f = wilson(f["k"], f["n"])
+            gained, lost, pv = mcnemar(f["correct_by_row"], b["correct_by_row"])
+            ft_tests.append({"rel": rel, "strat": strat, "gained": gained,
+                             "lost": lost, "p": pv,
+                             "delta": f["k"] / f["n"] * 100 - b["k"] / b["n"] * 100})
+            print(f"\n  {rel} / {strat}   (adaptateur : {f['adapter']})")
+            print(f"    base      {b['k']/b['n']*100:>5.1f} %  "
+                  f"[{lo_b:.1f} – {hi_b:.1f}]   n={b['n']}")
+            print(f"    fine-tuné {f['k']/f['n']*100:>5.1f} %  "
+                  f"[{lo_f:.1f} – {hi_f:.1f}]   n={f['n']}"
+                  + (f"   ({f['unparsed']} non analysées)" if f["unparsed"] else ""))
+            sign = "+" if gained > lost else "−" if lost > gained else "="
+            print(f"    écart     {ft_tests[-1]['delta']:+.1f} point(s)   "
+                  f"{sign}{abs(gained - lost)} lignes nettes "
+                  f"(gagne {gained}, perd {lost})   p={pv:.4f}")
+
+        # Corrected as a family, for the same reason the strategy tests are.
+        m = len(ft_tests)
+        if m:
+            still = True
+            print("\n  Après correction de Holm sur "
+                  f"{m} comparaison(s) :")
+            for i, t in enumerate(sorted(ft_tests, key=lambda x: x["p"])):
+                thr = 0.05 / (m - i)
+                if still and t["p"] > thr:
+                    still = False
+                verdict = ("significatif" if still and t["p"] <= thr
+                           else "non significatif")
+                print(f"    {t['rel']:<13}{t['strat']:<11}p={t['p']:.4f}   "
+                      f"seuil {thr:.4f}   {verdict}")
+
+        # Per level: the base model failed at levels 4 and 5, so a gain
+        # concentrated at 1 to 3 has not moved what the analysis identified.
+        print("\n  Par niveau d'ambiguïté (exactitude base → fine-tuné) :")
+        levels = [f"Level {i}" for i in range(1, 6)]
+        print(f"    {'':<13}" + "".join(f"{l[-1]:>16}" for l in levels))
+        for (rel, strat), f in sorted(ft.items()):
+            b = cells.get((rel, strat))
+            if not b:
+                continue
+            line = f"    {rel:<13}"
+            for lv in levels:
+                bs = [r for r in b["ok"] if r.get("ambiguity_level") == lv]
+                fs = [r for r in f["ok"] if r.get("ambiguity_level") == lv]
+                if not bs or not fs:
+                    line += f"{'—':>16}"
+                    continue
+                ab = sum(1 for r in bs if r["correct"]) / len(bs) * 100
+                af = sum(1 for r in fs if r["correct"]) / len(fs) * 100
+                line += f"{ab:>6.0f}→{af:<5.0f}    "
+            print(line)
+        print()
 
     # ---- verdict ------------------------------------------------------
     print("=" * 74)
