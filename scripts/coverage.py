@@ -19,6 +19,10 @@ RELATIONS = ("topological", "cardinal", "relative")
 STRATEGIES = ("zero_shot", "cot", "few_shot", "tot", "got")
 # Four model calls a row against one, so these cost roughly four times as much.
 COSTLY = {"tot", "got"}
+# Not a gap to close: few-shot draws its demonstrations from train.csv, which
+# is the pool the adapter was fine-tuned on. The model has memorised them, so
+# the arm cannot be compared with the base model's.
+EXCLUDED_WHEN_TUNED = {"few_shot"}
 
 
 def finished(rel: str, strat: str, variant: str = "", seed: int = 1) -> bool:
@@ -31,13 +35,19 @@ def main() -> int:
     print("=" * 70)
 
     for title, variant in (("BASE", ""), ("AFFINÉ (adaptateur de la famille)", "_lora")):
-        done = [(r, s) for r in RELATIONS for s in STRATEGIES
+        skip = EXCLUDED_WHEN_TUNED if variant else set()
+        applicable = [s for s in STRATEGIES if s not in skip]
+        done = [(r, s) for r in RELATIONS for s in applicable
                 if finished(r, s, variant)]
-        print(f"\n  {title} — {len(done)}/{len(RELATIONS) * len(STRATEGIES)}")
+        total = len(RELATIONS) * len(applicable)
+        print(f"\n  {title} — {len(done)}/{total}")
         for rel in RELATIONS:
-            missing = [s for s in STRATEGIES if not finished(rel, s, variant)]
+            missing = [s for s in applicable if not finished(rel, s, variant)]
             mark = "complet" if not missing else "manque : " + ", ".join(missing)
             print(f"    {rel:<14}{mark}")
+        if skip:
+            print(f"    {'':<14}(hors périmètre : {', '.join(sorted(skip))} — "
+                  f"démonstrations tirées du jeu d'entraînement)")
 
     print("\n  TRANSFERT — l'adaptateur d'une famille sur l'évaluation d'une autre")
     pairs = [(a, b) for a in RELATIONS for b in RELATIONS if a != b]
@@ -69,15 +79,20 @@ def main() -> int:
 
     # What it would cost to close the gaps, at the rates already observed.
     print("\n  COÛT DES CELLULES AFFINÉES MANQUANTES")
-    cheap = sum(1 for r in RELATIONS for s in STRATEGIES
-                if s not in COSTLY and s != "few_shot" and not finished(r, s, "_lora"))
-    dear = sum(1 for r in RELATIONS for s in STRATEGIES
-               if s in COSTLY and not finished(r, s, "_lora"))
-    contaminated = sum(1 for r in RELATIONS if not finished(r, "few_shot", "_lora"))
-    print(f"    {cheap} cellule(s) à un appel      ~{cheap * 35} min")
-    print(f"    {dear} cellule(s) à quatre appels  ~{dear * 4.5:.0f} h")
-    print(f"    {contaminated} cellule(s) few_shot        à écarter : les "
-          f"démonstrations sont le jeu d'entraînement")
+    cheap = [(r, s) for r in RELATIONS for s in STRATEGIES
+             if s not in COSTLY and s not in EXCLUDED_WHEN_TUNED
+             and not finished(r, s, "_lora")]
+    dear = [(r, s) for r in RELATIONS for s in STRATEGIES
+            if s in COSTLY and not finished(r, s, "_lora")]
+    if not cheap and not dear:
+        print("    aucune")
+        return 0
+    if cheap:
+        print(f"    {len(cheap)} à un appel       ~{len(cheap) * 35} min   "
+              f"{', '.join(f'{r}/{s}' for r, s in cheap)}")
+    if dear:
+        print(f"    {len(dear)} à quatre appels  ~{len(dear) * 4.5:.0f} h   "
+              f"{', '.join(f'{r}/{s}' for r, s in dear)}")
     return 0
 
 
