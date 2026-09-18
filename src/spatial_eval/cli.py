@@ -51,6 +51,12 @@ def _model_from(args) -> ModelConfig:
 def cmd_finetune(args) -> int:
     from .finetune import FinetuneConfig, train
 
+    # Without this the training loop's progress and loss go nowhere:
+    # setup_logging was only ever called by the run command, so the first
+    # fine-tune reported three final losses and nothing in between -- no
+    # curve, no timing, no way to see divergence while it was happening.
+    setup_logging(args.verbose, LOGS_DIR / "finetune.log")
+
     relations = [args.relation] if args.relation else list(RELATIONS)
     for rel in relations:
         cfg = FinetuneConfig(
@@ -369,6 +375,7 @@ def build_parser() -> argparse.ArgumentParser:
                    help="train on level 6 too (the analysis excludes it, so "
                         "the default does as well)")
     f.add_argument("--model-id", default=ModelConfig.model_id)
+    f.add_argument("-v", "--verbose", action="store_true")
     f.set_defaults(func=cmd_finetune)
 
     sub.add_parser("list", help="list relations and strategies").set_defaults(func=cmd_list)
