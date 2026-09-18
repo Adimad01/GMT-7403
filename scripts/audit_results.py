@@ -428,13 +428,16 @@ def main() -> int:
                     rws = [r for r in rws
                            if r.get("ambiguity_level") not in dropped]
                 ok = [r for r in rws if r.get("status") == "ok"]
-                # run.json appears only when a cell finishes, so its absence
-                # means this arm is still running. Reporting a part-finished
-                # cell beside complete ones invites reading a number that is
-                # not yet a number: the transfer run was shown at 59 percent
-                # on 132 of 250 rows, next to arms measured on all of theirs.
+                # A fine-tuned arm needs the completeness check the base arms
+                # get. run.json appears only when a cell finishes, so its
+                # absence means this one stopped early -- and without the
+                # check a half-finished run still printed an accuracy over
+                # whichever rows it reached: the transfer arm was shown at 59
+                # percent on 132 of 250 rows, beside arms measured on all of
+                # theirs, with the missing summary visible only as an adapter
+                # reading None.
                 ft[(rel, strat, var)] = {
-                    "partial": meta is None,
+                    "no_summary": meta is None,
                     "ok": ok, "k": sum(1 for r in ok if r.get("correct")),
                     "n": len(ok),
                     "correct_by_row": {r["row_index"]: bool(r.get("correct"))
@@ -452,10 +455,20 @@ def main() -> int:
             b = cells.get((rel, strat))
             if not b or not b["n"]:
                 continue
-            if f["partial"]:
+            # Measured against the base arm, which is the row set the two
+            # have to share for the paired test to mean anything -- not
+            # against the manifest, whose level field is filtered elsewhere.
+            missing = set(b["correct_by_row"]) - set(f["correct_by_row"])
+            if f["no_summary"] or missing:
                 print(f"\n  {rel} / {strat}{var}")
-                print(f"    EN COURS — {f['n']} lignes sur {b['n']}, "
-                      f"résultat non interprétable")
+                print(f"    INACHEVÉ — {f['n']} lignes sur {len(b['ok'])}, "
+                      f"{len(missing)} manquante(s)"
+                      + ("; run.json absent" if f["no_summary"] else ""))
+                print("    Aucun score rapporté : une exactitude sur une "
+                      "fraction des lignes n'est pas comparable.")
+                problems.append(
+                    f"{rel}/{strat}{var}: cellule fine-tunée inachevée "
+                    f"({f['n']}/{len(b['ok'])} lignes) — relancer")
                 continue
             lo_b, hi_b = wilson(b["k"], b["n"])
             lo_f, hi_f = wilson(f["k"], f["n"])
@@ -498,7 +511,8 @@ def main() -> int:
         print(f"    {'':<34}" + "".join(f"{l[-1]:>16}" for l in levels))
         for (rel, strat, var), f in sorted(ft.items()):
             b = cells.get((rel, strat))
-            if not b or f["partial"]:
+            if not b or f["no_summary"] \
+                    or set(b["correct_by_row"]) - set(f["correct_by_row"]):
                 continue
             line = f"    {rel + '/' + strat + var:<34}"
             for lv in levels:
