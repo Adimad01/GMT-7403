@@ -219,8 +219,18 @@ def train(cfg: FinetuneConfig) -> dict:
         state["epoch"] = epoch + 1
         state["seen_in_epoch"] = 0
         checkpoint(state)
-        log.info("%s | epoch %d done, mean loss %.4f",
-                 cfg.relation, epoch + 1, state["losses"][-1])
+
+        # Keep each epoch's adapter, not only the last. The loss reaches
+        # roughly 0.02 by the second epoch and near zero by the third, which
+        # is memorisation rather than learning -- so the useful adapter may
+        # not be the final one. Without a snapshot, testing that costs a
+        # retrain: an hour and a quarter per family. It costs about sixteen
+        # megabytes instead.
+        snap = cfg.out_dir / f"epoch{epoch + 1}"
+        snap.mkdir(parents=True, exist_ok=True)
+        model.save_pretrained(snap)
+        log.info("%s | epoch %d done, mean loss %.4f (snapshot: %s)",
+                 cfg.relation, epoch + 1, state["losses"][-1], snap)
 
     state["elapsed_seconds"] = round(time.time() - started, 1)
     state["finished"] = True
