@@ -393,14 +393,16 @@ def adapters() -> None:
 
 
 def pending(cells: list[dict]) -> bool:
-    """Whether any reference cell still has rows to compute."""
+    """Whether anything is left to compute."""
+    # A cell that was started and never finished is outstanding work whatever
+    # arm it belongs to. Checking only the fifteen reference cells declared a
+    # run finished while a fine-tuned cell sat at 160 of 288 with its process
+    # dead -- the one state where saying TERMINÉ costs the most.
+    if any(c["seen"] and not c["done"] for c in cells):
+        return True
     by_id = {c["id"]: c for c in cells}
-    for rel in RELATIONS:
-        for strat in STRATEGIES:
-            c = by_id.get(f"{rel}__{strat}__seed1")
-            if not c or not c["done"]:
-                return True
-    return False
+    return any(not (c := by_id.get(f"{rel}__{strat}__seed1")) or not c["done"]
+               for rel in RELATIONS for strat in STRATEGIES)
 
 
 def main() -> int:
