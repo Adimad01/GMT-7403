@@ -83,6 +83,39 @@ def _processes(pattern: str) -> list[tuple[int, str]]:
     return found
 
 
+def _etime_seconds(text: str) -> float:
+    """Parse ps's elapsed format: [[dd-]hh:]mm:ss."""
+    days, _, rest = text.rpartition("-")
+    parts = [float(x) for x in rest.split(":")]
+    while len(parts) < 3:
+        parts.insert(0, 0.0)
+    h, m, sec = parts
+    return (float(days or 0) * 86400) + h * 3600 + m * 60 + sec
+
+
+def process_age(pid: int) -> float | None:
+    """Seconds since this process started, or None if it cannot be read."""
+    try:
+        fields = (Path("/proc") / str(pid) / "stat").read_text().rsplit(") ", 1)[1].split()
+        started_ticks = int(fields[19])
+        uptime = float(Path("/proc/uptime").read_text().split()[0])
+        return uptime - started_ticks / os.sysconf("SC_CLK_TCK")
+    except Exception:
+        pass
+    # BSD and macOS have no /proc, and their ps has no etimes either -- only
+    # etime, as [[dd-]hh:]mm:ss.
+    for spec, parse in (("etimes=", float), ("etime=", _etime_seconds)):
+        try:
+            out = subprocess.run(["ps", "-o", spec, "-p", str(pid)],
+                                 capture_output=True, text=True,
+                                 timeout=5).stdout.strip()
+            if out:
+                return parse(out)
+        except Exception:
+            continue
+    return None
+
+
 def runner_pid() -> tuple[int | None, str]:
     """The pid of the evaluation process, from the lock it holds."""
     if LOCK.exists():
@@ -101,7 +134,10 @@ def runner_pid() -> tuple[int | None, str]:
             try:
                 os.kill(pid, 0)
                 return pid, "verrou (pid seul)"
-            except (ProcessLookupError, PermissionError, OSError):
+            except PermissionError:
+                # Not allowed to signal it -- which is proof it exists.
+                return pid, "verrou (pid seul)"
+            except (ProcessLookupError, OSError):
                 return None, "verrou périmé"
         except Exception:
             pass
@@ -316,8 +352,18 @@ def main() -> int:
     pid, source = runner_pid()
     age_min = (time.time() - RUN_LOG.stat().st_mtime) / 60 if RUN_LOG.exists() else None
 
+    age_s = process_age(pid) if pid else None
+
     if pid and age_min is not None and age_min <= QUIET_OK_MIN:
         verdict, detail = "EN COURS", f"pid {pid}, journal écrit il y a {age_min:.0f} min"
+    elif pid and age_s is not None and age_s < age_min * 60:
+        # The log is older than the process, so its last line belongs to an
+        # earlier run: this one has written nothing yet because it has not
+        # been alive long enough to. Reading the log age alone called a
+        # process forty seconds old stalled for forty-four minutes.
+        verdict, detail = ("EN COURS",
+                           f"pid {pid} démarré il y a {age_s / 60:.0f} min "
+                           f"(le modèle met ~1 min à charger)")
     elif pid and age_min is not None:
         verdict, detail = "BLOQUÉ", (f"pid {pid} vivant, mais rien d'écrit depuis "
                                      f"{age_min:.0f} min")
