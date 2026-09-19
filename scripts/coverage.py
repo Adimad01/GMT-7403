@@ -56,31 +56,6 @@ def main() -> int:
             print(f"    {'':<14}  optimiste. ~35 min par cellule si vous le "
                   f"voulez quand même.")
 
-    print("\n  TRANSFERT — l'adaptateur d'une famille sur l'évaluation d'une autre")
-    pairs = [(a, b) for a in RELATIONS for b in RELATIONS if a != b]
-    done = [(a, b) for a, b in pairs if finished(b, "zero_shot", f"_lora-{a}")]
-    print(f"    {len(done)}/{len(pairs)} paires")
-    for a, b in pairs:
-        state = "fait" if (a, b) in done else "—"
-        print(f"      {a:<13} → {b:<13}{state}")
-
-    print("\n  ADAPTATEURS")
-    for rel in RELATIONS:
-        sp = ADAPTERS / rel / "trainer_state.json"
-        if not sp.exists():
-            print(f"    {rel:<14}absent")
-            continue
-        st = json.loads(sp.read_text(encoding="utf-8"))
-        snaps = sorted(q.name for q in (ADAPTERS / rel).glob("epoch*"))
-        print(f"    {rel:<14}{st.get('epoch')} époques, "
-              f"{'terminé' if st.get('finished') else 'INACHEVÉ'}"
-              f"   instantanés : {', '.join(snaps) if snaps else 'aucun'}")
-
-    print("\n  TRANSFERT x STRATÉGIE")
-    others = [st for st in STRATEGIES if st != "zero_shot"]
-    print(f"    les 6 paires n'ont été mesurées qu'en zero_shot.")
-    print(f"    {len(pairs) * len(others)} combinaisons restantes "
-          f"(paire x {', '.join(others)}) — non prévues au plan.")
 
     print("\n  AXES NON EXPLORÉS")
     seeds = sorted({p.name for p in RESULTS.glob("*/*/seed*") if p.is_dir()})

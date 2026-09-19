@@ -269,12 +269,12 @@ def human(seconds: float) -> str:
     return f"{seconds / 3600:.1f} h"
 
 
-def remaining(cells: list[dict], show_transfer: bool = False) -> bool:
+def remaining(cells: list[dict]) -> bool:
     """The grid and what is left. True when work remains.
 
-    Transfer arms -- one family's adapter answering another's eval set -- are
-    a separate experiment, not a row of this grid. Shown only on request, so
-    the grid stays about the model each family was trained for.
+    The grid holds the base model and each family's own adapter. A directory
+    written by another family's adapter is not part of this comparison and is
+    not shown.
     """
     by_id = {c["id"]: c for c in cells}
     rate = per_row_seconds()
@@ -293,10 +293,8 @@ def remaining(cells: list[dict], show_transfer: bool = False) -> bool:
     print("\n  grille   (tous niveaux ; l'audit exclut le niveau 6)")
     head = "".join(f"{s:>11}" for s in STRATEGIES)
     print(f"    {'':<18}{head}")
-    variants = sorted({c["variant"] for c in cells if c["variant"]
-                       and (show_transfer or not c["variant"].startswith("_lora-"))})
-    hidden = sorted({c["variant"] for c in cells
-                     if c["variant"].startswith("_lora-")})
+    variants = [v for v in sorted({c["variant"] for c in cells if c["variant"]})
+                if v == "_lora"]
     todo, guessed = [], False
     for rel in RELATIONS:
         marks = []
@@ -333,9 +331,6 @@ def remaining(cells: list[dict], show_transfer: bool = False) -> bool:
             if any("·" not in x for x in row):
                 print(f"      {var.lstrip('_'):<16}" + "".join(row))
 
-    if hidden and not show_transfer:
-        print(f"\n  {len(hidden)} bras de transfert masqués — "
-              f"python3 scripts/status.py --transfer")
     if not todo:
         print("\n  les 15 cellules de référence sont calculées "
               "(voir coverage.py pour le reste du plan).")
@@ -407,10 +402,7 @@ def pending(cells: list[dict]) -> bool:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--transfer", action="store_true",
-                    help="also show the cross-family transfer arms, which are "
-                         "a separate experiment rather than part of the grid")
-    args = ap.parse_args()
+    ap.parse_args()
 
     pid, source = runner_pid()
     age_min = (time.time() - RUN_LOG.stat().st_mtime) / 60 if RUN_LOG.exists() else None
@@ -486,7 +478,7 @@ def main() -> int:
             else:
                 print(f"    {c['id']:<32}{c['seen']} lignes")
 
-    remaining(cells, show_transfer=args.transfer)
+    remaining(cells)
 
     adapters()
 
