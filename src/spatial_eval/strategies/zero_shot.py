@@ -12,6 +12,6 @@ class ZeroShot(Strategy):
 
     def build_prompt(self, ex: Example, ctx: Context) -> str:
         return (self.task_header(ctx.relation, ctx.labels)
-                + "\n" + self.question(ex)
+                + "\n" + self.question(ex, ctx)
                 + "\nAnswer with the label only.\n"
                 + self.answer_instruction())

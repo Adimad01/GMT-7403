@@ -39,6 +39,7 @@ class Example:
     label: str            # gold
     ambiguity_level: str
     text: str             # the natural-language description shown to the model
+    observer: str = ""    # relative rows only: the viewpoint the text states
 
     @property
     def key(self) -> str:
@@ -110,6 +111,8 @@ def load_examples(relation: str, limit: int | None = None,
             target=row[cols["object"]].strip(),
             label=row[cols["label"]].strip().lower(),
             ambiguity_level=row.get("ambiguity_level", "").strip(),
+            observer=(row.get(cols["observer"], "").strip()
+                      if "observer" in cols else ""),
             text=row.get(cols["text"], "").strip(),
         )
         if ex.label != entry["label"]:
@@ -177,6 +180,20 @@ def load_demos(relation: str) -> tuple[dict[str, list[Demo]], str]:
             ))
         demos[key] = items
     return demos, manifest["demo_map_sha256"]
+
+
+def load_kg(relation: str) -> dict[str, dict]:
+    """The stored facts for this relation's evaluation entities.
+
+    Built by data_generation/build_kg.py from the source each family's ground
+    truth was computed from, and checked by scripts/check_kg.py to hold no
+    statement of the relation under test.
+    """
+    path = relation_dir(relation) / "kg_eval.json"
+    if not path.exists():
+        raise FileNotFoundError(
+            f"{path} does not exist; run data_generation/build_kg.py")
+    return json.loads(path.read_text(encoding="utf-8"))["nodes"]
 
 
 def labels_for(relation: str) -> list[str]:

@@ -31,6 +31,10 @@ from .strategies import available
 def _add_model_args(p: argparse.ArgumentParser) -> None:
     g = p.add_argument_group("model")
     g.add_argument("--model-id", default=ModelConfig.model_id)
+    g.add_argument("--kg-mode", choices=["none", "input"], default="none",
+                   help="'input' puts the stored facts about the entities a "
+                        "question names in front of its description; results "
+                        "are written beside the plain run, not over it")
     g.add_argument("--adapter",
                    help="path to a LoRA adapter (adapters/<relation>); results "
                         "are written beside the base run, not over it")
@@ -45,7 +49,8 @@ def _model_from(args) -> ModelConfig:
     return ModelConfig(model_id=args.model_id, backend=args.backend,
                        max_new_tokens=args.max_new_tokens,
                        temperature=args.temperature, dtype=args.dtype,
-                       adapter=getattr(args, "adapter", None))
+                       adapter=getattr(args, "adapter", None),
+                       kg_mode=getattr(args, "kg_mode", "none"))
 
 
 def cmd_finetune(args) -> int:

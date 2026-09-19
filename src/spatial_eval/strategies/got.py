@@ -54,7 +54,7 @@ class GraphOfThought(Strategy):
             "a final one.",
         ]
         return (self.task_header(ctx.relation, ctx.labels)
-                + "\n" + self.question(ex)
+                + "\n" + self.question(ex, ctx)
                 + f"\nPartial analysis {i + 1}. {facets[i % len(facets)]}\n"
                   "Answer in at most three sentences.\n")
 
@@ -62,7 +62,7 @@ class GraphOfThought(Strategy):
         nodes = "\n\n".join(f"Thought {i + 1}: {t[:THOUGHT_CHARS]}"
                             for i, t in enumerate(thoughts))
         return (self.task_header(ctx.relation, ctx.labels)
-                + "\n" + self.question(ex)
+                + "\n" + self.question(ex, ctx)
                 + "\nThree partial analyses were produced. None is a final answer.\n\n"
                 + nodes
                 + "\n\nIn at most four sentences, say where these analyses agree, "

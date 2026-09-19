@@ -32,7 +32,7 @@ class TreeOfThought(Strategy):
             "what survives.",
         ]
         return (self.task_header(ctx.relation, ctx.labels)
-                + "\n" + self.question(ex)
+                + "\n" + self.question(ex, ctx)
                 + f"\nApproach {i + 1}: {angles[i % len(angles)]}\n"
                   "Give a short justification, then commit to one label.\n"
                 + self.answer_instruction())
@@ -55,7 +55,7 @@ class TreeOfThought(Strategy):
             for i, (lab, raw) in enumerate(candidates))
 
         adjudicate = (self.task_header(ctx.relation, ctx.labels)
-                      + "\n" + self.question(ex)
+                      + "\n" + self.question(ex, ctx)
                       + "\nThree independent analyses were produced:\n\n"
                       + summary
                       + "\n\nWeigh these against the description and decide which "

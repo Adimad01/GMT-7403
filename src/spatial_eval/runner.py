@@ -21,7 +21,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from .config import LOGS_DIR, RunConfig
-from .data import load_demos, load_examples, labels_for
+from .data import load_kg, load_demos, load_examples, labels_for
 from .model import Backend, build_backend
 from .strategies import Context, get_strategy
 
@@ -200,8 +200,13 @@ def run_cell(cfg: RunConfig, backend: Backend | None = None,
     if backend is None:
         backend = build_backend(cfg.model)
 
+    # The facts are loaded once per cell, not per row: the store is small and
+    # the same for every question in the cell.
+    kg = load_kg(cfg.relation) if cfg.model.kg_mode == "input" else None
+    if kg:
+        log.info("%s | knowledge store: %d entities", cfg.run_id, len(kg))
     ctx = Context(relation=cfg.relation, labels=labels, seed=cfg.seed,
-                  generate=backend.generate, demos=demos)
+                  generate=backend.generate, demos=demos, kg=kg)
 
     started = time.time()
     n_ok = n_err = 0

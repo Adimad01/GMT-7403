@@ -49,6 +49,7 @@ class Context:
     seed: int
     generate: callable              # (prompt, seed) -> str
     demos: dict[str, list[Demo]] | None = None
+    kg: dict[str, dict] | None = None   # stored facts, or None for no store
 
 
 class Strategy(ABC):
@@ -66,8 +67,43 @@ class Strategy(ABC):
                 f"Allowed answers: {', '.join(labels)}\n")
 
     @staticmethod
-    def question(ex: Example) -> str:
-        return (f"Description: {ex.text}\n"
+    def facts(ex: Example, ctx: "Context") -> str:
+        """Stored facts about the places this question names, or nothing.
+
+        Only those places. The store holds every evaluation entity, and
+        pasting all of them would bury the three that matter in several
+        hundred that do not, besides costing the context window.
+
+        The relation under test is never among these facts: the store is
+        built without it, and checked by scripts/check_kg.py.
+        """
+        if not ctx.kg:
+            return ""
+        names = [n for n in (ex.observer, ex.subject, ex.target) if n]
+        lines = []
+        for name in dict.fromkeys(names):          # keep order, drop repeats
+            f = ctx.kg.get(name)
+            if not f:
+                continue
+            bits = [f.get("kind", "place"),
+                    f"centre {f['lat']:.2f}, {f['lon']:.2f}"]
+            if f.get("extent_km"):
+                bits.append(f"extent {f['extent_km'][0]}x{f['extent_km'][1]} km")
+            if f.get("bbox"):
+                b = f["bbox"]
+                bits.append(f"bounds S{b[0]:.2f} W{b[1]:.2f} N{b[2]:.2f} E{b[3]:.2f}")
+            if f.get("context"):
+                bits.append("in " + ", ".join(f["context"]))
+            lines.append(f"- {name}: " + "; ".join(bits))
+        if not lines:
+            return ""
+        return "Known facts about these places:\n" + "\n".join(lines) + "\n\n"
+
+    @staticmethod
+    def question(ex: Example, ctx: "Context | None" = None) -> str:
+        head = Strategy.facts(ex, ctx) if ctx is not None else ""
+        return (head
+                + f"Description: {ex.text}\n"
                 f"Subject: {ex.subject}\n"
                 f"Object: {ex.target}\n"
                 f"Question: what is the relation of the subject with respect to "

@@ -38,5 +38,5 @@ class FewShot(Strategy):
                 f"ANSWER: {d.label}\n")
         return (self.task_header(ctx.relation, ctx.labels)
                 + "\nWorked examples:\n\n" + "\n".join(blocks)
-                + "\nNow the new case.\n\n" + self.question(ex)
+                + "\nNow the new case.\n\n" + self.question(ex, ctx)
                 + self.answer_instruction())

@@ -36,7 +36,8 @@ COLUMNS = {
     "cardinal": {"label": "relation_label", "subject": "source_entity",
                  "object": "target_entity", "text": "corpus"},
     "relative": {"label": "relation_label", "subject": "source_entity",
-                 "object": "target_entity", "text": "corpus"},
+                 "object": "target_entity", "text": "corpus",
+                 "observer": "observer_entity"},
 }
 
 TRAIN_COLUMNS = dict(COLUMNS)
@@ -49,6 +50,9 @@ class ModelConfig:
     # it is written into run.json: a fine-tuned score that cannot be told from
     # a base one by reading the result file is a score waiting to be misread.
     adapter: str | None = None
+    # "none" leaves the prompt as it was; "input" puts the stored facts about
+    # the entities the question names in front of the description.
+    kg_mode: str = "none"
     model_id: str = "openai/gpt-oss-20b"
     backend: str = "hf"                 # "hf" | "mock" (tests)
     max_new_tokens: int = 1024
@@ -81,15 +85,17 @@ class RunConfig:
         are the comparison, and resume would otherwise treat one as a partial
         copy of the other and skip the work.
         """
+        kg = "_kg" if self.model.kg_mode not in ("none", "", None) else ""
         if not self.model.adapter:
-            return ""
+            return kg
         # Which adapter answered has to be in the path, or a cross-family run
         # -- the cardinal adapter on the relative eval set, say -- would land
         # on the relative adapter's results and resume would call the work
         # already done. The plain "_lora" is kept when the adapter matches its
         # own family, so the paths already written stay where they are.
         name = Path(self.model.adapter).name
-        return "_lora" if name == self.relation else f"_lora-{name}"
+        lora = "_lora" if name == self.relation else f"_lora-{name}"
+        return lora + kg
 
     @property
     def run_id(self) -> str:
