@@ -473,11 +473,22 @@ def main() -> int:
             lo_b, hi_b = wilson(b["k"], b["n"])
             lo_f, hi_f = wilson(f["k"], f["n"])
             gained, lost, pv = mcnemar(f["correct_by_row"], b["correct_by_row"])
-            ft_tests.append({"rel": rel, "strat": f"{strat}{var}", "gained": gained,
-                             "lost": lost, "p": pv,
-                             "delta": f["k"] / f["n"] * 100 - b["k"] / b["n"] * 100})
             own = f"adapters/{rel}"
-            tag = "" if f["adapter"] == own else "   ← transfert"
+            # Few-shot on a fine-tuned model draws its demonstrations from the
+            # pool the adapter was trained on, so the model has seen them as
+            # training text. The arm is reportable with that said, but it is
+            # not comparable with the others and must not join the family the
+            # correction is computed over -- adding an arm that is certain to
+            # be significant would tighten the thresholds the clean arms face.
+            contaminated = (strat == "few_shot" and f["adapter"] == own)
+            tag = ("   ← démonstrations vues à l'entraînement" if contaminated
+                   else "" if f["adapter"] == own else "   ← transfert")
+            if not contaminated:
+                ft_tests.append({"rel": rel, "strat": f"{strat}{var}",
+                                 "gained": gained,
+                                 "lost": lost, "p": pv,
+                                 "delta": f["k"] / f["n"] * 100
+                                          - b["k"] / b["n"] * 100})
             print(f"\n  {rel} / {strat}   (adaptateur : {f['adapter']}){tag}")
             print(f"    base      {b['k']/b['n']*100:>5.1f} %  "
                   f"[{lo_b:.1f} – {hi_b:.1f}]   n={b['n']}")
@@ -485,9 +496,11 @@ def main() -> int:
                   f"[{lo_f:.1f} – {hi_f:.1f}]   n={f['n']}"
                   + (f"   ({f['unparsed']} non analysées)" if f["unparsed"] else ""))
             sign = "+" if gained > lost else "−" if lost > gained else "="
-            print(f"    écart     {ft_tests[-1]['delta']:+.1f} point(s)   "
+            delta = f["k"] / f["n"] * 100 - b["k"] / b["n"] * 100
+            print(f"    écart     {delta:+.1f} point(s)   "
                   f"{sign}{abs(gained - lost)} lignes nettes "
-                  f"(gagne {gained}, perd {lost})   p={pv:.4f}")
+                  f"(gagne {gained}, perd {lost})   p={pv:.4f}"
+                  + ("   [exclu de la correction]" if contaminated else ""))
 
         # Corrected as a family, for the same reason the strategy tests are.
         m = len(ft_tests)
@@ -511,7 +524,7 @@ def main() -> int:
         # question the base-model section answers, asked of the adapted model.
         within = []
         for (rel, strat, var), f in sorted(ft.items()):
-            if strat == "zero_shot" or var.startswith("_lora-"):
+            if strat in ("zero_shot", "few_shot") or var.startswith("_lora-"):
                 continue
             base_ft = ft.get((rel, "zero_shot", var))
             if not base_ft:
