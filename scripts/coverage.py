@@ -45,9 +45,16 @@ def main() -> int:
             missing = [s for s in applicable if not finished(rel, s, variant)]
             mark = "complet" if not missing else "manque : " + ", ".join(missing)
             print(f"    {rel:<14}{mark}")
-        if skip:
-            print(f"    {'':<14}(hors périmètre : {', '.join(sorted(skip))} — "
-                  f"démonstrations tirées du jeu d'entraînement)")
+        for st in sorted(skip):
+            missing = [r for r in RELATIONS if not finished(r, st, variant)]
+            state = "complet" if not missing else f"manque : {', '.join(missing)}"
+            print(f"    {'':<14}{st} — {state}")
+            print(f"    {'':<14}  décision, pas oubli : les démonstrations "
+                  f"viennent de train.csv,")
+            print(f"    {'':<14}  le jeu sur lequel l'adaptateur a été entraîné. "
+                  f"Le score serait")
+            print(f"    {'':<14}  optimiste. ~35 min par cellule si vous le "
+                  f"voulez quand même.")
 
     print("\n  TRANSFERT — l'adaptateur d'une famille sur l'évaluation d'une autre")
     pairs = [(a, b) for a in RELATIONS for b in RELATIONS if a != b]
@@ -68,6 +75,12 @@ def main() -> int:
         print(f"    {rel:<14}{st.get('epoch')} époques, "
               f"{'terminé' if st.get('finished') else 'INACHEVÉ'}"
               f"   instantanés : {', '.join(snaps) if snaps else 'aucun'}")
+
+    print("\n  TRANSFERT x STRATÉGIE")
+    others = [st for st in STRATEGIES if st != "zero_shot"]
+    print(f"    les 6 paires n'ont été mesurées qu'en zero_shot.")
+    print(f"    {len(pairs) * len(others)} combinaisons restantes "
+          f"(paire x {', '.join(others)}) — non prévues au plan.")
 
     print("\n  AXES NON EXPLORÉS")
     seeds = sorted({p.name for p in RESULTS.glob("*/*/seed*") if p.is_dir()})
