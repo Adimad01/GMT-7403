@@ -34,8 +34,16 @@ def main() -> int:
     print("  COUVERTURE EXPÉRIMENTALE")
     print("=" * 70)
 
-    for title, variant in (("BASE", ""), ("AFFINÉ (adaptateur de la famille)", "_lora")):
-        skip = EXCLUDED_WHEN_TUNED if variant else set()
+    # The four arms this design crosses: plain, adapter, knowledge store, and
+    # the two together. Listing only the first two made the knowledge cells
+    # invisible in the count, so a grid that was three cells into a new axis
+    # read as complete.
+    ARMS = (("BASE", ""),
+            ("AFFINÉ (adaptateur de la famille)", "_lora"),
+            ("BASE + BASE DE CONNAISSANCES", "_kg"),
+            ("AFFINÉ + BASE DE CONNAISSANCES", "_lora_kg"))
+    for title, variant in ARMS:
+        skip = EXCLUDED_WHEN_TUNED if "_lora" in variant else set()
         applicable = [s for s in STRATEGIES if s not in skip]
         done = [(r, s) for r in RELATIONS for s in applicable
                 if finished(r, s, variant)]
@@ -63,24 +71,34 @@ def main() -> int:
     print(f"    graines        seed 1 seulement"
           if not other else f"    graines        {sorted(other)}")
     print("    époques        aucune ablation 1 / 2 / 3")
-    print("    graphe KG      non commencé")
+    kg_built = all((REPO / "data" / r / "kg_eval.json").exists() for r in RELATIONS)
+    print(f"    base KG        {'construite et vérifiée' if kg_built else 'absente'}"
+          f" ; mode 'input' implémenté, 'rag' non")
 
     # What it would cost to close the gaps, at the rates already observed.
-    print("\n  COÛT DES CELLULES AFFINÉES MANQUANTES")
-    cheap = [(r, s) for r in RELATIONS for s in STRATEGIES
-             if s not in COSTLY and s not in EXCLUDED_WHEN_TUNED
-             and not finished(r, s, "_lora")]
-    dear = [(r, s) for r in RELATIONS for s in STRATEGIES
-            if s in COSTLY and not finished(r, s, "_lora")]
-    if not cheap and not dear:
+    print("\n  COÛT DE CE QUI MANQUE")
+    # Measured rates: a plain cell runs about 35 minutes at one call, four
+    # times that at four. An adapter answers in five tokens where the base
+    # model writes up to a thousand, so its cells take a couple of minutes.
+    total = 0.0
+    for title, variant in ARMS:
+        skip = EXCLUDED_WHEN_TUNED if "_lora" in variant else set()
+        cheap = [(r, s) for r in RELATIONS for s in STRATEGIES
+                 if s not in COSTLY and s not in skip
+                 and not finished(r, s, variant)]
+        dear = [(r, s) for r in RELATIONS for s in STRATEGIES
+                if s in COSTLY and not finished(r, s, variant)]
+        if not cheap and not dear:
+            continue
+        per_cheap = 2 / 60 if "_lora" in variant else 35 / 60
+        hours = len(cheap) * per_cheap + len(dear) * per_cheap * 4
+        total += hours
+        print(f"    {title:<36}{len(cheap) + len(dear):>2} cellule(s)"
+              f"   ~{hours:>5.1f} h")
+    if total:
+        print(f"    {'':<36}{'':>2}            ~{total:>5.1f} h au total")
+    else:
         print("    aucune")
-        return 0
-    if cheap:
-        print(f"    {len(cheap)} à un appel       ~{len(cheap) * 35} min   "
-              f"{', '.join(f'{r}/{s}' for r, s in cheap)}")
-    if dear:
-        print(f"    {len(dear)} à quatre appels  ~{len(dear) * 4.5:.0f} h   "
-              f"{', '.join(f'{r}/{s}' for r, s in dear)}")
     return 0
 
 
