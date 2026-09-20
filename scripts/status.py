@@ -293,8 +293,13 @@ def remaining(cells: list[dict]) -> bool:
     print("\n  grille   (tous niveaux ; l'audit exclut le niveau 6)")
     head = "".join(f"{s:>11}" for s in STRATEGIES)
     print(f"    {'':<18}{head}")
+    # Every arm of this comparison: the family's own adapter, the knowledge
+    # store, and the two together. A variant naming another family's adapter
+    # carries a hyphen -- that is the transfer experiment, not this grid.
+    # Matching "_lora" alone hid the knowledge-store cells as soon as they
+    # existed, which is how a finished run looked like one that never ran.
     variants = [v for v in sorted({c["variant"] for c in cells if c["variant"]})
-                if v == "_lora"]
+                if "-" not in v]
     todo, guessed = [], False
     for rel in RELATIONS:
         marks = []
