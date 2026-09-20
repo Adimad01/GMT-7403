@@ -404,15 +404,24 @@ def main() -> int:
     print()
 
     # ---- fine-tuning --------------------------------------------------
-    def variants(rel: str, strat: str) -> list[str]:
-        """The fine-tuned arm for this cell: the family's own adapter.
+    # What each arm is compared against: the thing it differs from by one
+    # change. The knowledge store and the adapter are each measured against
+    # the plain model; the two together are measured against the adapter, so
+    # the figure is what the store adds to a model that already learnt.
+    CONTROL = {"_lora": "", "_kg": "", "_lora_kg": "_lora"}
+    VARIES = {"_lora": "adaptateur", "_kg": "base de connaissances",
+              "_lora_kg": "base de connaissances, sur modèle affiné"}
 
-        Only "_lora" -- the adapter trained on this relation. Directories for
-        another family's adapter are left alone; this comparison is base
-        against fine-tuned within one relation, and nothing else.
+    def variants(rel: str, strat: str) -> list[str]:
+        """Every arm of this comparison written for this cell.
+
+        A variant naming another family's adapter carries a hyphen -- that is
+        the transfer experiment and not this. Listing only "_lora" hid the
+        knowledge-store cells the moment they existed.
         """
         d = RESULTS / rel / strat
-        return ["_lora"] if (d / "seed1_lora" / "run.json").exists() else []
+        return [v for v in CONTROL
+                if (d / f"seed1{v}" / "run.json").exists()]
 
     ft = {}
     for rel in relations:
@@ -445,14 +454,16 @@ def main() -> int:
 
     if ft:
         print("=" * 74)
-        print("  FINE-TUNING   (LoRA, un adaptateur par famille)")
+        print("  ADAPTATEUR ET BASE DE CONNAISSANCES   (chaque bras contre son témoin)")
         print("=" * 74)
         ft_tests = []
         for (rel, strat, var), f in sorted(ft.items()):
-            b = cells.get((rel, strat))
+            ctrl = CONTROL[var]
+            b = (cells.get((rel, strat)) if ctrl == ""
+                 else ft.get((rel, strat, ctrl)))
             if not b or not b["n"]:
                 continue
-            # Measured against the base arm, which is the row set the two
+            # Measured against its control, which is the row set the two
             # have to share for the paired test to mean anything -- not
             # against the manifest, whose level field is filtered elsewhere.
             missing = set(b["correct_by_row"]) - set(f["correct_by_row"])
@@ -477,7 +488,7 @@ def main() -> int:
             # not comparable with the others and must not join the family the
             # correction is computed over -- adding an arm that is certain to
             # be significant would tighten the thresholds the clean arms face.
-            contaminated = (strat == "few_shot" and f["adapter"] == own)
+            contaminated = (strat == "few_shot" and var.startswith("_lora"))
             tag = ("   ← démonstrations vues à l'entraînement"
                    if contaminated else "")
             if not contaminated:
@@ -486,10 +497,12 @@ def main() -> int:
                                  "lost": lost, "p": pv,
                                  "delta": f["k"] / f["n"] * 100
                                           - b["k"] / b["n"] * 100})
-            print(f"\n  {rel} / {strat}   (adaptateur : {f['adapter']}){tag}")
-            print(f"    base      {b['k']/b['n']*100:>5.1f} %  "
-                  f"[{lo_b:.1f} – {hi_b:.1f}]   n={b['n']}")
-            print(f"    fine-tuné {f['k']/f['n']*100:>5.1f} %  "
+            print(f"\n  {rel} / {strat}   — varie : {VARIES[var]}{tag}")
+            print(f"    témoin    {b['k']/b['n']*100:>5.1f} %  "
+                  f"[{lo_b:.1f} – {hi_b:.1f}]   n={b['n']}"
+                  + (f"   ({'sans' if ctrl == '' else 'affiné sans'} store)"
+                     if var.endswith("_kg") else ""))
+            print(f"    avec      {f['k']/f['n']*100:>5.1f} %  "
                   f"[{lo_f:.1f} – {hi_f:.1f}]   n={f['n']}"
                   + (f"   ({f['unparsed']} non analysées)" if f["unparsed"] else ""))
             sign = "+" if gained > lost else "−" if lost > gained else "="
