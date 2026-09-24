@@ -33,6 +33,13 @@ QUIET_OK_MIN = 20
 # sorted as available() sorts them.
 RELATIONS = ("topological", "cardinal", "relative")
 STRATEGIES = ("cot", "few_shot", "got", "tot", "zero_shot")
+# The arms the design crosses. A cell of any of them that has never been
+# started is still work the plan expects, which is not the same as work in
+# progress -- and saying TERMINÉ for the second made it sound like the first.
+ARMS = ("", "_lora", "_kg", "_lora_kg")
+# few-shot on a fine-tuned model draws its demos from the training pool, so
+# those cells are out of scope rather than outstanding.
+OUT_OF_SCOPE = {("_lora", "few_shot"), ("_lora_kg", "few_shot")}
 CELLS = len(RELATIONS) * len(STRATEGIES)
 
 # ToT and GoT issue four model calls per row against one for the rest, so a
@@ -434,10 +441,15 @@ def main() -> int:
                                      f"aucun processus, dernière écriture il y a "
                                      f"{age_min:.0f} min")
     else:
-        # No process and nothing outstanding is a finished run, not a stopped
-        # one. Printing ARRÊTÉ here sent the reader hunting for a failure that
-        # had not happened, moments after five cells completed normally.
-        verdict, detail = "TERMINÉ", "rien à calculer"
+        # No process and nothing half-done. That is not the same as the plan
+        # being finished, so the verdict says what it means and the count of
+        # cells never started is printed beside it.
+        planned = sum(1 for a in ARMS for rel in RELATIONS for strat in STRATEGIES
+                      if (a, strat) not in OUT_OF_SCOPE
+                      and not (RESULTS / rel / strat / f"seed1{a}" / "run.json").exists())
+        verdict = "AU REPOS"
+        detail = ("rien en cours, rien à reprendre" if not planned else
+                  f"rien en cours ; {planned} cellule(s) du plan jamais lancée(s)")
 
     sup = supervisor_pid()
 
@@ -447,7 +459,7 @@ def main() -> int:
     print(f"  {'':<10}source : {source}")
     # Only worth saying while something is running: with nothing to restart,
     # a missing watchdog is not a problem to report.
-    if verdict != "TERMINÉ":
+    if verdict != "AU REPOS":
         print(f"  {'':<10}superviseur : "
               + (f"pid {sup}, relance automatique active" if sup else
                  "ABSENT — aucune relance automatique en cas de plantage"))
