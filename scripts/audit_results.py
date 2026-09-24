@@ -21,6 +21,15 @@ REPO = Path(__file__).resolve().parents[1]
 RESULTS = REPO / "results"
 DATA = REPO / "data"
 RELATIONS = ("topological", "cardinal", "relative")
+
+# Below this many evaluation rows, a per-predicate accuracy is not a
+# measurement. 'equals' has five: two distinct places sharing one outline are
+# rare, and the catalogue holds eleven genuine pairs -- the other thirty-four
+# the geometry reports are one place under two names (France and the French
+# Republic), which would test name recognition rather than space. Five rows
+# give a Wilson interval from about 48 to 100 percent, so the 100 percent it
+# shows says nothing at all.
+MIN_SUPPORT = 20
 STRATEGIES = ("zero_shot", "cot", "few_shot", "tot", "got")
 
 # A strategy that issues several model calls per row should show it. A tree or
@@ -401,6 +410,36 @@ def main() -> int:
         print("  Aucun effet de stratégie n'est établi. Les tendances "
               "ci-dessus demandent")
         print("  d'être posées en hypothèse avant mesure, sur une seconde graine.")
+    print()
+
+    # ---- per-predicate support ----------------------------------------
+    print("=" * 74)
+    print("  PRÉDICATS TROP PEU REPRÉSENTÉS POUR ÊTRE MESURÉS")
+    print("=" * 74)
+    thin_any = False
+    for rel in relations:
+        c = cells.get((rel, "zero_shot"))
+        if not c:
+            continue
+        per = Counter(r.get("gold") for r in c["ok"])
+        thin = {g: n for g, n in per.items() if n < MIN_SUPPORT}
+        if not thin:
+            print(f"  {rel:<13}tous les prédicats ont au moins "
+                  f"{MIN_SUPPORT} lignes")
+            continue
+        thin_any = True
+        for g, n in sorted(thin.items()):
+            hit = sum(1 for r in c["ok"] if r.get("gold") == g and r.get("correct"))
+            lo, hi = wilson(hit, n)
+            print(f"  {rel:<13}{g:<12}{n:>3} ligne(s)   "
+                  f"exactitude {hit / n * 100:.0f} % mais IC [{lo:.0f} – {hi:.0f}]")
+            problems.append(
+                f"{rel}/{g}: {n} ligne(s) d'évaluation — exactitude à ne pas "
+                f"rapporter par prédicat")
+    if thin_any:
+        print("\n  Ces prédicats restent dans l'espace d'étiquettes : le modèle "
+              "doit pouvoir\n  les produire et ne pas les produire à tort. "
+              "Mais leur taux de réussite\n  ne se rapporte pas.")
     print()
 
     # ---- fine-tuning --------------------------------------------------
