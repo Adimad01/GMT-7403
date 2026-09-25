@@ -59,6 +59,57 @@ PAUSE=${PAUSE:-30}
 # comparison across all three relations in a couple of hours, and leaves the
 # expensive arms for last. Override with PASSES="..." to change it.
 PASSES=${PASSES:-"zero_shot cot few_shot tot got"}
+
+# Which arms to run, cheapest arm first, for the same reason. This script used
+# to run `cli run --all -s <strategy>` and nothing else, which is the base arm:
+# no adapter, no knowledge base. Once the base arm was complete, relaunching
+# after a cull did nothing at all -- it walked five finished passes and
+# reported "finished cleanly" while the cell status.py had just named as
+# pending sat untouched. The arm has to be part of what the supervisor knows.
+#
+#   base     the plain model
+#   kg       the plain model, facts prepended     (6 cells left, ~14 h)
+#   lora     the family's adapter                 (complete)
+#   lora_kg  the adapter and the facts together   (12 cells left, ~1 h)
+#
+# Default to what is actually missing. Add "base lora" back through ARMS if a
+# rerun is ever wanted; a complete arm still costs one model load per pass to
+# discover it has nothing to do, which is minutes, not seconds.
+ARMS=${ARMS:-"lora_kg kg"}
+RELATIONS=${RELATIONS:-"topological cardinal relative"}
+
+# One cell per process for the adapter arms: the adapter is baked into the
+# backend at build time, so a single process cannot serve two relations. That
+# costs a model load per cell. It is the price of banking each cell on its own
+# under a culler that gives no warning.
+run_pass() {
+    arm="$1"; strategy="$2"
+    case "${arm}" in
+        base)
+            python3 -m spatial_eval.cli run --all -s "${strategy}"
+            ;;
+        kg)
+            python3 -m spatial_eval.cli run --all -s "${strategy}" --kg-mode input
+            ;;
+        lora|lora_kg)
+            # few-shot draws its demonstrations from train.csv, the split the
+            # adapter was trained on, so the score would be optimistic. Out of
+            # scope by decision, not by oversight -- see coverage.py.
+            [ "${strategy}" = "few_shot" ] && return 0
+            extra=""
+            [ "${arm}" = "lora_kg" ] && extra="--kg-mode input"
+            for rel in ${RELATIONS}; do
+                python3 -m spatial_eval.cli run -r "${rel}" -s "${strategy}" \
+                    --adapter "adapters/${rel}" ${extra} || return $?
+            done
+            ;;
+        *)
+            echo "arm inconnu: ${arm} (base kg lora lora_kg)" >&2
+            return 64
+            ;;
+    esac
+}
+
 attempt=0
 
 while :; do
@@ -66,14 +117,16 @@ while :; do
     echo "=== attempt ${attempt} at $(date '+%Y-%m-%d %H:%M:%S') ==="
     mem_state
     status=0
-    for strategy in ${PASSES}; do
-        echo "--- pass: ${strategy} at $(date '+%H:%M:%S') ---"
-        python3 -m spatial_eval.cli run --all -s "${strategy}"
-        status=$?
-        # Stop at the first failure so the retry restarts from a known state.
-        # Re-running the passes that already succeeded costs almost nothing:
-        # resume never recomputes a finished row.
-        [ "${status}" -ne 0 ] && break
+    for arm in ${ARMS}; do
+        for strategy in ${PASSES}; do
+            echo "--- pass: ${arm} / ${strategy} at $(date '+%H:%M:%S') ---"
+            run_pass "${arm}" "${strategy}"
+            status=$?
+            # Stop at the first failure so the retry restarts from a known
+            # state. Re-running the passes that already succeeded costs almost
+            # nothing: resume never recomputes a finished row.
+            [ "${status}" -ne 0 ] && break 2
+        done
     done
     # A process killed outright leaves no traceback, so record the state that
     # usually explains it: 137 is SIGKILL, which on this host means the memory
