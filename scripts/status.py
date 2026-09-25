@@ -509,11 +509,14 @@ def main() -> int:
         print("  Démarrer le superviseur (il refusera de doubler le run en cours) :")
         print("    cd ~ && setsid nohup bash scripts/run_supervised.sh < /dev/null &")
 
-    if verdict == "TERMINÉ":
-        # Nothing is running and nothing is left to run: that is finished, not
-        # stopped. Printing the alarm and a relaunch command here sent the
-        # reader looking for a failure that had not happened.
-        pass
+    if verdict == "AU REPOS":
+        # Nothing running and nothing half-done. Offering to resume would be
+        # wrong -- there is nothing to resume -- and the supervisor only walks
+        # the base grid, so it would not start the cells that are missing
+        # either. Point at the inventory instead.
+        if "jamais lancée" in detail:
+            print("\n  Rien à reprendre. Pour voir les cellules qui restent :")
+            print("    python3 scripts/coverage.py")
     elif verdict != "EN COURS":
         print("\n  Relancer — la reprise conserve tout ce qui est déjà calculé :")
         print("    cd ~ && git pull --rebase origin main && \\")
