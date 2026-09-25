@@ -412,6 +412,56 @@ def pending(cells: list[dict]) -> bool:
                for rel in RELATIONS for strat in STRATEGIES)
 
 
+def supervisor_log() -> None:
+    """How the last supervised run ended, from the supervisor's own journal.
+
+    run.log records what the runner was computing. It says nothing about the
+    supervisor's decisions: which arm it had reached, whether a pass exited
+    non-zero, whether it gave up. Without that, a run that walked the wrong arm
+    and exited cleanly is indistinguishable from one the culler killed -- both
+    leave a stale last line and no process. Reading the two journals together
+    took two more commands, so in practice nobody read the second one.
+    """
+    logs = sorted((REPO / "logs").glob("supervisor-*.log"),
+                  key=lambda p: p.stat().st_mtime)
+    if not logs:
+        print("\n  journal du superviseur : aucun — run_supervised.sh "
+              "n'a jamais été lancé depuis ce conteneur")
+        return
+    newest = logs[-1]
+    lines = [l.rstrip() for l in
+             newest.read_text(encoding="utf-8", errors="replace").splitlines()
+             if l.strip()]
+    age = (time.time() - newest.stat().st_mtime) / 60
+    print(f"\n  journal du superviseur ({age:.0f} min)   {newest.name}")
+
+    passes = [l for l in lines if l.startswith("--- pass:")]
+    if passes:
+        print(f"    {len(passes)} passe(s) parcourue(s), "
+              f"dernière : {passes[-1][len('--- pass:'):].strip(' -')}")
+    else:
+        print("    aucune passe entamée")
+
+    # The supervisor brackets its own decisions in ===, which is the only
+    # place an exit code or a give-up is recorded.
+    verdicts = [l.strip("= ").strip() for l in lines if l.startswith("===")]
+    if verdicts:
+        for l in verdicts[-2:]:
+            print(f"    {l}")
+    else:
+        print("    aucun verdict écrit — tué avant de pouvoir en écrire un "
+              "(conteneur détruit)")
+
+    arms = [l for l in lines if l.startswith("--- pass:")]
+    seen = []
+    for l in arms:
+        a = l[len("--- pass:"):].strip().split("/")[0].strip()
+        if a not in seen:
+            seen.append(a)
+    if seen:
+        print(f"    bras visités : {', '.join(seen)}")
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.parse_args()
@@ -503,6 +553,8 @@ def main() -> int:
         tail = RUN_LOG.read_text(encoding="utf-8", errors="replace").splitlines()
         print(f"\n  dernière ligne du journal ({age_min:.0f} min) :")
         print(f"    {tail[-1][:100] if tail else '(vide)'}")
+
+    supervisor_log()
 
     if verdict == "EN COURS" and not sup:
         print("\n  Le calcul avance, mais rien ne le relancera s'il meurt.")
