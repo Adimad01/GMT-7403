@@ -67,15 +67,19 @@ PASSES=${PASSES:-"zero_shot cot few_shot tot got"}
 # reported "finished cleanly" while the cell status.py had just named as
 # pending sat untouched. The arm has to be part of what the supervisor knows.
 #
-#   base     the plain model
-#   kg       the plain model, facts prepended     (6 cells left, ~14 h)
+#   base     the plain model                      (complete)
+#   kg       the plain model, facts prepended     (5 cells left, ~12 h)
 #   lora     the family's adapter                 (complete)
-#   lora_kg  the adapter and the facts together   (12 cells left, ~1 h)
+#   lora_kg  the adapter and the facts together   (not in scope)
 #
-# Default to what is actually missing. Add "base lora" back through ARMS if a
-# rerun is ever wanted; a complete arm still costs one model load per pass to
-# discover it has nothing to do, which is minutes, not seconds.
-ARMS=${ARMS:-"lora_kg kg"}
+# The third experiment is the plain model with facts, compared against base and
+# against lora. Combining the adapter with the facts is a fourth arm nobody
+# asked for: it answers a different question, and running it first cost an hour
+# of GPU before the arm that was actually wanted got a turn. It stays reachable
+# through ARMS for whoever decides they want it, and out of the default until
+# then. The same goes for a rerun of a complete arm -- ARMS="base lora" -- which
+# still costs one model load per pass to discover it has nothing to do.
+ARMS=${ARMS:-"kg"}
 RELATIONS=${RELATIONS:-"topological cardinal relative"}
 
 # One cell per process for the adapter arms: the adapter is baked into the
