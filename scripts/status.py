@@ -174,6 +174,28 @@ def expected_rows(relation: str) -> int | None:
         return None
 
 
+def _proc_started_at(pid: int) -> float | None:
+    """Wall-clock time this pid began, in seconds since the epoch.
+
+    Needed to tell a cell the current run is writing from one a previous run
+    left half-finished. File age alone cannot decide it: a cell killed a minute
+    before the relaunch is fresher than anything the new run has had time to
+    touch, and was duly announced as "cellule en cours" while sitting
+    untouched -- on a run that had been restarted precisely because the
+    previous cell was going nowhere.
+    """
+    ticks = _start_ticks(pid)
+    if ticks is None:
+        return None
+    try:
+        for line in Path("/proc/stat").read_text(encoding="utf-8").splitlines():
+            if line.startswith("btime "):
+                return int(line.split()[1]) + ticks / os.sysconf("SC_CLK_TCK")
+    except Exception:
+        pass
+    return None
+
+
 def supervisor_pid() -> int | None:
     """The watchdog that restarts the runner after a crash.
 
@@ -533,7 +555,14 @@ def main() -> int:
         # Only one cell is ever being written. The others are part-finished
         # from an earlier session and wait for their pass to come round --
         # listing them all as "in progress" reads as several at once.
-        active = max(running, key=lambda c: c["touched"]) if pid else None
+        started = _proc_started_at(pid) if pid else None
+        if started is None:
+            active = max(running, key=lambda c: c["touched"]) if pid else None
+        else:
+            # A cell last written before this process existed is not the cell
+            # this process is writing, however recently it was touched.
+            fresh = [c for c in running if c["touched"] >= started - 5]
+            active = max(fresh, key=lambda c: c["touched"]) if fresh else None
         print()
         for c in sorted(running, key=lambda c: -c["touched"]):
             here = c is active
