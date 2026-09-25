@@ -434,7 +434,7 @@ def pending(cells: list[dict]) -> bool:
                for rel in RELATIONS for strat in STRATEGIES)
 
 
-def supervisor_log() -> None:
+def supervisor_log(running: bool) -> None:
     """How the last supervised run ended, from the supervisor's own journal.
 
     run.log records what the runner was computing. It says nothing about the
@@ -465,11 +465,17 @@ def supervisor_log() -> None:
         print("    aucune passe entamée")
 
     # The supervisor brackets its own decisions in ===, which is the only
-    # place an exit code or a give-up is recorded.
-    verdicts = [l.strip("= ").strip() for l in lines if l.startswith("===")]
+    # place an exit code or a give-up is recorded. The runner prints bare rules
+    # of the same character around its own banners, so a line that holds
+    # nothing once the rule is stripped is not a verdict -- printing those
+    # emitted two blank lines where the exit status was meant to be.
+    verdicts = [t for l in lines if l.startswith("===")
+                for t in [l.strip("= ").strip()] if t]
     if verdicts:
         for l in verdicts[-2:]:
             print(f"    {l}")
+    elif running:
+        print("    pas encore de verdict — la passe est en cours")
     else:
         print("    aucun verdict écrit — tué avant de pouvoir en écrire un "
               "(conteneur détruit)")
@@ -583,7 +589,7 @@ def main() -> int:
         print(f"\n  dernière ligne du journal ({age_min:.0f} min) :")
         print(f"    {tail[-1][:100] if tail else '(vide)'}")
 
-    supervisor_log()
+    supervisor_log(verdict == "EN COURS")
 
     if verdict == "EN COURS" and not sup:
         print("\n  Le calcul avance, mais rien ne le relancera s'il meurt.")
