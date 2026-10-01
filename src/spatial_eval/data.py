@@ -182,14 +182,19 @@ def load_demos(relation: str) -> tuple[dict[str, list[Demo]], str]:
     return demos, manifest["demo_map_sha256"]
 
 
-def load_kg(relation: str) -> dict[str, dict]:
-    """The stored facts for this relation's evaluation entities.
+def load_kg(relation: str, split: str = "eval") -> dict[str, dict]:
+    """The stored facts for this relation's entities, on one split.
+
+    The training store exists so an adapter can be fine-tuned on prompts that
+    already carry the facts. Without it, the only knowledge-graph arm possible
+    on a fine-tuned model shows it a prompt shape it never saw in training,
+    and a loss cannot be told apart from a loss caused by that mismatch.
 
     Built by data_generation/build_kg.py from the source each family's ground
     truth was computed from, and checked by scripts/check_kg.py to hold no
     statement of the relation under test.
     """
-    path = relation_dir(relation) / "kg_eval.json"
+    path = relation_dir(relation) / f"kg_{split}.json"
     if not path.exists():
         raise FileNotFoundError(
             f"{path} does not exist; run data_generation/build_kg.py")

@@ -26,7 +26,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 
 from .config import REPO_ROOT, ModelConfig, env_guards
-from .data import Example, labels_for, load_train
+from .data import Example, labels_for, load_kg, load_train
 from .strategies import Context, get_strategy
 
 log = logging.getLogger(__name__)
@@ -43,6 +43,10 @@ class FinetuneConfig:
     # experiment.
     exclude_levels: tuple[str, ...] = ("Level 6",)
     strategy: str = "zero_shot"     # the format the adapter is trained to answer in
+    # "input" prepends the stored facts to every training prompt, so the
+    # adapter learns the shape it will be evaluated on. The adapter lands in
+    # its own directory: the two are a comparison, not two copies.
+    kg_mode: str = "none"
     epochs: int = 3
     lr: float = 1e-4
     batch_size: int = 1
@@ -56,14 +60,22 @@ class FinetuneConfig:
 
     @property
     def out_dir(self) -> Path:
-        return ADAPTERS / self.relation
+        suffix = "_kg" if self.kg_mode not in ("none", "", None) else ""
+        return ADAPTERS / (self.relation + suffix)
 
 
-def _render(ex: Example, relation: str, strategy_name: str) -> tuple[str, str]:
-    """The prompt the model will see, and the answer it should produce."""
+def _render(ex: Example, relation: str, strategy_name: str,
+            kg_mode: str = "none") -> tuple[str, str]:
+    """The prompt the model will see, and the answer it should produce.
+
+    The facts come from the training store, never the evaluation one: an
+    adapter trained on the evaluation facts would have met the eval entities
+    during training, which is the leak the whole split exists to prevent.
+    """
     strategy = get_strategy(strategy_name)()
+    kg = load_kg(relation, "train") if kg_mode == "input" else None
     ctx = Context(relation=relation, labels=labels_for(relation),
-                  generate=lambda *a, **k: "", seed=0, demos=None)
+                  generate=lambda *a, **k: "", seed=0, demos=None, kg=kg)
     return strategy.build_prompt(ex, ctx), f"ANSWER: {ex.label}"
 
 
@@ -89,7 +101,7 @@ def train(cfg: FinetuneConfig) -> dict:
         tok.pad_token = tok.eos_token
 
     def encode(ex: Example):
-        prompt, answer = _render(ex, cfg.relation, cfg.strategy)
+        prompt, answer = _render(ex, cfg.relation, cfg.strategy, cfg.kg_mode)
         p_ids = tok(prompt, add_special_tokens=False)["input_ids"]
         a_ids = tok(answer + tok.eos_token, add_special_tokens=False)["input_ids"]
         # Truncate the prompt, never the answer: a clipped answer would teach

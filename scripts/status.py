@@ -36,10 +36,11 @@ STRATEGIES = ("cot", "few_shot", "got", "tot", "zero_shot")
 # The arms the design crosses. A cell of any of them that has never been
 # started is still work the plan expects, which is not the same as work in
 # progress -- and saying TERMINÉ for the second made it sound like the first.
-ARMS = ("", "_lora", "_kg", "_lora_kg")
+ARMS = ("", "_lora", "_kg", "_lora_kg", "_lorakg_kg")
 # few-shot on a fine-tuned model draws its demos from the training pool, so
 # those cells are out of scope rather than outstanding.
-OUT_OF_SCOPE = {("_lora", "few_shot"), ("_lora_kg", "few_shot")}
+OUT_OF_SCOPE = {("_lora", "few_shot"), ("_lora_kg", "few_shot"),
+                ("_lorakg_kg", "few_shot")}
 CELLS = len(RELATIONS) * len(STRATEGIES)
 
 # ToT and GoT issue four model calls per row against one for the rest, so a

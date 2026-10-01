@@ -70,7 +70,10 @@ PASSES=${PASSES:-"zero_shot cot few_shot tot got"}
 #   base     the plain model                      (complete)
 #   kg       the plain model, facts prepended     (5 cells left, ~12 h)
 #   lora     the family's adapter                 (complete)
-#   lora_kg  the adapter and the facts together   (not in scope)
+#   lora_kg  adapter trained WITHOUT the facts, facts at inference only
+#   lorakg_kg  adapter trained WITH the facts, facts at inference too: the
+#            matched condition, the only one that separates a gain from the
+#            facts from a loss caused by a prompt shape never seen in training
 #
 # The third experiment is the plain model with facts, compared against base and
 # against lora. Combining the adapter with the facts is a fourth arm nobody
@@ -95,6 +98,15 @@ run_pass() {
         kg)
             python3 -m spatial_eval.cli run --all -s "${strategy}" --kg-mode input
             ;;
+        lorakg_kg)
+            # Needs adapters/<rel>_kg, produced by
+            #   cli finetune --kg-mode input
+            [ "${strategy}" = "few_shot" ] && return 0
+            for rel in ${RELATIONS}; do
+                python3 -m spatial_eval.cli run -r "${rel}" -s "${strategy}" \
+                    --adapter "adapters/${rel}_kg" --kg-mode input || return $?
+            done
+            ;;
         lora|lora_kg)
             # few-shot draws its demonstrations from train.csv, the split the
             # adapter was trained on, so the score would be optimistic. Out of
@@ -108,7 +120,7 @@ run_pass() {
             done
             ;;
         *)
-            echo "arm inconnu: ${arm} (base kg lora lora_kg)" >&2
+            echo "arm inconnu: ${arm} (base kg lora lora_kg lorakg_kg)" >&2
             return 64
             ;;
     esac

@@ -69,6 +69,7 @@ def cmd_finetune(args) -> int:
             lr=args.lr, batch_size=args.batch_size, grad_accum=args.grad_accum,
             lora_r=args.lora_r, lora_alpha=args.lora_alpha,
             max_len=args.max_len, seed=args.seed,
+            kg_mode=args.kg_mode,
             exclude_levels=() if args.include_level_6 else ("Level 6",))
         print(f"\n  === {rel} ===")
         state = train(cfg)
@@ -78,8 +79,10 @@ def cmd_finetune(args) -> int:
         print(f"  adapter: {cfg.out_dir}")
     print("\n  Evaluate against the base model with:")
     for rel in relations:
+        suffix = "_kg" if args.kg_mode == "input" else ""
+        extra = " --kg-mode input" if args.kg_mode == "input" else ""
         print(f"    python3 -m spatial_eval.cli run -r {rel} -s zero_shot "
-              f"--adapter adapters/{rel}")
+              f"--adapter adapters/{rel}{suffix}{extra}")
     return 0
 
 
@@ -379,6 +382,9 @@ def build_parser() -> argparse.ArgumentParser:
     f.add_argument("--include-level-6", action="store_true",
                    help="train on level 6 too (the analysis excludes it, so "
                         "the default does as well)")
+    f.add_argument("--kg-mode", choices=["none", "input"], default="none",
+                   help="'input' trains on prompts that already carry the "
+                        "stored facts; the adapter lands in adapters/<rel>_kg")
     f.add_argument("--model-id", default=ModelConfig.model_id)
     f.add_argument("-v", "--verbose", action="store_true")
     f.set_defaults(func=cmd_finetune)

@@ -94,7 +94,15 @@ class RunConfig:
         # already done. The plain "_lora" is kept when the adapter matches its
         # own family, so the paths already written stay where they are.
         name = Path(self.model.adapter).name
-        lora = "_lora" if name == self.relation else f"_lora-{name}"
+        if name == self.relation:
+            lora = "_lora"
+        elif name == f"{self.relation}_kg":
+            # Fine-tuned on prompts that already carried the facts. Kept free
+            # of a hyphen so status.py lists it as an arm of the plan rather
+            # than as a cross-family probe.
+            lora = "_lorakg"
+        else:
+            lora = f"_lora-{name}"
         return lora + kg
 
     @property

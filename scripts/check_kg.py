@@ -30,14 +30,16 @@ def short(name: str) -> str:
 
 def main() -> int:
     problems = []
-    for rel in RELATIONS:
-        path = REPO / "data" / rel / "kg_eval.json"
+    # Both stores are checked. The training store is shown to the model
+    # during fine-tuning, so a leak there teaches the answer outright.
+    for rel, split in ((r, s) for r in RELATIONS for s in ("eval", "train")):
+        path = REPO / "data" / rel / f"kg_{split}.json"
         if not path.exists():
-            problems.append(f"{rel}: kg_eval.json absent")
+            problems.append(f"{rel}: kg_{split}.json absent")
             continue
         nodes = json.loads(path.read_text(encoding="utf-8"))["nodes"]
         rows = list(csv.DictReader(
-            (REPO / "data" / rel / "eval.csv").open(encoding="utf-8")))
+            (REPO / "data" / rel / f"{split}.csv").open(encoding="utf-8")))
         cols = ["source_entity", "target_entity"]
         if rel == "relative":
             cols.append("observer_entity")
@@ -58,15 +60,15 @@ def main() -> int:
         vague = [n for n, f in nodes.items()
                  if f.get("main_part_share", 1.0) < 0.35]
 
-        print(f"  {rel:<13}{len(nodes):>4} nœuds   "
+        print(f"  {rel:<13}{split:<6}{len(nodes):>4} nœuds   "
               f"{len(uncovered)} entité(s) sans fait   "
               f"{len(leaks)} fuite(s)   "
               f"{len(vague)} centroïde(s) peu représentatif(s)")
         if uncovered:
-            problems.append(f"{rel}: {len(uncovered)} entités sans fait "
+            problems.append(f"{rel}/{split}: {len(uncovered)} entités sans fait "
                             f"({', '.join(sorted(uncovered)[:4])})")
         if leaks:
-            problems.append(f"{rel}: {len(leaks)} ligne(s) dont un nœud nomme "
+            problems.append(f"{rel}/{split}: {len(leaks)} ligne(s) dont un nœud nomme "
                             f"l'autre entité — ex. {leaks[0]}")
         if vague:
             print(f"    {'':<13}dont : {', '.join(vague[:4])}")

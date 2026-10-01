@@ -1,4 +1,4 @@
-"""Build the knowledge base for the evaluation entities.
+"""Build the knowledge base, for both splits.
 
 Facts about places, never the relation being asked. The point of the arm this
 feeds is to separate two failures that an accuracy cannot tell apart: not
@@ -188,9 +188,13 @@ def main() -> int:
     coords = load_coords()
     print(f"  sources : {len(geometry)} géométries, {len(coords)} villes\n")
 
-    for rel in RELATIONS:
+    # Both splits. The evaluation store feeds the knowledge-graph arms; the
+    # training store feeds an adapter fine-tuned on prompts that already carry
+    # the facts, which is the only way to tell a gain from the facts apart
+    # from a loss caused by a prompt shape the adapter has never seen.
+    for rel, split in ((r, s) for r in RELATIONS for s in ("eval", "train")):
         rows = list(csv.DictReader(
-            (REPO / "data" / rel / "eval.csv").open(encoding="utf-8")))
+            (REPO / "data" / rel / f"{split}.csv").open(encoding="utf-8")))
         cols = ["source_entity", "target_entity"]
         if rel == "relative":
             cols.append("observer_entity")
@@ -209,7 +213,7 @@ def main() -> int:
             else:
                 missing.append(n)
 
-        out = REPO / "data" / rel / "kg_eval.json"
+        out = REPO / "data" / rel / f"kg_{split}.json"
         out.write_text(json.dumps({
             "relation": rel,
             "n_nodes": len(nodes),
@@ -220,7 +224,7 @@ def main() -> int:
         by_source = {}
         for f in nodes.values():
             by_source[f["source"]] = by_source.get(f["source"], 0) + 1
-        print(f"  {rel:<13}{len(nodes)}/{len(names)} entités "
+        print(f"  {rel:<13}{split:<6}{len(nodes)}/{len(names)} entités "
               f"({len(nodes)/len(names)*100:.0f} %)   {by_source}")
         if missing:
             print(f"    manquantes ({len(missing)}) : {', '.join(missing[:5])}")
