@@ -101,6 +101,18 @@ run_pass() {
         lorakg_kg)
             # Needs adapters/<rel>_kg, produced by
             #   cli finetune --kg-mode input
+            # Checked here rather than left to fail: a missing directory
+            # raises inside the runner, the supervisor reads a non-zero exit
+            # as a crash, and fifty retries later the log says nothing a
+            # reader can act on.
+            for rel in ${RELATIONS}; do
+                if [ ! -d "adapters/${rel}_kg" ]; then
+                    echo "    adapters/${rel}_kg absent." >&2
+                    echo "    Entraîner d'abord :" >&2
+                    echo "      python3 -m spatial_eval.cli finetune --kg-mode input -v" >&2
+                    return 64
+                fi
+            done
             [ "${strategy}" = "few_shot" ] && return 0
             for rel in ${RELATIONS}; do
                 python3 -m spatial_eval.cli run -r "${rel}" -s "${strategy}" \
@@ -156,6 +168,11 @@ while :; do
 
     if [ "${status}" -eq 0 ]; then
         echo "=== finished cleanly at $(date '+%Y-%m-%d %H:%M:%S') ==="
+        break
+    fi
+    if [ "${status}" -eq 64 ]; then
+        # Bad configuration, not a crash: retrying cannot fix it.
+        echo "=== configuration incomplète ; rien à relancer ==="
         break
     fi
     if [ "${status}" -eq 2 ]; then
