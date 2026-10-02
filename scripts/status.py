@@ -161,6 +161,21 @@ def runner_pid() -> tuple[int | None, str]:
     return None, "aucun"
 
 
+
+def finetune_pid() -> int | None:
+    """The pid of a fine-tuning process, which holds no lock.
+
+    Only `cli run` takes the results lock, so a three-hour fine-tune left the
+    banner reading AU REPOS -- nothing running, nothing to resume -- while a
+    GPU was busy the whole time. The adapters block below would eventually
+    show it, but only once the first checkpoint lands.
+    """
+    for pid, cmd in _processes("spatial_eval"):
+        if "python" in cmd and "spatial_eval.cli" in cmd and "finetune" in cmd:
+            return pid
+    return None
+
+
 def expected_rows(relation: str) -> int | None:
     """How many rows a cell of this relation is meant to cover.
 
@@ -519,6 +534,12 @@ def main() -> int:
         verdict, detail = "ARRÊTÉ", ("aucun processus" if age_min is None else
                                      f"aucun processus, dernière écriture il y a "
                                      f"{age_min:.0f} min")
+    elif (ft := finetune_pid()):
+        ft_age = process_age(ft)
+        verdict, detail = ("ENTRAÎNEMENT",
+                           f"pid {ft}, adaptateur en cours d'entraînement"
+                           + (f" depuis {ft_age / 60:.0f} min" if ft_age else ""))
+        source = "table des processus"
     else:
         # No process and nothing half-done. That is not the same as the plan
         # being finished, so the verdict says what it means and the count of
@@ -538,7 +559,7 @@ def main() -> int:
     print(f"  {'':<10}source : {source}")
     # Only worth saying while something is running: with nothing to restart,
     # a missing watchdog is not a problem to report.
-    if verdict != "AU REPOS":
+    if verdict not in ("AU REPOS", "ENTRAÎNEMENT"):
         print(f"  {'':<10}superviseur : "
               + (f"pid {sup}, relance automatique active" if sup else
                  "ABSENT — aucune relance automatique en cas de plantage"))
@@ -605,6 +626,9 @@ def main() -> int:
         if "jamais lancée" in detail:
             print("\n  Rien à reprendre. Pour voir les cellules qui restent :")
             print("    python3 scripts/coverage.py")
+    elif verdict == "ENTRAÎNEMENT":
+        print("\n  Suivre l'entraînement :")
+        print("    tail -f logs/finetune.log | grep -v 'urllib3\\|bitsandbytes'")
     elif verdict != "EN COURS":
         print("\n  Relancer — la reprise conserve tout ce qui est déjà calculé :")
         print("    cd ~ && git pull --rebase origin main && \\")
