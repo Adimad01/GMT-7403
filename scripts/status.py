@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import shlex
 import os
 import statistics
 import subprocess
@@ -630,8 +631,18 @@ def main() -> int:
         print("\n  Suivre l'entraînement :")
         print("    tail -f logs/finetune.log | grep -v 'urllib3\\|bitsandbytes'")
     elif verdict != "EN COURS":
+        # The supervisor walks ARMS, which defaults to one arm. Printing the
+        # bare command when the unfinished cell belongs to another arm sends
+        # the reader to a run that completes without touching it, and reports
+        # success for it. Name the arms that still owe cells.
+        todo = sorted({a for a in ARMS for rel in RELATIONS for strat in STRATEGIES
+                       if (a, strat) not in OUT_OF_SCOPE
+                       and not (RESULTS / rel / strat / f"seed1{a}" / "run.json").exists()})
+        arms = " ".join(a.lstrip("_") or "base" for a in todo)
         print("\n  Relancer — la reprise conserve tout ce qui est déjà calculé :")
         print("    cd ~ && git pull --rebase origin main && \\")
+        if arms:
+            print(f"      ARMS={shlex.quote(arms)} \\")
         print("      setsid nohup bash scripts/run_supervised.sh < /dev/null &")
     return 0
 
