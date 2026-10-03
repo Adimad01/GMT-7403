@@ -41,7 +41,12 @@ def main() -> int:
     ARMS = (("BASE", ""),
             ("AFFINÉ (adaptateur de la famille)", "_lora"),
             ("BASE + BASE DE CONNAISSANCES", "_kg"),
-            ("AFFINÉ + BASE DE CONNAISSANCES", "_lora_kg"))
+            ("AFFINÉ SANS LE GRAPHE + GRAPHE À L'ÉVALUATION", "_lora_kg"),
+            # The matched condition: adapter trained WITH the graph, graph at
+            # inference too. Absent from this list, twelve finished cells were
+            # invisible and the inventory answered "complete" about a plan it
+            # was not counting.
+            ("AFFINÉ AVEC LE GRAPHE + GRAPHE À L'ÉVALUATION", "_lorakg_kg"))
     for title, variant in ARMS:
         skip = EXCLUDED_WHEN_TUNED if "_lora" in variant else set()
         applicable = [s for s in STRATEGIES if s not in skip]
