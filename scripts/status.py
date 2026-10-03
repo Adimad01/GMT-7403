@@ -57,6 +57,14 @@ MULTI_CALL = {"tot", "got"}
 # header for a 13-character strategy ran into its neighbour.
 COL = max(11, max(len(s) for s in STRATEGIES) + 1)
 
+# run_supervised.sh walks the passes cheapest first. The relaunch hint below
+# prints them in that same order, so the command it suggests banks the cheap
+# cells before the expensive ones exactly as an unaided run would.
+PASS_ORDER = ("zero_shot", "cot", "few_shot", "few_shot_eval", "tot", "got")
+# A strategy missing here would be dropped from the printed PASSES, and the
+# command would quietly skip the cell it was meant to run.
+assert set(PASS_ORDER) == set(STRATEGIES), set(STRATEGIES) ^ set(PASS_ORDER)
+
 # A strategy with no measured rows yet is costed from the median of its
 # call-count class, which for a long-prompt strategy lands near the cheapest
 # ones: few_shot_eval was quoted at three minutes for a job of several hours.
@@ -590,11 +598,15 @@ def main() -> int:
     # The grid below carries each finished cell's accuracy, so listing them
     # again here would only repeat it. Failures do not appear there, and are
     # the one thing worth interrupting for.
+    # Width from the names actually present: at 32 a long id ran into the
+    # progress bar beside it.
+    idw = max(32, max((len(c["id"]) for c in cells), default=32) + 2)
+
     broken = [c for c in done if c["ok"] < c["total"]]
     if broken:
         print("\n  lignes en échec :")
         for c in broken:
-            print(f"    {c['id']:<32}{c['total'] - c['ok']} sur {c['total']}")
+            print(f"    {c['id']:<{idw}}{c['total'] - c['ok']} sur {c['total']}")
 
     if running:
         width = 30
@@ -615,10 +627,10 @@ def main() -> int:
             print("  cellule en cours :" if here else "  reprise en attente :")
             if c["total"]:
                 filled = round(width * c["seen"] / c["total"])
-                print(f"    {c['id']:<32}[{'#' * filled}{'.' * (width - filled)}] "
+                print(f"    {c['id']:<{idw}}[{'#' * filled}{'.' * (width - filled)}] "
                       f"{c['seen']}/{c['total']}  ({c['seen'] / c['total'] * 100:.0f} %)")
             else:
-                print(f"    {c['id']:<32}{c['seen']} lignes")
+                print(f"    {c['id']:<{idw}}{c['seen']} lignes")
 
     remaining(cells)
 
@@ -652,14 +664,23 @@ def main() -> int:
         # bare command when the unfinished cell belongs to another arm sends
         # the reader to a run that completes without touching it, and reports
         # success for it. Name the arms that still owe cells.
-        todo = sorted({a for a in ARMS for rel in RELATIONS for strat in STRATEGIES
-                       if (a, strat) not in OUT_OF_SCOPE
-                       and not (RESULTS / rel / strat / f"seed1{a}" / "run.json").exists()})
-        arms = " ".join(a.lstrip("_") or "base" for a in todo)
+        owed = [(a, strat) for a in ARMS for rel in RELATIONS for strat in STRATEGIES
+                if (a, strat) not in OUT_OF_SCOPE
+                and not (RESULTS / rel / strat / f"seed1{a}" / "run.json").exists()]
+        arms = " ".join(sorted({a.lstrip("_") or "base" for a, _ in owed}))
+        # Naming the passes too, when the work left sits in a subset of them.
+        # Without it the supervisor walks all six strategies on every arm; the
+        # finished cells are skipped, but each arm still pays a model load per
+        # pass to discover there is nothing to do.
+        left = {strat for _, strat in owed}
+        passes = (" ".join(p for p in PASS_ORDER if p in left)
+                  if left and len(left) < len(STRATEGIES) else "")
         print("\n  Relancer — la reprise conserve tout ce qui est déjà calculé :")
         print("    cd ~ && git pull --rebase origin main && \\")
         if arms:
             print(f"      ARMS={shlex.quote(arms)} \\")
+        if passes:
+            print(f"      PASSES={shlex.quote(passes)} \\")
         print("      setsid nohup bash scripts/run_supervised.sh < /dev/null &")
     return 0
 
