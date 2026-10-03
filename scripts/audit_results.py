@@ -30,11 +30,12 @@ RELATIONS = ("topological", "cardinal", "relative")
 # give a Wilson interval from about 48 to 100 percent, so the 100 percent it
 # shows says nothing at all.
 MIN_SUPPORT = 20
-STRATEGIES = ("zero_shot", "cot", "few_shot", "tot", "got")
+STRATEGIES = ("zero_shot", "cot", "few_shot", "few_shot_eval", "tot", "got")
 
 # A strategy that issues several model calls per row should show it. A tree or
 # graph arm reporting one call is not doing what its name claims.
-EXPECTED_CALLS = {"zero_shot": 1, "cot": 1, "few_shot": 1, "tot": 4, "got": 4}
+EXPECTED_CALLS = {"zero_shot": 1, "cot": 1, "few_shot": 1,
+                  "few_shot_eval": 1, "tot": 4, "got": 4}
 
 
 def wilson(k: int, n: int, z: float = 1.96) -> tuple[float, float]:
@@ -104,9 +105,19 @@ def manifest(relation: str) -> dict | None:
         return None
 
 
-def demo_manifest_hash(relation: str) -> str | None:
+# Which manifest pins each strategy's demonstrations. Checking few_shot_eval
+# against the train-sourced file would report every one of its cells as using
+# stale demonstrations.
+DEMO_MANIFEST = {"few_shot": "fewshot_manifest.json",
+                 "few_shot_eval": "fewshot_manifest_eval.json"}
+
+
+def demo_manifest_hash(relation: str, strategy: str = "few_shot") -> str | None:
+    name = DEMO_MANIFEST.get(strategy)
+    if not name:
+        return None
     try:
-        return json.loads((DATA / relation / "fewshot_manifest.json")
+        return json.loads((DATA / relation / name)
                           .read_text(encoding="utf-8")).get("demo_map_sha256")
     except Exception:
         return None
@@ -152,9 +163,11 @@ def main() -> int:
         # against the same wrong data.
         gold_of = {r["row_index"]: r["label"] for r in man["rows"]} if man else {}
         disk_hash = man.get("manifest_sha256") if man else None
-        disk_demo = demo_manifest_hash(rel)
         hashes, demo_hashes = set(), set()
         for strat in STRATEGIES:
+            # Per strategy, not per relation: the two few-shot variants pin
+            # different pools and so hash differently by design.
+            disk_demo = demo_manifest_hash(rel, strat)
             rows, meta = load(rel, strat)
             # run.json counts every row the cell ran, so its total must be
             # checked before any level is filtered out of the analysis.
@@ -189,7 +202,7 @@ def main() -> int:
             if meta:
                 if meta.get("eval_manifest_sha256"):
                     hashes.add(meta["eval_manifest_sha256"])
-                if strat == "few_shot" and meta.get("fewshot_manifest_sha256"):
+                if strat in DEMO_MANIFEST and meta.get("fewshot_manifest_sha256"):
                     demo_hashes.add(meta["fewshot_manifest_sha256"])
 
             ok = [r for r in rows if r.get("status") == "ok"]
@@ -231,7 +244,7 @@ def main() -> int:
                 problems.append(
                     f"{rel}/{strat}: produit sous un manifeste qui n'est plus "
                     f"celui du dépôt — les lignes évaluées ne sont plus celles-là")
-            if strat == "few_shot" and meta and disk_demo \
+            if strat in DEMO_MANIFEST and meta and disk_demo \
                     and meta.get("fewshot_manifest_sha256") \
                     and meta["fewshot_manifest_sha256"] != disk_demo:
                 flags.append("démonstrations obsolètes")
@@ -527,6 +540,9 @@ def main() -> int:
             # not comparable with the others and must not join the family the
             # correction is computed over -- adding an arm that is certain to
             # be significant would tighten the thresholds the clean arms face.
+            # Exact name, not a prefix: few_shot_eval draws from the eval
+            # split, which no adapter was trained on, so it is clean here and
+            # belongs in the family the correction is computed over.
             contaminated = (strat == "few_shot" and var.startswith("_lora"))
             tag = ("   ← démonstrations vues à l'entraînement"
                    if contaminated else "")
@@ -573,6 +589,10 @@ def main() -> int:
         # question the base-model section answers, asked of the adapted model.
         within = []
         for (rel, strat, var), f in sorted(ft.items()):
+            # zero_shot is the reference this compares against, and few_shot
+            # is contaminated on a tuned arm. few_shot_eval is deliberately
+            # absent from this list: it is the one few-shot number that can be
+            # asked whether it beats zero-shot on the adapted model.
             if strat in ("zero_shot", "few_shot") or var.startswith("_lora-"):
                 continue
             base_ft = ft.get((rel, "zero_shot", var))

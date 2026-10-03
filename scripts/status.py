@@ -33,13 +33,17 @@ QUIET_OK_MIN = 20
 # The grid the runner walks, in its order: relations outer, strategies inner,
 # sorted as available() sorts them.
 RELATIONS = ("topological", "cardinal", "relative")
-STRATEGIES = ("cot", "few_shot", "got", "tot", "zero_shot")
+STRATEGIES = ("cot", "few_shot", "few_shot_eval", "got", "tot", "zero_shot")
 # The arms the design crosses. A cell of any of them that has never been
 # started is still work the plan expects, which is not the same as work in
 # progress -- and saying TERMINÉ for the second made it sound like the first.
 ARMS = ("", "_lora", "_kg", "_lora_kg", "_lorakg_kg")
 # few-shot on a fine-tuned model draws its demos from the training pool, so
 # those cells are out of scope rather than outstanding.
+# few_shot draws its demonstrations from train.csv, which is the set the
+# adapters were fitted on, so the number would be optimistic for every tuned
+# arm. few_shot_eval draws from the eval split instead, which no adapter has
+# seen, and is therefore in scope everywhere -- that is what it exists for.
 OUT_OF_SCOPE = {("_lora", "few_shot"), ("_lora_kg", "few_shot"),
                 ("_lorakg_kg", "few_shot")}
 CELLS = len(RELATIONS) * len(STRATEGIES)
@@ -48,6 +52,16 @@ CELLS = len(RELATIONS) * len(STRATEGIES)
 # single average over all strategies would badly misestimate whichever is
 # left. Used only as a fallback when a strategy has no measured rows yet.
 MULTI_CALL = {"tot", "got"}
+
+# Grid column width, from the longest name rather than a constant: at 11 the
+# header for a 13-character strategy ran into its neighbour.
+COL = max(11, max(len(s) for s in STRATEGIES) + 1)
+
+# A strategy with no measured rows yet is costed from the median of its
+# call-count class, which for a long-prompt strategy lands near the cheapest
+# ones: few_shot_eval was quoted at three minutes for a job of several hours.
+# Where a measured strategy shares the prompt shape, use it instead.
+RATE_PROXY = {"few_shot_eval": "few_shot"}
 
 
 def _start_ticks(pid: int) -> int | None:
@@ -330,6 +344,9 @@ def remaining(cells: list[dict]) -> bool:
     def rate_for(strat: str) -> float | None:
         if strat in rate:
             return rate[strat]
+        proxy = RATE_PROXY.get(strat)
+        if proxy and proxy in rate:
+            return rate[proxy]
         pool = multi if strat in MULTI_CALL else single
         return statistics.median(pool) if pool else None
 
@@ -337,7 +354,7 @@ def remaining(cells: list[dict]) -> bool:
     # audit_results.py, which excludes it. This is a progress view; the audit
     # is where a number is meant to be read.
     print("\n  grille   (tous niveaux ; l'audit exclut le niveau 6)")
-    head = "".join(f"{s:>11}" for s in STRATEGIES)
+    head = "".join(f"{s:>{COL}}" for s in STRATEGIES)
     print(f"    {'':<18}{head}")
     # Every arm of this comparison: the family's own adapter, the knowledge
     # store, and the two together. A variant naming another family's adapter
@@ -354,11 +371,11 @@ def remaining(cells: list[dict]) -> bool:
             total = c["total"] if c else expected_rows(rel)
             seen = c["seen"] if c else 0
             if c and c["done"]:
-                marks.append(f"{c['acc'] * 100:>10.1f}%")
+                marks.append(f"{c['acc'] * 100:>{COL - 1}.1f}%")
             elif seen:
-                marks.append(f"{seen / total * 100:>10.0f}%" if total else f"{seen:>11}")
+                marks.append(f"{seen / total * 100:>{COL - 1}.0f}%" if total else f"{seen:>{COL}}")
             else:
-                marks.append(f"{'·':>11}")
+                marks.append(f"{'·':>{COL}}")
             if not (c and c["done"]) and total:
                 left = total - seen
                 r = rate_for(strat)
@@ -374,11 +391,11 @@ def remaining(cells: list[dict]) -> bool:
             for strat in STRATEGIES:
                 c = by_id.get(f"{rel}__{strat}__seed1{var}")
                 if c and c["done"]:
-                    row.append(f"{c['acc'] * 100:>10.1f}%")
+                    row.append(f"{c['acc'] * 100:>{COL - 1}.1f}%")
                 elif c and c["total"]:
-                    row.append(f"{c['seen'] / c['total'] * 100:>10.0f}%")
+                    row.append(f"{c['seen'] / c['total'] * 100:>{COL - 1}.0f}%")
                 else:
-                    row.append(f"{'·':>11}")
+                    row.append(f"{'·':>{COL}}")
             if any("·" not in x for x in row):
                 print(f"      {var.lstrip('_'):<16}" + "".join(row))
 

@@ -58,7 +58,7 @@ PAUSE=${PAUSE:-30}
 # at eighty percent is worth nothing until it completes. This order buys a
 # comparison across all three relations in a couple of hours, and leaves the
 # expensive arms for last. Override with PASSES="..." to change it.
-PASSES=${PASSES:-"zero_shot cot few_shot tot got"}
+PASSES=${PASSES:-"zero_shot cot few_shot few_shot_eval tot got"}
 
 # Which arms to run, cheapest arm first, for the same reason. This script used
 # to run `cli run --all -s <strategy>` and nothing else, which is the base arm:
@@ -122,7 +122,9 @@ run_pass() {
         lora|lora_kg)
             # few-shot draws its demonstrations from train.csv, the split the
             # adapter was trained on, so the score would be optimistic. Out of
-            # scope by decision, not by oversight -- see coverage.py.
+            # scope by decision, not by oversight -- see coverage.py. The test
+            # is on the whole name on purpose: few_shot_eval draws from the
+            # eval split, is in scope here, and must not be caught by a prefix.
             [ "${strategy}" = "few_shot" ] && return 0
             extra=""
             [ "${arm}" = "lora_kg" ] && extra="--kg-mode input"

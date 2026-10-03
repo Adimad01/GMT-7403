@@ -140,16 +140,30 @@ def load_examples(relation: str, limit: int | None = None,
     return examples, manifest["manifest_sha256"]
 
 
-def load_demos(relation: str) -> tuple[dict[str, list[Demo]], str]:
+def load_demos(relation: str,
+               source: str = "train") -> tuple[dict[str, list[Demo]], str]:
     """Return eval-row-key -> demonstrations, and the demo map hash.
 
     Few-shot demos are pinned for the same reason the eval set is: sampling them
     at run time would give different arms different demonstrations for the same
     question, and the comparison would no longer be about the strategy.
+
+    `source` picks which pool the demonstrations come from. "train" is the
+    original: rows the LoRA adapters were fitted on, so a fine-tuned model's
+    few-shot prompt is built from text it was trained on and the score is
+    optimistic. "eval" reads the second manifest, whose rows no adapter has
+    seen, which is what makes the strategy comparable across the arms. The two
+    are separate manifests and separate result cells; never merge their numbers.
     """
-    path = relation_dir(relation) / "fewshot_manifest.json"
+    if source not in ("train", "eval"):
+        raise ValueError(f"unknown demo source {source!r}; use 'train' or 'eval'")
+    name = ("fewshot_manifest.json" if source == "train"
+            else "fewshot_manifest_eval.json")
+    path = relation_dir(relation) / name
     if not path.exists():
-        raise ManifestError(f"missing few-shot manifest: {path}")
+        hint = ("scripts/build_splits.py" if source == "train"
+                else "scripts/build_fewshot_eval.py")
+        raise ManifestError(f"missing few-shot manifest: {path}. Build it with {hint}")
     manifest = json.loads(path.read_text(encoding="utf-8"))
 
     eval_manifest = load_eval_manifest(relation)
@@ -160,15 +174,23 @@ def load_demos(relation: str) -> tuple[dict[str, list[Demo]], str]:
             "few-shot arms.")
 
     cols = COLUMNS[relation]
-    train = _read_csv(relation_dir(relation) / "train.csv")
+    pool_name = "train.csv" if source == "train" else "eval.csv"
+    train = _read_csv(relation_dir(relation) / pool_name)
 
     demos: dict[str, list[Demo]] = {}
     for key, idxs in manifest["demos"].items():
+        # A row demonstrating itself would be shown its own gold label and then
+        # scored on repeating it. The builder excludes it; this refuses to run
+        # on a manifest where that guarantee was lost.
+        if source == "eval" and int(key) in idxs:
+            raise ManifestError(
+                f"{relation}: eval row {key} appears among its own "
+                f"demonstrations. Rebuild with scripts/build_fewshot_eval.py")
         items = []
         for i in idxs:
             if i >= len(train):
                 raise ManifestError(
-                    f"{relation}: demo index {i} out of range for train.csv "
+                    f"{relation}: demo index {i} out of range for {pool_name} "
                     f"({len(train)} rows).")
             r = train[i]
             items.append(Demo(

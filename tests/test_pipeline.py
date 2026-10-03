@@ -67,6 +67,53 @@ def test_demos_are_pinned_stable_and_do_not_reveal_the_answer():
             assert len({dm.label for dm in demos}) >= 2, (rel, key)
 
 
+def test_eval_sourced_demos_never_include_the_row_itself():
+    """The one risk the eval-sourced pool introduces, and the reason it is safe.
+
+    Train-sourced demonstrations come from a disjoint split, so a row cannot
+    demonstrate itself. Drawing from the eval split removes that guarantee: a
+    row shown its own description and its own gold label would be scored on
+    copying it back, and the cell would read near ceiling for no reason worth
+    reporting. The builder excludes it; this checks the data on disk, because
+    the manifest is what the runs actually read.
+    """
+    for rel in RELATIONS:
+        manifest = json.loads(
+            (DATA_DIR / rel / "fewshot_manifest_eval.json").read_text())
+        assert manifest["demo_split"] == "eval", rel
+        for key, idxs in manifest["demos"].items():
+            assert int(key) not in idxs, (rel, key)
+            assert len(set(idxs)) == len(idxs), (rel, key)
+
+        # Same two conditions as the train-sourced pool, and the same reason.
+        demos, _ = load_demos(rel, "eval")
+        ex = {e.key: e for e in load_examples(rel)[0]}
+        assert set(demos) == set(ex), rel
+        for key, dms in demos.items():
+            assert sum(d.label == ex[key].label for d in dms) <= 1, (rel, key)
+            assert len({d.label for d in dms}) >= 2, (rel, key)
+
+        # The two pools must be genuinely different prompts, or running both
+        # costs twelve cells to measure the same thing twice.
+        train, _ = load_demos(rel, "train")
+        differing = sum(1 for k in demos
+                        if [d.text for d in demos[k]] != [d.text for d in train[k]])
+        assert differing == len(demos), (rel, differing, len(demos))
+
+
+def test_strategies_declare_which_demo_pool_they_use():
+    from spatial_eval.strategies import available, get_strategy
+    sources = {n: getattr(get_strategy(n), "demo_source", None) for n in available()}
+    assert sources["few_shot"] == "train"
+    assert sources["few_shot_eval"] == "eval"
+    # Every other strategy must want no demonstrations at all: the runner keys
+    # the manifest load on this attribute, so a stray value would load a pool
+    # into a prompt that never shows it.
+    for name, src in sources.items():
+        if name not in ("few_shot", "few_shot_eval"):
+            assert src is None, (name, src)
+
+
 def test_prompt_seed_deterministic_and_order_independent():
     a = prompt_seed(1, "hello")
     assert a == prompt_seed(1, "hello")

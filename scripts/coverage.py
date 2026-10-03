@@ -16,12 +16,14 @@ RESULTS = REPO / "results"
 ADAPTERS = REPO / "adapters"
 
 RELATIONS = ("topological", "cardinal", "relative")
-STRATEGIES = ("zero_shot", "cot", "few_shot", "tot", "got")
+STRATEGIES = ("zero_shot", "cot", "few_shot", "few_shot_eval", "tot", "got")
 # Four model calls a row against one, so these cost roughly four times as much.
 COSTLY = {"tot", "got"}
 # Not a gap to close: few-shot draws its demonstrations from train.csv, which
 # is the pool the adapter was fine-tuned on. The model has memorised them, so
 # the arm cannot be compared with the base model's.
+# Only the train-sourced variant. few_shot_eval exists precisely so that the
+# tuned arms have a few-shot number that is not drawn from their training set.
 EXCLUDED_WHEN_TUNED = {"few_shot"}
 
 

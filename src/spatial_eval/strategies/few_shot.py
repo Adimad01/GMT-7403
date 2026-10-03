@@ -4,10 +4,16 @@ The demonstrations come from `fewshot_manifest.json`, never sampled at run
 time, so every arm that uses few-shot sees byte-identical demos for a given
 evaluation row.
 
-Note the demos are label-conditioned by construction: all five share the target
-row's gold label, one per ambiguity level. That reveals the answer class, so
-few-shot numbers are a leakage-aware probe to be compared against zero-shot --
-not a clean baseline, and not comparable across labels.
+The demonstrations are deliberately NOT label-conditioned. An earlier version
+gave every demonstration the target row's gold label, which put the answer in
+the prompt and held few-shot at 89-100% with no response to the ambiguity level
+at all. The manifest now pins three demonstrations spanning at least two
+labels, at most one of them carrying the target's label.
+
+What remains to report is the pool. `few_shot` draws from the train split,
+which is also the fine-tuning set, so the number is optimistic for a fine-tuned
+model; `few_shot_eval` draws from the evaluation split, which no adapter has
+seen. The two are separate cells and must not be averaged together.
 """
 from __future__ import annotations
 
@@ -19,6 +25,9 @@ from .base import Context, Strategy, register
 class FewShot(Strategy):
     name = "few_shot"
     description = "Pinned demonstrations, then the question. No reasoning scaffold."
+    # Which pool the pinned demonstrations come from. The subclass overrides it;
+    # the runner reads it to decide which manifest to load.
+    demo_source = "train"
 
     def build_prompt(self, ex: Example, ctx: Context) -> str:
         if ctx.demos is None:

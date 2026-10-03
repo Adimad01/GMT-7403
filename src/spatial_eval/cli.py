@@ -97,12 +97,18 @@ def cmd_verify(args) -> int:
             line = (f"  {rel:<13} eval rows={len(examples):>4}  "
                     f"unique facts={len({e.fact_id for e in examples}):>4}  "
                     f"sha={ev_hash[:12]}")
-            demos, dm_hash = load_demos(rel)
-            missing = [e.row_index for e in examples if e.key not in demos]
-            line += f"  demos={len(demos)} sha={dm_hash[:12]}"
-            if missing:
-                line += f"  ⚠ {len(missing)} rows lack demos"
-                ok = False
+            for src in ("train", "eval"):
+                try:
+                    demos, dm_hash = load_demos(rel, src)
+                except ManifestError as exc:
+                    line += f"\n  {'':<13} demos[{src}] absent: {exc}"
+                    continue
+                missing = [e.row_index for e in examples if e.key not in demos]
+                line += (f"\n  {'':<13} demos[{src}]={len(demos)} "
+                         f"sha={dm_hash[:12]}")
+                if missing:
+                    line += f"  ⚠ {len(missing)} rows lack demos"
+                    ok = False
             print(line + "   OK")
         except ManifestError as exc:
             print(f"  {rel:<13} FAILED\n      {exc}")
@@ -322,11 +328,14 @@ def cmd_prompts(args) -> int:
 
     examples, _ = load_examples(args.relation)
     ex = next((e for e in examples if e.row_index == args.row), examples[0])
-    demos = None
-    try:
-        demos, _ = load_demos(args.relation)
-    except Exception:
-        pass
+    # One pool per demo source, because the strategies below do not agree on
+    # which one they want and a single ctx would show the wrong demonstrations.
+    pools: dict[str, object] = {}
+    for src in ("train", "eval"):
+        try:
+            pools[src], _ = load_demos(args.relation, src)
+        except Exception:
+            pools[src] = None
 
     captured: list[tuple[str, str]] = []
 
@@ -335,8 +344,11 @@ def cmd_prompts(args) -> int:
         # A plausible reply keeps multi-step strategies walking their full path.
         return f"Reasoning placeholder.\nANSWER: {ex.label}"
 
-    ctx = Context(relation=args.relation, labels=LABELS[args.relation],
-                  seed=1, generate=recording_generate, demos=demos)
+    def ctx_for(strat) -> Context:
+        src = getattr(strat, "demo_source", None)
+        return Context(relation=args.relation, labels=LABELS[args.relation],
+                       seed=1, generate=recording_generate,
+                       demos=pools.get(src) if src else None)
 
     print("=" * 78)
     print(f"  PROMPTS — {args.relation}, eval row {ex.row_index}")
@@ -349,7 +361,7 @@ def cmd_prompts(args) -> int:
     for name in (available() if not args.strategy else [args.strategy]):
         captured.clear()
         strat = get_strategy(name)()
-        strat.run(ex, ctx)
+        strat.run(ex, ctx_for(strat))
         print("\n" + "=" * 78)
         print(f"  STRATEGY: {name}   ({len(captured)} model call"
               f"{'s' if len(captured) != 1 else ''})")

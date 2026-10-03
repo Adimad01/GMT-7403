@@ -154,8 +154,11 @@ def run_cell(cfg: RunConfig, backend: Backend | None = None,
     strategy = strategy_cls()
 
     demos = demo_hash = None
-    if cfg.strategy == "few_shot":
-        demos, demo_hash = load_demos(cfg.relation)
+    # Keyed on the strategy's own declared pool rather than its name, so a
+    # third demo source would not need another branch here.
+    demo_source = getattr(strategy, "demo_source", None)
+    if demo_source:
+        demos, demo_hash = load_demos(cfg.relation, demo_source)
 
     # Resume matches rows by index, which is only meaningful while the data
     # behind those indices is unchanged. After the corpus is regenerated the
@@ -171,7 +174,7 @@ def run_cell(cfg: RunConfig, backend: Backend | None = None,
         except Exception:
             old = None
         old_demo = was.get("fewshot_manifest_sha256") if 'was' in dir() else None
-        if (cfg.strategy == "few_shot" and old_demo and demo_hash
+        if (demo_source and old_demo and demo_hash
                 and old_demo != demo_hash):
             raise RuntimeError(
                 f"{cfg.run_id}: results in {out_dir} used few-shot "
