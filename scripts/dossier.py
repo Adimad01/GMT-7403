@@ -15,7 +15,11 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
 RELATIONS = ("topological", "cardinal", "relative")
-STRATEGIES = ("zero_shot", "cot", "few_shot", "tot", "got")
+# few_shot (demonstrations drawn from train.csv) is dropped from the design:
+# the adapters were fitted on that pool, so it cannot compare arms, and
+# few_shot_eval answers the few-shot question for every arm. Its cells stay
+# in git history; the strategy itself is still runnable with `cli run -s few_shot`.
+STRATEGIES = ("zero_shot", "cot", "few_shot_eval", "tot", "got")
 ARMS = (("base", ""), ("+ adaptateur", "_lora"),
         ("+ base de connaissances", "_kg"), ("adaptateur + base", "_lora_kg"))
 

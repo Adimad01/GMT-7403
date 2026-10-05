@@ -16,7 +16,11 @@ RESULTS = REPO / "results"
 ADAPTERS = REPO / "adapters"
 
 RELATIONS = ("topological", "cardinal", "relative")
-STRATEGIES = ("zero_shot", "cot", "few_shot", "few_shot_eval", "tot", "got")
+# few_shot (demonstrations drawn from train.csv) is dropped from the design:
+# the adapters were fitted on that pool, so it cannot compare arms, and
+# few_shot_eval answers the few-shot question for every arm. Its cells stay
+# in git history; the strategy itself is still runnable with `cli run -s few_shot`.
+STRATEGIES = ("zero_shot", "cot", "few_shot_eval", "tot", "got")
 # Four model calls a row against one, so these cost roughly four times as much.
 COSTLY = {"tot", "got"}
 # Not a gap to close: few-shot draws its demonstrations from train.csv, which
@@ -24,7 +28,7 @@ COSTLY = {"tot", "got"}
 # the arm cannot be compared with the base model's.
 # Only the train-sourced variant. few_shot_eval exists precisely so that the
 # tuned arms have a few-shot number that is not drawn from their training set.
-EXCLUDED_WHEN_TUNED = {"few_shot"}
+EXCLUDED_WHEN_TUNED: set[str] = set()
 
 
 def finished(rel: str, strat: str, variant: str = "", seed: int = 1) -> bool:

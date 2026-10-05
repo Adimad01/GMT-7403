@@ -33,7 +33,11 @@ QUIET_OK_MIN = 20
 # The grid the runner walks, in its order: relations outer, strategies inner,
 # sorted as available() sorts them.
 RELATIONS = ("topological", "cardinal", "relative")
-STRATEGIES = ("cot", "few_shot", "few_shot_eval", "got", "tot", "zero_shot")
+# few_shot (demonstrations drawn from train.csv) is dropped from the design:
+# the adapters were fitted on that pool, so it cannot compare arms, and
+# few_shot_eval answers the few-shot question for every arm. Its cells stay
+# in git history; the strategy itself is still runnable with `cli run -s few_shot`.
+STRATEGIES = ("cot", "few_shot_eval", "got", "tot", "zero_shot")
 # The arms the design crosses. A cell of any of them that has never been
 # started is still work the plan expects, which is not the same as work in
 # progress -- and saying TERMINÉ for the second made it sound like the first.
@@ -44,8 +48,7 @@ ARMS = ("", "_lora", "_kg", "_lora_kg", "_lorakg_kg")
 # adapters were fitted on, so the number would be optimistic for every tuned
 # arm. few_shot_eval draws from the eval split instead, which no adapter has
 # seen, and is therefore in scope everywhere -- that is what it exists for.
-OUT_OF_SCOPE = {("_lora", "few_shot"), ("_lora_kg", "few_shot"),
-                ("_lorakg_kg", "few_shot")}
+OUT_OF_SCOPE: set[tuple[str, str]] = set()
 CELLS = len(RELATIONS) * len(STRATEGIES)
 
 # ToT and GoT issue four model calls per row against one for the rest, so a
@@ -60,7 +63,7 @@ COL = max(11, max(len(s) for s in STRATEGIES) + 1)
 # run_supervised.sh walks the passes cheapest first. The relaunch hint below
 # prints them in that same order, so the command it suggests banks the cheap
 # cells before the expensive ones exactly as an unaided run would.
-PASS_ORDER = ("zero_shot", "cot", "few_shot", "few_shot_eval", "tot", "got")
+PASS_ORDER = ("zero_shot", "cot", "few_shot_eval", "tot", "got")
 # A strategy missing here would be dropped from the printed PASSES, and the
 # command would quietly skip the cell it was meant to run.
 assert set(PASS_ORDER) == set(STRATEGIES), set(STRATEGIES) ^ set(PASS_ORDER)
@@ -69,7 +72,7 @@ assert set(PASS_ORDER) == set(STRATEGIES), set(STRATEGIES) ^ set(PASS_ORDER)
 # call-count class, which for a long-prompt strategy lands near the cheapest
 # ones: few_shot_eval was quoted at three minutes for a job of several hours.
 # Where a measured strategy shares the prompt shape, use it instead.
-RATE_PROXY = {"few_shot_eval": "few_shot"}
+RATE_PROXY: dict[str, str] = {}
 
 
 def _start_ticks(pid: int) -> int | None:

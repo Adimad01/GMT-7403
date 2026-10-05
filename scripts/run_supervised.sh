@@ -58,7 +58,9 @@ PAUSE=${PAUSE:-30}
 # at eighty percent is worth nothing until it completes. This order buys a
 # comparison across all three relations in a couple of hours, and leaves the
 # expensive arms for last. Override with PASSES="..." to change it.
-PASSES=${PASSES:-"zero_shot cot few_shot few_shot_eval tot got"}
+# few_shot (demonstrations from train.csv) is out of the design; few_shot_eval
+# covers few-shot for every arm. PASSES="few_shot" still runs it explicitly.
+PASSES=${PASSES:-"zero_shot cot few_shot_eval tot got"}
 
 # Which arms to run, cheapest arm first, for the same reason. This script used
 # to run `cli run --all -s <strategy>` and nothing else, which is the base arm:

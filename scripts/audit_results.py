@@ -30,7 +30,11 @@ RELATIONS = ("topological", "cardinal", "relative")
 # give a Wilson interval from about 48 to 100 percent, so the 100 percent it
 # shows says nothing at all.
 MIN_SUPPORT = 20
-STRATEGIES = ("zero_shot", "cot", "few_shot", "few_shot_eval", "tot", "got")
+# few_shot (demonstrations drawn from train.csv) is dropped from the design:
+# the adapters were fitted on that pool, so it cannot compare arms, and
+# few_shot_eval answers the few-shot question for every arm. Its cells stay
+# in git history; the strategy itself is still runnable with `cli run -s few_shot`.
+STRATEGIES = ("zero_shot", "cot", "few_shot_eval", "tot", "got")
 
 # A strategy that issues several model calls per row should show it. A tree or
 # graph arm reporting one call is not doing what its name claims.
