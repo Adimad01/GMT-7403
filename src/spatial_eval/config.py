@@ -11,7 +11,17 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = REPO_ROOT / "data"
-RESULTS_DIR = REPO_ROOT / "results"
+# Which evaluation set a run reads. "eval" is the frozen evaluation every result in
+# results/ is computed on. Another name (e.g. "probe_crosses") reads
+# data/<relation>/<name>.csv with its own manifest and knowledge store, and writes
+# under results_<name>/, so a probe can never mix with the main grid:
+#     SPATIAL_EVAL_SET=probe_crosses python3 -m spatial_eval.cli run -r topological -s cot
+EVAL_SET = os.environ.get("SPATIAL_EVAL_SET", "eval").strip() or "eval"
+RESULTS_DIR = REPO_ROOT / ("results" if EVAL_SET == "eval" else f"results_{EVAL_SET}")
+# A rerun that must not touch the main grid (e.g. cut answers under a larger token limit)
+# names its own results directory, relative to the repository root.
+if os.environ.get("SPATIAL_RESULTS_DIR"):
+    RESULTS_DIR = REPO_ROOT / os.environ["SPATIAL_RESULTS_DIR"]
 LOGS_DIR = REPO_ROOT / "logs"
 
 # The three spatial relation families. "relation" is the user-facing word;

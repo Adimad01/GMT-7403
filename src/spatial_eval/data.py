@@ -22,7 +22,7 @@ import json
 from dataclasses import dataclass
 from pathlib import Path
 
-from .config import COLUMNS, DATA_DIR, LABELS
+from .config import COLUMNS, DATA_DIR, EVAL_SET, LABELS
 
 
 class ManifestError(RuntimeError):
@@ -65,7 +65,7 @@ def relation_dir(relation: str) -> Path:
 
 
 def load_eval_manifest(relation: str) -> dict:
-    path = relation_dir(relation) / "eval_manifest.json"
+    path = relation_dir(relation) / f"{EVAL_SET}_manifest.json"
     if not path.exists():
         raise ManifestError(f"missing eval manifest: {path}")
     manifest = json.loads(path.read_text(encoding="utf-8"))
@@ -92,8 +92,9 @@ def load_examples(relation: str, limit: int | None = None,
     manifest = load_eval_manifest(relation)
     cols = COLUMNS[relation]
 
-    src = relation_dir(relation) / ("eval.csv" if (relation_dir(relation) / "eval.csv").exists()
-                                    else "corpus.csv")
+    src = relation_dir(relation) / f"{EVAL_SET}.csv"
+    if EVAL_SET == "eval" and not src.exists():
+        src = relation_dir(relation) / "corpus.csv"
     rows = _read_csv(src)
 
     examples: list[Example] = []
@@ -155,6 +156,10 @@ def load_demos(relation: str,
     seen, which is what makes the strategy comparable across the arms. The two
     are separate manifests and separate result cells; never merge their numbers.
     """
+    if EVAL_SET != "eval":
+        raise ManifestError(
+            f"few-shot demonstrations are pinned to the main evaluation set; the "
+            f"'{EVAL_SET}' set has none. Run it with zero_shot, cot, tot or got.")
     if source not in ("train", "eval"):
         raise ValueError(f"unknown demo source {source!r}; use 'train' or 'eval'")
     name = ("fewshot_manifest.json" if source == "train"
@@ -216,6 +221,8 @@ def load_kg(relation: str, split: str = "eval") -> dict[str, dict]:
     truth was computed from, and checked by scripts/check_kg.py to hold no
     statement of the relation under test.
     """
+    if split == "eval" and EVAL_SET != "eval":
+        split = EVAL_SET                     # a probe set carries its own store
     path = relation_dir(relation) / f"kg_{split}.json"
     if not path.exists():
         raise FileNotFoundError(
