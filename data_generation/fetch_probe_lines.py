@@ -26,7 +26,8 @@ from shapely.ops import linemerge
 
 REPO = Path(__file__).resolve().parents[1]
 OUT = REPO / "data" / "topological" / "osm" / "probe_lines.json"
-URL = "https://overpass-api.de/api/interpreter"
+URLS = ["https://overpass-api.de/api/interpreter",
+        "https://overpass.private.coffee/api/interpreter"]
 UA = "spatial-eval/1.0 (academic research, Universite Laval)"
 SIMPLIFY = 0.01
 
@@ -46,16 +47,17 @@ LINES = {
 }
 
 
-def overpass(query: str, tries: int = 4) -> dict:
+def overpass(query: str, tries: int = 6) -> dict:
     data = urllib.parse.urlencode({"data": query}).encode()
     for k in range(tries):
+        url = URLS[k % len(URLS)]
         try:
-            req = urllib.request.Request(URL, data=data, headers={"User-Agent": UA})
+            req = urllib.request.Request(url, data=data, headers={"User-Agent": UA})
             with urllib.request.urlopen(req, timeout=400) as r:
                 return json.loads(r.read())
         except Exception as exc:                       # rate limit or timeout: wait and retry
             wait = 30 * (k + 1)
-            print(f"    {type(exc).__name__}: {exc}; retry in {wait}s")
+            print(f"    {url.split('/')[2]}: {type(exc).__name__}: {exc}; retry in {wait}s", flush=True)
             time.sleep(wait)
     raise RuntimeError("Overpass unreachable")
 
@@ -77,8 +79,12 @@ def main() -> int:
         if name in out:
             print(f"  {name}: already fetched")
             continue
-        print(f"  {name} ...")
-        g, ids = fetch(filt)
+        print(f"  {name} ...", flush=True)
+        try:
+            g, ids = fetch(filt)
+        except RuntimeError:
+            print("    skipped: Overpass did not answer; rerun the script later to retry", flush=True)
+            continue
         if g is None or g.is_empty:
             print("    nothing returned")
             continue
