@@ -26,12 +26,14 @@ from __future__ import annotations
 import csv
 import hashlib
 import json
+import math
 import random
 import sys
 from collections import defaultdict
 from pathlib import Path
 
-from shapely.geometry import shape
+from shapely.geometry import LineString, shape
+from shapely.ops import unary_union
 
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO / "data_generation"))
@@ -59,9 +61,57 @@ def polygons():
             continue
         g = shape(rec["geojson"])
         g = g if g.is_valid else g.buffer(0)
-        if not g.is_empty:
-            out[name] = (g, rec)
+        if g.is_empty:
+            continue
+        # A name that promises a state or province but resolved to a city: in the catalogue,
+        # "State of New York" is New York City (1,220 km2) and "State of Salzburg" the city of
+        # Salzburg (66 km2). Its relations are true of the shape and false of the name.
+        km2 = g.area * 111.32 ** 2 * math.cos(math.radians(g.centroid.y))
+        if name.startswith(("State of ", "Province of ")) and km2 < 5000:
+            continue
+        out[name] = (g, rec)
     return out
+
+
+def gap_bridges(line, min_gap: float = 0.05):
+    """Straight segments across the holes of an incomplete route.
+
+    OSM route relations are often missing sections: Interstate 90 has no New York portion in
+    the relations Overpass returns, the Appalachian Trail none either. Measured on such a line,
+    New York comes out `disjoint` from both, which is false. The pieces of the route are joined
+    by a minimum spanning tree (shortest links between piece ends, Kruskal), which bridges every
+    hole however many small pieces surround it; an area touching a bridge longer than min_gap
+    is not used.
+    """
+    parts = list(getattr(line, "geoms", [line]))
+    ends = [(k, pt) for k, g in enumerate(parts) for pt in (g.coords[0], g.coords[-1])]
+    edges = []
+    for x in range(len(ends)):
+        for y in range(x + 1, len(ends)):
+            (i, a), (j, b) = ends[x], ends[y]
+            if i != j:
+                edges.append((((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2) ** 0.5, i, j, a, b))
+    edges.sort()
+    root = list(range(len(parts)))
+    def find(k):
+        while root[k] != k:
+            root[k] = root[root[k]]
+            k = root[k]
+        return k
+    bridges = []
+    for d, i, j, a, b in edges:
+        ri, rj = find(i), find(j)
+        if ri != rj:
+            root[ri] = rj
+            if d > min_gap:
+                bridges.append(LineString([a, b]))
+    return unary_union(bridges).buffer(0.1) if bridges else None
+
+
+def same_place(P, Q) -> bool:
+    """Two catalogue names for one area ('Germany', 'Federal Republic of Germany')."""
+    inter = P.intersection(Q).area
+    return inter >= 0.97 * max(P.area, Q.area)
 
 
 def related_names(a: str, b: str) -> bool:
@@ -83,12 +133,15 @@ def main() -> int:
     cands = defaultdict(lambda: defaultdict(list))         # label -> line -> [(score, poly, info)]
     for lname, lrec in lines.items():
         L = shape(lrec["geojson"])
+        holes = gap_bridges(L)
         for pname, (P, prec) in polys.items():
             if related_names(lname, pname) or frozenset((lname, pname)) in used:
                 continue
             d = L.distance(P)
             if d > NEAR[1]:
                 continue
+            if holes is not None and P.intersects(holes):
+                continue                                    # a missing section could hide the truth
             label, info = relate(L, P)
             if label is None or convention_dependent(L, P, label):
                 continue
@@ -105,7 +158,13 @@ def main() -> int:
     for label in ("crosses", "within", "disjoint"):
         for lname, items in sorted(cands[label].items()):
             items.sort(key=lambda t: -t[0])                 # clearest crossing, best-known area first
-            for score, pname, info in items[:PER_LINE[label]]:
+            kept = []
+            for score, pname, info in items:
+                if len(kept) == PER_LINE[label]:
+                    break
+                if any(same_place(polys[pname][0], polys[q][0]) for q in kept):
+                    continue                                # same area under another name
+                kept.append(pname)
                 picked.append((label, lname, pname, info))
     print("  candidates kept:", {lab: sum(1 for p in picked if p[0] == lab) for lab in PER_LINE})
 
